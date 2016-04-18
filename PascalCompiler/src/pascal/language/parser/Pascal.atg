@@ -1,0 +1,363 @@
+COMPILER Pascal
+
+IGNORECASE
+
+CHARACTERS
+
+letter = 'A'..'Z' + 'a'..'z'.
+nonZeroDigit = "123456789".
+digit = "0123456789".
+
+cr = '\r'.
+lf = '\n'.
+tab = '\t'.
+
+stringChar = ANY - "\"" - '\\' - cr - lf.
+
+TOKENS
+
+identifier = letter {letter | digit} .
+stringLiteral = "''" | "'" stringChar stringChar { stringChar } "'".
+numericLiteral = "0" | nonZeroDigit { digit }.
+charLiteral = "'" stringChar "'".
+
+PRAGMAS
+
+COMMENTS FROM "{" TO "}"
+COMMENTS FROM "//" TO lf
+IGNORE cr + lf + tab
+
+PRODUCTIONS
+
+Pascal
+=
+[
+	UsesDeclaration
+]
+[
+	VariableDeclaration
+]
+[
+	TypesDeclaration
+]
+[
+	{
+		Function | Procedure
+	}
+]
+MainStatementsBlock
+.
+
+
+
+UsesDeclaration
+=
+"UNFINISHED_USES"
+.
+
+
+
+VariableDeclaration
+=
+	"var"
+	VariableTypeDeclaration ";"
+	{
+		VariableTypeDeclaration ";"
+	}
+.
+
+ 
+ 
+VariableTypeDeclaration
+=
+{
+	SimpleVariableTypeDeclaration
+|
+	ArrayVariableTypeDeclaration
+}
+.
+
+
+
+SimpleVariableTypeDeclaration
+=
+identifier 
+{
+	","
+	identifier
+}
+":"
+identifier
+.
+
+
+
+ArrayVariableTypeDeclaration
+=
+"UNFINISHED_A"
+.
+
+
+
+TypesDeclaration
+=
+"UNFINISHED_TYPES"
+.
+
+
+
+Function
+=
+"function"
+identifier
+"("
+	[
+		DefineArgumentsList
+	]
+")"
+":"
+identifier
+";"
+VariableDeclaration
+StatementsBlock
+.
+
+
+Procedure
+=
+"procedure"
+identifier
+"("
+	[
+		DefineArgumentsList
+	]
+")"
+";"
+VariableDeclaration
+StatementsBlock
+.
+
+DefineArgumentsList
+=
+{
+	identifier
+	":"
+	identifier
+	[
+		{
+			","
+			identifier
+			":"
+			identifier
+		}
+	]
+}
+.
+
+
+
+MainStatementsBlock
+=
+"BEGIN"
+Statement
+{
+	Statement
+}
+"END."
+.
+
+
+StatementsBlock
+=
+(
+	Statement
+|
+	"BEGIN"
+	Statement
+	{
+		Statement
+	}
+	"END"
+)
+.
+
+Statement
+=
+(
+	Expression ";"
+|
+	IfStatement
+|
+	CaseStatement
+|
+	WhileStatement
+|
+	RepeatStatement
+|
+	ForStatement
+)
+.
+
+
+
+CaseStatement
+=
+"case"
+identifier
+"of"
+	"UNFINISHED_CASE"
+"end"
+.
+
+
+
+WhileStatement
+=
+"while"
+Expression
+"do"
+StatementsBlock
+.
+
+
+
+RepeatStatement
+=
+"repeat"
+StatementsBlock
+"until"
+Expression
+.
+
+
+
+ForStatement
+=
+"UNFINISHED_FOR"
+"for" 
+Assignment
+(
+	"to"
+|
+	"downto"
+)
+numericLiteral
+StatementsBlock
+.
+
+
+
+IfStatement
+=
+"if"
+Expression
+"then"
+StatementsBlock
+[
+	"else"
+	StatementsBlock
+]
+.
+
+
+
+Expression
+=
+LogicConjunction
+[
+	"or"
+	LogicConjunction
+]
+.
+
+
+LogicConjunction
+=
+LogicFactor
+[
+	"and"
+	LogicFactor
+]
+.
+
+
+
+LogicFactor
+=
+Arithmetic
+( "<" | "<=" | ">" | ">=" | "=" | "<>" )
+Arithmetic
+.
+
+
+
+Arithmetic
+=
+Term
+{
+	( "+" | "-" )
+	Term
+}
+.
+
+
+Term
+=
+Factor
+{
+	( "*" | "div" | "mod" )
+	Factor
+}
+.
+
+
+
+Factor
+=
+(
+	numericLiteral
+|
+	"("
+	Expression
+	")"
+|
+	identifier
+	"("
+		ArgumentList
+	")"
+|
+	Assignment
+)
+.
+
+
+
+ArgumentList
+=
+[
+	Expression
+	{
+		","
+		Expression
+	}
+]
+.
+
+
+
+Assignment
+=
+identifier
+":="
+(
+	numericLiteral
+|
+	stringLiteral
+|
+	charLiteral
+)
+.
+
+
+
+END Pascal.

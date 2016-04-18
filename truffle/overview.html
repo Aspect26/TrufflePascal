@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+
+Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License version 2 only, as
+published by the Free Software Foundation.  Oracle designates this
+particular file as subject to the "Classpath" exception as provided
+by Oracle in the LICENSE file that accompanied this code.
+
+This code is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+version 2 for more details (a copy is included in the LICENSE file that
+accompanied this code).
+
+You should have received a copy of the GNU General Public License version
+2 along with this work; if not, write to the Free Software Foundation,
+Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+
+Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+or visit www.oracle.com if you need additional information or have any
+questions.
+-->
+
+</head>
+<body>
+
+<p>
+Truffle is a framework for writing and executing interpreters. In case
+you want to execute already written interpreters from your Java application,
+start at {@link com.oracle.truffle.api.vm.PolyglotEngine}. In case you'd like
+to write your own Truffle based language, start at 
+{@link com.oracle.truffle.api.TruffleLanguage}.
+<p>
+To get the best speed out of your Truffle system, make sure you are running
+on top of 
+<a target="_blank" href="http://openjdk.java.net/projects/graal/">Graal</a>
+virtual machine.
+
+<h4>Learning Truffle</h4>
+
+<p>
+Our typical sample language is called the <em>SimpleLanguage</em>.
+A good entry point for exploring <em>SimpleLanguage</em> is the
+<a target="_blank" href="https://github.com/graalvm/Truffle/blob/master/truffle/com.oracle.truffle.sl/src/com/oracle/truffle/sl/SLLanguage.java">SLLanguage</a>
+class.
+</p>
+
+<p>
+    There is an excellent tutorial <em>Add Graal JIT Compilation to Your JVM Language</em>
+    written by Stefan Marr which gives real example of turning an existing language
+    into <em>Truffle</em> based one:
+</p>
+<ul>
+    <li>Step 1: 
+        <a target="golo" href="http://stefan-marr.de/2015/11/add-graal-jit-compilation-to-your-jvm-language-in-5-easy-steps-step-1/">Setting a Goal and Choosing a Benchmark</a>
+    </li>
+    <li>Step 2: 
+        <a target="golo" href="http://stefan-marr.de/2015/11/add-graal-jit-compilation-to-your-jvm-language-in-5-easy-steps-step-2/">Adding Bits Operations</a>
+    </li>
+    <li>Step 3: 
+        <a target="golo" href="http://stefan-marr.de/2015/11/add-graal-jit-compilation-to-your-jvm-language-in-5-easy-steps-step-3/">Interpreting a Simple Fibonacci Function</a>
+    </li>
+    <li>Step 4: 
+        <a target="golo" href="http://stefan-marr.de/2015/12/add-graal-jit-compilation-to-your-jvm-language-in-5-easy-steps-step-4/">Complete Support for Mandelbrot</a>
+    </li>
+    <li>Step 5: 
+        <a target="golo" href="http://stefan-marr.de/2015/12/add-graal-jit-compilation-to-your-jvm-language-in-5-easy-steps-step-5/">Optimizing the Interpreter for Compilation</a>
+    </li>
+</ul>
+<p>
+    The posts cover not only basics, and API usage, but also description
+    of available tools for analyzing the performance and optimizing it.
+</p>
+
+<h4>Other References</h4>
+
+<ul>
+  <li><a target="_blank" href="https://wiki.openjdk.java.net/display/Graal/Publications+and+Presentations">Truffle Tutorials and Presentations</a></li>
+  <li><a target="_blank" href="https://wiki.openjdk.java.net/display/Graal/Truffle+FAQ+and+Guidelines">Truffle FAQ and Guidelines</a></li>
+  <li><a target="_blank" href="http://www.oracle.com/technetwork/oracle-labs/program-languages/overview/index-2301583.html">Graal VM and Truffle/JS</a> on the Oracle Technology Network</li>
+  <li><a target="_blank" href="http://ssw.jku.at/Research/Projects/JVM/Truffle.html">Papers on Truffle</a></li>
+  <li><a target="_blank" href="http://ssw.jku.at/Research/Projects/JVM/Graal.html">Papers on Graal</a></li>
+</ul>
+
+<h4>Keeping Compatibility</h4>
+
+<p>
+The <b>Truffle</b> API values work of its adopters and as such it is developed
+with compatibility in mind. Methods and features are not removed and renamed
+randomly, without a notice and there is a binary compatibility testing framework
+in place to verify that.
+</p>
+<p>
+On the other hand the <b>Truffle</b> project is still young and needs a way
+to refine and change previously taken decisions. To balance the need between
+compatibility and give us a way to remove things from the API we following
+these rules:
+</p>
+<ul>
+    <li>Rather than removing/renaming or changing an API element (class, method,
+        field), mark it <em>deprecated</em>.</li>
+    <li>Make sure usage of such element can be replaced by non-deprecated ways</li>
+    <li>Keep such element working until next release</li>
+    <li>If possible provide automatic migration using Jackpot's META-INF/upgrade/ files</li>
+    <li>When new (major) release is out, remove it</li>
+</ul>
+<p>
+By deprecating parts of API while keeping them functional we are giving
+users of the <b>Truffle</b> API time to adjust to required
+changes and (under the assumption they pay attention to warnings in the code
+base) easily identify and migrate to more modern API alternatives.
+</p>
+</body>
+</html>
