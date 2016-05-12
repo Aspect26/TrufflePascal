@@ -1,3 +1,3 @@
 BEGIN
-
+	writeln('asfd');
 END.

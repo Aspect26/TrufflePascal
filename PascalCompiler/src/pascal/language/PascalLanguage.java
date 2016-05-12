@@ -25,7 +25,7 @@ import com.oracle.truffle.api.vm.PolyglotEngine.Value;
 import pascal.language.exception.PascalException;
 import pascal.language.runtime.PascalContext;
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.01", mimeType = "text/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.01", mimeType = "application/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();
@@ -104,4 +104,12 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 		
 		main.execute();
 	}
+	
+	public Node createFindContextNode1() {
+        return createFindContextNode();
+    }
+
+    public PascalContext findContext1(Node contextNode) {
+        return findContext(contextNode);
+    }
 }

@@ -11,10 +11,11 @@ public class PascalFunction implements TruffleObject{
     /** The current implementation of this function. */
     private RootCallTarget callTarget;
     
-    private MaterializedFrame lexicalScope;
+    public PascalFunction(){
+    }
     
-    public PascalFunction(RootCallTarget callTarget){
-    	this.callTarget = callTarget;
+    protected void setCallTarget(RootCallTarget callTarget) {
+        this.callTarget = callTarget;
     }
     
     public RootCallTarget getRootCallTarget(){
@@ -26,14 +27,4 @@ public class PascalFunction implements TruffleObject{
 		// TODO Foreign access
 		return null;
 	}
-	
-	public void setLexicalScope(MaterializedFrame scope){
-		this.lexicalScope = scope;
-	}
-	
-	public MaterializedFrame getLexicalScope(){
-		return this.lexicalScope;
-	}
-	
-	
 }

@@ -1,5 +1,6 @@
 function test(previous, divideBy)
 {
+    println("sd");
 	i = 0;
 	sum = 0;
 	while(i < 100000){

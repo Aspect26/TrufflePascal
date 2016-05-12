@@ -28,8 +28,13 @@ Coco/R itself) does not fall under the GNU General Public License.
 -->begin
 package pascal.language.parser;
 
-import com.oracle.truffle.api.source.Source;
+import pascal.language.nodes.*;
 import pascal.language.runtime.PascalContext;
+
+import com.oracle.truffle.api.source.Source;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Parser {
 -->constants
@@ -43,11 +48,13 @@ public class Parser {
 	
 	public Scanner scanner;
 	public Errors errors;
+	private final NodeFactory factory;
 
 	-->declarations
 
 	public Parser(PascalContext context, Source source) {
 		this.scanner = new Scanner(source.getInputStream());
+		this.factory = new NodeFactory(context, source);
 		errors = new Errors();
 	}
 

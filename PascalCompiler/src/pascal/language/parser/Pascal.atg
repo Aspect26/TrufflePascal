@@ -17,9 +17,8 @@ stringChar = ANY - "\"" - '\\' - cr - lf.
 TOKENS
 
 identifier = letter {letter | digit} .
-stringLiteral = "''" | "'" stringChar stringChar { stringChar } "'".
+stringLiteral = "'" { stringChar } "'".
 numericLiteral = "0" | nonZeroDigit { digit }.
-charLiteral = "'" stringChar "'".
 
 PRAGMAS
 
@@ -29,335 +28,59 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 
-Pascal
-=
-[
-	UsesDeclaration
-]
-[
-	VariableDeclaration
-]
-[
-	TypesDeclaration
-]
-[
-	{
-		Function | Procedure
-	}
-]
-MainStatementsBlock
+Pascal = MainFunction.
+
+
+MainFunction 
+= 							                    (. factory.startMainFunction(); .)
+MainBlock						                (. factory.finishMainFunction(); .)
 .
 
 
 
-UsesDeclaration
+MainBlock
+= 							                    (. factory.startMainBlock(); .)
+"BEGIN" 						                (. List<StatementNode> body = new ArrayList<>(); .)
+{ 
+	Statement<out StatementNode statement>		(. body.add(statement); .)
+} 
+"END."							                (. factory.finishMainBlock(body); .)
+.
+
+Statement<out StatementNode statement>
 =
-"UNFINISHED_USES"
+Expression<out statement>
 .
 
 
-
-VariableDeclaration
-=
-	"var"
-	VariableTypeDeclaration ";"
-	{
-		VariableTypeDeclaration ";"
-	}
-.
-
- 
- 
-VariableTypeDeclaration
-=
-{
-	SimpleVariableTypeDeclaration
-|
-	ArrayVariableTypeDeclaration
-}
-.
-
-
-
-SimpleVariableTypeDeclaration
-=
-identifier 
-{
-	","
+Expression<out ExpressionNode expression>
+=							                    (. expression = null; .)
+(
 	identifier
-}
-":"
-identifier
-.
-
-
-
-ArrayVariableTypeDeclaration
-=
-"UNFINISHED_A"
-.
-
-
-
-TypesDeclaration
-=
-"UNFINISHED_TYPES"
-.
-
-
-
-Function
-=
-"function"
-identifier
-"("
-	[
-		DefineArgumentsList
-	]
-")"
-":"
-identifier
-";"
-VariableDeclaration
-StatementsBlock
-.
-
-
-Procedure
-=
-"procedure"
-identifier
-"("
-	[
-		DefineArgumentsList
-	]
-")"
-";"
-VariableDeclaration
-StatementsBlock
-.
-
-DefineArgumentsList
-=
-{
-	identifier
-	":"
-	identifier
-	[
-		{
-			","
-			identifier
-			":"
-			identifier
-		}
-	]
-}
-.
-
-
-
-MainStatementsBlock
-=
-"BEGIN"
-Statement
-{
-	Statement
-}
-"END."
-.
-
-
-StatementsBlock
-=
-(
-	Statement
+	MemberExpression<out expression, null, t>
 |
-	"BEGIN"
-	Statement
-	{
-		Statement
-	}
-	"END"
-)
-.
-
-Statement
-=
-(
-	Expression ";"
-|
-	IfStatement
-|
-	CaseStatement
-|
-	WhileStatement
-|
-	RepeatStatement
-|
-	ForStatement
+	stringLiteral					            (. expression = factory.createStringLiteral(t); .)
 )
 .
 
 
 
-CaseStatement
-=
-"case"
-identifier
-"of"
-	"UNFINISHED_CASE"
-"end"
+MemberExpression<out ExpressionNode expression, ExpressionNode r, Token assignmentName>
+=							                    (. expression = null; .)
+                                                (. ExpressionNode receiver = r; .)
+	"("						                    (. if(receiver == null); 
+                                                      receiver = factory.createFunctionNode(assignmentName); .)
+                                                (. List<ExpressionNode> parameters = new ArrayList<>(); .)
+                                                (. ExpressionNode parameter; .)
+		[
+			Expression<out parameter>           (. parameters.add(parameter); .)
+			{
+				","
+				Expression<out parameter>       (. parameters.add(parameter); .)
+			}
+		]
+	")"                                         (. expression = factory.createCall(receiver, parameters); .)
 .
-
-
-
-WhileStatement
-=
-"while"
-Expression
-"do"
-StatementsBlock
-.
-
-
-
-RepeatStatement
-=
-"repeat"
-StatementsBlock
-"until"
-Expression
-.
-
-
-
-ForStatement
-=
-"UNFINISHED_FOR"
-"for" 
-Assignment
-(
-	"to"
-|
-	"downto"
-)
-numericLiteral
-StatementsBlock
-.
-
-
-
-IfStatement
-=
-"if"
-Expression
-"then"
-StatementsBlock
-[
-	"else"
-	StatementsBlock
-]
-.
-
-
-
-Expression
-=
-LogicConjunction
-[
-	"or"
-	LogicConjunction
-]
-.
-
-
-LogicConjunction
-=
-LogicFactor
-[
-	"and"
-	LogicFactor
-]
-.
-
-
-
-LogicFactor
-=
-Arithmetic
-( "<" | "<=" | ">" | ">=" | "=" | "<>" )
-Arithmetic
-.
-
-
-
-Arithmetic
-=
-Term
-{
-	( "+" | "-" )
-	Term
-}
-.
-
-
-Term
-=
-Factor
-{
-	( "*" | "div" | "mod" )
-	Factor
-}
-.
-
-
-
-Factor
-=
-(
-	numericLiteral
-|
-	"("
-	Expression
-	")"
-|
-	identifier
-	"("
-		ArgumentList
-	")"
-|
-	Assignment
-)
-.
-
-
-
-ArgumentList
-=
-[
-	Expression
-	{
-		","
-		Expression
-	}
-]
-.
-
-
-
-Assignment
-=
-identifier
-":="
-(
-	numericLiteral
-|
-	stringLiteral
-|
-	charLiteral
-)
-.
-
 
 
 END Pascal.
