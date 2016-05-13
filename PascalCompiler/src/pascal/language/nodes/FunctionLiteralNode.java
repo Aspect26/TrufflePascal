@@ -24,12 +24,13 @@ public final class FunctionLiteralNode extends ExpressionNode{
     
     @Override
     public PascalFunction executeGeneric(VirtualFrame frame){
-    	PascalContext context = PascalLanguage.INSTANCE.findContext1(contextNode);
+    	/*PascalContext context = PascalLanguage.INSTANCE.findContext1(contextNode);
         if (context != cachedContext) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             this.cachedContext = context;
             this.cachedFunction = context.getFunctionRegistry().lookup(value);
         }
-        return cachedFunction;
+        return cachedFunction;*/return new PascalFunction();
+    	
     }
 }

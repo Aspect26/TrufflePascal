@@ -27,6 +27,7 @@ public class Parser {
 	public Scanner scanner;
 	public Errors errors;
 	private final NodeFactory factory;
+    public StatementNode mainNode;
 
 	
 
@@ -95,11 +96,13 @@ public class Parser {
 
 	void MainFunction() {
 		factory.startMainFunction(); 
-		MainBlock();
+		StatementNode blockNode = MainBlock();
 		factory.finishMainFunction(); 
+		mainNode = blockNode; 
 	}
 
-	void MainBlock() {
+	StatementNode  MainBlock() {
+		StatementNode  blockNode;
 		factory.startMainBlock(); 
 		Expect(4);
 		List<StatementNode> body = new ArrayList<>(); 
@@ -108,7 +111,8 @@ public class Parser {
 			body.add(statement); 
 		}
 		Expect(5);
-		factory.finishMainBlock(body); 
+		blockNode = factory.finishMainBlock(body); 
+		return blockNode;
 	}
 
 	StatementNode  Statement() {

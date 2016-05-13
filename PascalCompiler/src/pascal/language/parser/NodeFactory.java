@@ -14,6 +14,7 @@ import pascal.language.nodes.BlockNode;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.FunctionBodyNode;
 import pascal.language.nodes.FunctionLiteralNode;
+import pascal.language.nodes.InvokeNodeGen;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.StatementNode;
 import pascal.language.nodes.StringLiteralNode;
@@ -67,8 +68,9 @@ public class NodeFactory {
 		lexicalScope = new LexicalScope(lexicalScope);
 	}
 	
-	public void finishMainBlock(List<StatementNode> body){
+	public StatementNode finishMainBlock(List<StatementNode> bodyNodes){
 		lexicalScope = lexicalScope.outer;
+		return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
 	}
 	
 	public ExpressionNode createFunctionNode(Token tokenName){

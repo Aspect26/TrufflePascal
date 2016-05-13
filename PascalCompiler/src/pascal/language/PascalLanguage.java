@@ -9,6 +9,7 @@ import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.interop.ArityException;
@@ -23,9 +24,11 @@ import com.oracle.truffle.api.vm.PolyglotEngine;
 import com.oracle.truffle.api.vm.PolyglotEngine.Value;
 
 import pascal.language.exception.PascalException;
+import pascal.language.nodes.builtin.WritelnBuiltinNodeFactory;
+import pascal.language.parser.Parser;
 import pascal.language.runtime.PascalContext;
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.01", mimeType = "application/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.01", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();
@@ -85,9 +88,8 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 	}
 	
 	public static void main(String[] args) throws IOException {
-		if(args.length != 1){
+		/*if(args.length != 1){
 			System.out.println("The compiler takes exactly 1 parameters, which is path to the source code");
-			//System.out.println("The compiler will now terminate. Press any key to continue...");
 			return;
 		}
 		
@@ -102,7 +104,10 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 			throw new PascalException("No BEGIN defined...");
 		}
 		
-		main.execute();
+		main.execute();*/
+		Parser parser = new Parser(new PascalContext(), Source.fromFileName("test.pas"));
+		parser.Parse();
+		parser.mainNode.executeVoid(Truffle.getRuntime().createVirtualFrame(new Object[0], new FrameDescriptor()));
 	}
 	
 	public Node createFindContextNode1() {

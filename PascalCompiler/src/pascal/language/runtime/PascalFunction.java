@@ -4,6 +4,7 @@ import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.interop.ForeignAccess;
 import com.oracle.truffle.api.interop.TruffleObject;
+import com.oracle.truffle.api.utilities.CyclicAssumption;
 
 
 public class PascalFunction implements TruffleObject{
@@ -18,7 +19,7 @@ public class PascalFunction implements TruffleObject{
         this.callTarget = callTarget;
     }
     
-    public RootCallTarget getRootCallTarget(){
+    public RootCallTarget getCallTarget(){
     	return callTarget;
     }
     

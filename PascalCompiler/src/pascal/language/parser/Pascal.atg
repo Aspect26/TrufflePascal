@@ -33,18 +33,19 @@ Pascal = MainFunction.
 
 MainFunction 
 = 							                    (. factory.startMainFunction(); .)
-MainBlock						                (. factory.finishMainFunction(); .)
+MainBlock<out StatementNode blockNode>          (. factory.finishMainFunction(); .)
+                                                (. mainNode = blockNode; .)
 .
 
 
 
-MainBlock
+MainBlock<out StatementNode blockNode>
 = 							                    (. factory.startMainBlock(); .)
 "BEGIN" 						                (. List<StatementNode> body = new ArrayList<>(); .)
 { 
 	Statement<out StatementNode statement>		(. body.add(statement); .)
 } 
-"END."							                (. factory.finishMainBlock(body); .)
+"END."							                (. blockNode = factory.finishMainBlock(body); .)
 .
 
 Statement<out StatementNode statement>
