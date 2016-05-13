@@ -14,7 +14,7 @@ public class Parser {
 	public static final int _identifier = 1;
 	public static final int _stringLiteral = 2;
 	public static final int _numericLiteral = 3;
-	public static final int maxT = 9;
+	public static final int maxT = 10;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -118,6 +118,7 @@ public class Parser {
 	StatementNode  Statement() {
 		StatementNode  statement;
 		statement = Expression();
+		Expect(6);
 		return statement;
 	}
 
@@ -130,7 +131,7 @@ public class Parser {
 		} else if (la.kind == 2) {
 			Get();
 			expression = factory.createStringLiteral(t); 
-		} else SynErr(10);
+		} else SynErr(11);
 		return expression;
 	}
 
@@ -138,7 +139,7 @@ public class Parser {
 		ExpressionNode  expression;
 		expression = null; 
 		ExpressionNode receiver = r; 
-		Expect(6);
+		Expect(7);
 		if(receiver == null); 
 		                    receiver = factory.createFunctionNode(assignmentName); 
 		List<ExpressionNode> parameters = new ArrayList<>(); 
@@ -146,13 +147,13 @@ public class Parser {
 		if (la.kind == 1 || la.kind == 2) {
 			parameter = Expression();
 			parameters.add(parameter); 
-			while (la.kind == 7) {
+			while (la.kind == 8) {
 				Get();
 				parameter = Expression();
 				parameters.add(parameter); 
 			}
 		}
-		Expect(8);
+		Expect(9);
 		expression = factory.createCall(receiver, parameters); 
 		return expression;
 	}
@@ -169,7 +170,7 @@ public class Parser {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x}
 
 	};
 	
@@ -205,11 +206,12 @@ class Errors {
 			case 3: s = "numericLiteral expected"; break;
 			case 4: s = "\"begin\" expected"; break;
 			case 5: s = "\"end.\" expected"; break;
-			case 6: s = "\"(\" expected"; break;
-			case 7: s = "\",\" expected"; break;
-			case 8: s = "\")\" expected"; break;
-			case 9: s = "??? expected"; break;
-			case 10: s = "invalid Expression"; break;
+			case 6: s = "\";\" expected"; break;
+			case 7: s = "\"(\" expected"; break;
+			case 8: s = "\",\" expected"; break;
+			case 9: s = "\")\" expected"; break;
+			case 10: s = "??? expected"; break;
+			case 11: s = "invalid Expression"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

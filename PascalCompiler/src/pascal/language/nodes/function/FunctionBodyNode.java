@@ -1,9 +1,11 @@
-package pascal.language.nodes;
+package pascal.language.nodes.function;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.source.SourceSection;
 
+import pascal.language.nodes.ExpressionNode;
+import pascal.language.nodes.StatementNode;
 import pascal.language.runtime.Null;
 
 @NodeInfo(shortName = "function body")

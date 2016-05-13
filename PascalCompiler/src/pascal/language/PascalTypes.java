@@ -1,4 +1,4 @@
-package pascal.language.nodes;
+package pascal.language;
 
 import com.oracle.truffle.api.dsl.ImplicitCast;
 import com.oracle.truffle.api.dsl.TypeSystem;

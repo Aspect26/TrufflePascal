@@ -20,11 +20,7 @@ import com.oracle.truffle.api.interop.UnsupportedTypeException;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.Source;
-import com.oracle.truffle.api.vm.PolyglotEngine;
-import com.oracle.truffle.api.vm.PolyglotEngine.Value;
 
-import pascal.language.exception.PascalException;
-import pascal.language.nodes.builtin.WritelnBuiltinNodeFactory;
 import pascal.language.parser.Parser;
 import pascal.language.runtime.PascalContext;
 

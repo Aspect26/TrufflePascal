@@ -1,11 +1,10 @@
-package pascal.language.nodes;
-
-import java.util.List;
+package pascal.language.nodes.function;
 
 import com.oracle.truffle.api.CompilerAsserts;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
-import com.oracle.truffle.api.source.SourceSection;
+
+import pascal.language.nodes.StatementNode;
 
 @NodeInfo(shortName = "block", description = "The node implementation of a block of source code.")
 public class BlockNode extends StatementNode {

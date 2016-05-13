@@ -43,14 +43,16 @@ MainBlock<out StatementNode blockNode>
 = 							                    (. factory.startMainBlock(); .)
 "BEGIN" 						                (. List<StatementNode> body = new ArrayList<>(); .)
 { 
-	Statement<out StatementNode statement>		(. body.add(statement); .)
+	Statement<out StatementNode statement>  	(. body.add(statement); .)
 } 
 "END."							                (. blockNode = factory.finishMainBlock(body); .)
 .
 
 Statement<out StatementNode statement>
 =
-Expression<out statement>
+(
+    Expression<out statement> ";"
+)
 .
 
 
@@ -68,7 +70,7 @@ Expression<out ExpressionNode expression>
 
 MemberExpression<out ExpressionNode expression, ExpressionNode r, Token assignmentName>
 =							                    (. expression = null; .)
-                                                (. ExpressionNode receiver = r; .)
+(                                               (. ExpressionNode receiver = r; .)
 	"("						                    (. if(receiver == null); 
                                                       receiver = factory.createFunctionNode(assignmentName); .)
                                                 (. List<ExpressionNode> parameters = new ArrayList<>(); .)
@@ -81,6 +83,7 @@ MemberExpression<out ExpressionNode expression, ExpressionNode r, Token assignme
 			}
 		]
 	")"                                         (. expression = factory.createCall(receiver, parameters); .)
+)
 .
 
 

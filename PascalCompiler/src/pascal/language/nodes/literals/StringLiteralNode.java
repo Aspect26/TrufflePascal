@@ -1,6 +1,8 @@
-package pascal.language.nodes;
+package pascal.language.nodes.literals;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
+
+import pascal.language.nodes.ExpressionNode;
 
 public class StringLiteralNode extends ExpressionNode {
 	

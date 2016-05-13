@@ -8,16 +8,15 @@ import java.util.Map;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.source.Source;
-import com.oracle.truffle.api.source.SourceSection;
 
-import pascal.language.nodes.BlockNode;
 import pascal.language.nodes.ExpressionNode;
-import pascal.language.nodes.FunctionBodyNode;
-import pascal.language.nodes.FunctionLiteralNode;
-import pascal.language.nodes.InvokeNodeGen;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.StatementNode;
-import pascal.language.nodes.StringLiteralNode;
+import pascal.language.nodes.call.InvokeNodeGen;
+import pascal.language.nodes.function.BlockNode;
+import pascal.language.nodes.function.FunctionBodyNode;
+import pascal.language.nodes.literals.FunctionLiteralNode;
+import pascal.language.nodes.literals.StringLiteralNode;
 import pascal.language.runtime.PascalContext;
 
 public class NodeFactory {

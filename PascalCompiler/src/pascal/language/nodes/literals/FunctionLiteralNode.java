@@ -1,12 +1,12 @@
-package pascal.language.nodes;
+package pascal.language.nodes.literals;
 
-import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import pascal.language.PascalLanguage;
+import pascal.language.nodes.ExpressionNode;
 import pascal.language.runtime.PascalContext;
 import pascal.language.runtime.PascalFunction;
 

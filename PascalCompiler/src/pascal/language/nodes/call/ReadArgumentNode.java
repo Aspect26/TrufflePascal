@@ -1,7 +1,8 @@
-package pascal.language.nodes;
+package pascal.language.nodes.call;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import pascal.language.nodes.ExpressionNode;
 import pascal.language.runtime.Null;
 
 public class ReadArgumentNode extends ExpressionNode {

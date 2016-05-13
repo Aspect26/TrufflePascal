@@ -1,4 +1,4 @@
-package pascal.language.nodes;
+package pascal.language.nodes.call;
 
 import com.oracle.truffle.api.CompilerAsserts;
 import com.oracle.truffle.api.dsl.NodeChild;
@@ -15,12 +15,10 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+import pascal.language.nodes.ExpressionNode;
 import pascal.language.runtime.Null;
 import pascal.language.runtime.PascalContext;
 import pascal.language.runtime.PascalFunction;
-
-import com.oracle.truffle.api.nodes.Node.Child;
-import com.oracle.truffle.api.nodes.Node.Children;
 
 @NodeInfo(shortName = "invoke")
 @NodeChildren({@NodeChild(value = "functionNode", type = ExpressionNode.class)})

@@ -1,4 +1,4 @@
-package pascal.language.nodes;
+package pascal.language.nodes.call;
 
 import com.oracle.truffle.api.dsl.Cached;
 import com.oracle.truffle.api.dsl.Specialization;
