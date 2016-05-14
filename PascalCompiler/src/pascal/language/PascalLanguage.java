@@ -31,8 +31,10 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 	
 	@Override
 	protected PascalContext createContext(com.oracle.truffle.api.TruffleLanguage.Env env) {
-		return new PascalContext(env, new BufferedReader(new InputStreamReader(env.in())),
-				new PrintWriter(env.out(), true));
+		/*return new PascalContext(env, new BufferedReader(new InputStreamReader(env.in())),
+				new PrintWriter(env.out(), true));*/
+		
+		return null;
 	}
 
 	@Override
@@ -103,7 +105,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 		main.execute();*/
 		Parser parser = new Parser(new PascalContext(), Source.fromFileName("test.pas"));
 		parser.Parse();
-		parser.mainNode.executeVoid(Truffle.getRuntime().createVirtualFrame(new Object[0], new FrameDescriptor()));
+		Truffle.getRuntime().createCallTarget(parser.mainNode).call();
 	}
 	
 	public Node createFindContextNode1() {

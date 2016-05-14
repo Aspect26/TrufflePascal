@@ -4,30 +4,33 @@ import java.io.PrintWriter;
 
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-@NodeInfo(shortName = "writeln")
-public abstract class WritelnBuiltinNode extends BuiltinNode{
-	
-	@Specialization
-    public String println(String value) {
-        doPrint(getContext().getOutput(), value);
-        return value;
-    }
-	
-	@TruffleBoundary
-    private static void doPrint(PrintWriter out, String value) {
-        out.println(value);
-    }
-	
-	@Specialization
-    public Object println(Object value) {
-        doPrint(getContext().getOutput(), value);
-        return value;
-    }
+import pascal.language.nodes.ExpressionNode;
+import pascal.language.runtime.PascalContext;
 
-    @TruffleBoundary
-    private static void doPrint(PrintWriter out, Object value) {
-        out.println(value);
-    }
+@NodeInfo(shortName = "writeln")
+public class WritelnBuiltinNode extends BuiltinNode{
+
+	private final PascalContext context;
+	private final ExpressionNode[] params;
+	
+	public WritelnBuiltinNode(PascalContext context, ExpressionNode[] params){
+		this.context = context;
+		this.params = params;
+	}
+	
+	@Override
+	public PascalContext getContext() {
+		return context;
+	}
+
+	@Override
+	public Object executeGeneric(VirtualFrame frame) {
+		for(ExpressionNode param : params){
+			context.getOutput().println(param.executeGeneric(frame));
+		}
+		return null;
+	}
 }

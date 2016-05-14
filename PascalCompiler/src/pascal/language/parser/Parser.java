@@ -27,10 +27,9 @@ public class Parser {
 	public Scanner scanner;
 	public Errors errors;
 	private final NodeFactory factory;
-    public StatementNode mainNode;
+    public PascalRootNode mainNode;
 
 	
-
 	public Parser(PascalContext context, Source source) {
 		this.scanner = new Scanner(source.getInputStream());
 		this.factory = new NodeFactory(context, source);
@@ -97,8 +96,7 @@ public class Parser {
 	void MainFunction() {
 		factory.startMainFunction(); 
 		StatementNode blockNode = MainBlock();
-		factory.finishMainFunction(); 
-		mainNode = blockNode; 
+		mainNode = factory.finishMainFunction(blockNode); 
 	}
 
 	StatementNode  MainBlock() {

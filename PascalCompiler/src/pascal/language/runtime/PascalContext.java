@@ -1,6 +1,7 @@
 package pascal.language.runtime;
 
 import java.io.BufferedReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 
@@ -15,25 +16,24 @@ import com.oracle.truffle.api.source.Source;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.builtin.BuiltinNode;
-import pascal.language.nodes.builtin.WritelnBuiltinNodeFactory;
 import pascal.language.nodes.call.ReadArgumentNode;
 import pascal.language.parser.Parser;
 
 public final class PascalContext extends ExecutionContext {
 	private final BufferedReader input;
-    private final PrintWriter output;
+    private final PrintStream output;
     private final TruffleLanguage.Env env;
     private final PascalFunctionRegistry functionRegistry;
     
     public PascalContext(){
-    	this(null, null, null, false);
+    	this(null, null, System.out, false);
     }
     
-	public PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintWriter output) {
+	public PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintStream output) {
         this(env, input, output, true);
     }
 
-	private PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintWriter output, boolean installBuiltins) {
+	private PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintStream output, boolean installBuiltins) {
         this.input = input;
         this.output = output;
         this.env = env;
@@ -55,7 +55,7 @@ public final class PascalContext extends ExecutionContext {
 	/**
 	 * Returns the default output
 	 */
-	public PrintWriter getOutput() {
+	public PrintStream getOutput() {
         return output;
     }
 	
@@ -71,7 +71,7 @@ public final class PascalContext extends ExecutionContext {
      * {@link PascalBuiltinNode builtin implementation classes}.
      */
     private void installBuiltins(boolean registerRootNodes) {
-        installBuiltin(WritelnBuiltinNodeFactory.getInstance(), registerRootNodes);
+        //installBuiltin(WritelnBuiltinNodeFactory.getInstance(), registerRootNodes);
     }
     
     public void installBuiltin(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {

@@ -12,6 +12,7 @@ import com.oracle.truffle.api.source.Source;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.StatementNode;
+import pascal.language.nodes.builtin.WritelnBuiltinNode;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.function.BlockNode;
 import pascal.language.nodes.function.FunctionBodyNode;
@@ -58,9 +59,8 @@ public class NodeFactory {
 		functionNodes = new ArrayList<>();
 	}
 	
-	public void finishMainFunction(){
-		mainNode = new PascalRootNode(context, frameDescriptor, 
-				new FunctionBodyNode(new BlockNode(functionNodes.toArray(new StatementNode[functionNodes.size()]))));
+	public PascalRootNode finishMainFunction(StatementNode blockNode){
+		return new PascalRootNode(context, frameDescriptor, new FunctionBodyNode(blockNode));
 	}
 	
 	public void startMainBlock(){
@@ -78,7 +78,9 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createCall(ExpressionNode functionNode, List<ExpressionNode> params){
-		return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionNode);
+		return new WritelnBuiltinNode(context, params.toArray(new ExpressionNode[params.size()]));
+		//return WritelnBuiltinNodeFactory.create(params.toArray(new ExpressionNode[params.size()]), context);
+		//return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionNode);
 	}
 	
 	public ExpressionNode createStringLiteral(Token literalToken){

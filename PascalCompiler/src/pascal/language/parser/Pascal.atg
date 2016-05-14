@@ -12,7 +12,7 @@ cr = '\r'.
 lf = '\n'.
 tab = '\t'.
 
-stringChar = ANY - "\"" - '\\' - cr - lf.
+stringChar = ANY - "'" - cr - lf.
 
 TOKENS
 
@@ -33,8 +33,7 @@ Pascal = MainFunction.
 
 MainFunction 
 = 							                    (. factory.startMainFunction(); .)
-MainBlock<out StatementNode blockNode>          (. factory.finishMainFunction(); .)
-                                                (. mainNode = blockNode; .)
+MainBlock<out StatementNode blockNode>          (. mainNode = factory.finishMainFunction(blockNode); .)
 .
 
 

@@ -49,7 +49,7 @@ public class Parser {
 	public Scanner scanner;
 	public Errors errors;
 	private final NodeFactory factory;
-    public StatementNode mainNode;
+    public PascalRootNode mainNode;
 
 	-->declarations
 
