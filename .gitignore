@@ -20,13 +20,7 @@ workingsets.xml
 findbugs.results
 .metadata/
 /eclipseformat.backup.zip
-ASSEMBLY_EXCEPTION
-CHANGELOG.md
-CONTRIBUTING.md
-LICENSE.UPL
-LICENSE
 mxbuild
-mx.truffle
-README.md
-.travis.*
-
+/mx.truffle
+/.travis.*
+/*.sh

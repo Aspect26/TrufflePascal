@@ -1,10 +1,8 @@
-package pascal.language.nodes.function;
+package pascal.language.nodes;
 
 import com.oracle.truffle.api.CompilerAsserts;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
-
-import pascal.language.nodes.StatementNode;
 
 @NodeInfo(shortName = "block", description = "The node implementation of a block of source code.")
 public class BlockNode extends StatementNode {

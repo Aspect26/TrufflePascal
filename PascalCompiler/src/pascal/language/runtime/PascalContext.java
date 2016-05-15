@@ -23,7 +23,7 @@ import pascal.language.parser.Parser;
 public final class PascalContext extends ExecutionContext {
 	private final BufferedReader input;
     private final PrintStream output;
-    private final TruffleLanguage.Env env;
+    //private final TruffleLanguage.Env env;
     private final PascalFunctionRegistry functionRegistry;
     
     public PascalContext(){
@@ -37,13 +37,19 @@ public final class PascalContext extends ExecutionContext {
 	private PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintStream output, boolean installBuiltins) {
         this.input = input;
         this.output = output;
-        this.env = env;
+        //this.env = env;
         this.functionRegistry = new PascalFunctionRegistry();
         installBuiltins(installBuiltins);
     }
 	
-	public void evalSource(Source source){
-		Parser.parsePascal(this, source);
+	public PascalRootNode evalSource(Source source){
+		Parser parser = new Parser(this, source);
+		parser.Parse();
+		
+		if(parser.noErrors())
+			return parser.mainNode;
+		
+		return null;
 	}
 	
 	/**

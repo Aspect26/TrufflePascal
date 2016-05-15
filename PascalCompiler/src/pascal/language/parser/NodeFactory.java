@@ -1,6 +1,5 @@
 package pascal.language.parser;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,13 +8,11 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.source.Source;
 
+import pascal.language.nodes.BlockNode;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.StatementNode;
-import pascal.language.nodes.builtin.BuiltinNode;
-import pascal.language.nodes.builtin.WritelnBuiltinNode;
 import pascal.language.nodes.call.InvokeNodeGen;
-import pascal.language.nodes.function.BlockNode;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
 import pascal.language.nodes.literals.StringLiteralNode;
@@ -36,15 +33,12 @@ public class NodeFactory {
         }
     }
     
-	private List<StatementNode> functionNodes;
-	private PascalRootNode mainNode;
-	
 	 /* State while parsing a source unit. */
     private final PascalContext context;
-    private final Source source;
+    //private final Source source;
     
     /* State while parsing a function. */
-    private int parameterCount;
+    //private int parameterCount;
     private FrameDescriptor frameDescriptor;
     
     /* State while parsing a block. */
@@ -52,12 +46,11 @@ public class NodeFactory {
     
     public NodeFactory(PascalContext context, Source source){
     	this.context = context;
-    	this.source = source;
+    	//this.source = source;
     }
 	
 	public void startMainFunction(){
 		frameDescriptor = new FrameDescriptor();
-		functionNodes = new ArrayList<>();
 	}
 	
 	public PascalRootNode finishMainFunction(StatementNode blockNode){
@@ -74,19 +67,11 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createFunctionNode(Token tokenName){
-		final FrameSlot frameSlot = lexicalScope.locals.get(tokenName.val);
 		return new FunctionLiteralNode(context, tokenName.val);
 	}
 	
 	public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params){
 		return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
-		/*BuiltinNode builtin = context.getFunctionRegistry().lookup(functionName);
-		if(builtin != null)
-			return builtin;
-		
-		// function is not a builtin
-		// TODO: temporary solution, throw SemErr
-		return new WritelnBuiltinNode(context, params.toArray(new ExpressionNode[params.size()]));*/
 	}
 	
 	public ExpressionNode createStringLiteral(Token literalToken){

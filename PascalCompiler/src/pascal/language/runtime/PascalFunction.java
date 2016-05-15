@@ -1,10 +1,8 @@
 package pascal.language.runtime;
 
 import com.oracle.truffle.api.RootCallTarget;
-import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.interop.ForeignAccess;
 import com.oracle.truffle.api.interop.TruffleObject;
-import com.oracle.truffle.api.utilities.CyclicAssumption;
 
 
 public class PascalFunction implements TruffleObject{
