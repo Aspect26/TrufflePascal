@@ -28,6 +28,7 @@ import pascal.language.runtime.PascalContext;
 public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();
+	public static final String builtinKind = "Pascal builtin";
 	
 	@Override
 	protected PascalContext createContext(com.oracle.truffle.api.TruffleLanguage.Env env) {

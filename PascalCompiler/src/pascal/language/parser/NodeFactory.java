@@ -12,6 +12,7 @@ import com.oracle.truffle.api.source.Source;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.StatementNode;
+import pascal.language.nodes.builtin.BuiltinNode;
 import pascal.language.nodes.builtin.WritelnBuiltinNode;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.function.BlockNode;
@@ -74,13 +75,18 @@ public class NodeFactory {
 	
 	public ExpressionNode createFunctionNode(Token tokenName){
 		final FrameSlot frameSlot = lexicalScope.locals.get(tokenName.val);
-		return new FunctionLiteralNode(tokenName.val);
+		return new FunctionLiteralNode(context, tokenName.val);
 	}
 	
-	public ExpressionNode createCall(ExpressionNode functionNode, List<ExpressionNode> params){
-		return new WritelnBuiltinNode(context, params.toArray(new ExpressionNode[params.size()]));
-		//return WritelnBuiltinNodeFactory.create(params.toArray(new ExpressionNode[params.size()]), context);
-		//return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionNode);
+	public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params){
+		return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
+		/*BuiltinNode builtin = context.getFunctionRegistry().lookup(functionName);
+		if(builtin != null)
+			return builtin;
+		
+		// function is not a builtin
+		// TODO: temporary solution, throw SemErr
+		return new WritelnBuiltinNode(context, params.toArray(new ExpressionNode[params.size()]));*/
 	}
 	
 	public ExpressionNode createStringLiteral(Token literalToken){
