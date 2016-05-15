@@ -129,6 +129,10 @@ public class Parser {
         Parser parser = new Parser(context, source);
         parser.Parse();
     }
+    
+    public boolean noErrors(){
+    	return errors.count == 0;
+    }
 } // end Parser
 
 

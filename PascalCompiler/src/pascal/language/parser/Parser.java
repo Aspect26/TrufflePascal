@@ -30,6 +30,7 @@ public class Parser {
     public PascalRootNode mainNode;
 
 	
+
 	public Parser(PascalContext context, Source source) {
 		this.scanner = new Scanner(source.getInputStream());
 		this.factory = new NodeFactory(context, source);
@@ -175,6 +176,10 @@ public class Parser {
 	public static void parsePascal(PascalContext context, Source source) {
         Parser parser = new Parser(context, source);
         parser.Parse();
+    }
+    
+    public boolean noErrors(){
+    	return errors.count == 0;
     }
 } // end Parser
 

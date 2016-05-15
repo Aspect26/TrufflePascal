@@ -106,6 +106,11 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 		main.execute();*/
 		Parser parser = new Parser(new PascalContext(), Source.fromFileName("test.pas"));
 		parser.Parse();
+		if(!parser.noErrors()){
+			System.out.println("Errors while parsing, the code cannot be interpreted...");
+			return;
+		}
+			
 		Truffle.getRuntime().createCallTarget(parser.mainNode).call();
 	}
 	

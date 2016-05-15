@@ -30,7 +30,6 @@ public class Parser {
     public PascalRootNode mainNode;
 
 	
-
 	public Parser(PascalContext context, Source source) {
 		this.scanner = new Scanner(source.getInputStream());
 		this.factory = new NodeFactory(context, source);
