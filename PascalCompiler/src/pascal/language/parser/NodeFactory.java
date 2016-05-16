@@ -14,6 +14,10 @@ import pascal.language.nodes.BlockNode;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.StatementNode;
+import pascal.language.nodes.arithmetic.AddNodeGen;
+import pascal.language.nodes.arithmetic.DivideIntegerNodeGen;
+import pascal.language.nodes.arithmetic.MultiplyNodeGen;
+import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
@@ -139,5 +143,21 @@ public class NodeFactory {
 			return null;
 		
 		return AssignmentNodeGen.create(valueNode, slot);
+	}
+	
+	public ExpressionNode createBinary(Token operator, ExpressionNode leftNode, ExpressionNode rightNode){
+		switch(operator.val){
+		case "+":
+			return AddNodeGen.create(leftNode, rightNode);
+		case "-":
+			return SubstractNodeGen.create(leftNode, rightNode);
+		case "*":
+			return MultiplyNodeGen.create(leftNode, rightNode);
+		case "div":
+			return DivideIntegerNodeGen.create(leftNode, rightNode);
+		default:
+			//TODO: this
+            throw new RuntimeException("unexpected operation: " + operator.val);
+		}
 	}
 }

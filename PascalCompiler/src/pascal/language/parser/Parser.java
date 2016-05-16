@@ -15,7 +15,7 @@ public class Parser {
 	public static final int _stringLiteral = 2;
 	public static final int _numericLiteral = 3;
 	public static final int _variableType = 4;
-	public static final int maxT = 14;
+	public static final int maxT = 18;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -150,30 +150,62 @@ public class Parser {
 
 	ExpressionNode  Expression() {
 		ExpressionNode  expression;
+		expression = Term();
+		while (la.kind == 11 || la.kind == 12) {
+			if (la.kind == 11) {
+				Get();
+			} else {
+				Get();
+			}
+			Token op = t; 
+			ExpressionNode right = Term();
+			expression = factory.createBinary(op, expression, right); 
+		}
+		return expression;
+	}
+
+	ExpressionNode  Term() {
+		ExpressionNode  expression;
+		expression = Factor();
+		while (la.kind == 13 || la.kind == 14) {
+			if (la.kind == 13) {
+				Get();
+			} else {
+				Get();
+			}
+			Token op = t; 
+			ExpressionNode right = Factor();
+			expression = factory.createBinary(op, expression, right); 
+		}
+		return expression;
+	}
+
+	ExpressionNode  Factor() {
+		ExpressionNode  expression;
 		expression = null; 
 		if (la.kind == 1) {
 			Get();
-			if (la.kind == 11 || la.kind == 13) {
+			if (la.kind == 15 || la.kind == 17) {
 				expression = MemberExpression(null, t);
-			} else if (la.kind == 6 || la.kind == 8 || la.kind == 12) {
+			} else if (StartOf(1)) {
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
-			} else SynErr(15);
+			} else SynErr(19);
 		} else if (la.kind == 2) {
 			Get();
 			expression = factory.createStringLiteral(t); 
 		} else if (la.kind == 3) {
 			Get();
 			expression = factory.createNumericLiteral(t); 
-		} else SynErr(16);
+		} else SynErr(20);
 		return expression;
 	}
 
 	ExpressionNode  MemberExpression(ExpressionNode r, Token assignmentName) {
 		ExpressionNode  expression;
 		expression = null; 
-		if (la.kind == 11) {
+		if (la.kind == 15) {
 			ExpressionNode receiver = r; 
 			Get();
 			if(receiver == null); 
@@ -189,9 +221,9 @@ public class Parser {
 					parameters.add(parameter); 
 				}
 			}
-			Expect(12);
+			Expect(16);
 			expression = factory.createCall(receiver, parameters); 
-		} else if (la.kind == 13) {
+		} else if (la.kind == 17) {
 			Get();
 			ExpressionNode value = Expression();
 			if(assignmentName == null) { 
@@ -201,7 +233,7 @@ public class Parser {
 			if(expression == null) 
 			SemErr("Undefined variable!"); 
 			} 
-		} else SynErr(17);
+		} else SynErr(21);
 		return expression;
 	}
 
@@ -217,7 +249,8 @@ public class Parser {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_T, _T,_T,_T,_x, _T,_x,_x,_x}
 
 	};
 	
@@ -262,13 +295,17 @@ class Errors {
 			case 8: s = "\";\" expected"; break;
 			case 9: s = "\"begin\" expected"; break;
 			case 10: s = "\"end.\" expected"; break;
-			case 11: s = "\"(\" expected"; break;
-			case 12: s = "\")\" expected"; break;
-			case 13: s = "\":=\" expected"; break;
-			case 14: s = "??? expected"; break;
-			case 15: s = "invalid Expression"; break;
-			case 16: s = "invalid Expression"; break;
-			case 17: s = "invalid MemberExpression"; break;
+			case 11: s = "\"+\" expected"; break;
+			case 12: s = "\"-\" expected"; break;
+			case 13: s = "\"*\" expected"; break;
+			case 14: s = "\"div\" expected"; break;
+			case 15: s = "\"(\" expected"; break;
+			case 16: s = "\")\" expected"; break;
+			case 17: s = "\":=\" expected"; break;
+			case 18: s = "??? expected"; break;
+			case 19: s = "invalid Factor"; break;
+			case 20: s = "invalid Factor"; break;
+			case 21: s = "invalid MemberExpression"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

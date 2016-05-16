@@ -83,6 +83,27 @@ Statement<out StatementNode statement>
 
 
 Expression<out ExpressionNode expression>
+=
+Term<out expression>
+{
+    ( "+" | "-" )                               (. Token op = t; .)
+    Term<out ExpressionNode right>              (. expression = factory.createBinary(op, expression, right); .)
+}
+.
+
+
+Term<out ExpressionNode expression>
+=
+Factor<out expression>
+{
+    ( "*" | "div" )                             (. Token op = t; .)
+    Factor<out ExpressionNode right>            (. expression = factory.createBinary(op, expression, right); .)
+}
+.
+
+
+
+Factor<out ExpressionNode expression>
 =							                    (. expression = null; .)
 (
 	identifier
