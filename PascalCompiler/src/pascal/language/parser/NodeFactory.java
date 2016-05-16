@@ -1,11 +1,13 @@
 package pascal.language.parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.source.Source;
 
 import pascal.language.nodes.BlockNode;
@@ -15,7 +17,10 @@ import pascal.language.nodes.StatementNode;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
+import pascal.language.nodes.literals.LongLiteralNode;
 import pascal.language.nodes.literals.StringLiteralNode;
+import pascal.language.nodes.variables.AssignmentNodeGen;
+import pascal.language.nodes.variables.ReadVariableNodeGen;
 import pascal.language.runtime.PascalContext;
 
 public class NodeFactory {
@@ -44,13 +49,46 @@ public class NodeFactory {
     /* State while parsing a block. */
     private LexicalScope lexicalScope;
     
+    /* State while parsing variable line */
+    private List<String> newVariableNames;
+    
     public NodeFactory(PascalContext context, Source source){
     	this.context = context;
     	//this.source = source;
+    	frameDescriptor = new FrameDescriptor();
+    	lexicalScope = new LexicalScope(null);
+    }
+    
+    public void startVariableLineDefinition(){
+    	assert newVariableNames == null;
+    	newVariableNames = new ArrayList<>();
+    }
+    
+    public void addNewUnknownVariable(Token tokenName){
+    	newVariableNames.add(tokenName.val);
+    }
+    
+    public void finishVariableLineDefinition(Token variableType){
+    	FrameSlotKind slotKind;
+    	
+    	switch(variableType.val){
+    	case "long":
+    		slotKind  = FrameSlotKind.Long;
+    	default:
+    		slotKind = FrameSlotKind.Illegal;
+    	}
+    	
+    	assert slotKind != FrameSlotKind.Illegal;
+    	
+    	for(String variableName : newVariableNames){
+    		FrameSlot newSlot = frameDescriptor.addFrameSlot(variableName, slotKind);
+    		lexicalScope.locals.put(variableName, newSlot);
+    	}
+    	
+    	newVariableNames = null;
     }
 	
 	public void startMainFunction(){
-		frameDescriptor = new FrameDescriptor();
 	}
 	
 	public PascalRootNode finishMainFunction(StatementNode blockNode){
@@ -70,6 +108,14 @@ public class NodeFactory {
 		return new FunctionLiteralNode(context, tokenName.val);
 	}
 	
+	public ExpressionNode readVariable(Token nameToken){
+		final FrameSlot frameSlot = lexicalScope.locals.get(nameToken.val);
+		if(frameSlot == null)
+			return null;
+		
+		return ReadVariableNodeGen.create(frameSlot);
+	}
+	
 	public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params){
 		return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
 	}
@@ -81,5 +127,17 @@ public class NodeFactory {
 		literal = literal.substring(1, literal.length() - 1);
 		
 		return new StringLiteralNode(literal);
+	}
+	
+	public ExpressionNode createNumericLiteral(Token literalToken){
+		return new LongLiteralNode(Long.parseLong(literalToken.val));
+	}
+	
+	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode){
+		FrameSlot slot = frameDescriptor.findFrameSlot(nameToken.val);
+		if(slot == null)
+			return null;
+		
+		return AssignmentNodeGen.create(valueNode, slot);
 	}
 }

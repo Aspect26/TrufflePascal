@@ -24,3 +24,4 @@ mxbuild
 /mx.truffle
 /.travis.*
 /*.sh
+/.gitignore

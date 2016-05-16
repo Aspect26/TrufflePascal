@@ -19,6 +19,7 @@ TOKENS
 identifier = letter {letter | digit} .
 stringLiteral = "'" { stringChar } "'".
 numericLiteral = "0" | nonZeroDigit { digit }.
+variableType = "long".
 
 PRAGMAS
 
@@ -28,7 +29,33 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 
-Pascal = MainFunction.
+Pascal = 
+[ VariableDefinitions ]
+MainFunction
+.
+
+
+VariableDefinitions
+=
+"var"
+VariableLineDefinition
+{
+    VariableLineDefinition
+}
+.
+
+
+VariableLineDefinition
+=                                               (. factory.startVariableLineDefinition(); .)
+identifier                                      (. factory.addNewUnknownVariable(t); .)
+{
+    ","
+    identifier                                  (. factory.addNewUnknownVariable(t); .)
+}
+":"
+variableType  ";"                               (. factory.finishVariableLineDefinition(t); .) 
+.
+
 
 
 MainFunction 
@@ -59,9 +86,17 @@ Expression<out ExpressionNode expression>
 =							                    (. expression = null; .)
 (
 	identifier
-	MemberExpression<out expression, null, t>
+    (
+	    MemberExpression<out expression, null, t>
+    |
+                                                (. expression = factory.readVariable(t); .)
+                                                (. if(expression == null) .)
+                                                (.      SemErr("Undefined variable!"); .)
+    )
 |
 	stringLiteral					            (. expression = factory.createStringLiteral(t); .)
+|
+    numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
 )
 .
 
@@ -82,6 +117,15 @@ MemberExpression<out ExpressionNode expression, ExpressionNode r, Token assignme
 			}
 		]
 	")"                                         (. expression = factory.createCall(receiver, parameters); .)
+|
+    ":="
+    Expression<out ExpressionNode value>        (. if(assignmentName == null) { .) 
+                                                (.      SemErr("Invalid assignment target!"); .)
+                                                (. } else { .)
+                                                (.      expression = factory.createAssignment(assignmentName, value); .)
+                                                (.      if(expression == null) .)
+                                                (.          SemErr("Undefined variable!"); .)
+                                                (. } .)
 )
 .
 
