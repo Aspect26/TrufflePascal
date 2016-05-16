@@ -15,7 +15,7 @@ public class Parser {
 	public static final int _stringLiteral = 2;
 	public static final int _numericLiteral = 3;
 	public static final int _variableType = 4;
-	public static final int maxT = 18;
+	public static final int maxT = 19;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -132,7 +132,7 @@ public class Parser {
 		factory.startMainBlock(); 
 		Expect(9);
 		List<StatementNode> body = new ArrayList<>(); 
-		while (la.kind == 1 || la.kind == 2 || la.kind == 3) {
+		while (StartOf(1)) {
 			StatementNode statement = Statement();
 			body.add(statement); 
 		}
@@ -166,17 +166,36 @@ public class Parser {
 
 	ExpressionNode  Term() {
 		ExpressionNode  expression;
-		expression = Factor();
-		while (la.kind == 13 || la.kind == 14) {
+		expression = SignedFactor();
+		while (la.kind == 13 || la.kind == 14 || la.kind == 15) {
 			if (la.kind == 13) {
+				Get();
+			} else if (la.kind == 14) {
 				Get();
 			} else {
 				Get();
 			}
 			Token op = t; 
-			ExpressionNode right = Factor();
+			ExpressionNode right = SignedFactor();
 			expression = factory.createBinary(op, expression, right); 
 		}
+		return expression;
+	}
+
+	ExpressionNode  SignedFactor() {
+		ExpressionNode  expression;
+		Token unOp = null; 
+		if (la.kind == 11 || la.kind == 12) {
+			if (la.kind == 11) {
+				Get();
+			} else {
+				Get();
+			}
+			unOp = t; 
+		}
+		expression = Factor();
+		if(unOp != null) 
+		expression = factory.createUnary(unOp, expression); 
 		return expression;
 	}
 
@@ -185,34 +204,36 @@ public class Parser {
 		expression = null; 
 		if (la.kind == 1) {
 			Get();
-			if (la.kind == 15 || la.kind == 17) {
+			if (la.kind == 16 || la.kind == 18) {
 				expression = MemberExpression(null, t);
-			} else if (StartOf(1)) {
+			} else if (StartOf(2)) {
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
-			} else SynErr(19);
+			} else SynErr(20);
 		} else if (la.kind == 2) {
 			Get();
 			expression = factory.createStringLiteral(t); 
 		} else if (la.kind == 3) {
 			Get();
 			expression = factory.createNumericLiteral(t); 
-		} else SynErr(20);
+			if(expression == null) 
+			SemErr("Number too big!"); 
+		} else SynErr(21);
 		return expression;
 	}
 
 	ExpressionNode  MemberExpression(ExpressionNode r, Token assignmentName) {
 		ExpressionNode  expression;
 		expression = null; 
-		if (la.kind == 15) {
+		if (la.kind == 16) {
 			ExpressionNode receiver = r; 
 			Get();
 			if(receiver == null); 
 			                    receiver = factory.createFunctionNode(assignmentName); 
 			List<ExpressionNode> parameters = new ArrayList<>(); 
 			ExpressionNode parameter; 
-			if (la.kind == 1 || la.kind == 2 || la.kind == 3) {
+			if (StartOf(1)) {
 				parameter = Expression();
 				parameters.add(parameter); 
 				while (la.kind == 6) {
@@ -221,9 +242,9 @@ public class Parser {
 					parameters.add(parameter); 
 				}
 			}
-			Expect(16);
+			Expect(17);
 			expression = factory.createCall(receiver, parameters); 
-		} else if (la.kind == 17) {
+		} else if (la.kind == 18) {
 			Get();
 			ExpressionNode value = Expression();
 			if(assignmentName == null) { 
@@ -233,7 +254,7 @@ public class Parser {
 			if(expression == null) 
 			SemErr("Undefined variable!"); 
 			} 
-		} else SynErr(21);
+		} else SynErr(22);
 		return expression;
 	}
 
@@ -249,8 +270,9 @@ public class Parser {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_T, _T,_T,_T,_x, _T,_x,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_T, _T,_T,_T,_T, _x,_T,_x,_x, _x}
 
 	};
 	
@@ -299,13 +321,14 @@ class Errors {
 			case 12: s = "\"-\" expected"; break;
 			case 13: s = "\"*\" expected"; break;
 			case 14: s = "\"div\" expected"; break;
-			case 15: s = "\"(\" expected"; break;
-			case 16: s = "\")\" expected"; break;
-			case 17: s = "\":=\" expected"; break;
-			case 18: s = "??? expected"; break;
-			case 19: s = "invalid Factor"; break;
+			case 15: s = "\"mod\" expected"; break;
+			case 16: s = "\"(\" expected"; break;
+			case 17: s = "\")\" expected"; break;
+			case 18: s = "\":=\" expected"; break;
+			case 19: s = "??? expected"; break;
 			case 20: s = "invalid Factor"; break;
-			case 21: s = "invalid MemberExpression"; break;
+			case 21: s = "invalid Factor"; break;
+			case 22: s = "invalid MemberExpression"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

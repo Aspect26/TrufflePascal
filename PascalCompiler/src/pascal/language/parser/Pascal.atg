@@ -94,11 +94,21 @@ Term<out expression>
 
 Term<out ExpressionNode expression>
 =
-Factor<out expression>
+SignedFactor<out expression>
 {
-    ( "*" | "div" )                             (. Token op = t; .)
-    Factor<out ExpressionNode right>            (. expression = factory.createBinary(op, expression, right); .)
+    ( "*" | "div" | "mod")                      (. Token op = t; .)
+    SignedFactor<out ExpressionNode right>      (. expression = factory.createBinary(op, expression, right); .)
 }
+.
+
+
+SignedFactor<out ExpressionNode expression>
+=                                               (. Token unOp = null; .)
+[
+    ( "+" | "-" )                               (. unOp = t; .)
+]
+Factor<out expression>                          (. if(unOp != null) .)
+                                                (.  expression = factory.createUnary(unOp, expression); .)
 .
 
 
@@ -118,6 +128,8 @@ Factor<out ExpressionNode expression>
 	stringLiteral					            (. expression = factory.createStringLiteral(t); .)
 |
     numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
+                                                (. if(expression == null) .)
+                                                (.      SemErr("Number too big!"); .)
 )
 .
 

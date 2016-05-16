@@ -16,7 +16,9 @@ import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.StatementNode;
 import pascal.language.nodes.arithmetic.AddNodeGen;
 import pascal.language.nodes.arithmetic.DivideIntegerNodeGen;
+import pascal.language.nodes.arithmetic.ModuloNodeGen;
 import pascal.language.nodes.arithmetic.MultiplyNodeGen;
+import pascal.language.nodes.arithmetic.NegationNodeGen;
 import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.function.FunctionBodyNode;
@@ -134,7 +136,11 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createNumericLiteral(Token literalToken){
-		return new LongLiteralNode(Long.parseLong(literalToken.val));
+		try{
+			return new LongLiteralNode(Long.parseLong(literalToken.val));
+		} catch (NumberFormatException ex){
+			return null;
+		}
 	}
 	
 	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode){
@@ -155,9 +161,24 @@ public class NodeFactory {
 			return MultiplyNodeGen.create(leftNode, rightNode);
 		case "div":
 			return DivideIntegerNodeGen.create(leftNode, rightNode);
+		case "mod":
+			return ModuloNodeGen.create(leftNode, rightNode);
 		default:
-			//TODO: this
-            throw new RuntimeException("unexpected operation: " + operator.val);
+			//TODO: this -> SemErr
+            throw new RuntimeException("Unexpected binary operator: " + operator.val);
 		}
+	}
+	
+	public ExpressionNode createUnary(Token operator, ExpressionNode son){
+		switch(operator.val){
+		case "+":
+			return son;   // unary + in Pascal is for identity
+		case "-":
+			return NegationNodeGen.create(son);
+		default:
+			//TODO: this -> SemErr
+            throw new RuntimeException("Unexpected unary operator: " + operator.val);
+		}
+		
 	}
 }
