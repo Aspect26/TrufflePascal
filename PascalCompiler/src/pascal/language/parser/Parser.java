@@ -184,18 +184,19 @@ public class Parser {
 
 	ExpressionNode  SignedFactor() {
 		ExpressionNode  expression;
-		Token unOp = null; 
+		expression = null; 
 		if (la.kind == 11 || la.kind == 12) {
 			if (la.kind == 11) {
 				Get();
 			} else {
 				Get();
 			}
-			unOp = t; 
-		}
-		expression = Factor();
-		if(unOp != null) 
-		expression = factory.createUnary(unOp, expression); 
+			Token unOp = t; 
+			expression = SignedFactor();
+			expression = factory.createUnary(unOp, expression); 
+		} else if (la.kind == 1 || la.kind == 2 || la.kind == 3) {
+			expression = Factor();
+		} else SynErr(20);
 		return expression;
 	}
 
@@ -210,7 +211,7 @@ public class Parser {
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
-			} else SynErr(20);
+			} else SynErr(21);
 		} else if (la.kind == 2) {
 			Get();
 			expression = factory.createStringLiteral(t); 
@@ -219,7 +220,7 @@ public class Parser {
 			expression = factory.createNumericLiteral(t); 
 			if(expression == null) 
 			SemErr("Number too big!"); 
-		} else SynErr(21);
+		} else SynErr(22);
 		return expression;
 	}
 
@@ -254,7 +255,7 @@ public class Parser {
 			if(expression == null) 
 			SemErr("Undefined variable!"); 
 			} 
-		} else SynErr(22);
+		} else SynErr(23);
 		return expression;
 	}
 
@@ -326,9 +327,10 @@ class Errors {
 			case 17: s = "\")\" expected"; break;
 			case 18: s = "\":=\" expected"; break;
 			case 19: s = "??? expected"; break;
-			case 20: s = "invalid Factor"; break;
+			case 20: s = "invalid SignedFactor"; break;
 			case 21: s = "invalid Factor"; break;
-			case 22: s = "invalid MemberExpression"; break;
+			case 22: s = "invalid Factor"; break;
+			case 23: s = "invalid MemberExpression"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
