@@ -55,7 +55,7 @@ public class Parser {
 
 	public Parser(PascalContext context, Source source) {
 		this.scanner = new Scanner(source.getInputStream());
-		this.factory = new NodeFactory(context, source);
+		this.factory = new NodeFactory(this, context, source);
 		errors = new Errors();
 	}
 

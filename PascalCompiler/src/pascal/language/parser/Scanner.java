@@ -252,8 +252,8 @@ class StartStates {
 public class Scanner {
 	static final char EOL = '\n';
 	static final int  eofSym = 0;
-	static final int maxT = 19;
-	static final int noSym = 19;
+	static final int maxT = 18;
+	static final int noSym = 18;
 	char valCh;       // current input character (for token.val)
 
 	public Buffer buffer; // scanner buffer
@@ -293,11 +293,10 @@ public class Scanner {
 		start.set(40, 12); 
 		start.set(41, 13); 
 		start.set(Buffer.EOF, -1);
-		literals.put("long", new Integer(4));
-		literals.put("var", new Integer(5));
-		literals.put("begin", new Integer(9));
-		literals.put("div", new Integer(14));
-		literals.put("mod", new Integer(15));
+		literals.put("var", new Integer(4));
+		literals.put("begin", new Integer(8));
+		literals.put("div", new Integer(13));
+		literals.put("mod", new Integer(14));
 
 	}
 	
@@ -442,27 +441,27 @@ public class Scanner {
 				case 5:
 					{t.kind = 3; break loop;}
 				case 6:
-					{t.kind = 6; break loop;}
+					{t.kind = 5; break loop;}
 				case 7:
-					{t.kind = 8; break loop;}
+					{t.kind = 7; break loop;}
 				case 8:
-					{t.kind = 10; break loop;}
+					{t.kind = 9; break loop;}
 				case 9:
-					{t.kind = 11; break loop;}
+					{t.kind = 10; break loop;}
 				case 10:
-					{t.kind = 12; break loop;}
+					{t.kind = 11; break loop;}
 				case 11:
-					{t.kind = 13; break loop;}
+					{t.kind = 12; break loop;}
 				case 12:
-					{t.kind = 16; break loop;}
+					{t.kind = 15; break loop;}
 				case 13:
-					{t.kind = 17; break loop;}
+					{t.kind = 16; break loop;}
 				case 14:
-					{t.kind = 18; break loop;}
+					{t.kind = 17; break loop;}
 				case 15:
-					recEnd = pos; recKind = 7;
+					recEnd = pos; recKind = 6;
 					if (ch == '=') {AddCh(); state = 14; break;}
-					else {t.kind = 7; break loop;}
+					else {t.kind = 6; break loop;}
 				case 16:
 					recEnd = pos; recKind = 1;
 					if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'm' || ch >= 'o' && ch <= 'z') {AddCh(); state = 1; break;}

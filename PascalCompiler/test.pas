@@ -1,5 +1,5 @@
-VAR
-    a,b:long;
+var
+    a,b:integer;
 
 BEGIN
     a:=10;

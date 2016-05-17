@@ -44,6 +44,9 @@ public class NodeFactory {
         }
     }
     
+    // Reference to parser -> needed for throwing semantic errors
+    private Parser parser;
+    
 	 /* State while parsing a source unit. */
     private final PascalContext context;
     //private final Source source;
@@ -58,8 +61,9 @@ public class NodeFactory {
     /* State while parsing variable line */
     private List<String> newVariableNames;
     
-    public NodeFactory(PascalContext context, Source source){
+    public NodeFactory(Parser parser, PascalContext context, Source source){
     	this.context = context;
+    	this.parser = parser;
     	//this.source = source;
     	frameDescriptor = new FrameDescriptor();
     	lexicalScope = new LexicalScope(null);
@@ -78,13 +82,31 @@ public class NodeFactory {
     	FrameSlotKind slotKind;
     	
     	switch(variableType.val){
-    	case "long":
-    		slotKind  = FrameSlotKind.Long;
+    	case "integer":
+    		slotKind = FrameSlotKind.Long; break;
+    	case "cardinal":
+    		slotKind = FrameSlotKind.Long; break;
+    	case "shortint":
+    		slotKind = FrameSlotKind.Long; break;
+    	case "smallint":
+    		slotKind = FrameSlotKind.Long; break;
+    	case "longint":
+    		slotKind = FrameSlotKind.Long; break;
+    	case "int64":
+    		slotKind = FrameSlotKind.Long; break;
+    	case "byte":
+    		slotKind = FrameSlotKind.Long; break;
+    	case "word":
+    		slotKind = FrameSlotKind.Long; break;
+    	case "longword":
+    		slotKind = FrameSlotKind.Long; break;
     	default:
-    		slotKind = FrameSlotKind.Illegal;
+    		slotKind = FrameSlotKind.Illegal; break;
     	}
     	
-    	assert slotKind != FrameSlotKind.Illegal;
+    	if(slotKind == FrameSlotKind.Illegal){
+    		parser.SemErr("Unkown variable type: " + variableType.val);
+    	}
     	
     	for(String variableName : newVariableNames){
     		FrameSlot newSlot = frameDescriptor.addFrameSlot(variableName, slotKind);
@@ -164,8 +186,8 @@ public class NodeFactory {
 		case "mod":
 			return ModuloNodeGen.create(leftNode, rightNode);
 		default:
-			//TODO: this -> SemErr
-            throw new RuntimeException("Unexpected binary operator: " + operator.val);
+			parser.SemErr("Unexpected binary operator: " + operator.val);
+			return null;
 		}
 	}
 	
@@ -176,9 +198,8 @@ public class NodeFactory {
 		case "-":
 			return NegationNodeGen.create(son);
 		default:
-			//TODO: this -> SemErr
-            throw new RuntimeException("Unexpected unary operator: " + operator.val);
+			parser.SemErr("Unexpected unary operator: " + operator.val);
+			return null;
 		}
-		
 	}
 }

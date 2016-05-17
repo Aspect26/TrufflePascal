@@ -63,7 +63,12 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 	}
 	
 	public static void main(String[] args) throws IOException {
-		Parser parser = new Parser(new PascalContext(), Source.fromFileName("test.pas"));
+		if(args.length != 1){
+			System.out.println("The compiler expects exactly one argument - path to the source code.");
+			return;
+		}
+		
+		Parser parser = new Parser(new PascalContext(), Source.fromFileName(args[0]));
 		parser.Parse();
 		if(!parser.noErrors()){
 			System.out.println("Errors while parsing, the code cannot be interpreted...");

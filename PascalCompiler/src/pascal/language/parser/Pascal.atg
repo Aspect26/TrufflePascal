@@ -16,10 +16,9 @@ stringChar = ANY - "'" - cr - lf.
 
 TOKENS
 
-identifier = letter {letter | digit} .
+identifier = letter {letter | digit}.
 stringLiteral = "'" { stringChar } "'".
 numericLiteral = "0" | nonZeroDigit { digit }.
-variableType = "long".
 
 PRAGMAS
 
@@ -53,7 +52,8 @@ identifier                                      (. factory.addNewUnknownVariable
     identifier                                  (. factory.addNewUnknownVariable(t); .)
 }
 ":"
-variableType  ";"                               (. factory.finishVariableLineDefinition(t); .) 
+identifier                                      (. factory.finishVariableLineDefinition(t); .) 
+    ";" 
 .
 
 
@@ -103,12 +103,13 @@ SignedFactor<out expression>
 
 
 SignedFactor<out ExpressionNode expression>
-=                                               (. Token unOp = null; .)
-[
-    ( "+" | "-" )                               (. unOp = t; .)
-]
-Factor<out expression>                          (. if(unOp != null) .)
-                                                (.  expression = factory.createUnary(unOp, expression); .)
+=                                               (. expression = null; .)
+(
+    ( "+" | "-" )                               (. Token unOp = t; .)
+    SignedFactor<out expression>                (.  expression = factory.createUnary(unOp, expression); .)
+|
+    Factor<out expression>                                        
+)
 .
 
 
