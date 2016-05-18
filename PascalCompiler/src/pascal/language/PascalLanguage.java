@@ -16,6 +16,13 @@ import com.oracle.truffle.api.source.Source;
 import pascal.language.parser.Parser;
 import pascal.language.runtime.PascalContext;
 
+/**
+ * TODO LIST
+ *
+ * Custom Custom literal nodes for all numeric types and range checking for all operations?
+ * WriTeLn vs. writeln -> toLower()? 
+ */
+
 @TruffleLanguage.Registration(name = "Pascal", version = "0.1", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 

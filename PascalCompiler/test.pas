@@ -9,6 +9,9 @@ BEGIN
     writeln(5,5);
     writeln('---------------------');
     writeln( (a+b) mod 3); 
-
     write('A', 'B', 'C');
+
+    // TODO:
+    wRIteln(a);
+    //writeln(A);
 END.
