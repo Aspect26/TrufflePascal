@@ -126,6 +126,10 @@ Factor<out ExpressionNode expression>
                                                 (.      SemErr("Undefined variable!"); .)
     )
 |
+    "("
+    Expression<out expression>                  
+    ")"
+|
 	stringLiteral					            (. expression = factory.createStringLiteral(t); .)
 |
     numericLiteral                              (. expression = factory.createNumericLiteral(t); .)

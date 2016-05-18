@@ -193,7 +193,7 @@ public class Parser {
 			Token unOp = t; 
 			expression = SignedFactor();
 			expression = factory.createUnary(unOp, expression); 
-		} else if (la.kind == 1 || la.kind == 2 || la.kind == 3) {
+		} else if (StartOf(2)) {
 			expression = Factor();
 		} else SynErr(19);
 		return expression;
@@ -206,11 +206,15 @@ public class Parser {
 			Get();
 			if (la.kind == 15 || la.kind == 17) {
 				expression = MemberExpression(null, t);
-			} else if (StartOf(2)) {
+			} else if (StartOf(3)) {
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
 			} else SynErr(20);
+		} else if (la.kind == 15) {
+			Get();
+			expression = Expression();
+			Expect(16);
 		} else if (la.kind == 2) {
 			Get();
 			expression = factory.createStringLiteral(t); 
@@ -271,7 +275,8 @@ public class Parser {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x},
 		{_x,_x,_x,_x, _x,_T,_x,_T, _x,_x,_T,_T, _T,_T,_T,_x, _T,_x,_x,_x}
 
 	};

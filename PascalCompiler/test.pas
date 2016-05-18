@@ -7,7 +7,8 @@ BEGIN
     writeln(5------------------------------5);
     writeln(5);
     writeln(5,5);
+    writeln('---------------------');
+    writeln( (a+b) mod 3); 
 
-    //TODO: multiple arguments for writeln
     write('A', 'B', 'C');
 END.
