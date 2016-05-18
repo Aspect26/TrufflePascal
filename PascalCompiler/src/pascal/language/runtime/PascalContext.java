@@ -17,6 +17,7 @@ import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.builtin.BuiltinNode;
 import pascal.language.nodes.builtin.WriteBuiltinNodeFactory;
 import pascal.language.nodes.builtin.WritelnBuiltinNodeFactory;
+import pascal.language.nodes.call.ReadAllArgumentsNode;
 import pascal.language.nodes.call.ReadArgumentNode;
 import pascal.language.parser.Parser;
 
@@ -78,8 +79,9 @@ public final class PascalContext extends ExecutionContext {
      * {@link PascalBuiltinNode builtin implementation classes}.
      */
     private void installBuiltins(boolean registerRootNodes) {
-    	installBuiltin(WritelnBuiltinNodeFactory.getInstance(), registerRootNodes);
-    	installBuiltin(WriteBuiltinNodeFactory.getInstance(), registerRootNodes);
+    	
+    	installBuiltinInfiniteArgumens(WritelnBuiltinNodeFactory.getInstance(), registerRootNodes);
+    	installBuiltinInfiniteArgumens(WriteBuiltinNodeFactory.getInstance(), registerRootNodes);
     }
     
     public void installBuiltin(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {
@@ -99,6 +101,18 @@ public final class PascalContext extends ExecutionContext {
         String name = lookupNodeInfo(builtinBodyNode.getClass()).shortName();
         if (registerRootNodes) {
             /* Register the builtin function in our function registry. */
+            getFunctionRegistry().register(name, rootNode);
+        }
+    }
+    
+    public void installBuiltinInfiniteArgumens(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {
+    	ExpressionNode argumentsNode[] = new ExpressionNode[1];
+    	argumentsNode[0] = new ReadAllArgumentsNode();
+    	BuiltinNode bodyNode = factory.createNode(argumentsNode, this);
+    	PascalRootNode rootNode = new PascalRootNode(this, new FrameDescriptor(), bodyNode);
+    	
+    	String name = lookupNodeInfo(bodyNode.getClass()).shortName();
+        if (registerRootNodes) {
             getFunctionRegistry().register(name, rootNode);
         }
     }

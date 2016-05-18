@@ -18,7 +18,7 @@ public abstract class DispatchNode extends Node {
 	@Specialization(guards = "function.getCallTarget() == null")
 	protected Object doundefinedFunction(PascalFunction function, Object[] arguments){
 		//TODO: throw undefined function exception
-		throw new RuntimeException();
+		throw new RuntimeException("Undefined function! (TODO)");
 	}
 	
 	@Specialization(limit = "INLINE_CACHE_SIZE", guards = "function == cachedFunction")
