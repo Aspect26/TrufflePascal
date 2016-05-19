@@ -51,6 +51,7 @@ public class Parser {
 		for (;;) {
 			t = la;
 			la = scanner.Scan();
+			la.val = la.val.toLowerCase();
 			if (la.kind <= maxT) {
 				++errDist;
 				break;

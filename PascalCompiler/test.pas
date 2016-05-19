@@ -3,15 +3,11 @@ var
 
 BEGIN
     a:=10;
-    b:=6;
+    B:=6;
     writeln(5------------------------------5);
-    writeln(5);
+    WriTeLn(5);
     writeln(5,5);
-    writeln('---------------------');
-    writeln( (a+b) mod 3); 
-    write('A', 'B', 'C');
-
-    // TODO:
-    wRIteln(a);
-    //writeln(A);
+    WRITELN('---------------------');
+    writeln( (a+b) MoD 3); 
+    WRItE('A', 'B', 'C');
 END.

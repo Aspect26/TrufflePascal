@@ -152,7 +152,7 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createStringLiteral(Token literalToken){
-		/* Remove the trailing and ending " */
+		/* Remove the trailing and ending ' */
 		String literal = literalToken.val;
 		assert literal.length() >= 2 && literal.startsWith("'") && literal.endsWith("'");
 		literal = literal.substring(1, literal.length() - 1);
