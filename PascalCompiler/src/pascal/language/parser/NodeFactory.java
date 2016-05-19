@@ -133,14 +133,14 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createFunctionNode(Token tokenName){
-		if(context.getFunctionRegistry().lookup(tokenName.val) == null)
+		if(context.getFunctionRegistry().lookup(tokenName.val.toLowerCase()) == null)
 			parser.SemErr("The function '" + tokenName.val + "' is undefined in the current context.");
 			
-		return new FunctionLiteralNode(context, tokenName.val);
+		return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
 	}
 	
 	public ExpressionNode readVariable(Token nameToken){
-		final FrameSlot frameSlot = lexicalScope.locals.get(nameToken.val);
+		final FrameSlot frameSlot = lexicalScope.locals.get(nameToken.val.toLowerCase());
 		if(frameSlot == null)
 			return null;
 		
@@ -152,7 +152,6 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createStringLiteral(Token literalToken){
-		/* Remove the trailing and ending ' */
 		String literal = literalToken.val;
 		assert literal.length() >= 2 && literal.startsWith("'") && literal.endsWith("'");
 		literal = literal.substring(1, literal.length() - 1);
@@ -169,7 +168,7 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode){
-		FrameSlot slot = frameDescriptor.findFrameSlot(nameToken.val);
+		FrameSlot slot = frameDescriptor.findFrameSlot(nameToken.val.toLowerCase());
 		if(slot == null)
 			return null;
 		
@@ -177,7 +176,7 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createBinary(Token operator, ExpressionNode leftNode, ExpressionNode rightNode){
-		switch(operator.val){
+		switch(operator.val.toLowerCase()){
 		case "+":
 			return AddNodeGen.create(leftNode, rightNode);
 		case "-":

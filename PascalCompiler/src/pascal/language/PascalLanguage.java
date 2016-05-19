@@ -20,7 +20,7 @@ import pascal.language.runtime.PascalContext;
  * TODO LIST
  *
  * Custom Custom literal nodes for all numeric types and range checking for all operations?
- * WriTeLn vs. writeln -> toLower()? 
+ * ReadArgumentNode -> Object[] -> no specialization
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.1", mimeType = "text/x-pascal")
