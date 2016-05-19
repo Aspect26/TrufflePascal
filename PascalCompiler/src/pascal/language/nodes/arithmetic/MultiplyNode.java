@@ -11,7 +11,12 @@ import pascal.language.nodes.BinaryNode;
 public abstract class MultiplyNode extends BinaryNode{
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-    protected long add(long left, long right) {
+    protected long mul(long left, long right) {
+        return ExactMath.multiplyExact(left, right);
+    }
+	
+	@Specialization(rewriteOn = ArithmeticException.class)
+    protected int mul(int left, int right) {
         return ExactMath.multiplyExact(left, right);
     }
 }

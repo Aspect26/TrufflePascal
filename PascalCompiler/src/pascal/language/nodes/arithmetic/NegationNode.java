@@ -10,7 +10,12 @@ import pascal.language.nodes.UnaryNode;
 public abstract class NegationNode extends UnaryNode{
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-    protected long add(long val) {
+    protected long neg(long val) {
+		return -val;
+    }
+	
+	@Specialization(rewriteOn = ArithmeticException.class)
+    protected int neg(int val) {
 		return -val;
     }
 }

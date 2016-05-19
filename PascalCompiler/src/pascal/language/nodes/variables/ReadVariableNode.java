@@ -14,8 +14,18 @@ public abstract class ReadVariableNode extends ExpressionNode {
 	protected abstract FrameSlot getSlot();
 	
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
+    protected int readInt(VirtualFrame frame) throws FrameSlotTypeException {
+        return frame.getInt(getSlot());
+    }
+	
+	@Specialization(rewriteOn = FrameSlotTypeException.class)
     protected long readLong(VirtualFrame frame) throws FrameSlotTypeException {
         return frame.getLong(getSlot());
+    }
+	
+	@Specialization(rewriteOn = FrameSlotTypeException.class)
+    protected short readByte(VirtualFrame frame) throws FrameSlotTypeException {
+        return frame.getByte(getSlot());
     }
 	
 	@Specialization(rewriteOn = FrameSlotTypeException.class)

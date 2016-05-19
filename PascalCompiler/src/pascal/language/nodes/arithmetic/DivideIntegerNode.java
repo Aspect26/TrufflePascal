@@ -10,10 +10,22 @@ import pascal.language.nodes.BinaryNode;
 public abstract class DivideIntegerNode extends BinaryNode{
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-    protected long add(long left, long right) {
+    protected long div(long left, long right) {
 		long result = left / right;
         /*
          * The division overflows if left is Long.MIN_VALUE and right is -1.
+         */
+        if ((left & right & result) < 0) {
+            throw new ArithmeticException("Long overflow.");
+        }
+        return result;
+    }
+	
+	@Specialization(rewriteOn = ArithmeticException.class)
+    protected int div(int left, int right) {
+		int result = left / right;
+        /*
+         * The division overflows if left is Int.MIN_VALUE and right is -1.
          */
         if ((left & right & result) < 0) {
             throw new ArithmeticException("Long overflow.");

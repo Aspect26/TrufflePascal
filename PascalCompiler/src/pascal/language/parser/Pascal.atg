@@ -134,7 +134,7 @@ Factor<out ExpressionNode expression>
 |
     numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
                                                 (. if(expression == null) .)
-                                                (.      SemErr("Number too big!"); .)
+                                                (.      SemErr("Constant out of range!"); .)
 )
 .
 

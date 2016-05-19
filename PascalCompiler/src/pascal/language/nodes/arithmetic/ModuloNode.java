@@ -10,8 +10,12 @@ import pascal.language.nodes.BinaryNode;
 public abstract class ModuloNode extends BinaryNode{
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-    protected long add(long left, long right) {
-		long result = left % right;
-		return result;
+    protected long mod(long left, long right) {
+		return left % right;
+    }
+	
+	@Specialization(rewriteOn = ArithmeticException.class)
+    protected int mod(int left, int right) {
+		return left % right;
     }
 }

@@ -11,7 +11,12 @@ import pascal.language.nodes.BinaryNode;
 public abstract class SubstractNode extends BinaryNode{
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-    protected long add(long left, long right) {
+    protected long sub(long left, long right) {
+        return ExactMath.subtractExact(left, right);
+    }
+	
+	@Specialization(rewriteOn = ArithmeticException.class)
+    protected int sub(int left, int right) {
         return ExactMath.subtractExact(left, right);
     }
 }

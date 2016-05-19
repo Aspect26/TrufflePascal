@@ -23,6 +23,7 @@ import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
+import pascal.language.nodes.literals.IntLiteralNode;
 import pascal.language.nodes.literals.LongLiteralNode;
 import pascal.language.nodes.literals.StringLiteralNode;
 import pascal.language.nodes.variables.AssignmentNodeGen;
@@ -83,7 +84,7 @@ public class NodeFactory {
     	
     	switch(variableType.val){
     	case "integer":
-    		slotKind = FrameSlotKind.Long; break;
+    		slotKind = FrameSlotKind.Int; break;
     	case "cardinal":
     		slotKind = FrameSlotKind.Long; break;
     	case "shortint":
@@ -161,9 +162,13 @@ public class NodeFactory {
 	
 	public ExpressionNode createNumericLiteral(Token literalToken){
 		try{
-			return new LongLiteralNode(Long.parseLong(literalToken.val));
+			return new IntLiteralNode(Integer.parseInt(literalToken.val));
 		} catch (NumberFormatException ex){
-			return null;
+			try{
+				return new LongLiteralNode(Long.parseLong(literalToken.val));
+			} catch (NumberFormatException e){
+				return null;
+			}
 		}
 	}
 	
@@ -196,7 +201,7 @@ public class NodeFactory {
 	public ExpressionNode createUnary(Token operator, ExpressionNode son){
 		switch(operator.val){
 		case "+":
-			return son;   // unary + in Pascal is for identity
+			return son;   // unary + in Pascal marks identity
 		case "-":
 			return NegationNodeGen.create(son);
 		default:

@@ -1,11 +1,12 @@
 var
-    a,b:integer;
+    a,b,d:integer;
     c:longint;
 
 BEGIN
     a:=10;
     B:=6;
-    c:=8;
+    c:=8000000000000000000;
+    d:=a+b;
     writeln(c);
     writeln(5------------------------------5);
     WriTeLn(5);

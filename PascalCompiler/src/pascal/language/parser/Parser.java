@@ -222,7 +222,7 @@ public class Parser {
 			Get();
 			expression = factory.createNumericLiteral(t); 
 			if(expression == null) 
-			SemErr("Number too big!"); 
+			SemErr("Constant out of range!"); 
 		} else SynErr(21);
 		return expression;
 	}
