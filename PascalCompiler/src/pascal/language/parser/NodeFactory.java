@@ -84,7 +84,7 @@ public class NodeFactory {
     	
     	switch(variableType.val){
     	case "integer":
-    		slotKind = FrameSlotKind.Int; break;
+    		slotKind = FrameSlotKind.Long; break;
     	case "cardinal":
     		slotKind = FrameSlotKind.Long; break;
     	case "shortint":

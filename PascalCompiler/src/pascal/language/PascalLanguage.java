@@ -21,6 +21,10 @@ import pascal.language.runtime.PascalContext;
  *
  * Custom Custom literal nodes for all numeric types and range checking for all operations?
  * ReadArgumentNode -> Object[] -> no specialization
+ * Remove truffle from git
+ * ' in string
+ * ant build script
+ * runnable shell script
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.1", mimeType = "text/x-pascal")

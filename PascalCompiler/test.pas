@@ -14,4 +14,5 @@ BEGIN
     WRITELN('---------------------');
     writeln( (a+b) MoD 3); 
     WRItE('A', 'B', 'C');
+    //write('''');
 END.
