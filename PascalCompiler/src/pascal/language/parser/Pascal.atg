@@ -60,41 +60,41 @@ identifier                                      (. factory.finishVariableLineDef
 
 MainFunction 
 = 							                    (. factory.startMainFunction(); .)
-MainBlock<out StatementNode blockNode>          (. mainNode = factory.finishMainFunction(blockNode); .)
-.
-
-
-
-MainBlock<out StatementNode blockNode>
-= 							                    (. factory.startMainBlock(); .)
-"BEGIN" 						                (. List<StatementNode> body = new ArrayList<>(); .)
-{ 
-	Statement<out StatementNode statement>  	(. body.add(statement); .)
-} 
-"END."							                (. blockNode = factory.finishMainBlock(body); .)
+Block<out StatementNode blockNode>              (. mainNode = factory.finishMainFunction(blockNode); .)
+"."
 .
 
 
 Block<out StatementNode blockNode>
-                                                (. blockNode = null; .)
 =                                               
-    Statement<out blockNode>
-|
-    "begin"                                     (. List<StatementNode> body = new ArrayList<>(); .)
-    {
-        Statement<out StatementNode statement>  (. body.add(statement); .)
-    }   
+    "begin"                                     (. List<StatementNode> body = new ArrayList<>(); .)  
+    [ 
+        StatementSequence<body>
+    ]
     "end"                                       (. blockNode = factory.finishBlock(body); .)
 .
 
+
+StatementSequence<List body>
+=
+Statement<out StatementNode statement>          (. body.add(statement); .)
+{
+    ";"
+    Statement<out statement>                    (. body.add(statement); .)
+}                                       
+.
 
 
 Statement<out StatementNode statement>
 =                                               (. statement = null; .)
 (
-    Expression<out statement> ";"
+                                                (. statement = factory.createEmptyStatement(); .)
+|
+    Expression<out statement> 
 |
     IfStatement<out statement>
+|
+    Block<out statement>
 )
 .
 
@@ -105,11 +105,11 @@ IfStatement<out StatementNode statement>
     Expression<out ExpressionNode condition>
 
 "then"                                          
-    Block<out StatementNode thenStatement>
+    Statement<out StatementNode thenStatement>
                                                 (. StatementNode elseStatement = null; .)
 [
 "else"                                          
-    Block<out elseStatement>
+    Statement<out elseStatement>
 ]                                               (. statement = factory.createIfStatement(condition, thenStatement, elseStatement); .)
 .
 

@@ -107,8 +107,9 @@ public class Parser {
 
 	void MainFunction() {
 		factory.startMainFunction(); 
-		StatementNode blockNode = MainBlock();
+		StatementNode blockNode = Block();
 		mainNode = factory.finishMainFunction(blockNode); 
+		Expect(8);
 	}
 
 	void VariableLineDefinition() {
@@ -126,48 +127,41 @@ public class Parser {
 		Expect(7);
 	}
 
-	StatementNode  MainBlock() {
+	StatementNode  Block() {
 		StatementNode  blockNode;
-		factory.startMainBlock(); 
-		Expect(8);
+		Expect(9);
 		List<StatementNode> body = new ArrayList<>(); 
-		while (StartOf(1)) {
-			StatementNode statement = Statement();
+		if (StartOf(1)) {
+			StatementSequence(body);
+		}
+		Expect(10);
+		blockNode = factory.finishBlock(body); 
+		return blockNode;
+	}
+
+	void StatementSequence(List body) {
+		StatementNode statement = Statement();
+		body.add(statement); 
+		while (la.kind == 7) {
+			Get();
+			statement = Statement();
 			body.add(statement); 
 		}
-		Expect(9);
-		blockNode = factory.finishMainBlock(body); 
-		return blockNode;
 	}
 
 	StatementNode  Statement() {
 		StatementNode  statement;
 		statement = null; 
-		if (StartOf(2)) {
+		if (la.kind == 7 || la.kind == 10 || la.kind == 13) {
+			statement = factory.createEmptyStatement(); 
+		} else if (StartOf(2)) {
 			statement = Expression();
-			Expect(7);
 		} else if (la.kind == 11) {
 			statement = IfStatement();
+		} else if (la.kind == 9) {
+			statement = Block();
 		} else SynErr(33);
 		return statement;
-	}
-
-	StatementNode  Block() {
-		StatementNode  blockNode;
-		blockNode = null; 
-		if (StartOf(1)) {
-			blockNode = Statement();
-		} else if (la.kind == 8) {
-			Get();
-			List<StatementNode> body = new ArrayList<>(); 
-			while (StartOf(1)) {
-				StatementNode statement = Statement();
-				body.add(statement); 
-			}
-			Expect(10);
-			blockNode = factory.finishBlock(body); 
-		} else SynErr(34);
-		return blockNode;
 	}
 
 	ExpressionNode  Expression() {
@@ -187,11 +181,11 @@ public class Parser {
 		Expect(11);
 		ExpressionNode condition = Expression();
 		Expect(12);
-		StatementNode thenStatement = Block();
+		StatementNode thenStatement = Statement();
 		StatementNode elseStatement = null; 
 		if (la.kind == 13) {
 			Get();
-			elseStatement = Block();
+			elseStatement = Statement();
 		}
 		statement = factory.createIfStatement(condition, thenStatement, elseStatement); 
 		return statement;
@@ -294,7 +288,7 @@ public class Parser {
 			expression = factory.createUnary(unOp, expression); 
 		} else if (StartOf(4)) {
 			expression = Factor();
-		} else SynErr(35);
+		} else SynErr(34);
 		return expression;
 	}
 
@@ -309,7 +303,7 @@ public class Parser {
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
-			} else SynErr(36);
+			} else SynErr(35);
 		} else if (la.kind == 27) {
 			Get();
 			expression = Expression();
@@ -324,7 +318,7 @@ public class Parser {
 			SemErr("Constant out of range!"); 
 		} else if (la.kind == 29 || la.kind == 30) {
 			expression = LogicLiteral();
-		} else SynErr(37);
+		} else SynErr(36);
 		return expression;
 	}
 
@@ -359,7 +353,7 @@ public class Parser {
 			if(expression == null) 
 			SemErr("Undefined variable!"); 
 			} 
-		} else SynErr(38);
+		} else SynErr(37);
 		return expression;
 	}
 
@@ -372,7 +366,7 @@ public class Parser {
 		} else if (la.kind == 30) {
 			Get();
 			expression = factory.createLogicLiteral(false); 
-		} else SynErr(39);
+		} else SynErr(38);
 		return expression;
 	}
 
@@ -389,11 +383,11 @@ public class Parser {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x},
 		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_x,_x,_x, _x,_x}
+		{_x,_x,_x,_x, _x,_T,_x,_T, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_x,_x,_x, _x,_x}
 
 	};
 	
@@ -435,8 +429,8 @@ class Errors {
 			case 5: s = "\",\" expected"; break;
 			case 6: s = "\":\" expected"; break;
 			case 7: s = "\";\" expected"; break;
-			case 8: s = "\"begin\" expected"; break;
-			case 9: s = "\"end.\" expected"; break;
+			case 8: s = "\".\" expected"; break;
+			case 9: s = "\"begin\" expected"; break;
 			case 10: s = "\"end\" expected"; break;
 			case 11: s = "\"if\" expected"; break;
 			case 12: s = "\"then\" expected"; break;
@@ -461,12 +455,11 @@ class Errors {
 			case 31: s = "\":=\" expected"; break;
 			case 32: s = "??? expected"; break;
 			case 33: s = "invalid Statement"; break;
-			case 34: s = "invalid Block"; break;
-			case 35: s = "invalid SignedFactor"; break;
+			case 34: s = "invalid SignedFactor"; break;
+			case 35: s = "invalid Factor"; break;
 			case 36: s = "invalid Factor"; break;
-			case 37: s = "invalid Factor"; break;
-			case 38: s = "invalid MemberExpression"; break;
-			case 39: s = "invalid LogicLiteral"; break;
+			case 37: s = "invalid MemberExpression"; break;
+			case 38: s = "invalid LogicLiteral"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

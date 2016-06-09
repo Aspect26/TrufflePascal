@@ -12,6 +12,7 @@ import com.oracle.truffle.api.source.Source;
 
 import pascal.language.nodes.BlockNode;
 import pascal.language.nodes.ExpressionNode;
+import pascal.language.nodes.NopNode;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.StatementNode;
 import pascal.language.nodes.arithmetic.AddNodeGen;
@@ -173,6 +174,10 @@ public class NodeFactory {
 	
 	public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params){
 		return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
+	}
+	
+	public StatementNode createEmptyStatement(){
+		return new NopNode();
 	}
 	
 	public ExpressionNode createStringLiteral(Token literalToken){

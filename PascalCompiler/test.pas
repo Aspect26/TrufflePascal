@@ -23,13 +23,17 @@ BEGIN
 
     // *** BLOCK 3 (boolean + controlflow)
     a:=42;
-    if a<>42 then begin
-        b:=53;
-        c:=54;
-    end else
-        b:=64;
+    b:=1;
+    if a<>42 then 
+        begin
+            b:=53;
+            c:=54;;;;;;;;;;;;;;;
+        end
+    else 
+            b:=64
+    ;
     
     c:=65;
     
-    writeln(b,' ',c);
+    writeln(b,' ',c)
 END.
