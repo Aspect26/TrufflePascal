@@ -18,19 +18,16 @@ public abstract class AssignmentNode extends ExpressionNode{
 	
 	@Specialization(guards = "isIntKind(frame)")
 	protected int writeInt(VirtualFrame frame, int value){
-		//TODO: chceck if the variable even exist!
 		frame.setInt(getSlot(), value);
 		return value;
 	}
 	
 	@Specialization(guards = "isLongKind(frame)")
 	protected long writeLong(VirtualFrame frame, long value){
-		//TODO: chceck if the variable even exist!
 		frame.setLong(getSlot(), value);
+		
 		return value;
 	}
-	
-	
 	
 	/**
 	 * guard functions

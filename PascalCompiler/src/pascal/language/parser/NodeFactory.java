@@ -21,11 +21,19 @@ import pascal.language.nodes.arithmetic.MultiplyNodeGen;
 import pascal.language.nodes.arithmetic.NegationNodeGen;
 import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
+import pascal.language.nodes.control.IfNode;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
 import pascal.language.nodes.literals.IntLiteralNode;
+import pascal.language.nodes.literals.LogicLiteralNode;
 import pascal.language.nodes.literals.LongLiteralNode;
 import pascal.language.nodes.literals.StringLiteralNode;
+import pascal.language.nodes.logic.AndNodeGen;
+import pascal.language.nodes.logic.EqualsNodeGen;
+import pascal.language.nodes.logic.LessThanNodeGen;
+import pascal.language.nodes.logic.LessThanOrEqualNodeGen;
+import pascal.language.nodes.logic.NotNodeGen;
+import pascal.language.nodes.logic.OrNodeGen;
 import pascal.language.nodes.variables.AssignmentNodeGen;
 import pascal.language.nodes.variables.ReadVariableNodeGen;
 import pascal.language.runtime.PascalContext;
@@ -83,6 +91,8 @@ public class NodeFactory {
     	FrameSlotKind slotKind;
     	
     	switch(variableType.val){
+    	
+    	//ordinals
     	case "integer":
     		slotKind = FrameSlotKind.Long; break;
     	case "cardinal":
@@ -101,6 +111,11 @@ public class NodeFactory {
     		slotKind = FrameSlotKind.Long; break;
     	case "longword":
     		slotKind = FrameSlotKind.Long; break;
+    		
+    	// logical
+    	case "boolean":
+    		slotKind = FrameSlotKind.Boolean; break;
+    		
     	default:
     		slotKind = FrameSlotKind.Illegal; break;
     	}
@@ -133,11 +148,19 @@ public class NodeFactory {
 		return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
 	}
 	
+	public StatementNode finishBlock(List<StatementNode> bodyNodes){
+		return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
+	}
+	
 	public ExpressionNode createFunctionNode(Token tokenName){
 		if(context.getFunctionRegistry().lookup(tokenName.val.toLowerCase()) == null)
 			parser.SemErr("The function '" + tokenName.val + "' is undefined in the current context.");
 			
 		return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
+	}
+	
+	public StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode){
+		return new IfNode(condition, thenNode, elseNode);
 	}
 	
 	public ExpressionNode readVariable(Token nameToken){
@@ -172,6 +195,10 @@ public class NodeFactory {
 		}
 	}
 	
+	public ExpressionNode createLogicLiteral(boolean value){
+		return new LogicLiteralNode(value);
+	}
+	
 	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode){
 		FrameSlot slot = frameDescriptor.findFrameSlot(nameToken.val.toLowerCase());
 		if(slot == null)
@@ -182,6 +209,8 @@ public class NodeFactory {
 	
 	public ExpressionNode createBinary(Token operator, ExpressionNode leftNode, ExpressionNode rightNode){
 		switch(operator.val.toLowerCase()){
+		
+		// arithmetic
 		case "+":
 			return AddNodeGen.create(leftNode, rightNode);
 		case "-":
@@ -192,6 +221,26 @@ public class NodeFactory {
 			return DivideIntegerNodeGen.create(leftNode, rightNode);
 		case "mod":
 			return ModuloNodeGen.create(leftNode, rightNode);
+			
+		// logic
+		case "and":
+			return AndNodeGen.create(leftNode, rightNode);
+		case "or":
+			return OrNodeGen.create(leftNode, rightNode);
+			
+		case "<":
+			return LessThanNodeGen.create(leftNode, rightNode);
+		case "<=":
+			return LessThanOrEqualNodeGen.create(leftNode, rightNode);
+		case ">":
+			return NotNodeGen.create(LessThanOrEqualNodeGen.create(leftNode, rightNode));
+		case ">=":
+			return NotNodeGen.create(LessThanNodeGen.create(leftNode, rightNode));
+		case "=":
+			return EqualsNodeGen.create(leftNode, rightNode);
+		case "<>":
+			return NotNodeGen.create(EqualsNodeGen.create(leftNode, rightNode));
+			
 		default:
 			parser.SemErr("Unexpected binary operator: " + operator.val);
 			return null;
@@ -204,6 +253,8 @@ public class NodeFactory {
 			return son;   // unary + in Pascal marks identity
 		case "-":
 			return NegationNodeGen.create(son);
+		case "not":
+			return NotNodeGen.create(son);
 		default:
 			parser.SemErr("Unexpected unary operator: " + operator.val);
 			return null;

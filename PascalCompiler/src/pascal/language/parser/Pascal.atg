@@ -74,15 +74,77 @@ MainBlock<out StatementNode blockNode>
 "END."							                (. blockNode = factory.finishMainBlock(body); .)
 .
 
+
+Block<out StatementNode blockNode>
+                                                (. blockNode = null; .)
+=                                               
+    Statement<out blockNode>
+|
+    "begin"                                     (. List<StatementNode> body = new ArrayList<>(); .)
+    {
+        Statement<out StatementNode statement>  (. body.add(statement); .)
+    }   
+    "end"                                       (. blockNode = factory.finishBlock(body); .)
+.
+
+
+
 Statement<out StatementNode statement>
-=
+=                                               (. statement = null; .)
 (
     Expression<out statement> ";"
+|
+    IfStatement<out statement>
 )
 .
 
 
+IfStatement<out StatementNode statement>
+=
+"if"                                            
+    Expression<out ExpressionNode condition>
+
+"then"                                          
+    Block<out StatementNode thenStatement>
+                                                (. StatementNode elseStatement = null; .)
+[
+"else"                                          
+    Block<out elseStatement>
+]                                               (. statement = factory.createIfStatement(condition, thenStatement, elseStatement); .)
+.
+
+
 Expression<out ExpressionNode expression>
+=
+LogicTerm<out expression>
+{
+    "or"                                        (. Token op = t; .)
+    LogicTerm<out ExpressionNode right>         (. expression = factory.createBinary(op, expression, right); .)
+}
+.
+
+
+LogicTerm<out ExpressionNode expression>
+=
+LogicFactor<out expression>
+{
+    "and"                                       (. Token op = t; .)
+    LogicFactor<out ExpressionNode right>       (. expression = factory.createBinary(op, expression, right); .)
+}
+.
+
+
+LogicFactor<out ExpressionNode expression>
+=
+Arithmetic<out expression>
+[
+    (">" | ">=" | "<" | "<=" | "=" | "<>")      (. Token op = t; .)
+    Arithmetic<out ExpressionNode right>        (. expression = factory.createBinary(op, expression, right); .)
+]
+.
+
+
+Arithmetic<out ExpressionNode expression>
 =
 Term<out expression>
 {
@@ -135,6 +197,18 @@ Factor<out ExpressionNode expression>
     numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
                                                 (. if(expression == null) .)
                                                 (.      SemErr("Constant out of range!"); .)
+|
+    LogicLiteral<out expression>
+)
+.
+
+
+LogicLiteral<out ExpressionNode expression>
+=                                               (. expression = null; .)
+(
+    "true"                                      (. expression = factory.createLogicLiteral(true); .)
+|
+    "false"                                     (. expression = factory.createLogicLiteral(false); .)
 )
 .
 
