@@ -19,12 +19,48 @@ import pascal.language.runtime.PascalContext;
 /**
  * TODO LIST
  *
- * Custom Custom literal nodes for all numeric types and range checking for all operations?
+ * DONE - Remove truffle from git
+ * Custom literal nodes for all numeric types and range checking for all operations?
  * ReadArgumentNode -> Object[] -> no specialization
- * Remove truffle from git
  * ' in string
  * ant build script
  * runnable shell script
+ * type check in assignment in parser
+ * 
+ * --------- PLAN ------------------------------
+ * --- PHASE 3:
+ * readln
+ * DONE - boolean
+ * DONE - char
+ * 
+ * --- PHASE 4:
+ * DONE - if
+ * case
+ * for
+ * while
+ * repeat
+ * goto
+ * 
+ * --- PHASE 5:
+ * units
+ * floating point data types
+ * 
+ * --- PHASE 6:
+ * enum
+ * array
+ * record
+ * 
+ * --- PHASE 7:
+ * files
+ * 
+ * --- PHASE 8:
+ * pointers
+ * 
+ * --- PHASE 9:
+ * crt
+ * graph
+ * string
+ * dos
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.1", mimeType = "text/x-pascal")

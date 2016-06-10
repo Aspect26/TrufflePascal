@@ -192,7 +192,7 @@ Factor<out ExpressionNode expression>
     Expression<out expression>                  
     ")"
 |
-	stringLiteral					            (. expression = factory.createStringLiteral(t); .)
+	stringLiteral					            (. expression = factory.createCharLiteral(t); .)
 |
     numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
                                                 (. if(expression == null) .)

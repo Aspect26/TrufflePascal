@@ -24,6 +24,7 @@ import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.control.IfNode;
 import pascal.language.nodes.function.FunctionBodyNode;
+import pascal.language.nodes.literals.CharLiteralNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
 import pascal.language.nodes.literals.IntLiteralNode;
 import pascal.language.nodes.literals.LogicLiteralNode;
@@ -117,6 +118,10 @@ public class NodeFactory {
     	case "boolean":
     		slotKind = FrameSlotKind.Boolean; break;
     		
+    	// char
+    	case "char":
+    		slotKind = FrameSlotKind.Byte; break;
+    		
     	default:
     		slotKind = FrameSlotKind.Illegal; break;
     	}
@@ -180,12 +185,13 @@ public class NodeFactory {
 		return new NopNode();
 	}
 	
-	public ExpressionNode createStringLiteral(Token literalToken){
+	public ExpressionNode createCharLiteral(Token literalToken){
 		String literal = literalToken.val;
 		assert literal.length() >= 2 && literal.startsWith("'") && literal.endsWith("'");
 		literal = literal.substring(1, literal.length() - 1);
 		
-		return new StringLiteralNode(literal);
+		return (literal.length() == 1)? 
+				new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
 	}
 	
 	public ExpressionNode createNumericLiteral(Token literalToken){

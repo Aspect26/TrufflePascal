@@ -310,7 +310,7 @@ public class Parser {
 			Expect(28);
 		} else if (la.kind == 2) {
 			Get();
-			expression = factory.createStringLiteral(t); 
+			expression = factory.createCharLiteral(t); 
 		} else if (la.kind == 3) {
 			Get();
 			expression = factory.createNumericLiteral(t); 

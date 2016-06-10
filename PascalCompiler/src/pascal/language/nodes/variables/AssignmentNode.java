@@ -25,9 +25,22 @@ public abstract class AssignmentNode extends ExpressionNode{
 	@Specialization(guards = "isLongKind(frame)")
 	protected long writeLong(VirtualFrame frame, long value){
 		frame.setLong(getSlot(), value);
-		
 		return value;
 	}
+	
+	@Specialization(guards = "isBoolKind(frame)")
+	protected boolean writeBoolean(VirtualFrame frame, boolean value){
+		frame.setBoolean(getSlot(), value);
+		return value;
+	}
+	
+	// NOTE: characters are stored as bytes, since there is no FrameSlotKind for char
+	@Specialization(guards = "isCharKind(frame)")
+	protected char writeChar(VirtualFrame frame, char value){
+		frame.setByte(getSlot(), (byte)value);
+		return value;
+	}
+	
 	
 	/**
 	 * guard functions
@@ -38,6 +51,14 @@ public abstract class AssignmentNode extends ExpressionNode{
 	
 	protected boolean isIntKind(VirtualFrame frame){
 		return isKind(FrameSlotKind.Int);
+	}
+	
+	protected boolean isBoolKind(VirtualFrame frame){
+		return isKind(FrameSlotKind.Boolean);
+	}
+	
+	protected boolean isCharKind(VirtualFrame frame){
+		return isKind(FrameSlotKind.Byte);
 	}
 	
 	private boolean isKind(FrameSlotKind kind){

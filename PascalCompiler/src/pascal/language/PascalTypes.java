@@ -10,7 +10,7 @@ import com.oracle.truffle.api.dsl.internal.DSLOptions;
 import pascal.language.runtime.Null;
 import pascal.language.runtime.PascalFunction;
 
-@TypeSystem({int.class, long.class, boolean.class, PascalFunction.class, Null.class})
+@TypeSystem({int.class, long.class, boolean.class, char.class, PascalFunction.class, Null.class})
 @DSLOptions
 public class PascalTypes {
 	
