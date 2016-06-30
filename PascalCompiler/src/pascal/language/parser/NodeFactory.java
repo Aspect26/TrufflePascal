@@ -23,6 +23,7 @@ import pascal.language.nodes.arithmetic.NegationNodeGen;
 import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.control.IfNode;
+import pascal.language.nodes.control.RepeatNode;
 import pascal.language.nodes.control.WhileNode;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.literals.CharLiteralNode;
@@ -171,6 +172,10 @@ public class NodeFactory {
 	
 	public StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody){
 		return new WhileNode(condition, loopBody);
+	}
+	
+	public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody){
+		return new RepeatNode(condition, loopBody);
 	}
 	
 	public ExpressionNode readVariable(Token nameToken){

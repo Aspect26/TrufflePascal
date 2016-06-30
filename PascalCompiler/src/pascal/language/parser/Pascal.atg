@@ -96,8 +96,19 @@ Statement<out StatementNode statement>
 |
 	WhileLoop<out statement>
 |
+	RepeatLoop<out statement> 
+|
     Block<out statement>
 )
+.
+
+
+RepeatLoop<out StatementNode statement>
+=
+"repeat"										(. List<StatementNode> bodyNodes = new ArrayList<>(); .)
+StatementSequence<bodyNodes>					
+"until"
+Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.finishBlock(bodyNodes)); .)
 .
 
 
