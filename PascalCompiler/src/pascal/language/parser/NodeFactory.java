@@ -23,10 +23,10 @@ import pascal.language.nodes.arithmetic.NegationNodeGen;
 import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.control.IfNode;
+import pascal.language.nodes.control.WhileNode;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.literals.CharLiteralNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
-import pascal.language.nodes.literals.IntLiteralNode;
 import pascal.language.nodes.literals.LogicLiteralNode;
 import pascal.language.nodes.literals.LongLiteralNode;
 import pascal.language.nodes.literals.StringLiteralNode;
@@ -169,6 +169,10 @@ public class NodeFactory {
 		return new IfNode(condition, thenNode, elseNode);
 	}
 	
+	public StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody){
+		return new WhileNode(condition, loopBody);
+	}
+	
 	public ExpressionNode readVariable(Token nameToken){
 		final FrameSlot frameSlot = lexicalScope.locals.get(nameToken.val.toLowerCase());
 		if(frameSlot == null)
@@ -196,13 +200,9 @@ public class NodeFactory {
 	
 	public ExpressionNode createNumericLiteral(Token literalToken){
 		try{
-			return new IntLiteralNode(Integer.parseInt(literalToken.val));
-		} catch (NumberFormatException ex){
-			try{
-				return new LongLiteralNode(Long.parseLong(literalToken.val));
-			} catch (NumberFormatException e){
-				return null;
-			}
+			return new LongLiteralNode(Long.parseLong(literalToken.val));
+		} catch (NumberFormatException e){
+			return null;
 		}
 	}
 	

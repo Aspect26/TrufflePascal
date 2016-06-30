@@ -94,8 +94,19 @@ Statement<out StatementNode statement>
 |
     IfStatement<out statement>
 |
+	WhileLoop<out statement>
+|
     Block<out statement>
 )
+.
+
+
+WhileLoop<out StatementNode statement>
+=
+"while"
+Expression<out ExpressionNode condition>
+"do"
+Statement<out StatementNode loopBody>			(. statement = factory.createWhileLoop(condition, loopBody); .)
 .
 
 

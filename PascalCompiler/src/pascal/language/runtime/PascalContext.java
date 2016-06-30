@@ -15,6 +15,7 @@ import com.oracle.truffle.api.source.Source;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.builtin.BuiltinNode;
+import pascal.language.nodes.builtin.ReadlnBuiltinNodeFactory;
 import pascal.language.nodes.builtin.WriteBuiltinNodeFactory;
 import pascal.language.nodes.builtin.WritelnBuiltinNodeFactory;
 import pascal.language.nodes.call.ReadAllArgumentsNode;
@@ -82,6 +83,7 @@ public final class PascalContext extends ExecutionContext {
     	
     	installBuiltinInfiniteArgumens(WritelnBuiltinNodeFactory.getInstance(), registerRootNodes);
     	installBuiltinInfiniteArgumens(WriteBuiltinNodeFactory.getInstance(), registerRootNodes);
+    	installBuiltinInfiniteArgumens(ReadlnBuiltinNodeFactory.getInstance(), registerRootNodes);
     }
     
     public void installBuiltin(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {

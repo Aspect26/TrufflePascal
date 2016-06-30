@@ -28,6 +28,9 @@ import pascal.language.runtime.PascalContext;
  * support for not
  * 
  * --------- PLAN ------------------------------
+ * --- PHASE 1 DONE
+ * --- PHASE 2 DDONE
+ * 
  * --- PHASE 3:
  * readln
  * read
@@ -35,9 +38,9 @@ import pascal.language.runtime.PascalContext;
  * --- PHASE 4:
  * case
  * for
- * while
  * repeat
  * goto
+ * break
  * 
  * --- PHASE 5:
  * units

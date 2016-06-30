@@ -16,12 +16,6 @@ public abstract class AssignmentNode extends ExpressionNode{
 
 	protected abstract FrameSlot getSlot();
 	
-	@Specialization(guards = "isIntKind(frame)")
-	protected int writeInt(VirtualFrame frame, int value){
-		frame.setInt(getSlot(), value);
-		return value;
-	}
-	
 	@Specialization(guards = "isLongKind(frame)")
 	protected long writeLong(VirtualFrame frame, long value){
 		frame.setLong(getSlot(), value);
@@ -49,10 +43,6 @@ public abstract class AssignmentNode extends ExpressionNode{
 		return isKind(FrameSlotKind.Long);
 	}
 	
-	protected boolean isIntKind(VirtualFrame frame){
-		return isKind(FrameSlotKind.Int);
-	}
-	
 	protected boolean isBoolKind(VirtualFrame frame){
 		return isKind(FrameSlotKind.Boolean);
 	}
@@ -66,7 +56,6 @@ public abstract class AssignmentNode extends ExpressionNode{
 			return true;
 		}
 		else if(getSlot().getKind() == FrameSlotKind.Illegal){
-			// FIRST TIME WRITE TO VAIABLE!
 			CompilerDirectives.transferToInterpreterAndInvalidate();
             getSlot().setKind(kind);
             return true;

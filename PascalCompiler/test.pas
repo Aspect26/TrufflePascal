@@ -1,22 +1,16 @@
 var
-    c:char;
-    b:boolean;
     i:integer;
 
 BEGIN
-    b:=true;
+    i:=1;
+{
+    while true do
+        writeln('my first infinite loop!');
+}
 
-    if b then 
+    while i<10 do
     begin
-        writeln('true');
-    end
-    else
-    begin
-        writeln('false');
+        writeln('i:',i);
+        i:=i+1;
     end;
-
-    c:='a';
-
-    writeln(b);
-    writeln(c);
 END.
