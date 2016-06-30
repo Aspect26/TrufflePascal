@@ -19,22 +19,20 @@ import pascal.language.runtime.PascalContext;
 /**
  * TODO LIST
  *
- * DONE - Remove truffle from git
- * Custom literal nodes for all numeric types and range checking for all operations?
  * ReadArgumentNode -> Object[] -> no specialization
  * ' in string
  * ant build script
  * runnable shell script
  * type check in assignment in parser
+ * type check in all operations in parser
+ * support for not
  * 
  * --------- PLAN ------------------------------
  * --- PHASE 3:
  * readln
- * DONE - boolean
- * DONE - char
+ * read
  * 
  * --- PHASE 4:
- * DONE - if
  * case
  * for
  * while
@@ -63,7 +61,7 @@ import pascal.language.runtime.PascalContext;
  * dos
  */
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.1", mimeType = "text/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.3", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();
@@ -109,13 +107,8 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 		return null;
 	}
 	
-	public static void main(String[] args) throws IOException {
-		if(args.length != 1){
-			System.out.println("The compiler expects exactly one argument - path to the source code.");
-			return;
-		}
-		
-		Parser parser = new Parser(new PascalContext(), Source.fromFileName(args[0]));
+	public static void start(String sourcePath) throws IOException {
+		Parser parser = new Parser(new PascalContext(), Source.fromFileName(sourcePath));
 		parser.Parse();
 		if(!parser.noErrors()){
 			System.out.println("Errors while parsing, the code cannot be interpreted...");
