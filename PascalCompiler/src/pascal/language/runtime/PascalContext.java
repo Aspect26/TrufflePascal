@@ -87,8 +87,8 @@ public final class PascalContext extends ExecutionContext {
     	installBuiltinInfiniteArgumens(WriteBuiltinNodeFactory.getInstance(), registerRootNodes);
     	installBuiltinInfiniteArgumens(ReadlnBuiltinNodeFactory.getInstance(), registerRootNodes);
     	
-    	installBuiltin(IncBuiltinNodeFactory.getInstance(), registerRootNodes);
-    	installBuiltin(DecBuiltinNodeFactory.getInstance(), registerRootNodes);
+    	//installBuiltin(IncBuiltinNodeFactory.getInstance(), registerRootNodes);
+    	//installBuiltin(DecBuiltinNodeFactory.getInstance(), registerRootNodes);
     }
     
     public void installBuiltin(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {

@@ -20,4 +20,8 @@ BEGIN
         writeln('i:',i);
         i:=i-1;
     until i<6;
+
+    writeln('FOR');
+    for i:=10 downto 5 do
+        writeln('i:',i);
 END.

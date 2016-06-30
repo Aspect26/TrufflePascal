@@ -94,6 +94,8 @@ Statement<out StatementNode statement>
 |
     IfStatement<out statement>
 |
+	ForLoop<out statement>
+|
 	WhileLoop<out statement>
 |
 	RepeatLoop<out statement> 
@@ -101,6 +103,23 @@ Statement<out StatementNode statement>
     Block<out statement>
 )
 .
+
+
+ForLoop<out StatementNode statement>
+=
+"for"											(. boolean ascending = true; .)
+identifier										(. Token variableToken = t; .)
+":="
+Expression<out ExpressionNode startValue>	
+(
+	"to"										(. ascending = true; .)
+	|
+	"downto"									(. ascending = false; .)
+)
+Expression<out ExpressionNode finalValue>
+"do"
+Statement<out StatementNode loopBody>			(. statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
+.	
 
 
 RepeatLoop<out StatementNode statement>

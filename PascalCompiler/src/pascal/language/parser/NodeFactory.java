@@ -22,6 +22,7 @@ import pascal.language.nodes.arithmetic.MultiplyNodeGen;
 import pascal.language.nodes.arithmetic.NegationNodeGen;
 import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
+import pascal.language.nodes.control.ForNode;
 import pascal.language.nodes.control.IfNode;
 import pascal.language.nodes.control.RepeatNode;
 import pascal.language.nodes.control.WhileNode;
@@ -37,6 +38,7 @@ import pascal.language.nodes.logic.LessThanNodeGen;
 import pascal.language.nodes.logic.LessThanOrEqualNodeGen;
 import pascal.language.nodes.logic.NotNodeGen;
 import pascal.language.nodes.logic.OrNodeGen;
+import pascal.language.nodes.variables.AssignmentNode;
 import pascal.language.nodes.variables.AssignmentNodeGen;
 import pascal.language.nodes.variables.ReadVariableNodeGen;
 import pascal.language.runtime.PascalContext;
@@ -176,6 +178,13 @@ public class NodeFactory {
 	
 	public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody){
 		return new RepeatNode(condition, loopBody);
+	}
+	
+	public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue,
+			ExpressionNode finalValue, StatementNode loopBody){
+		
+		return new ForNode(ascending, lexicalScope.locals.get(variableToken.val.toLowerCase()), 
+				startValue, finalValue, loopBody);
 	}
 	
 	public ExpressionNode readVariable(Token nameToken){
