@@ -13,7 +13,7 @@ public abstract class LessThanOrEqualNode extends BinaryNode {
     public abstract boolean executeBoolean(VirtualFrame frame);
 	
 	@Specialization
-    protected boolean lessThan(long left, long right) {
-        return left < right;
+    protected boolean lessThanOrEqual(long left, long right) {
+        return left <= right;
     }
 }
