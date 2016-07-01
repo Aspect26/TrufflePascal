@@ -24,10 +24,13 @@ public final class IfNode extends StatementNode{
 	
 	@Override
 	public void executeVoid(VirtualFrame frame) {
-		if(checkCondition(frame))
+		if(checkCondition(frame)){
 			thenNode.executeVoid(frame);
-		else
-			elseNode.executeVoid(frame);
+		} else {
+			if(elseNode != null){
+				elseNode.executeVoid(frame);
+			}
+		}
 	}
 	
 	private boolean checkCondition(VirtualFrame frame){
