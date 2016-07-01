@@ -6,6 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
+import pascal.exceptions.BreakException;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.StatementNode;
 import pascal.language.nodes.call.InvokeNodeGen;
@@ -50,6 +51,7 @@ public class ForNode extends StatementNode {
 					frame.setLong(slot, frame.getLong(slot) - 1);
 				}
 			}
+		} catch(BreakException e){
 		} catch (UnexpectedResultException | FrameSlotTypeException e) {
 			// TODO HANDLE THIS ERROR
 		}

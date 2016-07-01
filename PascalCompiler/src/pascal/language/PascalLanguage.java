@@ -63,7 +63,7 @@ import pascal.language.runtime.PascalContext;
  * dos
  */
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.3", mimeType = "text/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.4", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();

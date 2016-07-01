@@ -3,25 +3,11 @@ var
 
 BEGIN
     i:=1;
-{
-    while true do
-        writeln('my first infinite loop!');
-}
 
-    writeln('WHILE');
     while i<10 do
     begin
         writeln('i:',i);
         i:=i+1;
+        if i>6 then break;
     end;
-
-    writeln('REPEAT');
-    repeat
-        writeln('i:',i);
-        i:=i-1;
-    until i<6;
-
-    writeln('FOR');
-    for i:=10 downto 5 do
-        writeln('i:',i);
 END.

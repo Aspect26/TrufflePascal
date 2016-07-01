@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
+import pascal.exceptions.BreakException;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.StatementNode;
 
@@ -24,6 +25,7 @@ public class WhileNode extends StatementNode {
 			while(condition.executeBoolean(frame)){
 				body.executeVoid(frame);
 			}
+		} catch(BreakException e){
 		} catch (UnexpectedResultException e) {
 			// TODO HANDLE THIS ERROR
 		}

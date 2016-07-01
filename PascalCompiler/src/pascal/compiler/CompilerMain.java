@@ -28,7 +28,7 @@ public class CompilerMain {
 		
 		// start interpreter
 		if(settings.verbose){
-			System.out.println("Welcome to Trupple v0.3a made by \"Aspect\"");
+			System.out.println("Welcome to Trupple v0.4 made by \"Aspect\"");
 			System.out.println("Starting interpretation...");
 			System.out.println("----------------------------------");
 		}

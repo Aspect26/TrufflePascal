@@ -100,6 +100,8 @@ Statement<out StatementNode statement>
 |
 	RepeatLoop<out statement> 
 |
+	"break"										(. statement = factory.createBreak(); .)
+|
     Block<out statement>
 )
 .
