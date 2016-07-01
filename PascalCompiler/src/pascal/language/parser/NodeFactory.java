@@ -23,6 +23,7 @@ import pascal.language.nodes.arithmetic.NegationNodeGen;
 import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
 import pascal.language.nodes.control.BreakNode;
+import pascal.language.nodes.control.CaseNode;
 import pascal.language.nodes.control.ForNode;
 import pascal.language.nodes.control.IfNode;
 import pascal.language.nodes.control.RepeatNode;
@@ -75,6 +76,10 @@ public class NodeFactory {
     
     /* State while parsing variable line */
     private List<String> newVariableNames;
+    
+    /* State while parsing case statement */
+    private List<ExpressionNode> caseExpressions;
+    private List<StatementNode> caseStatements;
     
     public NodeFactory(Parser parser, PascalContext context, Source source){
     	this.context = context;
@@ -160,6 +165,27 @@ public class NodeFactory {
 	
 	public StatementNode finishBlock(List<StatementNode> bodyNodes){
 		return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
+	}
+	
+	public void startCaseList(){
+		this.caseExpressions = new ArrayList<>();
+		this.caseStatements = new ArrayList<>();
+	}
+	
+	public void addCaseOption(ExpressionNode expression, StatementNode statement){
+		this.caseExpressions.add(expression);
+		this.caseStatements.add(statement);
+	}
+	
+	public CaseNode finishCaseStatement(ExpressionNode caseIndex){
+		CaseNode node = new CaseNode(caseIndex, 
+				caseExpressions.toArray(new ExpressionNode[caseExpressions.size()]),
+				caseStatements.toArray(new StatementNode[caseStatements.size()]));
+		
+		caseExpressions = null;
+		caseStatements = null;
+		
+		return node;
 	}
 	
 	public ExpressionNode createFunctionNode(Token tokenName){

@@ -26,6 +26,9 @@ import pascal.language.runtime.PascalContext;
  * type check in assignment in parser
  * type check in all operations in parser
  * support for not
+ * switch na error pokial sa neda vyhodnotit case
+ * parser time check na break 
+ * case bug - semicolon after last case option
  * 
  * --------- PLAN ------------------------------
  * --- PHASE 1 DONE
@@ -39,7 +42,6 @@ import pascal.language.runtime.PascalContext;
  * case
  * with
  * goto
- * break
  * 
  * --- PHASE 5:
  * units

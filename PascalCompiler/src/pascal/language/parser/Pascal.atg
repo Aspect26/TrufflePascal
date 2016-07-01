@@ -100,11 +100,37 @@ Statement<out StatementNode statement>
 |
 	RepeatLoop<out statement> 
 |
+	CaseStatement<out statement>
+|
 	"break"										(. statement = factory.createBreak(); .)
 |
     Block<out statement>
 )
 .
+
+
+CaseStatement<out StatementNode statement>
+=
+"case"
+Expression<out ExpressionNode caseIndex>
+"of"											(. factory.startCaseList();	.)
+CaseList 										
+"end"											(. statement = factory.finishCaseStatement(caseIndex); .)
+.
+
+CaseList
+=
+Expression<out ExpressionNode caseConstant>
+":"
+Statement<out StatementNode caseStatement>		(. factory.addCaseOption(caseConstant, caseStatement); .)
+{
+	";"
+	Expression<out caseConstant>
+	":"
+	Statement<out caseStatement>	(. factory.addCaseOption(caseConstant, caseStatement); .)
+}
+.
+
 
 
 ForLoop<out StatementNode statement>
