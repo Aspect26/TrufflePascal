@@ -39,8 +39,6 @@ import pascal.language.runtime.PascalContext;
  * read
  * 
  * --- PHASE 4:
- * case
- * with
  * goto
  * 
  * --- PHASE 5:

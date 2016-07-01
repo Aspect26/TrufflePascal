@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project PascalCompiler">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.workspace" value="/home/oem/workspaceGraal"/>
+    <property name="dir.jarfile" value="${dir.buildfile}"/>
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/Trupple.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="pascal.compiler.CompilerMain"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="./PascalCompiler/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.debug/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.dsl/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.instrumentation/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.interop/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.interop.java/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.vm/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.object/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.object.dsl/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.api.profiles/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.object/bin"/>
+            <fileset dir="./mxbuild/truffle/com.oracle.truffle.object.basic/bin"/>
+        </jar>
+    </target>
+</project>

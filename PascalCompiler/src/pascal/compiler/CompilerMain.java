@@ -1,4 +1,5 @@
 package pascal.compiler;
+import java.io.File;
 import java.io.IOException;
 
 import pascal.language.PascalLanguage;
@@ -23,6 +24,11 @@ public class CompilerMain {
 				System.out.println("Unknown parameter: " + args[i]);
 				return;
 			}
+		}
+		
+		if(! (new File(args[args.length-1]).exists())){
+			System.out.println("The specified source doesn't exist: " + args[args.length-1] + ".");
+			return;
 		}
 		settings.sourcePath = args[args.length - 1];
 		
