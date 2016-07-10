@@ -1,22 +1,18 @@
 var
     i:integer;
+    d:double;
 
 BEGIN
-    i:=1;
+    {d:=1;
+    writeln(d);}
 
-    while i<10 do
-    begin
-        writeln('i:',i);
-        i:=i+1;
-        if i>6 then begin 
-            break;
-        end;
-    end;
+    d:=1e+3;
+    writeln(d);
 
-    case i of
-        6: writeln('case is 6');
-        7: begin writeln('case is 7'); writeln('case is 7'); end;
-        8: writeln('case is 8')
-    end;    
+    d:=1.0;
+    writeln(d);
+
+    d:=53.23e-3;
+    writeln(d);   
     
 END.

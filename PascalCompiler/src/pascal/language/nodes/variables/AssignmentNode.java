@@ -35,6 +35,11 @@ public abstract class AssignmentNode extends ExpressionNode{
 		return value;
 	}
 	
+	@Specialization(guards = "isDoubleKind(frame)")
+	protected double writeChar(VirtualFrame frame, double value){
+		frame.setDouble(getSlot(), value);
+		return value;
+	}
 	
 	/**
 	 * guard functions
@@ -49,6 +54,10 @@ public abstract class AssignmentNode extends ExpressionNode{
 	
 	protected boolean isCharKind(VirtualFrame frame){
 		return isKind(FrameSlotKind.Byte);
+	}
+	
+	protected boolean isDoubleKind(VirtualFrame frame){
+		return isKind(FrameSlotKind.Double);
 	}
 	
 	private boolean isKind(FrameSlotKind kind){

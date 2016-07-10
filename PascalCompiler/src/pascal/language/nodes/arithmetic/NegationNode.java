@@ -15,7 +15,7 @@ public abstract class NegationNode extends UnaryNode{
     }
 	
 	@Specialization(rewriteOn = ArithmeticException.class)
-    protected int neg(int val) {
+    protected double neg(double val) {
 		return -val;
     }
 }

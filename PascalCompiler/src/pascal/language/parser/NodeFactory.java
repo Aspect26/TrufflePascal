@@ -30,6 +30,7 @@ import pascal.language.nodes.control.RepeatNode;
 import pascal.language.nodes.control.WhileNode;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.literals.CharLiteralNode;
+import pascal.language.nodes.literals.DoubleLiteralNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
 import pascal.language.nodes.literals.LogicLiteralNode;
 import pascal.language.nodes.literals.LongLiteralNode;
@@ -105,23 +106,21 @@ public class NodeFactory {
     	
     	//ordinals
     	case "integer":
-    		slotKind = FrameSlotKind.Long; break;
     	case "cardinal":
-    		slotKind = FrameSlotKind.Long; break;
     	case "shortint":
-    		slotKind = FrameSlotKind.Long; break;
     	case "smallint":
-    		slotKind = FrameSlotKind.Long; break;
     	case "longint":
-    		slotKind = FrameSlotKind.Long; break;
     	case "int64":
-    		slotKind = FrameSlotKind.Long; break;
     	case "byte":
-    		slotKind = FrameSlotKind.Long; break;
     	case "word":
-    		slotKind = FrameSlotKind.Long; break;
     	case "longword":
     		slotKind = FrameSlotKind.Long; break;
+    		
+    	// floating points
+    	case "single":
+    	case "real":
+    	case "double":
+    		slotKind = FrameSlotKind.Double; break;
     		
     	// logical
     	case "boolean":
@@ -249,6 +248,23 @@ public class NodeFactory {
 		} catch (NumberFormatException e){
 			return null;
 		}
+	}
+	
+	public ExpressionNode createRealLiteral(Token integerPart, Token fractionalPart, Token exponentOp, Token exponent){
+		int integer = Integer.parseInt(integerPart.val);
+		double fractional = (fractionalPart == null)? 0 : Double.parseDouble(fractionalPart.val);
+		int exponentMultiplier = (exponentOp != null && exponentOp.val == "-")? -1 : 1;
+		int exponentValue = (exponent == null)? 0 : Integer.parseInt(exponent.val);
+		
+		double value = integer;
+		
+		while(fractional > 1)
+			fractional /= 10;
+		value += fractional;
+		
+		value = value * Math.pow(10, exponentValue*exponentMultiplier);
+		
+		return new DoubleLiteralNode(value);
 	}
 	
 	public ExpressionNode createLogicLiteral(boolean value){

@@ -263,12 +263,60 @@ Factor<out ExpressionNode expression>
 |
 	stringLiteral					            (. expression = factory.createCharLiteral(t); .)
 |
-    numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
+    numericLiteral                              (. Token integerPartToken; .)
+												(. Token fractionalPartToken = null; .)
+												(. Token exponentOpToken = null; .)
+												(. Token exponentToken = null; .)
+												(. integerPartToken = t; .)
+    (
+    											(. expression = factory.createNumericLiteral(integerPartToken); .)
                                                 (. if(expression == null) .)
                                                 (.      SemErr("Constant out of range!"); .)
+    |
+		(
+			"."
+			numericLiteral						(. fractionalPartToken = t; .)
+			[
+				"e"
+				[ ( "+" | "-" ) ]				(. exponentOpToken = t; .)
+				numericLiteral					(. exponentToken = t; .)
+			]
+		|
+			"e"
+			[ ( "+" | "-" ) ]					(. exponentOpToken = t; .)
+			numericLiteral						(. exponentToken = t; .)
+		)										(. expression = factory.createRealLiteral(integerPartToken, .)
+												(. fractionalPartToken, exponentOpToken, exponentToken); .)    	
+    )
+                                           
+|
+	RealLiteral<out expression>
 |
     LogicLiteral<out expression>
 )
+.
+
+
+RealLiteral<out ExpressionNode expression>
+=												(. Token integerPartToken; .)
+												(. Token fractionalPartToken = null; .)
+												(. Token exponentOpToken = null; .)
+												(. Token exponentToken = null; .)
+numericLiteral									(. integerPartToken = t; .)
+(
+	"."
+	numericLiteral								(. fractionalPartToken = t; .)
+	[
+		"e"
+		[ ( "+" | "-" ) ]						(. exponentOpToken = t; .)
+		numericLiteral							(. exponentToken = t; .)
+	]
+|
+	"e"
+	[ ( "+" | "-" ) ]							(. exponentOpToken = t; .)
+	numericLiteral								(. exponentToken = t; .)
+)												(. expression = factory.createRealLiteral(integerPartToken, .)
+												(.		fractionalPartToken, exponentOpToken, exponentToken); .)
 .
 
 

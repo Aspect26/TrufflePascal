@@ -21,8 +21,6 @@ import pascal.language.runtime.PascalContext;
  *
  * ReadArgumentNode -> Object[] -> no specialization
  * ' in string
- * ant build script
- * runnable shell script
  * type check in assignment in parser
  * type check in all operations in parser
  * support for not

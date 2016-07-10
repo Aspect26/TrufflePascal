@@ -16,7 +16,15 @@ public abstract class SubstractNode extends BinaryNode{
     }
 	
 	@Specialization(rewriteOn = ArithmeticException.class)
-    protected int sub(int left, int right) {
-        return ExactMath.subtractExact(left, right);
+    protected double sub(double left, long right) {
+        return left - right;
+    }
+	
+	protected double sub(long left, double right) {
+        return left - right;
+    }
+	
+	protected double sub(double left, double right) {
+        return left - right;
     }
 }

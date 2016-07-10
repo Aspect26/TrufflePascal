@@ -252,8 +252,8 @@ class StartStates {
 public class Scanner {
 	static final char EOL = '\n';
 	static final int  eofSym = 0;
-	static final int maxT = 42;
-	static final int noSym = 42;
+	static final int maxT = 43;
+	static final int noSym = 43;
 	char valCh;       // current input character (for token.val)
 
 	public Buffer buffer; // scanner buffer
@@ -315,8 +315,9 @@ public class Scanner {
 		literals.put("and", new Integer(26));
 		literals.put("div", new Integer(36));
 		literals.put("mod", new Integer(37));
-		literals.put("true", new Integer(40));
-		literals.put("false", new Integer(41));
+		literals.put("e", new Integer(40));
+		literals.put("true", new Integer(41));
+		literals.put("false", new Integer(42));
 
 	}
 	

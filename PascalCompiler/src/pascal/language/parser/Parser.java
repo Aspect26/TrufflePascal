@@ -14,7 +14,7 @@ public class Parser {
 	public static final int _identifier = 1;
 	public static final int _stringLiteral = 2;
 	public static final int _numericLiteral = 3;
-	public static final int maxT = 42;
+	public static final int maxT = 43;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -157,7 +157,7 @@ public class Parser {
 			statement = factory.createEmptyStatement(); 
 			break;
 		}
-		case 1: case 2: case 3: case 33: case 34: case 38: case 40: case 41: {
+		case 1: case 2: case 3: case 33: case 34: case 38: case 41: case 42: {
 			statement = Expression();
 			break;
 		}
@@ -190,7 +190,7 @@ public class Parser {
 			statement = Block();
 			break;
 		}
-		default: SynErr(43); break;
+		default: SynErr(44); break;
 		}
 		return statement;
 	}
@@ -236,7 +236,7 @@ public class Parser {
 		} else if (la.kind == 17) {
 			Get();
 			ascending = false; 
-		} else SynErr(44);
+		} else SynErr(45);
 		ExpressionNode finalValue = Expression();
 		Expect(18);
 		StatementNode loopBody = Statement();
@@ -388,7 +388,7 @@ public class Parser {
 			expression = factory.createUnary(unOp, expression); 
 		} else if (StartOf(3)) {
 			expression = Factor();
-		} else SynErr(45);
+		} else SynErr(46);
 		return expression;
 	}
 
@@ -403,7 +403,7 @@ public class Parser {
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
-			} else SynErr(46);
+			} else SynErr(47);
 		} else if (la.kind == 38) {
 			Get();
 			expression = Expression();
@@ -413,12 +413,54 @@ public class Parser {
 			expression = factory.createCharLiteral(t); 
 		} else if (la.kind == 3) {
 			Get();
-			expression = factory.createNumericLiteral(t); 
-			if(expression == null) 
-			SemErr("Constant out of range!"); 
-		} else if (la.kind == 40 || la.kind == 41) {
+			Token integerPartToken; 
+			Token fractionalPartToken = null; 
+			Token exponentOpToken = null; 
+			Token exponentToken = null; 
+			integerPartToken = t; 
+			if (StartOf(4)) {
+				expression = factory.createNumericLiteral(integerPartToken); 
+				if(expression == null) 
+				SemErr("Constant out of range!"); 
+			} else if (la.kind == 8 || la.kind == 40) {
+				if (la.kind == 8) {
+					Get();
+					Expect(3);
+					fractionalPartToken = t; 
+					if (la.kind == 40) {
+						Get();
+						if (la.kind == 33 || la.kind == 34) {
+							if (la.kind == 33) {
+								Get();
+							} else {
+								Get();
+							}
+						}
+						exponentOpToken = t; 
+						Expect(3);
+						exponentToken = t; 
+					}
+				} else {
+					Get();
+					if (la.kind == 33 || la.kind == 34) {
+						if (la.kind == 33) {
+							Get();
+						} else {
+							Get();
+						}
+					}
+					exponentOpToken = t; 
+					Expect(3);
+					exponentToken = t; 
+				}
+				expression = factory.createRealLiteral(integerPartToken, 
+				fractionalPartToken, exponentOpToken, exponentToken); 
+			} else SynErr(48);
+		} else if (la.kind == 3) {
+			expression = RealLiteral();
+		} else if (la.kind == 41 || la.kind == 42) {
 			expression = LogicLiteral();
-		} else SynErr(47);
+		} else SynErr(49);
 		return expression;
 	}
 
@@ -453,20 +495,63 @@ public class Parser {
 			if(expression == null) 
 			SemErr("Undefined variable!"); 
 			} 
-		} else SynErr(48);
+		} else SynErr(50);
+		return expression;
+	}
+
+	ExpressionNode  RealLiteral() {
+		ExpressionNode  expression;
+		Token integerPartToken; 
+		Token fractionalPartToken = null; 
+		Token exponentOpToken = null; 
+		Token exponentToken = null; 
+		Expect(3);
+		integerPartToken = t; 
+		if (la.kind == 8) {
+			Get();
+			Expect(3);
+			fractionalPartToken = t; 
+			if (la.kind == 40) {
+				Get();
+				if (la.kind == 33 || la.kind == 34) {
+					if (la.kind == 33) {
+						Get();
+					} else {
+						Get();
+					}
+				}
+				exponentOpToken = t; 
+				Expect(3);
+				exponentToken = t; 
+			}
+		} else if (la.kind == 40) {
+			Get();
+			if (la.kind == 33 || la.kind == 34) {
+				if (la.kind == 33) {
+					Get();
+				} else {
+					Get();
+				}
+			}
+			exponentOpToken = t; 
+			Expect(3);
+			exponentToken = t; 
+		} else SynErr(51);
+		expression = factory.createRealLiteral(integerPartToken, 
+		fractionalPartToken, exponentOpToken, exponentToken); 
 		return expression;
 	}
 
 	ExpressionNode  LogicLiteral() {
 		ExpressionNode  expression;
 		expression = null; 
-		if (la.kind == 40) {
+		if (la.kind == 41) {
 			Get();
 			expression = factory.createLogicLiteral(true); 
-		} else if (la.kind == 41) {
+		} else if (la.kind == 42) {
 			Get();
 			expression = factory.createLogicLiteral(false); 
-		} else SynErr(49);
+		} else SynErr(52);
 		return expression;
 	}
 
@@ -482,12 +567,12 @@ public class Parser {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_T,_x, _T,_T,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x},
-		{_x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_T,_x, _x,_T,_x,_x, _T,_T,_T,_x, _T,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_T,_x, _T,_T,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x},
+		{_x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_T,_x, _x,_T,_x,_x, _T,_T,_T,_x, _T,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x}
 
 	};
 	
@@ -561,16 +646,19 @@ class Errors {
 			case 37: s = "\"mod\" expected"; break;
 			case 38: s = "\"(\" expected"; break;
 			case 39: s = "\")\" expected"; break;
-			case 40: s = "\"true\" expected"; break;
-			case 41: s = "\"false\" expected"; break;
-			case 42: s = "??? expected"; break;
-			case 43: s = "invalid Statement"; break;
-			case 44: s = "invalid ForLoop"; break;
-			case 45: s = "invalid SignedFactor"; break;
-			case 46: s = "invalid Factor"; break;
+			case 40: s = "\"e\" expected"; break;
+			case 41: s = "\"true\" expected"; break;
+			case 42: s = "\"false\" expected"; break;
+			case 43: s = "??? expected"; break;
+			case 44: s = "invalid Statement"; break;
+			case 45: s = "invalid ForLoop"; break;
+			case 46: s = "invalid SignedFactor"; break;
 			case 47: s = "invalid Factor"; break;
-			case 48: s = "invalid MemberExpression"; break;
-			case 49: s = "invalid LogicLiteral"; break;
+			case 48: s = "invalid Factor"; break;
+			case 49: s = "invalid Factor"; break;
+			case 50: s = "invalid MemberExpression"; break;
+			case 51: s = "invalid RealLiteral"; break;
+			case 52: s = "invalid LogicLiteral"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

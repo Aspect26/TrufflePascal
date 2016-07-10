@@ -13,9 +13,4 @@ public abstract class ModuloNode extends BinaryNode{
     protected long mod(long left, long right) {
 		return left % right;
     }
-	
-	@Specialization(rewriteOn = ArithmeticException.class)
-    protected int mod(int left, int right) {
-		return left % right;
-    }
 }
