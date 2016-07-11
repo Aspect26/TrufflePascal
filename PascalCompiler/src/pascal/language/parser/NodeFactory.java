@@ -51,8 +51,11 @@ public class NodeFactory {
     static class LexicalScope {
         protected final LexicalScope outer;
         protected final Map<String, FrameSlot> locals;
+        protected final String name;
+        public FrameDescriptor frameDescriptor;
 
-        LexicalScope(LexicalScope outer) {
+        LexicalScope(LexicalScope outer, String name) {
+        	this.name = name;
             this.outer = outer;
             this.locals = new HashMap<>();
             if (outer != null) {
@@ -61,16 +64,26 @@ public class NodeFactory {
         }
     }
     
+    /**
+     * WTF -> FrameDescriptor.copy() function does not copy slot kinds
+     * @see com.oracle.truffle.api.frame.FrameDescriptor#copy
+     * @param original descriptor to be copied
+     * @return new descriptor with the same default value and slots
+     */
+    public FrameDescriptor copyFrameDescriptor(FrameDescriptor original) {
+        FrameDescriptor clonedFrameDescriptor = new FrameDescriptor(original.getDefaultValue());
+        for(FrameSlot slot : original.getSlots()){
+        	clonedFrameDescriptor.addFrameSlot(slot.getIdentifier(), slot.getInfo(), slot.getKind());
+        }
+        return clonedFrameDescriptor;
+    }
+    
     // Reference to parser -> needed for throwing semantic errors
     private Parser parser;
     
 	 /* State while parsing a source unit. */
     private final PascalContext context;
     //private final Source source;
-    
-    /* State while parsing a function. */
-    //private int parameterCount;
-    private FrameDescriptor frameDescriptor;
     
     /* State while parsing a block. */
     private LexicalScope lexicalScope;
@@ -85,9 +98,9 @@ public class NodeFactory {
     public NodeFactory(Parser parser, PascalContext context, Source source){
     	this.context = context;
     	this.parser = parser;
-    	//this.source = source;
-    	frameDescriptor = new FrameDescriptor();
-    	lexicalScope = new LexicalScope(null);
+    	
+    	this.lexicalScope = new LexicalScope(null, null);
+		this.lexicalScope.frameDescriptor = new FrameDescriptor();
     }
     
     public void startVariableLineDefinition(){
@@ -139,7 +152,7 @@ public class NodeFactory {
     	}
     	
     	for(String variableName : newVariableNames){
-    		FrameSlot newSlot = frameDescriptor.addFrameSlot(variableName, slotKind);
+    		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(variableName, slotKind);
     		lexicalScope.locals.put(variableName, newSlot);
     	}
     	
@@ -147,15 +160,15 @@ public class NodeFactory {
     }
     
     public void startProcedure(Token name){
-    	
+    	startSubroutine(name);
     }
     
     public void finishProcedure(StatementNode bodyNode){
-    	
+    	finishSubroutine(bodyNode);
     }
     
     public void startFunction(Token name){
-    	
+    	startSubroutine(name);
     }
     
     public void setFunctionReturnValue(Token type){
@@ -163,18 +176,37 @@ public class NodeFactory {
     }
     
     public void finishFunction(StatementNode bodyNode){
-    	
+    	finishSubroutine(bodyNode);
     }
-	
+    
+    private void startSubroutine(Token name){
+    	if(lexicalScope.outer != null){
+    		context.getOutput().println("Nested subroutines are not supported.");
+    		return;
+    	}
+    	
+    	lexicalScope = new LexicalScope(lexicalScope, name.val);
+    	lexicalScope.frameDescriptor = copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
+    }
+    
+    private void finishSubroutine(StatementNode bodyNode){
+    	if(lexicalScope.outer == null){
+    		context.getOutput().println("Can't leave subroutine.");
+    		return;
+    	}
+    	
+    	lexicalScope = lexicalScope.outer;
+    	FrameDescriptor fd = new FrameDescriptor();
+    }
+    
 	public void startMainFunction(){
 	}
 	
 	public PascalRootNode finishMainFunction(StatementNode blockNode){
-		return new PascalRootNode(context, frameDescriptor, new FunctionBodyNode(blockNode));
+		return new PascalRootNode(context, lexicalScope.frameDescriptor, new FunctionBodyNode(blockNode));
 	}
 	
 	public void startMainBlock(){
-		lexicalScope = new LexicalScope(lexicalScope);
 	}
 	
 	public StatementNode finishMainBlock(List<StatementNode> bodyNodes){
@@ -292,7 +324,7 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode){
-		FrameSlot slot = frameDescriptor.findFrameSlot(nameToken.val.toLowerCase());
+		FrameSlot slot = lexicalScope.frameDescriptor.findFrameSlot(nameToken.val.toLowerCase());
 		if(slot == null)
 			return null;
 		
