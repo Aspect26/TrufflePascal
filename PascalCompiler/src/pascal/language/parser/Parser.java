@@ -140,6 +140,21 @@ public class Parser {
 
 	void Function() {
 		Expect(9);
+		Expect(1);
+		factory.startFunction(t); 
+		if (la.kind == 10) {
+			FormalParameterList();
+		}
+		Expect(6);
+		Expect(1);
+		Expect(7);
+		factory.setFunctionReturnValue(t); 
+		if (la.kind == 4) {
+			VariableDefinitions();
+		}
+		StatementNode bodyNode = Block();
+		factory.finishFunction(bodyNode); 
+		Expect(7);
 	}
 
 	void Procedure() {
@@ -632,7 +647,7 @@ class Errors {
 			case 6: s = "\":\" expected"; break;
 			case 7: s = "\";\" expected"; break;
 			case 8: s = "\"procedure\" expected"; break;
-			case 9: s = "\"-2/-32*/44-/5-34*/5\" expected"; break;
+			case 9: s = "\"function\" expected"; break;
 			case 10: s = "\"(\" expected"; break;
 			case 11: s = "\")\" expected"; break;
 			case 12: s = "\".\" expected"; break;

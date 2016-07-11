@@ -153,6 +153,18 @@ public class NodeFactory {
     public void finishProcedure(StatementNode bodyNode){
     	
     }
+    
+    public void startFunction(Token name){
+    	
+    }
+    
+    public void setFunctionReturnValue(Token type){
+    	
+    }
+    
+    public void finishFunction(StatementNode bodyNode){
+    	
+    }
 	
 	public void startMainFunction(){
 	}

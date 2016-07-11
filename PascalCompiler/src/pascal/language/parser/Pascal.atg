@@ -78,7 +78,15 @@ Block<out StatementNode bodyNode>				(. factory.finishProcedure(bodyNode); .)
 
 Function
 =												
-"-2/-32*/44-/5-34*/5"
+"function"									
+identifier										(. factory.startFunction(t); .)
+[ FormalParameterList ] 
+":"
+identifier	
+";"												(. factory.setFunctionReturnValue(t); .)
+[ VariableDefinitions ]
+Block<out StatementNode bodyNode>				(. factory.finishFunction(bodyNode); .)
+";"
 .
 
 

@@ -283,20 +283,21 @@ public class Scanner {
 		start.set(39, 2); 
 		start.set(48, 5); 
 		start.set(44, 6); 
-		start.set(58, 36); 
+		start.set(58, 19); 
 		start.set(59, 7); 
-		start.set(45, 37); 
-		start.set(40, 26); 
-		start.set(41, 27); 
-		start.set(46, 28); 
-		start.set(62, 38); 
-		start.set(60, 39); 
-		start.set(61, 32); 
-		start.set(43, 34); 
-		start.set(42, 35); 
+		start.set(40, 8); 
+		start.set(41, 9); 
+		start.set(46, 10); 
+		start.set(62, 20); 
+		start.set(60, 21); 
+		start.set(61, 14); 
+		start.set(43, 16); 
+		start.set(45, 17); 
+		start.set(42, 18); 
 		start.set(Buffer.EOF, -1);
 		literals.put("var", new Integer(4));
 		literals.put("procedure", new Integer(8));
+		literals.put("function", new Integer(9));
 		literals.put("begin", new Integer(13));
 		literals.put("end", new Integer(14));
 		literals.put("break", new Integer(15));
@@ -467,94 +468,39 @@ public class Scanner {
 				case 7:
 					{t.kind = 7; break loop;}
 				case 8:
-					if (ch == '/') {AddCh(); state = 9; break;}
-					else {state = 0; break;}
-				case 9:
-					if (ch == '-') {AddCh(); state = 10; break;}
-					else {state = 0; break;}
-				case 10:
-					if (ch == '3') {AddCh(); state = 11; break;}
-					else {state = 0; break;}
-				case 11:
-					if (ch == '2') {AddCh(); state = 12; break;}
-					else {state = 0; break;}
-				case 12:
-					if (ch == '*') {AddCh(); state = 13; break;}
-					else {state = 0; break;}
-				case 13:
-					if (ch == '/') {AddCh(); state = 14; break;}
-					else {state = 0; break;}
-				case 14:
-					if (ch == '4') {AddCh(); state = 15; break;}
-					else {state = 0; break;}
-				case 15:
-					if (ch == '4') {AddCh(); state = 16; break;}
-					else {state = 0; break;}
-				case 16:
-					if (ch == '-') {AddCh(); state = 17; break;}
-					else {state = 0; break;}
-				case 17:
-					if (ch == '/') {AddCh(); state = 18; break;}
-					else {state = 0; break;}
-				case 18:
-					if (ch == '5') {AddCh(); state = 19; break;}
-					else {state = 0; break;}
-				case 19:
-					if (ch == '-') {AddCh(); state = 20; break;}
-					else {state = 0; break;}
-				case 20:
-					if (ch == '3') {AddCh(); state = 21; break;}
-					else {state = 0; break;}
-				case 21:
-					if (ch == '4') {AddCh(); state = 22; break;}
-					else {state = 0; break;}
-				case 22:
-					if (ch == '*') {AddCh(); state = 23; break;}
-					else {state = 0; break;}
-				case 23:
-					if (ch == '/') {AddCh(); state = 24; break;}
-					else {state = 0; break;}
-				case 24:
-					if (ch == '5') {AddCh(); state = 25; break;}
-					else {state = 0; break;}
-				case 25:
-					{t.kind = 9; break loop;}
-				case 26:
 					{t.kind = 10; break loop;}
-				case 27:
+				case 9:
 					{t.kind = 11; break loop;}
-				case 28:
+				case 10:
 					{t.kind = 12; break loop;}
-				case 29:
+				case 11:
 					{t.kind = 19; break loop;}
-				case 30:
+				case 12:
 					{t.kind = 32; break loop;}
-				case 31:
+				case 13:
 					{t.kind = 34; break loop;}
-				case 32:
+				case 14:
 					{t.kind = 35; break loop;}
-				case 33:
+				case 15:
 					{t.kind = 36; break loop;}
-				case 34:
+				case 16:
 					{t.kind = 37; break loop;}
-				case 35:
+				case 17:
+					{t.kind = 38; break loop;}
+				case 18:
 					{t.kind = 39; break loop;}
-				case 36:
+				case 19:
 					recEnd = pos; recKind = 6;
-					if (ch == '=') {AddCh(); state = 29; break;}
+					if (ch == '=') {AddCh(); state = 11; break;}
 					else {t.kind = 6; break loop;}
-				case 37:
-					recEnd = pos; recKind = 38;
-					if (ch == '2') {AddCh(); state = 8; break;}
-					else {t.kind = 38; break loop;}
-				case 38:
+				case 20:
 					recEnd = pos; recKind = 31;
-					if (ch == '=') {AddCh(); state = 30; break;}
+					if (ch == '=') {AddCh(); state = 12; break;}
 					else {t.kind = 31; break loop;}
-				case 39:
+				case 21:
 					recEnd = pos; recKind = 33;
-					if (ch == '=') {AddCh(); state = 31; break;}
-					else if (ch == '>') {AddCh(); state = 33; break;}
+					if (ch == '=') {AddCh(); state = 13; break;}
+					else if (ch == '>') {AddCh(); state = 15; break;}
 					else {t.kind = 33; break loop;}
 
 			}
