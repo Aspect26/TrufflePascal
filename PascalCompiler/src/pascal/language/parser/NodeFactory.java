@@ -145,6 +145,14 @@ public class NodeFactory {
     	
     	newVariableNames = null;
     }
+    
+    public void startProcedure(Token name){
+    	
+    }
+    
+    public void finishProcedure(StatementNode bodyNode){
+    	
+    }
 	
 	public void startMainFunction(){
 	}

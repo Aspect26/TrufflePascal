@@ -1,7 +1,5 @@
 package pascal.language.nodes.literals;
 
-import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
@@ -13,23 +11,15 @@ import pascal.language.runtime.PascalFunction;
 public final class FunctionLiteralNode extends ExpressionNode{
 	private final String value;
 
-	@CompilationFinal private PascalFunction cachedFunction;
-    @CompilationFinal private PascalContext cachedContext;
-    
-    private final PascalContext context;
+	private final PascalFunction function;
     
     public FunctionLiteralNode(PascalContext context, String value){
     	this.value = value;
-    	this.context = context;
+    	this.function = context.getFunctionRegistry().lookup(value);
     }
     
     @Override
     public PascalFunction executeGeneric(VirtualFrame frame){
-        if (context != cachedContext) {
-            CompilerDirectives.transferToInterpreterAndInvalidate();
-            this.cachedContext = context;
-            this.cachedFunction = context.getFunctionRegistry().lookup(value);
-        }
-        return cachedFunction;
+        return function;
     }
 }

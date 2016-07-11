@@ -42,32 +42,4 @@ public abstract class InvokeNode extends ExpressionNode {
         }
         return dispatchNode.executeDispatch(frame, function, argumentValues);
     }
-    
-    @Child private Node crossLanguageCall;
-    
-    @Specialization
-    @ExplodeLoop
-    protected Object executeGeneric(VirtualFrame frame, TruffleObject function) {
-        /*
-         * The number of arguments is constant for one invoke node. During compilation, the loop is
-         * unrolled and the execute methods of all arguments are inlined. This is triggered by the
-         * ExplodeLoop annotation on the method. The compiler assertion below illustrates that the
-         * array length is really constant.
-         */
-        CompilerAsserts.compilationConstant(argumentNodes.length);
-
-        Object[] argumentValues = new Object[argumentNodes.length];
-        for (int i = 0; i < argumentNodes.length; i++) {
-            argumentValues[i] = argumentNodes[i].executeGeneric(frame);
-        }
-        if (crossLanguageCall == null) {
-            crossLanguageCall = insert(Message.createExecute(argumentValues.length).createNode());
-        }
-        try {
-            Object res = ForeignAccess.sendExecute(crossLanguageCall, frame, function, argumentValues);
-            return PascalContext.fromForeignValue(res);
-        } catch (ArityException | UnsupportedTypeException | UnsupportedMessageException e) {
-            return Null.SINGLETON;
-        }
-    }
 }

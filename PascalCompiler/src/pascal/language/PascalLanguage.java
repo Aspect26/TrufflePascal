@@ -27,6 +27,7 @@ import pascal.language.runtime.PascalContext;
  * switch na error pokial sa neda vyhodnotit case
  * parser time check na break 
  * case bug - semicolon after last case option
+ * float bug - exponent must have unary operator with it (+ or -)
  * 
  * --------- PLAN ------------------------------
  * --- PHASE 1 DONE
@@ -41,7 +42,6 @@ import pascal.language.runtime.PascalContext;
  * 
  * --- PHASE 5:
  * units
- * floating point data types
  * 
  * --- PHASE 6:
  * enum
@@ -61,7 +61,7 @@ import pascal.language.runtime.PascalContext;
  * dos
  */
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.4", mimeType = "text/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.5", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();

@@ -30,6 +30,7 @@ PRODUCTIONS
 
 Pascal = 
 [ VariableDefinitions ]
+{ Subroutine }
 MainFunction
 .
 
@@ -53,7 +54,71 @@ identifier                                      (. factory.addNewUnknownVariable
 }
 ":"
 identifier                                      (. factory.finishVariableLineDefinition(t); .) 
-    ";" 
+";" 
+.
+
+
+Subroutine
+=
+( Function | Procedure )
+.
+
+
+Procedure
+=
+"procedure"									
+identifier										(. factory.startProcedure(t); .)
+[ FormalParameterList ] ";" 
+[ VariableDefinitions ]
+Block<out StatementNode bodyNode>				(. factory.finishProcedure(bodyNode); .)
+";"
+.
+
+
+
+Function
+=												
+"-2/-32*/44-/5-34*/5"
+.
+
+
+FormalParameterList
+=
+(
+	"("
+	FormalParameter
+	{ ";" FormalParameter }
+	")"
+)
+.
+
+
+FormalParameter
+=
+(
+	ValueParameter
+|
+	VariableParameter
+)
+.
+
+
+ValueParameter
+=
+identifier
+{
+	","
+	identifier
+}
+":"
+identifier
+.
+
+
+VariableParameter
+=
+"var"
+VariableLineDefinition
 .
 
 
@@ -250,7 +315,7 @@ Factor<out ExpressionNode expression>
 (
 	identifier
     (
-	    MemberExpression<out expression, null, t>
+	    MemberExpression<out expression, t>
     |
                                                 (. expression = factory.readVariable(t); .)
                                                 (. if(expression == null) .)
@@ -288,35 +353,9 @@ Factor<out ExpressionNode expression>
 		)										(. expression = factory.createRealLiteral(integerPartToken, .)
 												(. fractionalPartToken, exponentOpToken, exponentToken); .)    	
     )
-                                           
-|
-	RealLiteral<out expression>
 |
     LogicLiteral<out expression>
 )
-.
-
-
-RealLiteral<out ExpressionNode expression>
-=												(. Token integerPartToken; .)
-												(. Token fractionalPartToken = null; .)
-												(. Token exponentOpToken = null; .)
-												(. Token exponentToken = null; .)
-numericLiteral									(. integerPartToken = t; .)
-(
-	"."
-	numericLiteral								(. fractionalPartToken = t; .)
-	[
-		"e"
-		[ ( "+" | "-" ) ]						(. exponentOpToken = t; .)
-		numericLiteral							(. exponentToken = t; .)
-	]
-|
-	"e"
-	[ ( "+" | "-" ) ]							(. exponentOpToken = t; .)
-	numericLiteral								(. exponentToken = t; .)
-)												(. expression = factory.createRealLiteral(integerPartToken, .)
-												(.		fractionalPartToken, exponentOpToken, exponentToken); .)
 .
 
 
@@ -331,11 +370,10 @@ LogicLiteral<out ExpressionNode expression>
 
 
 
-MemberExpression<out ExpressionNode expression, ExpressionNode r, Token assignmentName>
+MemberExpression<out ExpressionNode expression, Token identifierName>
 =							                    (. expression = null; .)
-(                                               (. ExpressionNode receiver = r; .)
-	"("						                    (. if(receiver == null); 
-                                                      receiver = factory.createFunctionNode(assignmentName); .)
+(                                               
+	"("						                    (. ExpressionNode functionNode = factory.createFunctionNode(identifierName); .)
                                                 (. List<ExpressionNode> parameters = new ArrayList<>(); .)
                                                 (. ExpressionNode parameter; .)
 		[
@@ -345,13 +383,13 @@ MemberExpression<out ExpressionNode expression, ExpressionNode r, Token assignme
 				Expression<out parameter>       (. parameters.add(parameter); .)
 			}
 		]
-	")"                                         (. expression = factory.createCall(receiver, parameters); .)
+	")"                                         (. expression = factory.createCall(functionNode, parameters); .)
 |
     ":="
-    Expression<out ExpressionNode value>        (. if(assignmentName == null) { .) 
+    Expression<out ExpressionNode value>        (. if(identifierName == null) { .) 
                                                 (.      SemErr("Invalid assignment target!"); .)
                                                 (. } else { .)
-                                                (.      expression = factory.createAssignment(assignmentName, value); .)
+                                                (.      expression = factory.createAssignment(identifierName, value); .)
                                                 (.      if(expression == null) .)
                                                 (.          SemErr("Undefined variable!"); .)
                                                 (. } .)

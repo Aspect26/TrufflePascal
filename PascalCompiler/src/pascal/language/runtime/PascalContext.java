@@ -83,9 +83,9 @@ public final class PascalContext extends ExecutionContext {
      */
     private void installBuiltins(boolean registerRootNodes) {
     	
-    	installBuiltinInfiniteArgumens(WritelnBuiltinNodeFactory.getInstance(), registerRootNodes);
-    	installBuiltinInfiniteArgumens(WriteBuiltinNodeFactory.getInstance(), registerRootNodes);
-    	installBuiltinInfiniteArgumens(ReadlnBuiltinNodeFactory.getInstance(), registerRootNodes);
+    	installBuiltinInfiniteArguments(WritelnBuiltinNodeFactory.getInstance(), registerRootNodes);
+    	installBuiltinInfiniteArguments(WriteBuiltinNodeFactory.getInstance(), registerRootNodes);
+    	installBuiltinInfiniteArguments(ReadlnBuiltinNodeFactory.getInstance(), registerRootNodes);
     	
     	//installBuiltin(IncBuiltinNodeFactory.getInstance(), registerRootNodes);
     	//installBuiltin(DecBuiltinNodeFactory.getInstance(), registerRootNodes);
@@ -112,7 +112,7 @@ public final class PascalContext extends ExecutionContext {
         }
     }
     
-    public void installBuiltinInfiniteArgumens(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {
+    public void installBuiltinInfiniteArguments(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {
     	ExpressionNode argumentsNode[] = new ExpressionNode[1];
     	argumentsNode[0] = new ReadAllArgumentsNode();
     	BuiltinNode bodyNode = factory.createNode(argumentsNode, this);
