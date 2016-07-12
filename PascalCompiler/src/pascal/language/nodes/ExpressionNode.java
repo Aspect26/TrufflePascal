@@ -26,4 +26,8 @@ public abstract class ExpressionNode extends StatementNode {
 	public long executeLong(VirtualFrame frame) throws UnexpectedResultException{
 		return PascalTypesGen.expectLong(executeGeneric(frame));
 	}
+	
+	public char executeChar(VirtualFrame frame) throws UnexpectedResultException{
+		return PascalTypesGen.expectCharacter(executeGeneric(frame));
+	}
 }

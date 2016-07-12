@@ -1,6 +1,5 @@
 package pascal.language.nodes.call;
 
-import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import pascal.language.nodes.ExpressionNode;

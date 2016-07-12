@@ -30,6 +30,8 @@ import pascal.language.nodes.control.IfNode;
 import pascal.language.nodes.control.RepeatNode;
 import pascal.language.nodes.control.WhileNode;
 import pascal.language.nodes.function.FunctionBodyNode;
+import pascal.language.nodes.function.ReadSubroutineArgumentNode;
+import pascal.language.nodes.function.ReadSubroutineArgumentNodeGen;
 import pascal.language.nodes.literals.CharLiteralNode;
 import pascal.language.nodes.literals.DoubleLiteralNode;
 import pascal.language.nodes.literals.FunctionLiteralNode;
@@ -209,11 +211,13 @@ public class NodeFactory {
     }
     
     public void addFormalParameters(List<String> names, String type){
-    	FrameSlotKind slot = getSlotByTypeName(type);
+    	FrameSlotKind slotKind = getSlotByTypeName(type);
     	
     	for(String name : names){
-    		final ExpressionNode readNode = new ReadArgumentNode(lexicalScope.scopeNodes.size());
-    		final AssignmentNode assignment = AssignmentNodeGen.create(readNode, lexicalScope.frameDescriptor.findOrAddFrameSlot(name));
+    		final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(lexicalScope.scopeNodes.size(), slotKind);
+    		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(name, slotKind);
+    		final AssignmentNode assignment = AssignmentNodeGen.create(readNode, newSlot);
+    		lexicalScope.locals.put(name, newSlot);
     		lexicalScope.scopeNodes.add(assignment);
     	}
     }
