@@ -1,5 +1,6 @@
 package pascal.language.nodes.call;
 
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import pascal.language.nodes.ExpressionNode;
@@ -8,8 +9,10 @@ import pascal.language.runtime.Null;
 public class ReadArgumentNode extends ExpressionNode {
 
 	private final int index;
+	//private final FrameSlotKind kind;
 	
-	public ReadArgumentNode(int index){
+	public ReadArgumentNode(/*FrameSlotKind type,*/ int index){
+		//this.kind = type;
 		this.index = index;
 	}
 	

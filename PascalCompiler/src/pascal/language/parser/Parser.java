@@ -103,8 +103,10 @@ public class Parser {
 	void VariableDefinitions() {
 		Expect(4);
 		VariableLineDefinition();
+		Expect(5);
 		while (la.kind == 1) {
 			VariableLineDefinition();
+			Expect(5);
 		}
 	}
 
@@ -127,15 +129,14 @@ public class Parser {
 		factory.startVariableLineDefinition(); 
 		Expect(1);
 		factory.addNewUnknownVariable(t); 
-		while (la.kind == 5) {
+		while (la.kind == 6) {
 			Get();
 			Expect(1);
 			factory.addNewUnknownVariable(t); 
 		}
-		Expect(6);
+		Expect(7);
 		Expect(1);
 		factory.finishVariableLineDefinition(t); 
-		Expect(7);
 	}
 
 	void Function() {
@@ -145,16 +146,16 @@ public class Parser {
 		if (la.kind == 10) {
 			FormalParameterList();
 		}
-		Expect(6);
-		Expect(1);
 		Expect(7);
+		Expect(1);
+		Expect(5);
 		factory.setFunctionReturnValue(t); 
 		if (la.kind == 4) {
 			VariableDefinitions();
 		}
 		StatementNode bodyNode = Block();
 		factory.finishFunction(bodyNode); 
-		Expect(7);
+		Expect(5);
 	}
 
 	void Procedure() {
@@ -164,19 +165,19 @@ public class Parser {
 		if (la.kind == 10) {
 			FormalParameterList();
 		}
-		Expect(7);
+		Expect(5);
 		if (la.kind == 4) {
 			VariableDefinitions();
 		}
 		StatementNode bodyNode = Block();
 		factory.finishProcedure(bodyNode); 
-		Expect(7);
+		Expect(5);
 	}
 
 	void FormalParameterList() {
 		Expect(10);
 		FormalParameter();
-		while (la.kind == 7) {
+		while (la.kind == 5) {
 			Get();
 			FormalParameter();
 		}
@@ -198,30 +199,39 @@ public class Parser {
 	void FormalParameter() {
 		if (la.kind == 1) {
 			ValueParameter();
-		} else if (la.kind == 4) {
+		} else if (la.kind == 1) {
 			VariableParameter();
 		} else SynErr(47);
 	}
 
 	void ValueParameter() {
+		List<String> identifiers = new ArrayList<>(); 
 		Expect(1);
-		while (la.kind == 5) {
+		identifiers.add(t.val); 
+		while (la.kind == 6) {
 			Get();
 			Expect(1);
+			identifiers.add(t.val); 
 		}
-		Expect(6);
+		Expect(7);
 		Expect(1);
+		factory.addFormalParameters(identifiers, t.val); 
 	}
 
 	void VariableParameter() {
-		Expect(4);
-		VariableLineDefinition();
+		Expect(1);
+		while (la.kind == 6) {
+			Get();
+			Expect(1);
+		}
+		Expect(7);
+		Expect(1);
 	}
 
 	void StatementSequence(List body) {
 		StatementNode statement = Statement();
 		body.add(statement); 
-		while (la.kind == 7) {
+		while (la.kind == 5) {
 			Get();
 			statement = Statement();
 			body.add(statement); 
@@ -232,7 +242,7 @@ public class Parser {
 		StatementNode  statement;
 		statement = null; 
 		switch (la.kind) {
-		case 7: case 14: case 24: case 28: {
+		case 5: case 14: case 24: case 28: {
 			statement = factory.createEmptyStatement(); 
 			break;
 		}
@@ -358,13 +368,13 @@ public class Parser {
 
 	void CaseList() {
 		ExpressionNode caseConstant = Expression();
-		Expect(6);
+		Expect(7);
 		StatementNode caseStatement = Statement();
 		factory.addCaseOption(caseConstant, caseStatement); 
-		while (la.kind == 7) {
+		while (la.kind == 5) {
 			Get();
 			caseConstant = Expression();
-			Expect(6);
+			Expect(7);
 			caseStatement = Statement();
 			factory.addCaseOption(caseConstant, caseStatement); 
 		}
@@ -552,7 +562,7 @@ public class Parser {
 			if (StartOf(5)) {
 				parameter = Expression();
 				parameters.add(parameter); 
-				while (la.kind == 5) {
+				while (la.kind == 6) {
 					Get();
 					parameter = Expression();
 					parameters.add(parameter); 
@@ -600,7 +610,7 @@ public class Parser {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_T,_x, _x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_T, _T,_x,_x},
+		{_x,_T,_T,_T, _x,_T,_x,_x, _x,_x,_T,_x, _x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_T, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_T,_x, _x,_T,_x,_x, _T,_T,_T,_x, _T,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x},
@@ -643,9 +653,9 @@ class Errors {
 			case 2: s = "stringLiteral expected"; break;
 			case 3: s = "numericLiteral expected"; break;
 			case 4: s = "\"var\" expected"; break;
-			case 5: s = "\",\" expected"; break;
-			case 6: s = "\":\" expected"; break;
-			case 7: s = "\";\" expected"; break;
+			case 5: s = "\";\" expected"; break;
+			case 6: s = "\",\" expected"; break;
+			case 7: s = "\":\" expected"; break;
 			case 8: s = "\"procedure\" expected"; break;
 			case 9: s = "\"function\" expected"; break;
 			case 10: s = "\"(\" expected"; break;

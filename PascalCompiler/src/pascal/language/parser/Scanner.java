@@ -282,9 +282,9 @@ public class Scanner {
 		for (int i = 49; i <= 57; ++i) start.set(i, 4);
 		start.set(39, 2); 
 		start.set(48, 5); 
-		start.set(44, 6); 
+		start.set(59, 6); 
+		start.set(44, 7); 
 		start.set(58, 19); 
-		start.set(59, 7); 
 		start.set(40, 8); 
 		start.set(41, 9); 
 		start.set(46, 10); 
@@ -466,7 +466,7 @@ public class Scanner {
 				case 6:
 					{t.kind = 5; break loop;}
 				case 7:
-					{t.kind = 7; break loop;}
+					{t.kind = 6; break loop;}
 				case 8:
 					{t.kind = 10; break loop;}
 				case 9:
@@ -490,9 +490,9 @@ public class Scanner {
 				case 18:
 					{t.kind = 39; break loop;}
 				case 19:
-					recEnd = pos; recKind = 6;
+					recEnd = pos; recKind = 7;
 					if (ch == '=') {AddCh(); state = 11; break;}
-					else {t.kind = 6; break loop;}
+					else {t.kind = 7; break loop;}
 				case 20:
 					recEnd = pos; recKind = 31;
 					if (ch == '=') {AddCh(); state = 12; break;}

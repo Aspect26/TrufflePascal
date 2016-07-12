@@ -22,6 +22,7 @@ import pascal.language.nodes.arithmetic.MultiplyNodeGen;
 import pascal.language.nodes.arithmetic.NegationNodeGen;
 import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
+import pascal.language.nodes.call.ReadArgumentNode;
 import pascal.language.nodes.control.BreakNode;
 import pascal.language.nodes.control.CaseNode;
 import pascal.language.nodes.control.ForNode;
@@ -52,7 +53,9 @@ public class NodeFactory {
         protected final LexicalScope outer;
         protected final Map<String, FrameSlot> locals;
         protected final String name;
+        
         public FrameDescriptor frameDescriptor;
+        public List<StatementNode> scopeNodes = new ArrayList<>();
 
         LexicalScope(LexicalScope outer, String name) {
         	this.name = name;
@@ -103,6 +106,40 @@ public class NodeFactory {
 		this.lexicalScope.frameDescriptor = new FrameDescriptor();
     }
     
+    private FrameSlotKind getSlotByTypeName(String type){
+    	switch(type){
+    	
+    	// ordinals
+    	case "integer":
+    	case "cardinal":
+    	case "shortint":
+    	case "smallint":
+    	case "longint":
+    	case "int64":
+    	case "byte":
+    	case "word":
+    	case "longword":
+    		return FrameSlotKind.Long;
+    		
+    	// floating points
+    	case "single":
+    	case "real":
+    	case "double":
+    		return FrameSlotKind.Double; 
+    		
+    	// logical
+    	case "boolean":
+    		return FrameSlotKind.Boolean; 
+    		
+    	// char
+    	case "char":
+    		return FrameSlotKind.Byte; 
+    		
+    	default:
+    		return FrameSlotKind.Illegal; 
+    	}
+    }
+    
     public void startVariableLineDefinition(){
     	assert newVariableNames == null;
     	newVariableNames = new ArrayList<>();
@@ -113,39 +150,7 @@ public class NodeFactory {
     }
     
     public void finishVariableLineDefinition(Token variableType){
-    	FrameSlotKind slotKind;
-    	
-    	switch(variableType.val){
-    	
-    	//ordinals
-    	case "integer":
-    	case "cardinal":
-    	case "shortint":
-    	case "smallint":
-    	case "longint":
-    	case "int64":
-    	case "byte":
-    	case "word":
-    	case "longword":
-    		slotKind = FrameSlotKind.Long; break;
-    		
-    	// floating points
-    	case "single":
-    	case "real":
-    	case "double":
-    		slotKind = FrameSlotKind.Double; break;
-    		
-    	// logical
-    	case "boolean":
-    		slotKind = FrameSlotKind.Boolean; break;
-    		
-    	// char
-    	case "char":
-    		slotKind = FrameSlotKind.Byte; break;
-    		
-    	default:
-    		slotKind = FrameSlotKind.Illegal; break;
-    	}
+    	FrameSlotKind slotKind = getSlotByTypeName(variableType.val);
     	
     	if(slotKind == FrameSlotKind.Illegal){
     		parser.SemErr("Unkown variable type: " + variableType.val);
@@ -195,8 +200,22 @@ public class NodeFactory {
     		return;
     	}
     	
+    	lexicalScope.scopeNodes.add(bodyNode);
+    	final StatementNode subroutineNode = new BlockNode(lexicalScope.scopeNodes.toArray(new StatementNode[lexicalScope.scopeNodes.size()]));
+    	final FunctionBodyNode functionBodyNode = new FunctionBodyNode(subroutineNode);
+    	final PascalRootNode rootNode = new PascalRootNode(context, lexicalScope.frameDescriptor, functionBodyNode);
+    	context.getFunctionRegistry().register(lexicalScope.name, rootNode);
     	lexicalScope = lexicalScope.outer;
-    	FrameDescriptor fd = new FrameDescriptor();
+    }
+    
+    public void addFormalParameters(List<String> names, String type){
+    	FrameSlotKind slot = getSlotByTypeName(type);
+    	
+    	for(String name : names){
+    		final ExpressionNode readNode = new ReadArgumentNode(lexicalScope.scopeNodes.size());
+    		final AssignmentNode assignment = AssignmentNodeGen.create(readNode, lexicalScope.frameDescriptor.findOrAddFrameSlot(name));
+    		lexicalScope.scopeNodes.add(assignment);
+    	}
     }
     
 	public void startMainFunction(){

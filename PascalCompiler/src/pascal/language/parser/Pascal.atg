@@ -38,9 +38,9 @@ MainFunction
 VariableDefinitions
 =
 "var"
-VariableLineDefinition
+VariableLineDefinition ";"
 {
-    VariableLineDefinition
+    VariableLineDefinition ";"
 }
 .
 
@@ -54,7 +54,6 @@ identifier                                      (. factory.addNewUnknownVariable
 }
 ":"
 identifier                                      (. factory.finishVariableLineDefinition(t); .) 
-";" 
 .
 
 
@@ -112,7 +111,19 @@ FormalParameter
 
 
 ValueParameter
-=
+=												(. List<String> identifiers = new ArrayList<>(); .)
+identifier										(. identifiers.add(t.val); .)
+{
+	","
+	identifier									(. identifiers.add(t.val); .)
+}
+":"
+identifier										(. factory.addFormalParameters(identifiers, t.val); .)
+.
+
+
+VariableParameter
+=													
 identifier
 {
 	","
@@ -120,13 +131,6 @@ identifier
 }
 ":"
 identifier
-.
-
-
-VariableParameter
-=
-"var"
-VariableLineDefinition
 .
 
 
