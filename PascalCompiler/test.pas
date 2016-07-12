@@ -4,15 +4,15 @@ var
     psdf:real;
 
 
-procedure p(a:integer);
+function p(a:integer):integer;
 var ef:integer;
 begin
  writeln(a);
- a:=a+1;
- writeln(a);
+ p:=15435;
 end;
 
 BEGIN
  i := 1;
- p(5);
+ i := p(5);
+ writeln(i);
 END.

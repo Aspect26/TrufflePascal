@@ -81,8 +81,8 @@ Function
 identifier										(. factory.startFunction(t); .)
 [ FormalParameterList ] 
 ":"
-identifier	
-";"												(. factory.setFunctionReturnValue(t); .)
+identifier										(. factory.setFunctionReturnValue(t); .)
+";"												
 [ VariableDefinitions ]
 Block<out StatementNode bodyNode>				(. factory.finishFunction(bodyNode); .)
 ";"

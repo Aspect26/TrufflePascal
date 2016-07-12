@@ -148,8 +148,8 @@ public class Parser {
 		}
 		Expect(7);
 		Expect(1);
-		Expect(5);
 		factory.setFunctionReturnValue(t); 
+		Expect(5);
 		if (la.kind == 4) {
 			VariableDefinitions();
 		}

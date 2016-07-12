@@ -30,6 +30,8 @@ import pascal.language.nodes.control.IfNode;
 import pascal.language.nodes.control.RepeatNode;
 import pascal.language.nodes.control.WhileNode;
 import pascal.language.nodes.function.FunctionBodyNode;
+import pascal.language.nodes.function.FunctionBodyNodeGen;
+import pascal.language.nodes.function.ProcedureBodyNode;
 import pascal.language.nodes.function.ReadSubroutineArgumentNode;
 import pascal.language.nodes.function.ReadSubroutineArgumentNodeGen;
 import pascal.language.nodes.literals.CharLiteralNode;
@@ -58,6 +60,7 @@ public class NodeFactory {
         
         public FrameDescriptor frameDescriptor;
         public List<StatementNode> scopeNodes = new ArrayList<>();
+        public FrameSlot returnSlot = null;
 
         LexicalScope(LexicalScope outer, String name) {
         	this.name = name;
@@ -171,7 +174,11 @@ public class NodeFactory {
     }
     
     public void finishProcedure(StatementNode bodyNode){
-    	finishSubroutine(bodyNode);
+    	StatementNode subroutineNode = finishSubroutine(bodyNode);
+    	final ProcedureBodyNode functionBodyNode = new ProcedureBodyNode(subroutineNode);
+    	final PascalRootNode rootNode = new PascalRootNode(context, lexicalScope.frameDescriptor, functionBodyNode);
+    	context.getFunctionRegistry().register(lexicalScope.name, rootNode);
+    	lexicalScope = lexicalScope.outer;
     }
     
     public void startFunction(Token name){
@@ -179,11 +186,19 @@ public class NodeFactory {
     }
     
     public void setFunctionReturnValue(Token type){
-    	
+    	lexicalScope.returnSlot = 
+    			lexicalScope.frameDescriptor.addFrameSlot(lexicalScope.name, getSlotByTypeName(type.val));
+    	lexicalScope.locals.put(lexicalScope.name, lexicalScope.returnSlot);
     }
     
     public void finishFunction(StatementNode bodyNode){
-    	finishSubroutine(bodyNode);
+    	StatementNode subroutineNode = finishSubroutine(bodyNode);
+    	
+    	final FunctionBodyNode functionBodyNode = 
+    			FunctionBodyNodeGen.create(subroutineNode, lexicalScope.returnSlot);
+    	final PascalRootNode rootNode = new PascalRootNode(context, lexicalScope.frameDescriptor, functionBodyNode);
+    	context.getFunctionRegistry().register(lexicalScope.name, rootNode);
+    	lexicalScope = lexicalScope.outer;
     }
     
     private void startSubroutine(Token name){
@@ -196,18 +211,15 @@ public class NodeFactory {
     	lexicalScope.frameDescriptor = copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
     }
     
-    private void finishSubroutine(StatementNode bodyNode){
+    private StatementNode finishSubroutine(StatementNode bodyNode){
     	if(lexicalScope.outer == null){
     		context.getOutput().println("Can't leave subroutine.");
-    		return;
+    		return null;
     	}
     	
     	lexicalScope.scopeNodes.add(bodyNode);
     	final StatementNode subroutineNode = new BlockNode(lexicalScope.scopeNodes.toArray(new StatementNode[lexicalScope.scopeNodes.size()]));
-    	final FunctionBodyNode functionBodyNode = new FunctionBodyNode(subroutineNode);
-    	final PascalRootNode rootNode = new PascalRootNode(context, lexicalScope.frameDescriptor, functionBodyNode);
-    	context.getFunctionRegistry().register(lexicalScope.name, rootNode);
-    	lexicalScope = lexicalScope.outer;
+    	return subroutineNode;
     }
     
     public void addFormalParameters(List<String> names, String type){
@@ -226,7 +238,7 @@ public class NodeFactory {
 	}
 	
 	public PascalRootNode finishMainFunction(StatementNode blockNode){
-		return new PascalRootNode(context, lexicalScope.frameDescriptor, new FunctionBodyNode(blockNode));
+		return new PascalRootNode(context, lexicalScope.frameDescriptor, new ProcedureBodyNode(blockNode));
 	}
 	
 	public void startMainBlock(){
