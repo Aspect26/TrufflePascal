@@ -1,18 +1,11 @@
-var
-    i:integer;
-    d:double;
-    psdf:real;
-
-
-function p(a:integer):integer;
-var ef:integer;
+function factorial(a:integer):integer;
 begin
- writeln(a);
- p:=15435;
+ if a < 2 then 
+  begin factorial := 1; end
+ else 
+  begin factorial := a*factorial(a-1); end;
 end;
 
-BEGIN
- i := 1;
- i := p(5);
- writeln(i);
-END.
+begin
+ writeln(factorial(7));
+end.

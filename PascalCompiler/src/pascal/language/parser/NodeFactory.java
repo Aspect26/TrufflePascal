@@ -275,9 +275,6 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createFunctionNode(Token tokenName){
-		if(context.getFunctionRegistry().lookup(tokenName.val.toLowerCase()) == null)
-			parser.SemErr("The function '" + tokenName.val + "' is undefined in the current context.");
-			
 		return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
 	}
 	
