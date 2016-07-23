@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.List;
 
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
@@ -107,13 +108,13 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 		return null;
 	}
 	
-	public static void start(String sourcePath) throws IOException {
+	public static void start(String sourcePath, List<String> imports) throws IOException {
 		Parser parser = new Parser(new PascalContext(), Source.fromFileName(sourcePath));
 		parser.Parse();
 		if(!parser.noErrors()){
 			System.out.println("Errors while parsing, the code cannot be interpreted...");
 			return;
-		}
+		} 
 			
 		Truffle.getRuntime().createCallTarget(parser.mainNode).call();
 	}

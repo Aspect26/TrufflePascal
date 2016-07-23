@@ -36,7 +36,7 @@ import com.oracle.truffle.api.source.Source;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parser {
+public class Parser{
 -->constants
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -135,6 +135,10 @@ public class Parser {
     }
 } // end Parser
 
+class FormalParameter{
+	public String type;
+	public String identifier;
+}
 
 class Errors {
 	public int count = 0;                                    // number of errors detected

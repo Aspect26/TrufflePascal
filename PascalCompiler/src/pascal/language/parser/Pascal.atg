@@ -29,10 +29,28 @@ IGNORE cr + lf + tab
 PRODUCTIONS
 
 Pascal = 
-[ VariableDefinitions ]
-{ Subroutine }
-MainFunction
+(
+	[ ImportsSection ]
+	[ VariableDefinitions ]
+	{ Subroutine }
+	MainFunction
+|
+	Unit
+)
 .
+
+
+ImportsSection
+=
+"uses"
+identifier										(. factory.importUnit(t.val); .)
+{
+	","
+	identifier									(. factory.importUnit(t.val); .)
+}
+";"
+.
+
 
 
 VariableDefinitions
@@ -408,5 +426,66 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
 )
 .
 
+
+
+Unit
+=
+"unit"
+identifier										(. factory.startUnit(t); .)
+"interface"
+InterfaceSection
+"implementation"
+ImplementationSection
+"end."
+.
+
+
+InterfaceSection
+=
+{
+	(
+		ProcedureHeading
+	|
+		FunctionHeading
+	)
+}
+.
+
+
+
+ProcedureHeading
+=
+"procedure"
+identifier										(. String name = t.val; .)
+												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ IFormalParameterList<out formalParameters> ] 		
+												(. factory.addProcedureInterface(name, formalParameters); .)
+.
+
+
+
+FunctionHeading
+=
+"function"
+identifier										(. String name = t.val; .)
+												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ IFormalParameterList<out formalParameters> ] 
+":"
+identifier										(. String returnValue = t.val; .)
+												(. factory.addFunctionInterface(name, formalParameters, returnValue); .)
+.
+
+
+IFormalParameterList<out List formalParameters>
+=
+"FPRS"											(. formalParameters = new ArrayList<>(); .)
+.
+
+
+
+ImplementationSection
+=
+"IMPLEMENTATION"
+.
 
 END Pascal.

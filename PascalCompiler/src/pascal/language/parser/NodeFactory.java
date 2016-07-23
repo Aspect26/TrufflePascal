@@ -50,6 +50,8 @@ import pascal.language.nodes.variables.AssignmentNode;
 import pascal.language.nodes.variables.AssignmentNodeGen;
 import pascal.language.nodes.variables.ReadVariableNodeGen;
 import pascal.language.runtime.PascalContext;
+import pascal.language.runtime.PascalFunction;
+import pascal.language.runtime.PascalFunctionRegistry;
 
 public class NodeFactory {
 	
@@ -102,6 +104,11 @@ public class NodeFactory {
     /* State while parsing case statement */
     private List<ExpressionNode> caseExpressions;
     private List<StatementNode> caseStatements;
+    
+    /* List of units found in sources given (name -> function registry) */
+    private Map<String, PascalFunctionRegistry> units = new HashMap<>();
+    
+    private String unitName;
     
     public NodeFactory(Parser parser, PascalContext context, Source source){
     	this.context = context;
@@ -415,5 +422,31 @@ public class NodeFactory {
 			parser.SemErr("Unexpected unary operator: " + operator.val);
 			return null;
 		}
+	}
+	
+	public void importUnit(String unitName){
+		PascalFunctionRegistry fRegistry = units.get(unitName);
+		if(fRegistry == null){
+			parser.SemErr("Unknown unit. Did you imported it to compiler? - " + unitName);
+			return;
+		}
+		
+		this.context.getFunctionRegistry().addAll(fRegistry);
+	}
+	
+	/*****************************************************************************
+	 * UNIT SECTION
+	 */
+	
+	public void startUnit(Token t){
+		this.unitName = t.val;
+	}
+	
+	public void addProcedureInterface(String name, List<FormalParameter> formalParameters){
+		
+	}
+	
+	public void addFunctionInterface(String name, List<FormalParameter> formalParameters, String returnType){
+		
 	}
 }
