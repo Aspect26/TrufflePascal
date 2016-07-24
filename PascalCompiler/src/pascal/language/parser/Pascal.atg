@@ -130,13 +130,13 @@ FormalParameter
 
 ValueParameter
 =												(. List<String> identifiers = new ArrayList<>(); .)
-identifier										(. identifiers.add(t.val); .)
+identifier										(. identifiers.add(t.val.toLowerCase()); .)
 {
 	","
-	identifier									(. identifiers.add(t.val); .)
+	identifier									(. identifiers.add(t.val.toLowerCase()); .)
 }
 ":"
-identifier										(. factory.addFormalParameters(identifiers, t.val); .)
+identifier										(. factory.addFormalParameters(identifiers, t.val.toLowerCase()); .)
 .
 
 
@@ -437,7 +437,7 @@ identifier										(. factory.startUnit(t); .)
 InterfaceSection
 "implementation"
 ImplementationSection
-"endunit."
+"endunit."										(. factory.endUnit(); .)
 .
 
 
@@ -461,6 +461,7 @@ identifier										(. String name = t.val; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ IFormalParameterList<out formalParameters> ] 		
 												(. factory.addProcedureInterface(name, formalParameters); .)
+";"
 .
 
 
@@ -474,6 +475,7 @@ identifier										(. String name = t.val; .)
 ":"
 identifier										(. String returnValue = t.val; .)
 												(. factory.addFunctionInterface(name, formalParameters, returnValue); .)
+";"
 .
 
 
@@ -531,7 +533,9 @@ identifier										(. String typeName = t.val; .)
 
 ImplementationSection
 =
-"IMPLEMENTATION"
+{
+	Subroutine
+}
 .
 
 END Pascal.

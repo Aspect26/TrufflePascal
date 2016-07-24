@@ -153,6 +153,7 @@ public class Parser{
 		Expect(48);
 		ImplementationSection();
 		Expect(49);
+		factory.endUnit(); 
 	}
 
 	void VariableLineDefinition() {
@@ -237,15 +238,15 @@ public class Parser{
 	void ValueParameter() {
 		List<String> identifiers = new ArrayList<>(); 
 		Expect(1);
-		identifiers.add(t.val); 
+		identifiers.add(t.val.toLowerCase()); 
 		while (la.kind == 5) {
 			Get();
 			Expect(1);
-			identifiers.add(t.val); 
+			identifiers.add(t.val.toLowerCase()); 
 		}
 		Expect(8);
 		Expect(1);
-		factory.addFormalParameters(identifiers, t.val); 
+		factory.addFormalParameters(identifiers, t.val.toLowerCase()); 
 	}
 
 	void VariableParameter() {
@@ -638,7 +639,9 @@ public class Parser{
 	}
 
 	void ImplementationSection() {
-		Expect(48);
+		while (la.kind == 9 || la.kind == 10) {
+			Subroutine();
+		}
 	}
 
 	void ProcedureHeading() {
@@ -650,6 +653,7 @@ public class Parser{
 			formalParameters = IFormalParameterList();
 		}
 		factory.addProcedureInterface(name, formalParameters); 
+		Expect(6);
 	}
 
 	void FunctionHeading() {
@@ -664,6 +668,7 @@ public class Parser{
 		Expect(1);
 		String returnValue = t.val; 
 		factory.addFunctionInterface(name, formalParameters, returnValue); 
+		Expect(6);
 	}
 
 	List  IFormalParameterList() {

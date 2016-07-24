@@ -68,6 +68,7 @@ public class NodeFactory {
         	this.name = name;
             this.outer = outer;
             this.locals = new HashMap<>();
+            this.frameDescriptor = new FrameDescriptor();
             if (outer != null) {
                 locals.putAll(outer.locals);
             }
@@ -107,6 +108,20 @@ public class NodeFactory {
     
     /* List of units found in sources given (name -> function registry) */
     private Map<String, PascalFunctionRegistry> units = new HashMap<>();
+    
+    /* Interface state while parsing unit interface */
+    private Map<String, List<FormalParameter>> unitProcedures = new HashMap<>();
+    private Map<String, FunctionFormalParameters> unitFunctions = new HashMap<>();
+    
+    class FunctionFormalParameters{
+    	public FunctionFormalParameters(List<FormalParameter> formalParameters, String typeName){
+    		this.formalParameters = formalParameters;
+    		this.typeName = typeName;
+    	}
+    	
+    	public List<FormalParameter> formalParameters;
+    	public String typeName;
+    }
     
     private String unitName;
     
@@ -214,7 +229,7 @@ public class NodeFactory {
     		return;
     	}
     	
-    	lexicalScope = new LexicalScope(lexicalScope, name.val);
+    	lexicalScope = new LexicalScope(lexicalScope, name.val.toLowerCase());
     	lexicalScope.frameDescriptor = copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
     }
     
@@ -413,7 +428,7 @@ public class NodeFactory {
 	public ExpressionNode createUnary(Token operator, ExpressionNode son){
 		switch(operator.val){
 		case "+":
-			return son;   // unary + in Pascal marks identity
+			return son;   // unary + in Pascal markss identity
 		case "-":
 			return NegationNodeGen.create(son);
 		case "not":
@@ -440,6 +455,11 @@ public class NodeFactory {
 	
 	public void startUnit(Token t){
 		this.unitName = t.val;
+		this.lexicalScope = new LexicalScope(null, unitName);
+	}
+	
+	public void endUnit(){
+		this.unitName = null;
 	}
 	
 	public void appendIFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params){
@@ -458,10 +478,29 @@ public class NodeFactory {
 	}
 	
 	public void addProcedureInterface(String name, List<FormalParameter> formalParameters){
-		
+		if(subroutineExists(name))
+				return;
+
+		unitProcedures.put(name, formalParameters);
 	}
 	
 	public void addFunctionInterface(String name, List<FormalParameter> formalParameters, String returnType){
+		if(subroutineExists(name))
+			return;
+
+		unitFunctions.put(name, new FunctionFormalParameters(formalParameters, returnType));
+	}
+	
+	private boolean subroutineExists(String name){
+		if(unitProcedures.containsKey(name)){
+			parser.SemErr("Procedure with name " + name + " is already defined in unit file " + unitName);
+			return true;
+		}
+		else if(unitFunctions.containsKey(name)){
+			parser.SemErr("Function with name " + name + " is already defined in unit file " + unitName);
+			return true;
+		}
 		
+		return false;
 	}
 }

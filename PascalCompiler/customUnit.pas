@@ -1,13 +1,21 @@
-unit customUnit;
+UNIT customUnit;
 
-interface
+INTERFACE
 
 function RA(w,h:integer):integer;
+procedure Hello;
 
-implementation
+IMPLEMENTATION
 
 function RA(w,h:integer):integer;
 var i:integer;
 begin
- RA:=w*h;
-end.
+ RA:=w*w;
+end;
+
+procedure Hello;
+begin
+ writeln('Hello World!');
+end;
+
+endunit.
