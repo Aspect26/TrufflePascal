@@ -252,8 +252,8 @@ class StartStates {
 public class Scanner {
 	static final char EOL = '\n';
 	static final int  eofSym = 0;
-	static final int maxT = 51;
-	static final int noSym = 51;
+	static final int maxT = 50;
+	static final int noSym = 50;
 	char valCh;       // current input character (for token.val)
 
 	public Buffer buffer; // scanner buffer
@@ -326,7 +326,6 @@ public class Scanner {
 		literals.put("unit", new Integer(46));
 		literals.put("interface", new Integer(47));
 		literals.put("implementation", new Integer(48));
-		literals.put("fprs", new Integer(50));
 
 	}
 	
@@ -522,6 +521,26 @@ public class Scanner {
 					else if (ch == 'd') {AddCh(); state = 25; break;}
 					else {t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
 				case 25:
+					recEnd = pos; recKind = 1;
+					if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 't' || ch >= 'v' && ch <= 'z') {AddCh(); state = 1; break;}
+					else if (ch == 'u') {AddCh(); state = 26; break;}
+					else {t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
+				case 26:
+					recEnd = pos; recKind = 1;
+					if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'm' || ch >= 'o' && ch <= 'z') {AddCh(); state = 1; break;}
+					else if (ch == 'n') {AddCh(); state = 27; break;}
+					else {t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
+				case 27:
+					recEnd = pos; recKind = 1;
+					if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'h' || ch >= 'j' && ch <= 'z') {AddCh(); state = 1; break;}
+					else if (ch == 'i') {AddCh(); state = 28; break;}
+					else {t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
+				case 28:
+					recEnd = pos; recKind = 1;
+					if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 's' || ch >= 'u' && ch <= 'z') {AddCh(); state = 1; break;}
+					else if (ch == 't') {AddCh(); state = 29; break;}
+					else {t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t;}
+				case 29:
 					recEnd = pos; recKind = 1;
 					if (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z') {AddCh(); state = 1; break;}
 					else if (ch == '.') {AddCh(); state = 19; break;}

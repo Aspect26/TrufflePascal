@@ -37,7 +37,7 @@ public class CompilerMain {
 		}
 		
 		public boolean isNextArgument(){
-			if (currentIndex + 1 >= args.length-1)
+			if (currentIndex  >= args.length-1)
 				return false;
 			
 			return args[currentIndex + 1].charAt(0) != '-';

@@ -432,11 +432,12 @@ Unit
 =
 "unit"
 identifier										(. factory.startUnit(t); .)
+";"
 "interface"
 InterfaceSection
 "implementation"
 ImplementationSection
-"end."
+"endunit."
 .
 
 
@@ -477,10 +478,55 @@ identifier										(. String returnValue = t.val; .)
 
 
 IFormalParameterList<out List formalParameters>
-=
-"FPRS"											(. formalParameters = new ArrayList<>(); .)
+=												(. formalParameters = new ArrayList<FormalParameter>(); .)
+"("												(. List<FormalParameter> formalParameter = new ArrayList<>(); .)
+	IFormalParameter<out formalParameter>		(. factory.appendIFormalParameter(formalParameter, formalParameters); .)
+	{
+		";"
+		IFormalParameter<out formalParameter>	(. factory.appendIFormalParameter(formalParameter, formalParameters); .)
+	}											
+")"
 .
 
+
+
+IFormalParameter<out List formalParameter>
+=												(. formalParameter = new ArrayList<FormalParameter>(); .)
+(
+	IValueParameter<out formalParameter>
+|
+	IVariableParameter<out formalParameter>
+)
+.
+
+
+
+IValueParameter<out List formalParameter>
+=												(. List<String> identifiers = new ArrayList<>(); .)
+identifier										(. identifiers.add(t.val); .)
+{
+	","
+	identifier									(. identifiers.add(t.val); .)
+}
+":"
+identifier										(. String typeName = t.val; .)
+												(. formalParameter = factory.createInterfaceParameter(identifiers, typeName); .)
+.
+
+
+
+IVariableParameter<out List formalParameter>
+=												(. List<String> identifiers = new ArrayList<>(); .)
+"var"
+identifier										(. identifiers.add(t.val); .)			
+{
+	","
+	identifier									(. identifiers.add(t.val); .)
+}
+":"
+identifier										(. String typeName = t.val; .)
+												(. formalParameter = factory.createInterfaceParameter(identifiers, typeName); .)
+.
 
 
 ImplementationSection

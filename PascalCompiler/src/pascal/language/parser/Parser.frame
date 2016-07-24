@@ -53,9 +53,8 @@ public class Parser{
 
 	-->declarations
 
-	public Parser(PascalContext context, Source source) {
-		this.scanner = new Scanner(source.getInputStream());
-		this.factory = new NodeFactory(this, context, source);
+	public Parser(PascalContext context) {
+		this.factory = new NodeFactory(this, context);
 		errors = new Errors();
 	}
 
@@ -114,7 +113,8 @@ public class Parser{
 	
 -->productions
 
-	public void Parse() {
+	public void Parse(Source source) {
+		this.scanner = new Scanner(source.getInputStream());
 		la = new Token();
 		la.val = "";		
 		Get();
@@ -125,17 +125,17 @@ public class Parser{
 -->initialization
 	};
 	
-	public static void parsePascal(PascalContext context, Source source) {
-        Parser parser = new Parser(context, source);
-        parser.Parse();
-    }
-    
     public boolean noErrors(){
     	return errors.count == 0;
     }
 } // end Parser
 
 class FormalParameter{
+	public FormalParameter(String id, String type){
+		this.type = type;
+		this.identifier = id;
+	}
+	
 	public String type;
 	public String identifier;
 }

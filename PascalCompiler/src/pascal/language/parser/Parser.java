@@ -14,7 +14,7 @@ public class Parser{
 	public static final int _identifier = 1;
 	public static final int _stringLiteral = 2;
 	public static final int _numericLiteral = 3;
-	public static final int maxT = 51;
+	public static final int maxT = 50;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -31,9 +31,8 @@ public class Parser{
 
 	
 
-	public Parser(PascalContext context, Source source) {
-		this.scanner = new Scanner(source.getInputStream());
-		this.factory = new NodeFactory(this, context, source);
+	public Parser(PascalContext context) {
+		this.factory = new NodeFactory(this, context);
 		errors = new Errors();
 	}
 
@@ -104,7 +103,7 @@ public class Parser{
 			MainFunction();
 		} else if (la.kind == 46) {
 			Unit();
-		} else SynErr(52);
+		} else SynErr(51);
 	}
 
 	void ImportsSection() {
@@ -134,7 +133,7 @@ public class Parser{
 			Function();
 		} else if (la.kind == 9) {
 			Procedure();
-		} else SynErr(53);
+		} else SynErr(52);
 	}
 
 	void MainFunction() {
@@ -148,6 +147,7 @@ public class Parser{
 		Expect(46);
 		Expect(1);
 		factory.startUnit(t); 
+		Expect(6);
 		Expect(47);
 		InterfaceSection();
 		Expect(48);
@@ -231,7 +231,7 @@ public class Parser{
 			ValueParameter();
 		} else if (la.kind == 1) {
 			VariableParameter();
-		} else SynErr(54);
+		} else SynErr(53);
 	}
 
 	void ValueParameter() {
@@ -309,7 +309,7 @@ public class Parser{
 			statement = Block();
 			break;
 		}
-		default: SynErr(55); break;
+		default: SynErr(54); break;
 		}
 		return statement;
 	}
@@ -355,7 +355,7 @@ public class Parser{
 		} else if (la.kind == 22) {
 			Get();
 			ascending = false; 
-		} else SynErr(56);
+		} else SynErr(55);
 		ExpressionNode finalValue = Expression();
 		Expect(23);
 		StatementNode loopBody = Statement();
@@ -507,7 +507,7 @@ public class Parser{
 			expression = factory.createUnary(unOp, expression); 
 		} else if (StartOf(4)) {
 			expression = Factor();
-		} else SynErr(57);
+		} else SynErr(56);
 		return expression;
 	}
 
@@ -522,7 +522,7 @@ public class Parser{
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
-			} else SynErr(58);
+			} else SynErr(57);
 		} else if (la.kind == 11) {
 			Get();
 			expression = Expression();
@@ -574,10 +574,10 @@ public class Parser{
 				}
 				expression = factory.createRealLiteral(integerPartToken, 
 				fractionalPartToken, exponentOpToken, exponentToken); 
-			} else SynErr(59);
+			} else SynErr(58);
 		} else if (la.kind == 44 || la.kind == 45) {
 			expression = LogicLiteral();
-		} else SynErr(60);
+		} else SynErr(59);
 		return expression;
 	}
 
@@ -610,7 +610,7 @@ public class Parser{
 			if(expression == null) 
 			SemErr("Undefined variable!"); 
 			} 
-		} else SynErr(61);
+		} else SynErr(60);
 		return expression;
 	}
 
@@ -623,7 +623,7 @@ public class Parser{
 		} else if (la.kind == 45) {
 			Get();
 			expression = factory.createLogicLiteral(false); 
-		} else SynErr(62);
+		} else SynErr(61);
 		return expression;
 	}
 
@@ -646,7 +646,7 @@ public class Parser{
 		Expect(1);
 		String name = t.val; 
 		List<FormalParameter> formalParameters = new ArrayList<>(); 
-		if (la.kind == 50) {
+		if (la.kind == 11) {
 			formalParameters = IFormalParameterList();
 		}
 		factory.addProcedureInterface(name, formalParameters); 
@@ -657,7 +657,7 @@ public class Parser{
 		Expect(1);
 		String name = t.val; 
 		List<FormalParameter> formalParameters = new ArrayList<>(); 
-		if (la.kind == 50) {
+		if (la.kind == 11) {
 			formalParameters = IFormalParameterList();
 		}
 		Expect(8);
@@ -668,14 +668,70 @@ public class Parser{
 
 	List  IFormalParameterList() {
 		List  formalParameters;
-		Expect(50);
-		formalParameters = new ArrayList<>(); 
+		formalParameters = new ArrayList<FormalParameter>(); 
+		Expect(11);
+		List<FormalParameter> formalParameter = new ArrayList<>(); 
+		formalParameter = IFormalParameter();
+		factory.appendIFormalParameter(formalParameter, formalParameters); 
+		while (la.kind == 6) {
+			Get();
+			formalParameter = IFormalParameter();
+			factory.appendIFormalParameter(formalParameter, formalParameters); 
+		}
+		Expect(12);
 		return formalParameters;
+	}
+
+	List  IFormalParameter() {
+		List  formalParameter;
+		formalParameter = new ArrayList<FormalParameter>(); 
+		if (la.kind == 1) {
+			formalParameter = IValueParameter();
+		} else if (la.kind == 7) {
+			formalParameter = IVariableParameter();
+		} else SynErr(62);
+		return formalParameter;
+	}
+
+	List  IValueParameter() {
+		List  formalParameter;
+		List<String> identifiers = new ArrayList<>(); 
+		Expect(1);
+		identifiers.add(t.val); 
+		while (la.kind == 5) {
+			Get();
+			Expect(1);
+			identifiers.add(t.val); 
+		}
+		Expect(8);
+		Expect(1);
+		String typeName = t.val; 
+		formalParameter = factory.createInterfaceParameter(identifiers, typeName); 
+		return formalParameter;
+	}
+
+	List  IVariableParameter() {
+		List  formalParameter;
+		List<String> identifiers = new ArrayList<>(); 
+		Expect(7);
+		Expect(1);
+		identifiers.add(t.val); 
+		while (la.kind == 5) {
+			Get();
+			Expect(1);
+			identifiers.add(t.val); 
+		}
+		Expect(8);
+		Expect(1);
+		String typeName = t.val; 
+		formalParameter = factory.createInterfaceParameter(identifiers, typeName); 
+		return formalParameter;
 	}
 
 
 
-	public void Parse() {
+	public void Parse(Source source) {
+		this.scanner = new Scanner(source.getInputStream());
 		la = new Token();
 		la.val = "";		
 		Get();
@@ -685,27 +741,27 @@ public class Parser{
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _T,_x,_x,_T, _x,_T,_T,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_T,_T,_T, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_T,_T,_x, _T,_x,_x,_x, _T,_x,_x,_T, _x,_x,_T,_x, _x,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_x,_x,_x, _T,_x,_x,_T, _x,_T,_T,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x},
+		{_x,_x,_x,_x, _x,_T,_T,_x, _T,_x,_x,_x, _T,_x,_x,_T, _x,_x,_T,_x, _x,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x}
 
 	};
 	
-	public static void parsePascal(PascalContext context, Source source) {
-        Parser parser = new Parser(context, source);
-        parser.Parse();
-    }
-    
     public boolean noErrors(){
     	return errors.count == 0;
     }
 } // end Parser
 
 class FormalParameter{
+	public FormalParameter(String id, String type){
+		this.type = type;
+		this.identifier = id;
+	}
+	
 	public String type;
 	public String identifier;
 }
@@ -778,20 +834,20 @@ class Errors {
 			case 46: s = "\"unit\" expected"; break;
 			case 47: s = "\"interface\" expected"; break;
 			case 48: s = "\"implementation\" expected"; break;
-			case 49: s = "\"end.\" expected"; break;
-			case 50: s = "\"fprs\" expected"; break;
-			case 51: s = "??? expected"; break;
-			case 52: s = "invalid Pascal"; break;
-			case 53: s = "invalid Subroutine"; break;
-			case 54: s = "invalid FormalParameter"; break;
-			case 55: s = "invalid Statement"; break;
-			case 56: s = "invalid ForLoop"; break;
-			case 57: s = "invalid SignedFactor"; break;
+			case 49: s = "\"endunit.\" expected"; break;
+			case 50: s = "??? expected"; break;
+			case 51: s = "invalid Pascal"; break;
+			case 52: s = "invalid Subroutine"; break;
+			case 53: s = "invalid FormalParameter"; break;
+			case 54: s = "invalid Statement"; break;
+			case 55: s = "invalid ForLoop"; break;
+			case 56: s = "invalid SignedFactor"; break;
+			case 57: s = "invalid Factor"; break;
 			case 58: s = "invalid Factor"; break;
 			case 59: s = "invalid Factor"; break;
-			case 60: s = "invalid Factor"; break;
-			case 61: s = "invalid MemberExpression"; break;
-			case 62: s = "invalid LogicLiteral"; break;
+			case 60: s = "invalid MemberExpression"; break;
+			case 61: s = "invalid LogicLiteral"; break;
+			case 62: s = "invalid IFormalParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

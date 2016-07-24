@@ -110,7 +110,7 @@ public class NodeFactory {
     
     private String unitName;
     
-    public NodeFactory(Parser parser, PascalContext context, Source source){
+    public NodeFactory(Parser parser, PascalContext context){
     	this.context = context;
     	this.parser = parser;
     	
@@ -440,6 +440,21 @@ public class NodeFactory {
 	
 	public void startUnit(Token t){
 		this.unitName = t.val;
+	}
+	
+	public void appendIFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params){
+		for(FormalParameter param : parameter){
+			params.add(param);
+		}
+	}
+	
+	public List<FormalParameter> createInterfaceParameter(List<String> identifiers, String typeName){
+		List<FormalParameter> paramList = new ArrayList<>();
+		for(String identifier : identifiers){
+			paramList.add(new FormalParameter(identifier, typeName));
+		}
+		
+		return paramList;
 	}
 	
 	public void addProcedureInterface(String name, List<FormalParameter> formalParameters){

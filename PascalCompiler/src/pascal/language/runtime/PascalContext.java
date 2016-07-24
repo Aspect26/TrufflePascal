@@ -48,7 +48,7 @@ public final class PascalContext extends ExecutionContext {
         installBuiltins(installBuiltins);
     }
 	
-	public PascalRootNode evalSource(Source source){
+	/*public PascalRootNode evalSource(Source source){
 		Parser parser = new Parser(this, source);
 		parser.Parse();
 		
@@ -56,7 +56,7 @@ public final class PascalContext extends ExecutionContext {
 			return parser.mainNode;
 		
 		return null;
-	}
+	}*/
 	
 	public BufferedReader getInput() {
         return input;

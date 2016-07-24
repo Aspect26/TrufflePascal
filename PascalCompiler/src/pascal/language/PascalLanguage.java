@@ -79,9 +79,10 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 	
 	@Override
 	protected CallTarget parse(Source code, Node context, String... argumentNames) throws IOException {
-		final PascalContext _context = new PascalContext();
-		RootNode rootNode =_context.evalSource(code);
-		return Truffle.getRuntime().createCallTarget(rootNode);
+		//final PascalContext _context = new PascalContext();
+		//RootNode rootNode =_context.evalSource(code);
+		//return Truffle.getRuntime().createCallTarget(rootNode);
+		return null;
 	}
 
 	@Override
@@ -109,10 +110,20 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 	}
 	
 	public static void start(String sourcePath, List<String> imports) throws IOException {
-		Parser parser = new Parser(new PascalContext(), Source.fromFileName(sourcePath));
-		parser.Parse();
+		PascalContext context = new PascalContext();
+		Parser parser = new Parser(context);
+		
+		for(String imp : imports){
+			parser.Parse(Source.fromFileName(imp));
+			if(!parser.noErrors()){
+				System.out.println("Errors while parsing import file " + imp + ".");
+				return;
+			} 
+		}
+		
+		parser.Parse(Source.fromFileName(sourcePath));
 		if(!parser.noErrors()){
-			System.out.println("Errors while parsing, the code cannot be interpreted...");
+			System.out.println("Errors while parsing source file, the code cannot be interpreted...");
 			return;
 		} 
 			
