@@ -18,6 +18,10 @@ import pascal.language.parser.Parser;
 import pascal.language.runtime.PascalContext;
 
 /**
+ * QUSTIONS LIST
+ * how to use Graal
+ * integer range check (ako riesit unsigned ??)
+ * 
  * TODO LIST
  *
  * ReadArgumentNode -> Object[] -> no specialization
@@ -34,6 +38,7 @@ import pascal.language.runtime.PascalContext;
  * --------- PLAN ------------------------------
  * --- PHASE 1 DONE
  * --- PHASE 2 DDONE
+ * --- PHASE 5 DONE
  * 
  * --- PHASE 3:
  * readln
@@ -41,9 +46,6 @@ import pascal.language.runtime.PascalContext;
  * 
  * --- PHASE 4:
  * goto
- * 
- * --- PHASE 5:
- * units
  * 
  * --- PHASE 6:
  * enum
@@ -63,7 +65,7 @@ import pascal.language.runtime.PascalContext;
  * dos
  */
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.5", mimeType = "text/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.6", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();

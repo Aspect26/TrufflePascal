@@ -29,7 +29,6 @@ public final class PascalContext extends ExecutionContext {
     private final PrintStream output;
     //private final TruffleLanguage.Env env;
     private final PascalFunctionRegistry functionRegistry;
-    private final PascalUnitRegistry unitRegistry;
     
     public PascalContext(){
     	this(null, null, System.out, true);
@@ -43,20 +42,9 @@ public final class PascalContext extends ExecutionContext {
         this.input = input;
         this.output = output;
         //this.env = env;
-        this.unitRegistry = new PascalUnitRegistry();
         this.functionRegistry = new PascalFunctionRegistry();
         installBuiltins(installBuiltins);
     }
-	
-	/*public PascalRootNode evalSource(Source source){
-		Parser parser = new Parser(this, source);
-		parser.Parse();
-		
-		if(parser.noErrors())
-			return parser.mainNode;
-		
-		return null;
-	}*/
 	
 	public BufferedReader getInput() {
         return input;
@@ -68,10 +56,6 @@ public final class PascalContext extends ExecutionContext {
 	
     public PascalFunctionRegistry getFunctionRegistry() {
         return functionRegistry;
-    }
-    
-    public PascalUnitRegistry getUnitRegistry(){
-    	return unitRegistry;
     }
     
     /**
