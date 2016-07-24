@@ -8,7 +8,6 @@ import java.util.Map;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import com.oracle.truffle.api.source.Source;
 
 import pascal.language.nodes.BlockNode;
 import pascal.language.nodes.ExpressionNode;
@@ -22,7 +21,6 @@ import pascal.language.nodes.arithmetic.MultiplyNodeGen;
 import pascal.language.nodes.arithmetic.NegationNodeGen;
 import pascal.language.nodes.arithmetic.SubstractNodeGen;
 import pascal.language.nodes.call.InvokeNodeGen;
-import pascal.language.nodes.call.ReadArgumentNode;
 import pascal.language.nodes.control.BreakNode;
 import pascal.language.nodes.control.CaseNode;
 import pascal.language.nodes.control.ForNode;
@@ -32,7 +30,6 @@ import pascal.language.nodes.control.WhileNode;
 import pascal.language.nodes.function.FunctionBodyNode;
 import pascal.language.nodes.function.FunctionBodyNodeGen;
 import pascal.language.nodes.function.ProcedureBodyNode;
-import pascal.language.nodes.function.ReadSubroutineArgumentNode;
 import pascal.language.nodes.function.ReadSubroutineArgumentNodeGen;
 import pascal.language.nodes.literals.CharLiteralNode;
 import pascal.language.nodes.literals.DoubleLiteralNode;
@@ -50,7 +47,6 @@ import pascal.language.nodes.variables.AssignmentNode;
 import pascal.language.nodes.variables.AssignmentNodeGen;
 import pascal.language.nodes.variables.ReadVariableNodeGen;
 import pascal.language.runtime.PascalContext;
-import pascal.language.runtime.PascalFunction;
 import pascal.language.runtime.PascalFunctionRegistry;
 
 public class NodeFactory {

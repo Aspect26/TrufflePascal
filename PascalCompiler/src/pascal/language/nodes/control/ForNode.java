@@ -9,8 +9,6 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import pascal.exceptions.BreakException;
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.StatementNode;
-import pascal.language.nodes.call.InvokeNodeGen;
-import pascal.language.nodes.literals.FunctionLiteralNode;
 import pascal.language.nodes.variables.AssignmentNode;
 import pascal.language.nodes.variables.AssignmentNodeGen;
 

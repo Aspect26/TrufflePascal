@@ -10,19 +10,15 @@ import com.oracle.truffle.api.dsl.NodeFactory;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.nodes.NodeInfo;
-import com.oracle.truffle.api.source.Source;
 
 import pascal.language.nodes.ExpressionNode;
 import pascal.language.nodes.PascalRootNode;
 import pascal.language.nodes.builtin.BuiltinNode;
-import pascal.language.nodes.builtin.DecBuiltinNodeFactory;
-import pascal.language.nodes.builtin.IncBuiltinNodeFactory;
 import pascal.language.nodes.builtin.ReadlnBuiltinNodeFactory;
 import pascal.language.nodes.builtin.WriteBuiltinNodeFactory;
 import pascal.language.nodes.builtin.WritelnBuiltinNodeFactory;
 import pascal.language.nodes.call.ReadAllArgumentsNode;
 import pascal.language.nodes.call.ReadArgumentNode;
-import pascal.language.parser.Parser;
 
 public final class PascalContext extends ExecutionContext {
 	private final BufferedReader input;

@@ -24,6 +24,11 @@ public class PascalFunction implements TruffleObject{
     	return callTarget;
     }
     
+    @Override
+    public String toString(){
+    	return name;
+    }
+    
 	@Override
 	public ForeignAccess getForeignAccess() {
 		// TODO Foreign access
