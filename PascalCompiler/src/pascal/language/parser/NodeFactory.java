@@ -194,7 +194,7 @@ public class NodeFactory {
     public void finishProcedure(StatementNode bodyNode){
     	StatementNode subroutineNode = finishSubroutine(bodyNode);
     	final ProcedureBodyNode functionBodyNode = new ProcedureBodyNode(subroutineNode);
-    	final PascalRootNode rootNode = new PascalRootNode(context, lexicalScope.frameDescriptor, functionBodyNode);
+    	final PascalRootNode rootNode = new PascalRootNode(lexicalScope.frameDescriptor, functionBodyNode);
     	
     	if(unitName == null){
     		context.getFunctionRegistry().register(lexicalScope.name, rootNode);
@@ -220,7 +220,7 @@ public class NodeFactory {
     	
     	final FunctionBodyNode functionBodyNode = 
     			FunctionBodyNodeGen.create(subroutineNode, lexicalScope.returnSlot);
-    	final PascalRootNode rootNode = new PascalRootNode(context, lexicalScope.frameDescriptor, functionBodyNode);
+    	final PascalRootNode rootNode = new PascalRootNode(lexicalScope.frameDescriptor, functionBodyNode);
     	
     	if(unitName == null){
     		context.getFunctionRegistry().register(lexicalScope.name, rootNode);
@@ -274,7 +274,7 @@ public class NodeFactory {
 	}
 	
 	public PascalRootNode finishMainFunction(StatementNode blockNode){
-		return new PascalRootNode(context, lexicalScope.frameDescriptor, new ProcedureBodyNode(blockNode));
+		return new PascalRootNode(lexicalScope.frameDescriptor, new ProcedureBodyNode(blockNode));
 	}
 	
 	public void startMainBlock(){
@@ -486,7 +486,7 @@ public class NodeFactory {
 			parser.SemErr("Unit with name " + unitName + " is already defined.");
 			return;
 		}
-		this.units.put(unitName, new PascalFunctionRegistry());
+		this.units.put(unitName, new PascalFunctionRegistry(context));
 	}
 	
 	public void endUnit(){

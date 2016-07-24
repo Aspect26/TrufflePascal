@@ -27,19 +27,14 @@ public final class PascalContext extends ExecutionContext {
     private final PascalFunctionRegistry functionRegistry;
     
     public PascalContext(){
-    	this(null, null, System.out, true);
+    	this(null, null, System.out);
     }
     
-	public PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintStream output) {
-        this(env, input, output, true);
-    }
-
-	private PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintStream output, boolean installBuiltins) {
+	private PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintStream output) {
         this.input = input;
         this.output = output;
         //this.env = env;
-        this.functionRegistry = new PascalFunctionRegistry();
-        installBuiltins(installBuiltins);
+        this.functionRegistry = new PascalFunctionRegistry(this);
     }
 	
 	public BufferedReader getInput() {
@@ -52,65 +47,6 @@ public final class PascalContext extends ExecutionContext {
 	
     public PascalFunctionRegistry getFunctionRegistry() {
         return functionRegistry;
-    }
-    
-    /**
-     * Adds all builtin functions to the {@link PascalFunctionRegistry}. This method lists all
-     * {@link PascalBuiltinNode builtin implementation classes}.
-     */
-    private void installBuiltins(boolean registerRootNodes) {
-    	
-    	installBuiltinInfiniteArguments(WritelnBuiltinNodeFactory.getInstance(), registerRootNodes);
-    	installBuiltinInfiniteArguments(WriteBuiltinNodeFactory.getInstance(), registerRootNodes);
-    	installBuiltinInfiniteArguments(ReadlnBuiltinNodeFactory.getInstance(), registerRootNodes);
-    	
-    	//installBuiltin(IncBuiltinNodeFactory.getInstance(), registerRootNodes);
-    	//installBuiltin(DecBuiltinNodeFactory.getInstance(), registerRootNodes);
-    }
-    
-    public void installBuiltin(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {
-        int argumentCount = factory.getExecutionSignature().size();
-        ExpressionNode[] argumentNodes = new ExpressionNode[argumentCount];
-
-        for (int i = 0; i < argumentCount; i++) {
-            argumentNodes[i] = new ReadArgumentNode(i);
-        }
-        
-        /* Instantiate the builtin node. This node performs the actual functionality. */
-        BuiltinNode builtinBodyNode = factory.createNode(argumentNodes, this);
-        
-        /* Wrap the builtin in a RootNode. Truffle requires all AST to start with a RootNode. */
-        PascalRootNode rootNode = new PascalRootNode(this, new FrameDescriptor(), builtinBodyNode);
-
-        String name = lookupNodeInfo(builtinBodyNode.getClass()).shortName();
-        if (registerRootNodes) {
-            /* Register the builtin function in our function registry. */
-            getFunctionRegistry().register(name, rootNode);
-        }
-    }
-    
-    public void installBuiltinInfiniteArguments(NodeFactory<? extends BuiltinNode> factory, boolean registerRootNodes) {
-    	ExpressionNode argumentsNode[] = new ExpressionNode[1];
-    	argumentsNode[0] = new ReadAllArgumentsNode();
-    	BuiltinNode bodyNode = factory.createNode(argumentsNode, this);
-    	PascalRootNode rootNode = new PascalRootNode(this, new FrameDescriptor(), bodyNode);
-    	
-    	String name = lookupNodeInfo(bodyNode.getClass()).shortName();
-        if (registerRootNodes) {
-            getFunctionRegistry().register(name, rootNode);
-        }
-    }
-    
-    public static NodeInfo lookupNodeInfo(Class<?> clazz) {
-        if (clazz == null) {
-            return null;
-        }
-        NodeInfo info = clazz.getAnnotation(NodeInfo.class);
-        if (info != null) {
-            return info;
-        } else {
-            return lookupNodeInfo(clazz.getSuperclass());
-        }
     }
     
     public static Object fromForeignValue(Object a) {

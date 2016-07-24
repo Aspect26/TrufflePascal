@@ -72,11 +72,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext>{
 	
 	@Override
 	protected PascalContext createContext(com.oracle.truffle.api.TruffleLanguage.Env env) {
-		return new PascalContext(
-				env, 
-				new BufferedReader(new InputStreamReader(env.in())),
-				new PrintStream(env.out())
-				);
+		return null;
 	}
 	
 	@Override
