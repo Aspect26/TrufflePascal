@@ -1,3 +1,5 @@
+uses customUnit;
+
 function factorial(a:integer):integer;
 begin
  if a < 2 then 
@@ -8,4 +10,5 @@ end;
 
 begin
  writeln(factorial(7));
+ Hello();
 end.

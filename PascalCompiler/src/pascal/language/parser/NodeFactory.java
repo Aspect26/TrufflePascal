@@ -199,7 +199,13 @@ public class NodeFactory {
     	StatementNode subroutineNode = finishSubroutine(bodyNode);
     	final ProcedureBodyNode functionBodyNode = new ProcedureBodyNode(subroutineNode);
     	final PascalRootNode rootNode = new PascalRootNode(context, lexicalScope.frameDescriptor, functionBodyNode);
-    	context.getFunctionRegistry().register(lexicalScope.name, rootNode);
+    	
+    	if(unitName == null){
+    		context.getFunctionRegistry().register(lexicalScope.name, rootNode);
+    	} else{
+    		units.get(unitName).register(lexicalScope.name, rootNode);
+    	}
+    		
     	lexicalScope = lexicalScope.outer;
     }
     
@@ -219,14 +225,26 @@ public class NodeFactory {
     	final FunctionBodyNode functionBodyNode = 
     			FunctionBodyNodeGen.create(subroutineNode, lexicalScope.returnSlot);
     	final PascalRootNode rootNode = new PascalRootNode(context, lexicalScope.frameDescriptor, functionBodyNode);
-    	context.getFunctionRegistry().register(lexicalScope.name, rootNode);
+    	
+    	if(unitName == null){
+    		context.getFunctionRegistry().register(lexicalScope.name, rootNode);
+    	} else{
+    		units.get(unitName).register(lexicalScope.name, rootNode);
+    	}
+
     	lexicalScope = lexicalScope.outer;
     }
     
     private void startSubroutine(Token name){
-    	if(lexicalScope.outer != null){
+     	if(lexicalScope.outer != null){
     		context.getOutput().println("Nested subroutines are not supported.");
     		return;
+    	}
+    	
+    	if(unitName == null)
+    		context.getFunctionRegistry().registerFunctionName(name.val.toLowerCase());
+    	else{
+    		// TODO: check if function has interface in current unit
     	}
     	
     	lexicalScope = new LexicalScope(lexicalScope, name.val.toLowerCase());
@@ -297,6 +315,15 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createFunctionNode(Token tokenName){
+		String functionName = tokenName.val.toLowerCase();
+		if(context.getFunctionRegistry().lookup(functionName) == null){
+			if(unitName != null){
+				if(units.get(unitName).lookup(functionName) != null)
+					return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
+			}
+			parser.SemErr("Undefined function: " + functionName);
+			return null;
+		}
 		return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
 	}
 	
@@ -439,10 +466,12 @@ public class NodeFactory {
 		}
 	}
 	
-	public void importUnit(String unitName){
-		PascalFunctionRegistry fRegistry = units.get(unitName);
+	public void importUnit(Token unitToken){
+		String importingUnit = unitToken.val.toLowerCase();
+		
+		PascalFunctionRegistry fRegistry = units.get(importingUnit);
 		if(fRegistry == null){
-			parser.SemErr("Unknown unit. Did you imported it to compiler? - " + unitName);
+			parser.SemErr("Unknown unit. Did you imported it to compiler? - " + importingUnit);
 			return;
 		}
 		
@@ -454,8 +483,14 @@ public class NodeFactory {
 	 */
 	
 	public void startUnit(Token t){
-		this.unitName = t.val;
+		this.unitName = t.val.toLowerCase();
 		this.lexicalScope = new LexicalScope(null, unitName);
+		
+		if(units.containsValue(t.val.toLowerCase())){
+			parser.SemErr("Unit with name " + unitName + " is already defined.");
+			return;
+		}
+		this.units.put(unitName, new PascalFunctionRegistry());
 	}
 	
 	public void endUnit(){
@@ -481,6 +516,7 @@ public class NodeFactory {
 		if(subroutineExists(name))
 				return;
 
+		units.get(unitName).registerFunctionName(name);
 		unitProcedures.put(name, formalParameters);
 	}
 	
@@ -488,6 +524,7 @@ public class NodeFactory {
 		if(subroutineExists(name))
 			return;
 
+		units.get(unitName).registerFunctionName(name);
 		unitFunctions.put(name, new FunctionFormalParameters(formalParameters, returnType));
 	}
 	

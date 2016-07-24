@@ -10,7 +10,10 @@ public class PascalFunction implements TruffleObject{
     /** The current implementation of this function. */
     private RootCallTarget callTarget;
     
-    public PascalFunction(){
+    private final String name;
+    
+    public PascalFunction(String name){
+    	this.name = name;
     }
     
     protected void setCallTarget(RootCallTarget callTarget) {

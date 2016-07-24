@@ -14,7 +14,7 @@ public class Parser{
 	public static final int _identifier = 1;
 	public static final int _stringLiteral = 2;
 	public static final int _numericLiteral = 3;
-	public static final int maxT = 50;
+	public static final int maxT = 49;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -103,17 +103,17 @@ public class Parser{
 			MainFunction();
 		} else if (la.kind == 46) {
 			Unit();
-		} else SynErr(51);
+		} else SynErr(50);
 	}
 
 	void ImportsSection() {
 		Expect(4);
 		Expect(1);
-		factory.importUnit(t.val); 
+		factory.importUnit(t); 
 		while (la.kind == 5) {
 			Get();
 			Expect(1);
-			factory.importUnit(t.val); 
+			factory.importUnit(t); 
 		}
 		Expect(6);
 	}
@@ -133,7 +133,7 @@ public class Parser{
 			Function();
 		} else if (la.kind == 9) {
 			Procedure();
-		} else SynErr(52);
+		} else SynErr(51);
 	}
 
 	void MainFunction() {
@@ -152,8 +152,9 @@ public class Parser{
 		InterfaceSection();
 		Expect(48);
 		ImplementationSection();
-		Expect(49);
+		Expect(15);
 		factory.endUnit(); 
+		Expect(13);
 	}
 
 	void VariableLineDefinition() {
@@ -232,7 +233,7 @@ public class Parser{
 			ValueParameter();
 		} else if (la.kind == 1) {
 			VariableParameter();
-		} else SynErr(53);
+		} else SynErr(52);
 	}
 
 	void ValueParameter() {
@@ -310,7 +311,7 @@ public class Parser{
 			statement = Block();
 			break;
 		}
-		default: SynErr(54); break;
+		default: SynErr(53); break;
 		}
 		return statement;
 	}
@@ -356,7 +357,7 @@ public class Parser{
 		} else if (la.kind == 22) {
 			Get();
 			ascending = false; 
-		} else SynErr(55);
+		} else SynErr(54);
 		ExpressionNode finalValue = Expression();
 		Expect(23);
 		StatementNode loopBody = Statement();
@@ -508,7 +509,7 @@ public class Parser{
 			expression = factory.createUnary(unOp, expression); 
 		} else if (StartOf(4)) {
 			expression = Factor();
-		} else SynErr(56);
+		} else SynErr(55);
 		return expression;
 	}
 
@@ -523,7 +524,7 @@ public class Parser{
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
-			} else SynErr(57);
+			} else SynErr(56);
 		} else if (la.kind == 11) {
 			Get();
 			expression = Expression();
@@ -575,10 +576,10 @@ public class Parser{
 				}
 				expression = factory.createRealLiteral(integerPartToken, 
 				fractionalPartToken, exponentOpToken, exponentToken); 
-			} else SynErr(58);
+			} else SynErr(57);
 		} else if (la.kind == 44 || la.kind == 45) {
 			expression = LogicLiteral();
-		} else SynErr(59);
+		} else SynErr(58);
 		return expression;
 	}
 
@@ -611,7 +612,7 @@ public class Parser{
 			if(expression == null) 
 			SemErr("Undefined variable!"); 
 			} 
-		} else SynErr(60);
+		} else SynErr(59);
 		return expression;
 	}
 
@@ -624,7 +625,7 @@ public class Parser{
 		} else if (la.kind == 45) {
 			Get();
 			expression = factory.createLogicLiteral(false); 
-		} else SynErr(61);
+		} else SynErr(60);
 		return expression;
 	}
 
@@ -694,7 +695,7 @@ public class Parser{
 			formalParameter = IValueParameter();
 		} else if (la.kind == 7) {
 			formalParameter = IVariableParameter();
-		} else SynErr(62);
+		} else SynErr(61);
 		return formalParameter;
 	}
 
@@ -746,13 +747,13 @@ public class Parser{
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _T,_x,_x,_T, _x,_T,_T,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x},
-		{_x,_x,_x,_x, _x,_T,_T,_x, _T,_x,_x,_x, _T,_x,_x,_T, _x,_x,_T,_x, _x,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _T,_x,_x,_T, _x,_T,_T,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_T,_T,_x, _T,_x,_x,_x, _T,_x,_x,_T, _x,_x,_T,_x, _x,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x}
 
 	};
 	
@@ -839,20 +840,19 @@ class Errors {
 			case 46: s = "\"unit\" expected"; break;
 			case 47: s = "\"interface\" expected"; break;
 			case 48: s = "\"implementation\" expected"; break;
-			case 49: s = "\"endunit.\" expected"; break;
-			case 50: s = "??? expected"; break;
-			case 51: s = "invalid Pascal"; break;
-			case 52: s = "invalid Subroutine"; break;
-			case 53: s = "invalid FormalParameter"; break;
-			case 54: s = "invalid Statement"; break;
-			case 55: s = "invalid ForLoop"; break;
-			case 56: s = "invalid SignedFactor"; break;
+			case 49: s = "??? expected"; break;
+			case 50: s = "invalid Pascal"; break;
+			case 51: s = "invalid Subroutine"; break;
+			case 52: s = "invalid FormalParameter"; break;
+			case 53: s = "invalid Statement"; break;
+			case 54: s = "invalid ForLoop"; break;
+			case 55: s = "invalid SignedFactor"; break;
+			case 56: s = "invalid Factor"; break;
 			case 57: s = "invalid Factor"; break;
 			case 58: s = "invalid Factor"; break;
-			case 59: s = "invalid Factor"; break;
-			case 60: s = "invalid MemberExpression"; break;
-			case 61: s = "invalid LogicLiteral"; break;
-			case 62: s = "invalid IFormalParameter"; break;
+			case 59: s = "invalid MemberExpression"; break;
+			case 60: s = "invalid LogicLiteral"; break;
+			case 61: s = "invalid IFormalParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

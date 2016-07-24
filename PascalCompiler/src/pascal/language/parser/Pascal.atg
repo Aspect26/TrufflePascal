@@ -43,10 +43,10 @@ Pascal =
 ImportsSection
 =
 "uses"
-identifier										(. factory.importUnit(t.val); .)
+identifier										(. factory.importUnit(t); .)
 {
 	","
-	identifier									(. factory.importUnit(t.val); .)
+	identifier									(. factory.importUnit(t); .)
 }
 ";"
 .
@@ -437,7 +437,8 @@ identifier										(. factory.startUnit(t); .)
 InterfaceSection
 "implementation"
 ImplementationSection
-"endunit."										(. factory.endUnit(); .)
+"end"										(. factory.endUnit(); .)
+"."
 .
 
 

@@ -25,8 +25,12 @@ public class PascalFunctionRegistry {
 		return result;
 	}
 	
+	public void registerFunctionName(String name){
+		functions.put(name, new PascalFunction("__UnimplementedFunction"));
+	}
+	
 	public void register(String name, PascalRootNode rootNode){
-		PascalFunction func = new PascalFunction();
+		PascalFunction func = new PascalFunction(name);
 		functions.put(name, func);
 		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
 		func.setCallTarget(callTarget);
