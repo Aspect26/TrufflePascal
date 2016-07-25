@@ -87,7 +87,7 @@ Procedure
 identifier										(. factory.startProcedure(t); .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
-";" 
+";" 											(. factory.checkUnitInterfaceMatchProcedure(formalParameters); .)
 [ VariableDefinitions ]
 Block<out StatementNode bodyNode>				(. factory.finishProcedure(bodyNode); .)
 ";"
@@ -103,7 +103,8 @@ identifier										(. factory.startFunction(t); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
 ":"
 identifier										(. factory.setFunctionReturnValue(t); .)
-";"												
+												(. factory.checkUnitInterfaceMatchFunction(formalParameters,t.val.toLowerCase()); .)
+";"
 [ VariableDefinitions ]
 Block<out StatementNode bodyNode>				(. factory.finishFunction(bodyNode); .)
 ";"
@@ -464,7 +465,7 @@ InterfaceSection
 ProcedureHeading
 =
 "procedure"
-identifier										(. String name = t.val; .)
+identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ IFormalParameterList<out formalParameters> ] 		
 												(. factory.addProcedureInterface(name, formalParameters); .)
@@ -476,7 +477,7 @@ identifier										(. String name = t.val; .)
 FunctionHeading
 =
 "function"
-identifier										(. String name = t.val; .)
+identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ IFormalParameterList<out formalParameters> ] 
 ":"

@@ -183,6 +183,7 @@ public class Parser{
 		Expect(8);
 		Expect(1);
 		factory.setFunctionReturnValue(t); 
+		factory.checkUnitInterfaceMatchFunction(formalParameters,t.val.toLowerCase()); 
 		Expect(6);
 		if (la.kind == 7) {
 			VariableDefinitions();
@@ -202,6 +203,7 @@ public class Parser{
 		}
 		factory.addFormalParameters(formalParameters); 
 		Expect(6);
+		factory.checkUnitInterfaceMatchProcedure(formalParameters); 
 		if (la.kind == 7) {
 			VariableDefinitions();
 		}
@@ -670,7 +672,7 @@ public class Parser{
 	void ProcedureHeading() {
 		Expect(9);
 		Expect(1);
-		String name = t.val; 
+		Token name = t; 
 		List<FormalParameter> formalParameters = new ArrayList<>(); 
 		if (la.kind == 11) {
 			formalParameters = IFormalParameterList();
@@ -682,7 +684,7 @@ public class Parser{
 	void FunctionHeading() {
 		Expect(10);
 		Expect(1);
-		String name = t.val; 
+		Token name = t; 
 		List<FormalParameter> formalParameters = new ArrayList<>(); 
 		if (la.kind == 11) {
 			formalParameters = IFormalParameterList();

@@ -41,6 +41,42 @@ public class UnitInterface {
 		return interfaceProcedures.containsKey(name) || interfaceFunctions.containsKey(name);
 	}
 	
+	public boolean subroutineImplementationExists(String name){
+		return context.getFunctionRegistry().lookup(name) != null;
+	}
+	
+	public boolean checkProcedureMatch(String name, List<FormalParameter> params){
+		if(!interfaceProcedures.containsKey(name))
+			return false;
+		
+		return compareFormalParametersList(interfaceProcedures.get(name), params);
+	}
+	
+	public boolean checkFunctionMatch(String name, List<FormalParameter> params, String returnType){
+		if(!interfaceFunctions.containsKey(name))
+			return false;
+		
+		if(!compareFormalParametersList(interfaceFunctions.get(name).formalParameters, params))
+			return false;
+		
+		return interfaceFunctions.get(name).typeName.equals(returnType);
+	}
+	
+	private boolean compareFormalParametersList(List<FormalParameter> left, List<FormalParameter> right){
+		if(left.size() != right.size())
+			return false;
+		
+		for(int i=0; i<left.size(); i++){
+			if(!left.get(i).identifier.equals(right.get(i).identifier))
+				return false;
+			
+			if(!left.get(i).type.equals(right.get(i).type))
+				return false;
+		}
+		
+		return true;
+	}
+	
 	public PascalFunctionRegistry getFunctionRegistry(){
 		return context.getFunctionRegistry();
 	}

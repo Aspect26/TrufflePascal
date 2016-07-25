@@ -223,10 +223,13 @@ public class NodeFactory {
     		return;
     	}
     	
+     	String identifier = name.val.toLowerCase();
     	if(unitName == null)
-    		context.getFunctionRegistry().registerFunctionName(name.val.toLowerCase());
+    		context.getFunctionRegistry().registerFunctionName(identifier);
     	else{
-    		// TODO: check if function has interface in current unit
+    		if(units.get(unitName).subroutineImplementationExists(identifier)){
+    			parser.SemErr("Subroutine already defined: " + identifier + ",");
+    		}
     	}
     	
     	lexicalScope = new LexicalScope(lexicalScope, name.val.toLowerCase());
@@ -502,15 +505,35 @@ public class NodeFactory {
 		this.unitName = null;
 	}
 	
-	public void addProcedureInterface(String name, List<FormalParameter> formalParameters){
-		if(!units.get(unitName).addProcedureInterface(name, formalParameters)){
+	public void addProcedureInterface(Token name, List<FormalParameter> formalParameters){
+		if(!units.get(unitName).addProcedureInterface(name.val.toLowerCase(), formalParameters)){
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
 	}
 	
-	public void addFunctionInterface(String name, List<FormalParameter> formalParameters, String returnType){
-		if(!units.get(unitName).addFunctionInterface(name, formalParameters, returnType)){
+	public void addFunctionInterface(Token name, List<FormalParameter> formalParameters, String returnType){
+		if(!units.get(unitName).addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)){
 			parser.SemErr("Subroutine with this name is already defined: " + name);
+		}
+	}
+	
+	public void checkUnitInterfaceMatchProcedure(List<FormalParameter> parameters){
+		if(unitName == null)
+			return;
+		
+		String identifier = lexicalScope.name;
+		if(!units.get(unitName).checkProcedureMatch(identifier, parameters)){
+			parser.SemErr("Procedure heading for " + identifier + " does not match any procedure from the interface.");
+		}
+	}
+	
+	public void checkUnitInterfaceMatchFunction(List<FormalParameter> parameters, String returnType){
+		if(unitName == null)
+			return;
+		
+		String identifier = lexicalScope.name;
+		if(!units.get(unitName).checkFunctionMatch(identifier, parameters, returnType)){
+			parser.SemErr("Function heading for " + identifier + " does not match any function from the interface.");
 		}
 	}
 }
