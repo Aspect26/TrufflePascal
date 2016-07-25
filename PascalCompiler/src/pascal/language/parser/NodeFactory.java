@@ -103,21 +103,7 @@ public class NodeFactory {
     private List<StatementNode> caseStatements;
     
     /* List of units found in sources given (name -> function registry) */
-    private Map<String, PascalFunctionRegistry> units = new HashMap<>();
-    
-    /* Interface state while parsing unit interface */
-    private Map<String, List<FormalParameter>> unitProcedures = new HashMap<>();
-    private Map<String, FunctionFormalParameters> unitFunctions = new HashMap<>();
-    
-    class FunctionFormalParameters{
-    	public FunctionFormalParameters(List<FormalParameter> formalParameters, String typeName){
-    		this.formalParameters = formalParameters;
-    		this.typeName = typeName;
-    	}
-    	
-    	public List<FormalParameter> formalParameters;
-    	public String typeName;
-    }
+    private Map<String, UnitInterface> units = new HashMap<>();
     
     private String unitName;
     
@@ -199,7 +185,7 @@ public class NodeFactory {
     	if(unitName == null){
     		context.getFunctionRegistry().register(lexicalScope.name, rootNode);
     	} else{
-    		units.get(unitName).register(lexicalScope.name, rootNode);
+    		units.get(unitName).getFunctionRegistry().register(lexicalScope.name, rootNode);
     	}
     		
     	lexicalScope = lexicalScope.outer;
@@ -225,7 +211,7 @@ public class NodeFactory {
     	if(unitName == null){
     		context.getFunctionRegistry().register(lexicalScope.name, rootNode);
     	} else{
-    		units.get(unitName).register(lexicalScope.name, rootNode);
+    		units.get(unitName).getFunctionRegistry().register(lexicalScope.name, rootNode);
     	}
 
     	lexicalScope = lexicalScope.outer;
@@ -312,15 +298,22 @@ public class NodeFactory {
 	
 	public ExpressionNode createFunctionNode(Token tokenName){
 		String functionName = tokenName.val.toLowerCase();
-		if(context.getFunctionRegistry().lookup(functionName) == null){
-			if(unitName != null){
-				if(units.get(unitName).lookup(functionName) != null)
-					return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
+		
+		if(unitName == null){
+			if(context.getFunctionRegistry().lookup(functionName) == null){
+				parser.SemErr("Undefined function: " + functionName);
+				return null;
+			} else {
+				return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
 			}
-			parser.SemErr("Undefined function: " + functionName);
-			return null;
+		} else{
+			if(units.get(unitName).getFunctionRegistry().lookup(functionName) == null){
+				parser.SemErr("Undefined function: " + functionName);
+				return null;
+			} else{
+				return new FunctionLiteralNode(units.get(unitName).getCotnext(), tokenName.val.toLowerCase());
+			}
 		}
-		return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
 	}
 	
 	public StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode){
@@ -465,11 +458,11 @@ public class NodeFactory {
 	public void importUnit(Token unitToken){
 		String importingUnit = unitToken.val.toLowerCase();
 		
-		PascalFunctionRegistry fRegistry = units.get(importingUnit);
-		if(fRegistry == null){
+		if(!units.containsKey(importingUnit)){
 			parser.SemErr("Unknown unit. Did you imported it to compiler? - " + importingUnit);
 			return;
 		}
+		PascalFunctionRegistry fRegistry = units.get(importingUnit).getFunctionRegistry();
 		
 		this.context.getFunctionRegistry().addAll(fRegistry);
 	}
@@ -486,7 +479,7 @@ public class NodeFactory {
 			parser.SemErr("Unit with name " + unitName + " is already defined.");
 			return;
 		}
-		this.units.put(unitName, new PascalFunctionRegistry(context));
+		this.units.put(unitName, new UnitInterface(unitName));
 	}
 	
 	public void endUnit(){
@@ -509,31 +502,14 @@ public class NodeFactory {
 	}
 	
 	public void addProcedureInterface(String name, List<FormalParameter> formalParameters){
-		if(subroutineExists(name))
-				return;
-
-		units.get(unitName).registerFunctionName(name);
-		unitProcedures.put(name, formalParameters);
+		if(!units.get(unitName).addProcedureInterface(name, formalParameters)){
+			parser.SemErr("Subroutine with this name is already defined: " + name);
+		}
 	}
 	
 	public void addFunctionInterface(String name, List<FormalParameter> formalParameters, String returnType){
-		if(subroutineExists(name))
-			return;
-
-		units.get(unitName).registerFunctionName(name);
-		unitFunctions.put(name, new FunctionFormalParameters(formalParameters, returnType));
-	}
-	
-	private boolean subroutineExists(String name){
-		if(unitProcedures.containsKey(name)){
-			parser.SemErr("Procedure with name " + name + " is already defined in unit file " + unitName);
-			return true;
+		if(!units.get(unitName).addFunctionInterface(name, formalParameters, returnType)){
+			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
-		else if(unitFunctions.containsKey(name)){
-			parser.SemErr("Function with name " + name + " is already defined in unit file " + unitName);
-			return true;
-		}
-		
-		return false;
 	}
 }
