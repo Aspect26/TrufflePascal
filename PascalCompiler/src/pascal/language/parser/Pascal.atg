@@ -74,14 +74,14 @@ VariableLineDefinition ";"
 
 
 VariableLineDefinition
-=                                               (. factory.startVariableLineDefinition(); .)
-identifier                                      (. factory.addNewUnknownVariable(t); .)
+=                                               (. List<String> identifiers = new ArrayList<>(); .)
+identifier                                      (. identifiers.add(t.val.toLowerCase()); .)
 {
     ","
-    identifier                                  (. factory.addNewUnknownVariable(t); .)
+    identifier                                  (. identifiers.add(t.val.toLowerCase()); .)
 }
 ":"
-identifier                                      (. factory.finishVariableLineDefinition(t); .) 
+identifier                                      (. factory.finishVariableLineDefinition(identifiers, t); .) 
 .
 
 
@@ -95,7 +95,7 @@ Procedure
 =
 "procedure"									
 identifier										(. factory.startProcedure(t); .)
-												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
 ";" 											(. factory.checkUnitInterfaceMatchProcedure(formalParameters); .)
 [ VariableDefinitions ]
@@ -109,7 +109,7 @@ Function
 =												
 "function"									
 identifier										(. factory.startFunction(t); .)
-												(. List<FormalParameter> formalParameters= new ArrayList<>(); .)
+												(. List<VariableDeclaration> formalParameters= new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
 ":"
 identifier										(. factory.setFunctionReturnValue(t); .)
@@ -124,8 +124,8 @@ Block<out StatementNode bodyNode>				(. factory.finishFunction(bodyNode); .)
 FormalParameterList<out List formalParameters>
 =
 (
-	"("											(. List<FormalParameter> parameters = new ArrayList<>(); .)
-												(. List<FormalParameter> parameter = new ArrayList<>(); .)
+	"("											(. List<VariableDeclaration> parameters = new ArrayList<>(); .)
+												(. List<VariableDeclaration> parameter = new ArrayList<>(); .)
 	FormalParameter<out parameter>				(. factory.appendFormalParameter(parameter, parameters); .)						
 	{ 
 		";" FormalParameter<out parameter> 		(. factory.appendFormalParameter(parameter, parameters); .)
@@ -476,7 +476,7 @@ ProcedureHeading
 =
 "procedure"
 identifier										(. Token name = t; .)
-												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
 [ IFormalParameterList<out formalParameters> ] 		
 												(. factory.addProcedureInterface(name, formalParameters); .)
 ";"
@@ -488,7 +488,7 @@ FunctionHeading
 =
 "function"
 identifier										(. Token name = t; .)
-												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
 [ IFormalParameterList<out formalParameters> ] 
 ":"
 identifier										(. String returnValue = t.val; .)
@@ -498,8 +498,8 @@ identifier										(. String returnValue = t.val; .)
 
 
 IFormalParameterList<out List formalParameters>
-=												(. formalParameters = new ArrayList<FormalParameter>(); .)
-"("												(. List<FormalParameter> formalParameter = new ArrayList<>(); .)
+=												(. formalParameters = new ArrayList<VariableDeclaration>(); .)
+"("												(. List<VariableDeclaration> formalParameter = new ArrayList<>(); .)
 	IFormalParameter<out formalParameter>		(. factory.appendFormalParameter(formalParameter, formalParameters); .)
 	{
 		";"
@@ -511,7 +511,7 @@ IFormalParameterList<out List formalParameters>
 
 
 IFormalParameter<out List formalParameter>
-=												(. formalParameter = new ArrayList<FormalParameter>(); .)
+=												(. formalParameter = new ArrayList<VariableDeclaration>(); .)
 (
 	IValueParameter<out formalParameter>
 |

@@ -95,9 +95,6 @@ public class NodeFactory {
     /* State while parsing a block. */
     private LexicalScope lexicalScope;
     
-    /* State while parsing variable line */
-    private List<String> newVariableNames;
-    
     /* State while parsing case statement */
     private List<ExpressionNode> caseExpressions;
     private List<StatementNode> caseStatements;
@@ -149,28 +146,17 @@ public class NodeFactory {
     	}
     }
     
-    public void startVariableLineDefinition(){
-    	assert newVariableNames == null;
-    	newVariableNames = new ArrayList<>();
-    }
-    
-    public void addNewUnknownVariable(Token tokenName){
-    	newVariableNames.add(tokenName.val);
-    }
-    
-    public void finishVariableLineDefinition(Token variableType){
+    public void finishVariableLineDefinition(List<String> identifiers, Token variableType){
     	FrameSlotKind slotKind = getSlotByTypeName(variableType.val);
     	
     	if(slotKind == FrameSlotKind.Illegal){
     		parser.SemErr("Unkown variable type: " + variableType.val);
     	}
     	
-    	for(String variableName : newVariableNames){
-    		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(variableName, slotKind);
-    		lexicalScope.locals.put(variableName, newSlot);
+    	for(String identifier : identifiers){
+    		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
+    		lexicalScope.locals.put(identifier, newSlot);
     	}
-    	
-    	newVariableNames = null;
     }
     
     public void startProcedure(Token name){
@@ -247,23 +233,23 @@ public class NodeFactory {
     	return subroutineNode;
     }
     
-    public void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params){
-		for(FormalParameter param : parameter){
+    public void appendFormalParameter(List<VariableDeclaration> parameter, List<VariableDeclaration> params){
+		for(VariableDeclaration param : parameter){
 			params.add(param);
 		}
 	}
 	
-	public List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName){
-		List<FormalParameter> paramList = new ArrayList<>();
+	public List<VariableDeclaration> createFormalParametersList(List<String> identifiers, String typeName){
+		List<VariableDeclaration> paramList = new ArrayList<>();
 		for(String identifier : identifiers){
-			paramList.add(new FormalParameter(identifier, typeName));
+			paramList.add(new VariableDeclaration(identifier, typeName));
 		}
 		
 		return paramList;
 	}
     
-    public void addFormalParameters(List<FormalParameter> params){
-    	for(FormalParameter param : params){
+    public void addFormalParameters(List<VariableDeclaration> params){
+    	for(VariableDeclaration param : params){
     		FrameSlotKind slotKind = getSlotByTypeName(param.type);
     		final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(lexicalScope.scopeNodes.size(), slotKind);
     		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(param.identifier, slotKind);
@@ -505,19 +491,19 @@ public class NodeFactory {
 		this.unitName = null;
 	}
 	
-	public void addProcedureInterface(Token name, List<FormalParameter> formalParameters){
+	public void addProcedureInterface(Token name, List<VariableDeclaration> formalParameters){
 		if(!units.get(unitName).addProcedureInterface(name.val.toLowerCase(), formalParameters)){
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
 	}
 	
-	public void addFunctionInterface(Token name, List<FormalParameter> formalParameters, String returnType){
+	public void addFunctionInterface(Token name, List<VariableDeclaration> formalParameters, String returnType){
 		if(!units.get(unitName).addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)){
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
 	}
 	
-	public void checkUnitInterfaceMatchProcedure(List<FormalParameter> parameters){
+	public void checkUnitInterfaceMatchProcedure(List<VariableDeclaration> parameters){
 		if(unitName == null)
 			return;
 		
@@ -527,7 +513,7 @@ public class NodeFactory {
 		}
 	}
 	
-	public void checkUnitInterfaceMatchFunction(List<FormalParameter> parameters, String returnType){
+	public void checkUnitInterfaceMatchFunction(List<VariableDeclaration> parameters, String returnType){
 		if(unitName == null)
 			return;
 		

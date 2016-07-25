@@ -130,8 +130,8 @@ public class Parser{
     }
 } // end Parser
 
-class FormalParameter{
-	public FormalParameter(String id, String type){
+class VariableDeclaration{
+	public VariableDeclaration(String id, String type){
 		this.type = type;
 		this.identifier = id;
 	}

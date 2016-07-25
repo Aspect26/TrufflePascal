@@ -11,7 +11,7 @@ public class UnitInterface {
 	public final String name;
 	
 	private final PascalContext context;
-	private final Map<String, List<FormalParameter>> interfaceProcedures;
+	private final Map<String, List<VariableDeclaration>> interfaceProcedures;
 	private final Map<String, FunctionFormalParameters> interfaceFunctions;
 	
 	public UnitInterface(String name){
@@ -21,7 +21,7 @@ public class UnitInterface {
 		this.interfaceFunctions = new HashMap<>();
 	}
 	
-	public boolean addProcedureInterface(String name, List<FormalParameter> parameters){
+	public boolean addProcedureInterface(String name, List<VariableDeclaration> parameters){
 		if(subroutineExists(name))
 			return false;
 		
@@ -29,7 +29,7 @@ public class UnitInterface {
 		return true;
 	}
 	
-	public boolean addFunctionInterface(String name, List<FormalParameter> parameters, String returnType){
+	public boolean addFunctionInterface(String name, List<VariableDeclaration> parameters, String returnType){
 		if(subroutineExists(name))
 			return false;
 		
@@ -45,14 +45,14 @@ public class UnitInterface {
 		return context.getFunctionRegistry().lookup(name) != null;
 	}
 	
-	public boolean checkProcedureMatch(String name, List<FormalParameter> params){
+	public boolean checkProcedureMatch(String name, List<VariableDeclaration> params){
 		if(!interfaceProcedures.containsKey(name))
 			return false;
 		
 		return compareFormalParametersList(interfaceProcedures.get(name), params);
 	}
 	
-	public boolean checkFunctionMatch(String name, List<FormalParameter> params, String returnType){
+	public boolean checkFunctionMatch(String name, List<VariableDeclaration> params, String returnType){
 		if(!interfaceFunctions.containsKey(name))
 			return false;
 		
@@ -62,7 +62,7 @@ public class UnitInterface {
 		return interfaceFunctions.get(name).typeName.equals(returnType);
 	}
 	
-	private boolean compareFormalParametersList(List<FormalParameter> left, List<FormalParameter> right){
+	private boolean compareFormalParametersList(List<VariableDeclaration> left, List<VariableDeclaration> right){
 		if(left.size() != right.size())
 			return false;
 		
@@ -87,11 +87,11 @@ public class UnitInterface {
 }
 
 class FunctionFormalParameters{
-	public FunctionFormalParameters(List<FormalParameter> formalParameters, String typeName){
+	public FunctionFormalParameters(List<VariableDeclaration> formalParameters, String typeName){
 		this.formalParameters = formalParameters;
 		this.typeName = typeName;
 	}
 	
-	public List<FormalParameter> formalParameters;
+	public List<VariableDeclaration> formalParameters;
 	public String typeName;
 }

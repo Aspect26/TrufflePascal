@@ -163,24 +163,24 @@ public class Parser{
 	}
 
 	void VariableLineDefinition() {
-		factory.startVariableLineDefinition(); 
+		List<String> identifiers = new ArrayList<>(); 
 		Expect(1);
-		factory.addNewUnknownVariable(t); 
+		identifiers.add(t.val.toLowerCase()); 
 		while (la.kind == 5) {
 			Get();
 			Expect(1);
-			factory.addNewUnknownVariable(t); 
+			identifiers.add(t.val.toLowerCase()); 
 		}
 		Expect(8);
 		Expect(1);
-		factory.finishVariableLineDefinition(t); 
+		factory.finishVariableLineDefinition(identifiers, t); 
 	}
 
 	void Function() {
 		Expect(10);
 		Expect(1);
 		factory.startFunction(t); 
-		List<FormalParameter> formalParameters= new ArrayList<>(); 
+		List<VariableDeclaration> formalParameters= new ArrayList<>(); 
 		if (la.kind == 11) {
 			formalParameters = FormalParameterList();
 		}
@@ -202,7 +202,7 @@ public class Parser{
 		Expect(9);
 		Expect(1);
 		factory.startProcedure(t); 
-		List<FormalParameter> formalParameters = new ArrayList<>(); 
+		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
 		if (la.kind == 11) {
 			formalParameters = FormalParameterList();
 		}
@@ -220,8 +220,8 @@ public class Parser{
 	List  FormalParameterList() {
 		List  formalParameters;
 		Expect(11);
-		List<FormalParameter> parameters = new ArrayList<>(); 
-		List<FormalParameter> parameter = new ArrayList<>(); 
+		List<VariableDeclaration> parameters = new ArrayList<>(); 
+		List<VariableDeclaration> parameter = new ArrayList<>(); 
 		parameter = FormalParameter();
 		factory.appendFormalParameter(parameter, parameters); 
 		while (la.kind == 6) {
@@ -678,7 +678,7 @@ public class Parser{
 		Expect(9);
 		Expect(1);
 		Token name = t; 
-		List<FormalParameter> formalParameters = new ArrayList<>(); 
+		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
 		if (la.kind == 11) {
 			formalParameters = IFormalParameterList();
 		}
@@ -690,7 +690,7 @@ public class Parser{
 		Expect(10);
 		Expect(1);
 		Token name = t; 
-		List<FormalParameter> formalParameters = new ArrayList<>(); 
+		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
 		if (la.kind == 11) {
 			formalParameters = IFormalParameterList();
 		}
@@ -703,9 +703,9 @@ public class Parser{
 
 	List  IFormalParameterList() {
 		List  formalParameters;
-		formalParameters = new ArrayList<FormalParameter>(); 
+		formalParameters = new ArrayList<VariableDeclaration>(); 
 		Expect(11);
-		List<FormalParameter> formalParameter = new ArrayList<>(); 
+		List<VariableDeclaration> formalParameter = new ArrayList<>(); 
 		formalParameter = IFormalParameter();
 		factory.appendFormalParameter(formalParameter, formalParameters); 
 		while (la.kind == 6) {
@@ -719,7 +719,7 @@ public class Parser{
 
 	List  IFormalParameter() {
 		List  formalParameter;
-		formalParameter = new ArrayList<FormalParameter>(); 
+		formalParameter = new ArrayList<VariableDeclaration>(); 
 		if (la.kind == 1) {
 			formalParameter = IValueParameter();
 		} else if (la.kind == 7) {
@@ -791,8 +791,8 @@ public class Parser{
     }
 } // end Parser
 
-class FormalParameter{
-	public FormalParameter(String id, String type){
+class VariableDeclaration{
+	public VariableDeclaration(String id, String type){
 		this.type = type;
 		this.identifier = id;
 	}
