@@ -95,9 +95,10 @@ Procedure
 =
 "procedure"									
 identifier										(. factory.startProcedure(t); .)
+												(. Token name = t; .)
 												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
-";" 											(. factory.checkUnitInterfaceMatchProcedure(formalParameters); .)
+";" 											(. factory.checkUnitInterfaceMatchProcedure(name, formalParameters); .)
 [ VariableDefinitions ]
 Block<out StatementNode bodyNode>				(. factory.finishProcedure(bodyNode); .)
 ";"
@@ -109,11 +110,12 @@ Function
 =												
 "function"									
 identifier										(. factory.startFunction(t); .)
+												(. Token name = t; .)
 												(. List<VariableDeclaration> formalParameters= new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
 ":"
 identifier										(. factory.setFunctionReturnValue(t); .)
-												(. factory.checkUnitInterfaceMatchFunction(formalParameters,t.val.toLowerCase()); .)
+												(. factory.checkUnitInterfaceMatchFunction(name, formalParameters,t.val.toLowerCase()); .)
 ";"
 [ VariableDefinitions ]
 Block<out StatementNode bodyNode>				(. factory.finishFunction(bodyNode); .)
@@ -366,7 +368,7 @@ Factor<out ExpressionNode expression>
     |
                                                 (. expression = factory.readVariable(t); .)
                                                 (. if(expression == null) .)
-                                                (.      SemErr("Undefined variable!"); .)
+                                                (.      SemErr("Undefined variable " + t.val + "."); .)
     )
 |
     "("
@@ -438,7 +440,7 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
                                                 (. } else { .)
                                                 (.      expression = factory.createAssignment(identifierName, value); .)
                                                 (.      if(expression == null) .)
-                                                (.          SemErr("Undefined variable!"); .)
+                                                (.          SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); .)
                                                 (. } .)
 )
 .
@@ -466,6 +468,8 @@ InterfaceSection
 		ProcedureHeading
 	|
 		FunctionHeading
+	|
+		VariableDefinitions
 	)
 }
 .
@@ -552,7 +556,11 @@ identifier										(. String typeName = t.val; .)
 ImplementationSection
 =
 {
-	Subroutine
+	(
+		Subroutine
+	|
+		VariableDefinitions
+	)
 }
 .
 

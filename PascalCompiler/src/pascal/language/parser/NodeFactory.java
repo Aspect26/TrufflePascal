@@ -2,8 +2,10 @@ package pascal.language.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
@@ -77,7 +79,7 @@ public class NodeFactory {
      * @param original descriptor to be copied
      * @return new descriptor with the same default value and slots
      */
-    public FrameDescriptor copyFrameDescriptor(FrameDescriptor original) {
+    public static FrameDescriptor copyFrameDescriptor(FrameDescriptor original) {
         FrameDescriptor clonedFrameDescriptor = new FrameDescriptor(original.getDefaultValue());
         for(FrameSlot slot : original.getSlots()){
         	clonedFrameDescriptor.addFrameSlot(slot.getIdentifier(), slot.getInfo(), slot.getKind());
@@ -101,8 +103,7 @@ public class NodeFactory {
     
     /* List of units found in sources given (name -> function registry) */
     private Map<String, UnitInterface> units = new HashMap<>();
-    
-    private String unitName;
+    private UnitInterface currentUnit = null;
     
     public NodeFactory(Parser parser, PascalContext context){
     	this.context = context;
@@ -154,8 +155,17 @@ public class NodeFactory {
     	}
     	
     	for(String identifier : identifiers){
-    		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
-    		lexicalScope.locals.put(identifier, newSlot);
+    		try{
+    			if(currentUnit == null){
+    				FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
+    				lexicalScope.locals.put(identifier, newSlot);
+    			} else {
+    				currentUnit.addGlobalVariable(identifier, slotKind);
+    			}
+    		} catch(IllegalArgumentException e){
+    			parser.SemErr("Duplicate variable: " + identifier + ".");
+    			continue;
+    		}
     	}
     }
     
@@ -164,17 +174,19 @@ public class NodeFactory {
     }
     
     public void finishProcedure(StatementNode bodyNode){
+    	LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+    	
     	StatementNode subroutineNode = finishSubroutine(bodyNode);
     	final ProcedureBodyNode functionBodyNode = new ProcedureBodyNode(subroutineNode);
-    	final PascalRootNode rootNode = new PascalRootNode(lexicalScope.frameDescriptor, functionBodyNode);
+    	final PascalRootNode rootNode = new PascalRootNode(ls.frameDescriptor, functionBodyNode);
     	
-    	if(unitName == null){
-    		context.getFunctionRegistry().register(lexicalScope.name, rootNode);
+    	if(currentUnit == null){
+    		context.getFunctionRegistry().register(ls.name, rootNode);
+    		lexicalScope = lexicalScope.outer;
     	} else{
-    		units.get(unitName).getFunctionRegistry().register(lexicalScope.name, rootNode);
+    		currentUnit.getFunctionRegistry().register(ls.name, rootNode);
+    		currentUnit.leaveLexicalScope();
     	}
-    		
-    	lexicalScope = lexicalScope.outer;
     }
     
     public void startFunction(Token name){
@@ -182,54 +194,63 @@ public class NodeFactory {
     }
     
     public void setFunctionReturnValue(Token type){
-    	lexicalScope.returnSlot = 
-    			lexicalScope.frameDescriptor.addFrameSlot(lexicalScope.name, getSlotByTypeName(type.val));
-    	lexicalScope.locals.put(lexicalScope.name, lexicalScope.returnSlot);
+    	LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+    	
+    	ls.returnSlot = ls.frameDescriptor.addFrameSlot(ls.name, getSlotByTypeName(type.val));
+    	ls.locals.put(ls.name, ls.returnSlot);
     }
     
     public void finishFunction(StatementNode bodyNode){
     	StatementNode subroutineNode = finishSubroutine(bodyNode);
+    	LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
     	
     	final FunctionBodyNode functionBodyNode = 
-    			FunctionBodyNodeGen.create(subroutineNode, lexicalScope.returnSlot);
-    	final PascalRootNode rootNode = new PascalRootNode(lexicalScope.frameDescriptor, functionBodyNode);
+    			FunctionBodyNodeGen.create(subroutineNode, ls.returnSlot);
+    	final PascalRootNode rootNode = new PascalRootNode(ls.frameDescriptor, functionBodyNode);
     	
-    	if(unitName == null){
-    		context.getFunctionRegistry().register(lexicalScope.name, rootNode);
+    	if(currentUnit == null){
+    		context.getFunctionRegistry().register(ls.name, rootNode);
+    		lexicalScope = lexicalScope.outer;
     	} else{
-    		units.get(unitName).getFunctionRegistry().register(lexicalScope.name, rootNode);
+    		currentUnit.getFunctionRegistry().register(ls.name, rootNode);
+    		currentUnit.leaveLexicalScope();
     	}
-
-    	lexicalScope = lexicalScope.outer;
     }
     
     private void startSubroutine(Token name){
-     	if(lexicalScope.outer != null){
+    	LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+    	
+    	if(ls.outer != null){
     		context.getOutput().println("Nested subroutines are not supported.");
     		return;
     	}
     	
-     	String identifier = name.val.toLowerCase();
-    	if(unitName == null)
+    	String identifier = name.val.toLowerCase();
+    	if(currentUnit == null){
     		context.getFunctionRegistry().registerFunctionName(identifier);
-    	else{
-    		if(units.get(unitName).subroutineImplementationExists(identifier)){
+    		lexicalScope = new LexicalScope(lexicalScope, identifier);
+    		lexicalScope.frameDescriptor = copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
+    	} else {
+    		if(!currentUnit.startSubroutineImplementation(identifier)){
     			parser.SemErr("Subroutine already defined: " + identifier + ",");
     		}
     	}
-    	
-    	lexicalScope = new LexicalScope(lexicalScope, name.val.toLowerCase());
-    	lexicalScope.frameDescriptor = copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
     }
     
     private StatementNode finishSubroutine(StatementNode bodyNode){
-    	if(lexicalScope.outer == null){
+    	if(currentUnit == null && lexicalScope.outer == null){
     		context.getOutput().println("Can't leave subroutine.");
     		return null;
     	}
     	
-    	lexicalScope.scopeNodes.add(bodyNode);
-    	final StatementNode subroutineNode = new BlockNode(lexicalScope.scopeNodes.toArray(new StatementNode[lexicalScope.scopeNodes.size()]));
+    	if(currentUnit != null && currentUnit.getLexicalScope().outer == null){
+    		context.getOutput().println("Can't leave subroutine.");
+    		return null;
+    	}
+    	
+    	LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+    	ls.scopeNodes.add(bodyNode);
+    	final StatementNode subroutineNode = new BlockNode(ls.scopeNodes.toArray(new StatementNode[ls.scopeNodes.size()]));
     	return subroutineNode;
     }
     
@@ -249,13 +270,15 @@ public class NodeFactory {
 	}
     
     public void addFormalParameters(List<VariableDeclaration> params){
+    	LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+    	
     	for(VariableDeclaration param : params){
     		FrameSlotKind slotKind = getSlotByTypeName(param.type);
-    		final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(lexicalScope.scopeNodes.size(), slotKind);
-    		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(param.identifier, slotKind);
+    		final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(ls.scopeNodes.size(), slotKind);
+    		FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(param.identifier, slotKind);
     		final AssignmentNode assignment = AssignmentNodeGen.create(readNode, newSlot);
-    		lexicalScope.locals.put(param.identifier, newSlot);
-    		lexicalScope.scopeNodes.add(assignment);
+    		ls.locals.put(param.identifier, newSlot);
+    		ls.scopeNodes.add(assignment);
     	}
     }
     
@@ -304,7 +327,7 @@ public class NodeFactory {
 	public ExpressionNode createFunctionNode(Token tokenName){
 		String functionName = tokenName.val.toLowerCase();
 		
-		if(unitName == null){
+		if(currentUnit == null){
 			if(context.getFunctionRegistry().lookup(functionName) == null){
 				parser.SemErr("Undefined function: " + functionName);
 				return null;
@@ -312,11 +335,11 @@ public class NodeFactory {
 				return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
 			}
 		} else{
-			if(units.get(unitName).getFunctionRegistry().lookup(functionName) == null){
+			if(currentUnit.getFunctionRegistry().lookup(functionName) == null){
 				parser.SemErr("Undefined function: " + functionName);
 				return null;
 			} else{
-				return new FunctionLiteralNode(units.get(unitName).getCotnext(), tokenName.val.toLowerCase());
+				return new FunctionLiteralNode(currentUnit.getCotnext(), tokenName.val.toLowerCase());
 			}
 		}
 	}
@@ -336,7 +359,8 @@ public class NodeFactory {
 	public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue,
 			ExpressionNode finalValue, StatementNode loopBody){
 		
-		return new ForNode(ascending, lexicalScope.locals.get(variableToken.val.toLowerCase()), 
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return new ForNode(ascending, ls.locals.get(variableToken.val.toLowerCase()), 
 				startValue, finalValue, loopBody);
 	}
 	
@@ -345,7 +369,9 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode readVariable(Token nameToken){
-		final FrameSlot frameSlot = lexicalScope.locals.get(nameToken.val.toLowerCase());
+		String identifier = nameToken.val.toLowerCase();
+		FrameSlot frameSlot = getVisibleSlot(identifier);
+    	
 		if(frameSlot == null)
 			return null;
 		
@@ -399,11 +425,29 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode){
-		FrameSlot slot = lexicalScope.frameDescriptor.findFrameSlot(nameToken.val.toLowerCase());
+		FrameSlot slot = getVisibleSlot(nameToken.val.toLowerCase());
 		if(slot == null)
 			return null;
 		
 		return AssignmentNodeGen.create(valueNode, slot);
+	}
+	
+	private FrameSlot getVisibleSlot(String identifier){
+		FrameSlot slot;
+		if(currentUnit != null)
+			slot = currentUnit.getSlot(identifier); 
+		else{
+			 slot = lexicalScope.frameDescriptor.findFrameSlot(identifier);
+			 if(slot == null){
+				 Iterator<Entry<String, UnitInterface>> it = units.entrySet().iterator();
+				 while (it.hasNext()) {
+					 Map.Entry<String, UnitInterface> pair = it.next();
+					 slot = pair.getValue().getSlot(identifier);
+				 }
+			 }
+		}
+		
+		return slot;
 	}
 	
 	public ExpressionNode createBinary(Token operator, ExpressionNode leftNode, ExpressionNode rightNode){
@@ -477,48 +521,49 @@ public class NodeFactory {
 	 */
 	
 	public void startUnit(Token t){
-		this.unitName = t.val.toLowerCase();
-		this.lexicalScope = new LexicalScope(null, unitName);
+		String unitName = t.val.toLowerCase();
 		
 		if(units.containsValue(t.val.toLowerCase())){
 			parser.SemErr("Unit with name " + unitName + " is already defined.");
 			return;
 		}
-		this.units.put(unitName, new UnitInterface(unitName));
+		
+		currentUnit = new UnitInterface(unitName);
+		this.units.put(unitName, currentUnit);
 	}
 	
 	public void endUnit(){
-		this.unitName = null;
+		currentUnit = null;
 	}
 	
 	public void addProcedureInterface(Token name, List<VariableDeclaration> formalParameters){
-		if(!units.get(unitName).addProcedureInterface(name.val.toLowerCase(), formalParameters)){
+		if(!currentUnit.addProcedureInterface(name.val.toLowerCase(), formalParameters)){
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
 	}
 	
 	public void addFunctionInterface(Token name, List<VariableDeclaration> formalParameters, String returnType){
-		if(!units.get(unitName).addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)){
+		if(!currentUnit.addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)){
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
 	}
 	
-	public void checkUnitInterfaceMatchProcedure(List<VariableDeclaration> parameters){
-		if(unitName == null)
+	public void checkUnitInterfaceMatchProcedure(Token name, List<VariableDeclaration> parameters){
+		if(currentUnit == null)
 			return;
 		
-		String identifier = lexicalScope.name;
-		if(!units.get(unitName).checkProcedureMatch(identifier, parameters)){
+		String identifier = name.val.toLowerCase();
+		if(!currentUnit.checkProcedureMatch(identifier, parameters)){
 			parser.SemErr("Procedure heading for " + identifier + " does not match any procedure from the interface.");
 		}
 	}
 	
-	public void checkUnitInterfaceMatchFunction(List<VariableDeclaration> parameters, String returnType){
-		if(unitName == null)
+	public void checkUnitInterfaceMatchFunction(Token name, List<VariableDeclaration> parameters, String returnType){
+		if(currentUnit == null)
 			return;
 		
-		String identifier = lexicalScope.name;
-		if(!units.get(unitName).checkFunctionMatch(identifier, parameters, returnType)){
+		String identifier = name.val.toLowerCase();
+		if(!currentUnit.checkFunctionMatch(identifier, parameters, returnType)){
 			parser.SemErr("Function heading for " + identifier + " does not match any function from the interface.");
 		}
 	}

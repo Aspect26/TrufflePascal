@@ -12,5 +12,7 @@ var a:integer;
 
 begin
  writeln(factorial(7));
+ c:=8;
  Hello();
+ writeln(c);
 end.

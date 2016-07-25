@@ -180,6 +180,7 @@ public class Parser{
 		Expect(10);
 		Expect(1);
 		factory.startFunction(t); 
+		Token name = t; 
 		List<VariableDeclaration> formalParameters= new ArrayList<>(); 
 		if (la.kind == 11) {
 			formalParameters = FormalParameterList();
@@ -188,7 +189,7 @@ public class Parser{
 		Expect(8);
 		Expect(1);
 		factory.setFunctionReturnValue(t); 
-		factory.checkUnitInterfaceMatchFunction(formalParameters,t.val.toLowerCase()); 
+		factory.checkUnitInterfaceMatchFunction(name, formalParameters,t.val.toLowerCase()); 
 		Expect(6);
 		if (la.kind == 7) {
 			VariableDefinitions();
@@ -202,13 +203,14 @@ public class Parser{
 		Expect(9);
 		Expect(1);
 		factory.startProcedure(t); 
+		Token name = t; 
 		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
 		if (la.kind == 11) {
 			formalParameters = FormalParameterList();
 		}
 		factory.addFormalParameters(formalParameters); 
 		Expect(6);
-		factory.checkUnitInterfaceMatchProcedure(formalParameters); 
+		factory.checkUnitInterfaceMatchProcedure(name, formalParameters); 
 		if (la.kind == 7) {
 			VariableDefinitions();
 		}
@@ -552,7 +554,7 @@ public class Parser{
 			} else if (StartOf(5)) {
 				expression = factory.readVariable(t); 
 				if(expression == null) 
-				SemErr("Undefined variable!"); 
+				SemErr("Undefined variable " + t.val + "."); 
 			} else SynErr(57);
 		} else if (la.kind == 11) {
 			Get();
@@ -639,7 +641,7 @@ public class Parser{
 			} else { 
 			expression = factory.createAssignment(identifierName, value); 
 			if(expression == null) 
-			SemErr("Undefined variable!"); 
+			SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); 
 			} 
 		} else SynErr(60);
 		return expression;
@@ -659,18 +661,24 @@ public class Parser{
 	}
 
 	void InterfaceSection() {
-		while (la.kind == 9 || la.kind == 10) {
+		while (la.kind == 7 || la.kind == 9 || la.kind == 10) {
 			if (la.kind == 9) {
 				ProcedureHeading();
-			} else {
+			} else if (la.kind == 10) {
 				FunctionHeading();
+			} else {
+				VariableDefinitions();
 			}
 		}
 	}
 
 	void ImplementationSection() {
-		while (la.kind == 9 || la.kind == 10) {
-			Subroutine();
+		while (la.kind == 7 || la.kind == 9 || la.kind == 10) {
+			if (la.kind == 9 || la.kind == 10) {
+				Subroutine();
+			} else {
+				VariableDefinitions();
+			}
 		}
 	}
 

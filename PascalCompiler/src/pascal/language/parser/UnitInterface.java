@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.FrameSlotKind;
+
+import pascal.language.parser.NodeFactory.LexicalScope;
 import pascal.language.runtime.PascalContext;
 import pascal.language.runtime.PascalFunctionRegistry;
 
@@ -11,6 +15,7 @@ public class UnitInterface {
 	public final String name;
 	
 	private final PascalContext context;
+	private LexicalScope lexicalScope;
 	private final Map<String, List<VariableDeclaration>> interfaceProcedures;
 	private final Map<String, FunctionFormalParameters> interfaceFunctions;
 	
@@ -19,6 +24,12 @@ public class UnitInterface {
 		this.context = new PascalContext();
 		this.interfaceProcedures = new HashMap<>();
 		this.interfaceFunctions = new HashMap<>();
+		this.lexicalScope = new LexicalScope(null, name);
+	}
+	
+	public void addGlobalVariable(String identifier, FrameSlotKind slotKind){
+		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
+		lexicalScope.locals.put(identifier, newSlot);
 	}
 	
 	public boolean addProcedureInterface(String name, List<VariableDeclaration> parameters){
@@ -43,6 +54,15 @@ public class UnitInterface {
 	
 	public boolean subroutineImplementationExists(String name){
 		return context.getFunctionRegistry().lookup(name) != null;
+	}
+	
+	public boolean startSubroutineImplementation(String identifier){
+		if(context.getFunctionRegistry().lookup(name) != null)
+			return false;
+		
+		lexicalScope = new LexicalScope(lexicalScope, identifier);
+		lexicalScope.frameDescriptor = NodeFactory.copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
+		return true;
 	}
 	
 	public boolean checkProcedureMatch(String name, List<VariableDeclaration> params){
@@ -77,11 +97,27 @@ public class UnitInterface {
 		return true;
 	}
 	
+	public void leaveLexicalScope(){
+		this.lexicalScope = lexicalScope.outer;
+	}
+	
 	public PascalFunctionRegistry getFunctionRegistry(){
 		return context.getFunctionRegistry();
 	}
 	
 	public PascalContext getCotnext(){
+		return context;
+	}
+	
+	public FrameSlot getSlot(String identifier){
+		 return lexicalScope.frameDescriptor.findFrameSlot(identifier);
+	}
+	
+	public LexicalScope getLexicalScope(){
+		return lexicalScope;
+	}
+	
+	public PascalContext getContext(){
 		return context;
 	}
 }
