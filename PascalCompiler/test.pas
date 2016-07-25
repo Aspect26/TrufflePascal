@@ -8,6 +8,8 @@ begin
   begin factorial := a*factorial(a-1); end;
 end;
 
+var a:integer;
+
 begin
  writeln(factorial(7));
  Hello();

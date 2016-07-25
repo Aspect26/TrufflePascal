@@ -31,8 +31,7 @@ PRODUCTIONS
 Pascal = 
 (
 	[ ImportsSection ]
-	[ VariableDefinitions ]
-	{ Subroutine }
+	{ PreDeclaration }
 	MainFunction
 |
 	Unit
@@ -49,6 +48,17 @@ identifier										(. factory.importUnit(t); .)
 	identifier									(. factory.importUnit(t); .)
 }
 ";"
+.
+
+
+
+PreDeclaration
+=
+( 
+	VariableDefinitions 
+|
+	Subroutine
+)
 .
 
 

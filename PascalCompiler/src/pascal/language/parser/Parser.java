@@ -94,11 +94,8 @@ public class Parser{
 			if (la.kind == 4) {
 				ImportsSection();
 			}
-			if (la.kind == 7) {
-				VariableDefinitions();
-			}
-			while (la.kind == 9 || la.kind == 10) {
-				Subroutine();
+			while (la.kind == 7 || la.kind == 9 || la.kind == 10) {
+				PreDeclaration();
 			}
 			MainFunction();
 		} else if (la.kind == 46) {
@@ -118,21 +115,11 @@ public class Parser{
 		Expect(6);
 	}
 
-	void VariableDefinitions() {
-		Expect(7);
-		VariableLineDefinition();
-		Expect(6);
-		while (la.kind == 1) {
-			VariableLineDefinition();
-			Expect(6);
-		}
-	}
-
-	void Subroutine() {
-		if (la.kind == 10) {
-			Function();
-		} else if (la.kind == 9) {
-			Procedure();
+	void PreDeclaration() {
+		if (la.kind == 7) {
+			VariableDefinitions();
+		} else if (la.kind == 9 || la.kind == 10) {
+			Subroutine();
 		} else SynErr(51);
 	}
 
@@ -155,6 +142,24 @@ public class Parser{
 		Expect(15);
 		factory.endUnit(); 
 		Expect(13);
+	}
+
+	void VariableDefinitions() {
+		Expect(7);
+		VariableLineDefinition();
+		Expect(6);
+		while (la.kind == 1) {
+			VariableLineDefinition();
+			Expect(6);
+		}
+	}
+
+	void Subroutine() {
+		if (la.kind == 10) {
+			Function();
+		} else if (la.kind == 9) {
+			Procedure();
+		} else SynErr(52);
 	}
 
 	void VariableLineDefinition() {
@@ -248,7 +253,7 @@ public class Parser{
 			formalParameter = ValueParameter();
 		} else if (la.kind == 1) {
 			formalParameter = VariableParameter();
-		} else SynErr(52);
+		} else SynErr(53);
 		return formalParameter;
 	}
 
@@ -335,7 +340,7 @@ public class Parser{
 			statement = Block();
 			break;
 		}
-		default: SynErr(53); break;
+		default: SynErr(54); break;
 		}
 		return statement;
 	}
@@ -381,7 +386,7 @@ public class Parser{
 		} else if (la.kind == 22) {
 			Get();
 			ascending = false; 
-		} else SynErr(54);
+		} else SynErr(55);
 		ExpressionNode finalValue = Expression();
 		Expect(23);
 		StatementNode loopBody = Statement();
@@ -533,7 +538,7 @@ public class Parser{
 			expression = factory.createUnary(unOp, expression); 
 		} else if (StartOf(4)) {
 			expression = Factor();
-		} else SynErr(55);
+		} else SynErr(56);
 		return expression;
 	}
 
@@ -548,7 +553,7 @@ public class Parser{
 				expression = factory.readVariable(t); 
 				if(expression == null) 
 				SemErr("Undefined variable!"); 
-			} else SynErr(56);
+			} else SynErr(57);
 		} else if (la.kind == 11) {
 			Get();
 			expression = Expression();
@@ -600,10 +605,10 @@ public class Parser{
 				}
 				expression = factory.createRealLiteral(integerPartToken, 
 				fractionalPartToken, exponentOpToken, exponentToken); 
-			} else SynErr(57);
+			} else SynErr(58);
 		} else if (la.kind == 44 || la.kind == 45) {
 			expression = LogicLiteral();
-		} else SynErr(58);
+		} else SynErr(59);
 		return expression;
 	}
 
@@ -636,7 +641,7 @@ public class Parser{
 			if(expression == null) 
 			SemErr("Undefined variable!"); 
 			} 
-		} else SynErr(59);
+		} else SynErr(60);
 		return expression;
 	}
 
@@ -649,7 +654,7 @@ public class Parser{
 		} else if (la.kind == 45) {
 			Get();
 			expression = factory.createLogicLiteral(false); 
-		} else SynErr(60);
+		} else SynErr(61);
 		return expression;
 	}
 
@@ -719,7 +724,7 @@ public class Parser{
 			formalParameter = IValueParameter();
 		} else if (la.kind == 7) {
 			formalParameter = IVariableParameter();
-		} else SynErr(61);
+		} else SynErr(62);
 		return formalParameter;
 	}
 
@@ -866,17 +871,18 @@ class Errors {
 			case 48: s = "\"implementation\" expected"; break;
 			case 49: s = "??? expected"; break;
 			case 50: s = "invalid Pascal"; break;
-			case 51: s = "invalid Subroutine"; break;
-			case 52: s = "invalid FormalParameter"; break;
-			case 53: s = "invalid Statement"; break;
-			case 54: s = "invalid ForLoop"; break;
-			case 55: s = "invalid SignedFactor"; break;
-			case 56: s = "invalid Factor"; break;
+			case 51: s = "invalid PreDeclaration"; break;
+			case 52: s = "invalid Subroutine"; break;
+			case 53: s = "invalid FormalParameter"; break;
+			case 54: s = "invalid Statement"; break;
+			case 55: s = "invalid ForLoop"; break;
+			case 56: s = "invalid SignedFactor"; break;
 			case 57: s = "invalid Factor"; break;
 			case 58: s = "invalid Factor"; break;
-			case 59: s = "invalid MemberExpression"; break;
-			case 60: s = "invalid LogicLiteral"; break;
-			case 61: s = "invalid IFormalParameter"; break;
+			case 59: s = "invalid Factor"; break;
+			case 60: s = "invalid MemberExpression"; break;
+			case 61: s = "invalid LogicLiteral"; break;
+			case 62: s = "invalid IFormalParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
