@@ -56,7 +56,12 @@ public class PascalFunctionRegistry {
 		Iterator<Entry<String, PascalFunction>> it = registry.functions.entrySet().iterator();
 	    while (it.hasNext()) {
 	        Map.Entry<String, PascalFunction> pair = it.next();
-	        this.functions.put(pair.getKey(), pair.getValue());
+	        
+	        String name = pair.getKey();
+	        if(this.functions.containsKey(name))
+	        	continue;
+	        
+	        this.functions.put(name, pair.getValue());
 	    }
 	}
 	
@@ -68,7 +73,7 @@ public class PascalFunctionRegistry {
     	
     	installBuiltinInfiniteArguments(WritelnBuiltinNodeFactory.getInstance());
     	installBuiltinInfiniteArguments(WriteBuiltinNodeFactory.getInstance());
-    	installBuiltinInfiniteArguments(ReadlnBuiltinNodeFactory.getInstance());
+    	//installBuiltinInfiniteArguments(ReadlnBuiltinNodeFactory.getInstance());
     	
     	//installBuiltin(IncBuiltinNodeFactory.getInstance(), registerRootNodes);
     	//installBuiltin(DecBuiltinNodeFactory.getInstance(), registerRootNodes);
