@@ -244,17 +244,33 @@ public class NodeFactory {
     	return subroutineNode;
     }
     
-    public void addFormalParameters(List<String> names, String type){
-    	FrameSlotKind slotKind = getSlotByTypeName(type);
-    	
-    	for(String name : names){
+    public void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params){
+		for(FormalParameter param : parameter){
+			params.add(param);
+		}
+	}
+	
+	public List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName){
+		List<FormalParameter> paramList = new ArrayList<>();
+		for(String identifier : identifiers){
+			paramList.add(new FormalParameter(identifier, typeName));
+		}
+		
+		return paramList;
+	}
+    
+    public void addFormalParameters(List<FormalParameter> params){
+    	for(FormalParameter param : params){
+    		FrameSlotKind slotKind = getSlotByTypeName(param.type);
     		final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(lexicalScope.scopeNodes.size(), slotKind);
-    		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(name, slotKind);
+    		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(param.identifier, slotKind);
     		final AssignmentNode assignment = AssignmentNodeGen.create(readNode, newSlot);
-    		lexicalScope.locals.put(name, newSlot);
+    		lexicalScope.locals.put(param.identifier, newSlot);
     		lexicalScope.scopeNodes.add(assignment);
     	}
     }
+    
+    
     
 	public void startMainFunction(){
 	}
@@ -484,21 +500,6 @@ public class NodeFactory {
 	
 	public void endUnit(){
 		this.unitName = null;
-	}
-	
-	public void appendIFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params){
-		for(FormalParameter param : parameter){
-			params.add(param);
-		}
-	}
-	
-	public List<FormalParameter> createInterfaceParameter(List<String> identifiers, String typeName){
-		List<FormalParameter> paramList = new ArrayList<>();
-		for(String identifier : identifiers){
-			paramList.add(new FormalParameter(identifier, typeName));
-		}
-		
-		return paramList;
 	}
 	
 	public void addProcedureInterface(String name, List<FormalParameter> formalParameters){

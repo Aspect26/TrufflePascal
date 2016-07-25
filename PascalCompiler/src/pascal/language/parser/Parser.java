@@ -175,9 +175,11 @@ public class Parser{
 		Expect(10);
 		Expect(1);
 		factory.startFunction(t); 
+		List<FormalParameter> formalParameters= new ArrayList<>(); 
 		if (la.kind == 11) {
-			FormalParameterList();
+			formalParameters = FormalParameterList();
 		}
+		factory.addFormalParameters(formalParameters); 
 		Expect(8);
 		Expect(1);
 		factory.setFunctionReturnValue(t); 
@@ -194,9 +196,11 @@ public class Parser{
 		Expect(9);
 		Expect(1);
 		factory.startProcedure(t); 
+		List<FormalParameter> formalParameters = new ArrayList<>(); 
 		if (la.kind == 11) {
-			FormalParameterList();
+			formalParameters = FormalParameterList();
 		}
+		factory.addFormalParameters(formalParameters); 
 		Expect(6);
 		if (la.kind == 7) {
 			VariableDefinitions();
@@ -206,14 +210,21 @@ public class Parser{
 		Expect(6);
 	}
 
-	void FormalParameterList() {
+	List  FormalParameterList() {
+		List  formalParameters;
 		Expect(11);
-		FormalParameter();
+		List<FormalParameter> parameters = new ArrayList<>(); 
+		List<FormalParameter> parameter = new ArrayList<>(); 
+		parameter = FormalParameter();
+		factory.appendFormalParameter(parameter, parameters); 
 		while (la.kind == 6) {
 			Get();
-			FormalParameter();
+			parameter = FormalParameter();
+			factory.appendFormalParameter(parameter, parameters); 
 		}
 		Expect(12);
+		formalParameters = parameters; 
+		return formalParameters;
 	}
 
 	StatementNode  Block() {
@@ -228,15 +239,19 @@ public class Parser{
 		return blockNode;
 	}
 
-	void FormalParameter() {
+	List  FormalParameter() {
+		List  formalParameter;
+		formalParameter = new ArrayList<>(); 
 		if (la.kind == 1) {
-			ValueParameter();
+			formalParameter = ValueParameter();
 		} else if (la.kind == 1) {
-			VariableParameter();
+			formalParameter = VariableParameter();
 		} else SynErr(52);
+		return formalParameter;
 	}
 
-	void ValueParameter() {
+	List  ValueParameter() {
+		List  formalParameter;
 		List<String> identifiers = new ArrayList<>(); 
 		Expect(1);
 		identifiers.add(t.val.toLowerCase()); 
@@ -247,17 +262,24 @@ public class Parser{
 		}
 		Expect(8);
 		Expect(1);
-		factory.addFormalParameters(identifiers, t.val.toLowerCase()); 
+		formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase()); 
+		return formalParameter;
 	}
 
-	void VariableParameter() {
+	List  VariableParameter() {
+		List  formalParameter;
+		List<String> identifiers = new ArrayList<>(); 
 		Expect(1);
+		identifiers.add(t.val.toLowerCase()); 
 		while (la.kind == 5) {
 			Get();
 			Expect(1);
+			identifiers.add(t.val.toLowerCase()); 
 		}
 		Expect(8);
 		Expect(1);
+		formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase()); 
+		return formalParameter;
 	}
 
 	void StatementSequence(List body) {
@@ -678,11 +700,11 @@ public class Parser{
 		Expect(11);
 		List<FormalParameter> formalParameter = new ArrayList<>(); 
 		formalParameter = IFormalParameter();
-		factory.appendIFormalParameter(formalParameter, formalParameters); 
+		factory.appendFormalParameter(formalParameter, formalParameters); 
 		while (la.kind == 6) {
 			Get();
 			formalParameter = IFormalParameter();
-			factory.appendIFormalParameter(formalParameter, formalParameters); 
+			factory.appendFormalParameter(formalParameter, formalParameters); 
 		}
 		Expect(12);
 		return formalParameters;
@@ -712,7 +734,7 @@ public class Parser{
 		Expect(8);
 		Expect(1);
 		String typeName = t.val; 
-		formalParameter = factory.createInterfaceParameter(identifiers, typeName); 
+		formalParameter = factory.createFormalParametersList(identifiers, typeName); 
 		return formalParameter;
 	}
 
@@ -730,7 +752,7 @@ public class Parser{
 		Expect(8);
 		Expect(1);
 		String typeName = t.val; 
-		formalParameter = factory.createInterfaceParameter(identifiers, typeName); 
+		formalParameter = factory.createFormalParametersList(identifiers, typeName); 
 		return formalParameter;
 	}
 

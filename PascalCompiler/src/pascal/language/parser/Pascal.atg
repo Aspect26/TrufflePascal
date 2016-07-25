@@ -85,7 +85,9 @@ Procedure
 =
 "procedure"									
 identifier										(. factory.startProcedure(t); .)
-[ FormalParameterList ] ";" 
+												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
+";" 
 [ VariableDefinitions ]
 Block<out StatementNode bodyNode>				(. factory.finishProcedure(bodyNode); .)
 ";"
@@ -97,7 +99,8 @@ Function
 =												
 "function"									
 identifier										(. factory.startFunction(t); .)
-[ FormalParameterList ] 
+												(. List<FormalParameter> formalParameters= new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
 ":"
 identifier										(. factory.setFunctionReturnValue(t); .)
 ";"												
@@ -107,28 +110,31 @@ Block<out StatementNode bodyNode>				(. factory.finishFunction(bodyNode); .)
 .
 
 
-FormalParameterList
+FormalParameterList<out List formalParameters>
 =
 (
-	"("
-	FormalParameter
-	{ ";" FormalParameter }
+	"("											(. List<FormalParameter> parameters = new ArrayList<>(); .)
+												(. List<FormalParameter> parameter = new ArrayList<>(); .)
+	FormalParameter<out parameter>				(. factory.appendFormalParameter(parameter, parameters); .)						
+	{ 
+		";" FormalParameter<out parameter> 		(. factory.appendFormalParameter(parameter, parameters); .)
+	}
 	")"
-)
+)												(. formalParameters = parameters; .)
 .
 
 
-FormalParameter
-=
+FormalParameter<out List formalParameter>
+=												(. formalParameter = new ArrayList<>(); .)
 (
-	ValueParameter
+	ValueParameter<out formalParameter>
 |
-	VariableParameter
+	VariableParameter<out formalParameter>
 )
 .
 
 
-ValueParameter
+ValueParameter<out List formalParameter>
 =												(. List<String> identifiers = new ArrayList<>(); .)
 identifier										(. identifiers.add(t.val.toLowerCase()); .)
 {
@@ -136,19 +142,19 @@ identifier										(. identifiers.add(t.val.toLowerCase()); .)
 	identifier									(. identifiers.add(t.val.toLowerCase()); .)
 }
 ":"
-identifier										(. factory.addFormalParameters(identifiers, t.val.toLowerCase()); .)
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase()); .)
 .
 
 
-VariableParameter
-=													
-identifier
+VariableParameter<out List formalParameter>
+=												(. List<String> identifiers = new ArrayList<>(); .)
+identifier										(. identifiers.add(t.val.toLowerCase()); .)
 {
 	","
-	identifier
+	identifier									(. identifiers.add(t.val.toLowerCase()); .)
 }
 ":"
-identifier
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase()); .)
 .
 
 
@@ -483,10 +489,10 @@ identifier										(. String returnValue = t.val; .)
 IFormalParameterList<out List formalParameters>
 =												(. formalParameters = new ArrayList<FormalParameter>(); .)
 "("												(. List<FormalParameter> formalParameter = new ArrayList<>(); .)
-	IFormalParameter<out formalParameter>		(. factory.appendIFormalParameter(formalParameter, formalParameters); .)
+	IFormalParameter<out formalParameter>		(. factory.appendFormalParameter(formalParameter, formalParameters); .)
 	{
 		";"
-		IFormalParameter<out formalParameter>	(. factory.appendIFormalParameter(formalParameter, formalParameters); .)
+		IFormalParameter<out formalParameter>	(. factory.appendFormalParameter(formalParameter, formalParameters); .)
 	}											
 ")"
 .
@@ -513,7 +519,7 @@ identifier										(. identifiers.add(t.val); .)
 }
 ":"
 identifier										(. String typeName = t.val; .)
-												(. formalParameter = factory.createInterfaceParameter(identifiers, typeName); .)
+												(. formalParameter = factory.createFormalParametersList(identifiers, typeName); .)
 .
 
 
@@ -528,7 +534,7 @@ identifier										(. identifiers.add(t.val); .)
 }
 ":"
 identifier										(. String typeName = t.val; .)
-												(. formalParameter = factory.createInterfaceParameter(identifiers, typeName); .)
+												(. formalParameter = factory.createFormalParametersList(identifiers, typeName); .)
 .
 
 
