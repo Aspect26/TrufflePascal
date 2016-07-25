@@ -1,9 +1,6 @@
 package pascal.language;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.List;
 
 import com.oracle.truffle.api.CallTarget;
@@ -32,11 +29,13 @@ import pascal.language.runtime.PascalContext;
  * parser time check na break 
  * case bug - semicolon after last case option
  * float bug - exponent must have unary operator with it (+ or -)
- * unit - implementation section -> chceck if subroutine header fits its interface equivalent
+ * unit - can't have it's own "private" methods
+ * unit - variable declared only in IMPLEMENTATION section are visible from the outside
+ * unit - no support for initialization and finalization section
  * 
  * --------- PLAN ------------------------------
  * --- PHASE 1 DONE
- * --- PHASE 2 DDONE
+ * --- PHASE 2 DONE
  * --- PHASE 5 DONE
  * 
  * --- PHASE 3:

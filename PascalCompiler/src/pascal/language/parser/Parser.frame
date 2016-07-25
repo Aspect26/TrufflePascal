@@ -50,6 +50,7 @@ public class Parser{
 	public Errors errors;
 	private final NodeFactory factory;
     public PascalRootNode mainNode;
+	private int loopDepth = 0;
 
 	-->declarations
 

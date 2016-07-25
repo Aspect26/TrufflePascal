@@ -15,4 +15,8 @@ begin
  c:=8;
  Hello();
  writeln(c);
+
+ while(true) do
+    break;
+
 end.

@@ -4,9 +4,9 @@ INTERFACE
 
 function RA(w,h:integer):integer;
 procedure Hello;
-var c:integer;
 
 IMPLEMENTATION
+var c:integer;
 function RA(w,h:integer):integer;
 var i:integer;
 begin
@@ -15,7 +15,6 @@ end;
 
 procedure Hello;
 begin
- c:=5;
  writeln('Hello World!');
  writeln(c);
 end;

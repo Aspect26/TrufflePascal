@@ -28,6 +28,7 @@ public class Parser{
 	public Errors errors;
 	private final NodeFactory factory;
     public PascalRootNode mainNode;
+	private int loopDepth = 0;
 
 	
 
@@ -335,6 +336,8 @@ public class Parser{
 		}
 		case 16: {
 			Get();
+			if(loopDepth == 0) 
+			SemErr("Break statement outside of a loop."); 
 			statement = factory.createBreak(); 
 			break;
 		}
@@ -376,6 +379,7 @@ public class Parser{
 
 	StatementNode  ForLoop() {
 		StatementNode  statement;
+		loopDepth++; 
 		Expect(19);
 		boolean ascending = true; 
 		Expect(1);
@@ -393,27 +397,32 @@ public class Parser{
 		Expect(23);
 		StatementNode loopBody = Statement();
 		statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); 
+		loopDepth--; 
 		return statement;
 	}
 
 	StatementNode  WhileLoop() {
 		StatementNode  statement;
+		loopDepth++; 
 		Expect(26);
 		ExpressionNode condition = Expression();
 		Expect(23);
 		StatementNode loopBody = Statement();
 		statement = factory.createWhileLoop(condition, loopBody); 
+		loopDepth--; 
 		return statement;
 	}
 
 	StatementNode  RepeatLoop() {
 		StatementNode  statement;
+		loopDepth++; 
 		Expect(24);
 		List<StatementNode> bodyNodes = new ArrayList<>(); 
 		StatementSequence(bodyNodes);
 		Expect(25);
 		ExpressionNode condition = Expression();
 		statement = factory.createRepeatLoop(condition, factory.finishBlock(bodyNodes)); 
+		loopDepth--; 
 		return statement;
 	}
 

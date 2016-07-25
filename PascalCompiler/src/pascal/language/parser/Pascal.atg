@@ -216,7 +216,9 @@ Statement<out StatementNode statement>
 |
 	CaseStatement<out statement>
 |
-	"break"										(. statement = factory.createBreak(); .)
+	"break"										(. if(loopDepth == 0) .)
+												(. 		SemErr("Break statement outside of a loop."); .)
+												(. statement = factory.createBreak(); .)
 |
     Block<out statement>
 )
@@ -248,7 +250,7 @@ Statement<out StatementNode caseStatement>		(. factory.addCaseOption(caseConstan
 
 
 ForLoop<out StatementNode statement>
-=
+=												(. loopDepth++; .)
 "for"											(. boolean ascending = true; .)
 identifier										(. Token variableToken = t; .)
 ":="
@@ -261,24 +263,27 @@ Expression<out ExpressionNode startValue>
 Expression<out ExpressionNode finalValue>
 "do"
 Statement<out StatementNode loopBody>			(. statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
+												(. loopDepth--; .)
 .	
 
 
 RepeatLoop<out StatementNode statement>
-=
+=												(. loopDepth++; .)
 "repeat"										(. List<StatementNode> bodyNodes = new ArrayList<>(); .)
 StatementSequence<bodyNodes>					
 "until"
 Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.finishBlock(bodyNodes)); .)
+												(. loopDepth--; .)
 .
 
 
 WhileLoop<out StatementNode statement>
-=
+=												(. loopDepth++; .)
 "while"
 Expression<out ExpressionNode condition>
 "do"
 Statement<out StatementNode loopBody>			(. statement = factory.createWhileLoop(condition, loopBody); .)
+												(. loopDepth--; .)
 .
 
 
