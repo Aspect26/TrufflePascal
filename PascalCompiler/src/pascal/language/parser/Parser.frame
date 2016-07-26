@@ -129,6 +129,18 @@ public class Parser{
     public boolean noErrors(){
     	return errors.count == 0;
     }
+    
+    public boolean caseEnds(){
+    	if(la.val.toLowerCase().equals("end") && !t.val.toLowerCase().equals(":"))
+    		return true;
+    		
+    	else if(la.val.toLowerCase().equals(";")){
+    		Token next = scanner.Peek();
+    		return next.val.toLowerCase().equals("end");
+    	}
+    	
+    	return false;
+    }
 } // end Parser
 
 class VariableDeclaration{

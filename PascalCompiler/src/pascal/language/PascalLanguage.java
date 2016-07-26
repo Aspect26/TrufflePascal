@@ -24,10 +24,9 @@ import pascal.language.runtime.PascalContext;
  * ' in string
  * type check in assignment in parser
  * type check in all operations in parser
+ * type check in if condition (is it boolean?)
  * support for not
  * switch na error pokial sa neda vyhodnotit case
- * parser time check na break 
- * case bug - semicolon after last case option
  * float bug - exponent must have unary operator with it (+ or -)
  * unit - can't have it's own "private" methods
  * unit - variable declared only in IMPLEMENTATION section are visible from the outside

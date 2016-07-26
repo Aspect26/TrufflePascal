@@ -443,12 +443,15 @@ public class Parser{
 		Expect(8);
 		StatementNode caseStatement = Statement();
 		factory.addCaseOption(caseConstant, caseStatement); 
-		while (la.kind == 6) {
-			Get();
+		while (!caseEnds()) {
+			Expect(6);
 			caseConstant = Expression();
 			Expect(8);
 			caseStatement = Statement();
 			factory.addCaseOption(caseConstant, caseStatement); 
+		}
+		if (la.kind == 6) {
+			Get();
 		}
 	}
 
@@ -805,6 +808,18 @@ public class Parser{
 	
     public boolean noErrors(){
     	return errors.count == 0;
+    }
+    
+    public boolean caseEnds(){
+    	if(la.val.toLowerCase().equals("end") && !t.val.toLowerCase().equals(":"))
+    		return true;
+    		
+    	else if(la.val.toLowerCase().equals(";")){
+    		Token next = scanner.Peek();
+    		return next.val.toLowerCase().equals("end");
+    	}
+    	
+    	return false;
     }
 } // end Parser
 

@@ -240,11 +240,13 @@ Expression<out ExpressionNode caseConstant>
 ":"
 Statement<out StatementNode caseStatement>		(. factory.addCaseOption(caseConstant, caseStatement); .)
 {
+	IF(!caseEnds())
 	";"
 	Expression<out caseConstant>
 	":"
-	Statement<out caseStatement>	(. factory.addCaseOption(caseConstant, caseStatement); .)
+	Statement<out caseStatement>				(. factory.addCaseOption(caseConstant, caseStatement); .)
 }
+[ ";" ]
 .
 
 
