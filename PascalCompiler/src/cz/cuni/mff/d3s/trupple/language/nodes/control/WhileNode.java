@@ -11,21 +11,23 @@ import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 @NodeInfo(shortName = "while", description = "The node implementing a while loop")
 public class WhileNode extends StatementNode {
 
-	@Child private ExpressionNode condition;
-	@Child private StatementNode body;
-	
-	public WhileNode(ExpressionNode condition, StatementNode body){
+	@Child
+	private ExpressionNode condition;
+	@Child
+	private StatementNode body;
+
+	public WhileNode(ExpressionNode condition, StatementNode body) {
 		this.body = body;
 		this.condition = condition;
 	}
-	
+
 	@Override
 	public void executeVoid(VirtualFrame frame) {
 		try {
-			while(condition.executeBoolean(frame)){
+			while (condition.executeBoolean(frame)) {
 				body.executeVoid(frame);
 			}
-		} catch(BreakException e){
+		} catch (BreakException e) {
 		} catch (UnexpectedResultException e) {
 			// TODO HANDLE THIS ERROR
 		}

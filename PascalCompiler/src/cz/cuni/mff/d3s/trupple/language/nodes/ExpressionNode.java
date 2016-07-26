@@ -13,21 +13,21 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 public abstract class ExpressionNode extends StatementNode {
 
 	public abstract Object executeGeneric(VirtualFrame frame);
-	
+
 	@Override
 	public void executeVoid(VirtualFrame virtualFrame) {
 		executeGeneric(virtualFrame);
 	}
-	
-	public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException{
+
+	public boolean executeBoolean(VirtualFrame frame) throws UnexpectedResultException {
 		return PascalTypesGen.expectBoolean(executeGeneric(frame));
 	}
-	
-	public long executeLong(VirtualFrame frame) throws UnexpectedResultException{
+
+	public long executeLong(VirtualFrame frame) throws UnexpectedResultException {
 		return PascalTypesGen.expectLong(executeGeneric(frame));
 	}
-	
-	public char executeChar(VirtualFrame frame) throws UnexpectedResultException{
+
+	public char executeChar(VirtualFrame frame) throws UnexpectedResultException {
 		return PascalTypesGen.expectCharacter(executeGeneric(frame));
 	}
 }

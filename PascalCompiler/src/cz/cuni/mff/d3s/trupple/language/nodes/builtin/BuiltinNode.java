@@ -10,7 +10,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 @NodeField(name = "context", type = PascalContext.class)
 @GenerateNodeFactory
-public abstract class BuiltinNode extends ExpressionNode{
+public abstract class BuiltinNode extends ExpressionNode {
 
 	public abstract PascalContext getContext();
 }

@@ -8,12 +8,12 @@ import cz.cuni.mff.d3s.trupple.language.nodes.UnaryNode;
 
 @NodeInfo(shortName = "!")
 public abstract class NotNode extends UnaryNode {
-	
+
 	@Override
-    public abstract boolean executeBoolean(VirtualFrame frame);
-	
+	public abstract boolean executeBoolean(VirtualFrame frame);
+
 	@Specialization
-    protected boolean logicalNot(boolean child) {
-        return !child;
-    }
+	protected boolean logicalNot(boolean child) {
+		return !child;
+	}
 }

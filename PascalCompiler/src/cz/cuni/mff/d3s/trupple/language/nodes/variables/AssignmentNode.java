@@ -12,66 +12,65 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeChild("valueNode")
 @NodeField(name = "slot", type = FrameSlot.class)
-public abstract class AssignmentNode extends ExpressionNode{
+public abstract class AssignmentNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
-	
+
 	@Specialization(guards = "isLongKind(frame)")
-	protected long writeLong(VirtualFrame frame, long value){
+	protected long writeLong(VirtualFrame frame, long value) {
 		frame.setLong(getSlot(), value);
 		return value;
 	}
-	
+
 	@Specialization(guards = "isBoolKind(frame)")
-	protected boolean writeBoolean(VirtualFrame frame, boolean value){
+	protected boolean writeBoolean(VirtualFrame frame, boolean value) {
 		frame.setBoolean(getSlot(), value);
 		return value;
 	}
-	
-	// NOTE: characters are stored as bytes, since there is no FrameSlotKind for char
+
+	// NOTE: characters are stored as bytes, since there is no FrameSlotKind for
+	// char
 	@Specialization(guards = "isCharKind(frame)")
-	protected char writeChar(VirtualFrame frame, char value){
-		frame.setByte(getSlot(), (byte)value);
+	protected char writeChar(VirtualFrame frame, char value) {
+		frame.setByte(getSlot(), (byte) value);
 		return value;
 	}
-	
+
 	@Specialization(guards = "isDoubleKind(frame)")
-	protected double writeChar(VirtualFrame frame, double value){
+	protected double writeChar(VirtualFrame frame, double value) {
 		frame.setDouble(getSlot(), value);
 		return value;
 	}
-	
+
 	/**
 	 * guard functions
 	 */
-	protected boolean isLongKind(VirtualFrame frame){
+	protected boolean isLongKind(VirtualFrame frame) {
 		return isKind(FrameSlotKind.Long);
 	}
-	
-	protected boolean isBoolKind(VirtualFrame frame){
+
+	protected boolean isBoolKind(VirtualFrame frame) {
 		return isKind(FrameSlotKind.Boolean);
 	}
-	
-	protected boolean isCharKind(VirtualFrame frame){
+
+	protected boolean isCharKind(VirtualFrame frame) {
 		return isKind(FrameSlotKind.Byte);
 	}
-	
-	protected boolean isDoubleKind(VirtualFrame frame){
+
+	protected boolean isDoubleKind(VirtualFrame frame) {
 		return isKind(FrameSlotKind.Double);
 	}
-	
-	private boolean isKind(FrameSlotKind kind){
-		if(getSlot().getKind() == kind){
+
+	private boolean isKind(FrameSlotKind kind) {
+		if (getSlot().getKind() == kind) {
 			return true;
-		}
-		else if(getSlot().getKind() == FrameSlotKind.Illegal){
+		} else if (getSlot().getKind() == FrameSlotKind.Illegal) {
 			CompilerDirectives.transferToInterpreterAndInvalidate();
-            getSlot().setKind(kind);
-            return true;
-		}
-		else{
+			getSlot().setKind(kind);
+			return true;
+		} else {
 			return false;
 		}
 	}
-	
+
 }

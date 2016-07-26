@@ -8,17 +8,17 @@ import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
 
 @NodeInfo(shortName = "=")
 public abstract class EqualsNode extends BinaryNode {
-	
+
 	@Override
-    public abstract boolean executeBoolean(VirtualFrame frame);
-	
+	public abstract boolean executeBoolean(VirtualFrame frame);
+
 	@Specialization
-    protected boolean equals(boolean left, boolean right) {
-        return left == right;
-    }
-	
+	protected boolean equals(boolean left, boolean right) {
+		return left == right;
+	}
+
 	@Specialization
-	protected boolean equals(long left, long right){
+	protected boolean equals(long left, long right) {
 		return left == right;
 	}
 }

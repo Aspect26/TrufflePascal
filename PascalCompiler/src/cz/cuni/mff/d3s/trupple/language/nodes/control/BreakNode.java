@@ -8,7 +8,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 public final class BreakNode extends StatementNode {
 
 	@Override
-	public void executeVoid(VirtualFrame frame){
+	public void executeVoid(VirtualFrame frame) {
 		throw BreakException.SINGLETON;
 	}
 }

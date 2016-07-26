@@ -7,18 +7,19 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 @NodeInfo(shortName = "block", description = "The node implementation of a block of source code.")
 public class BlockNode extends StatementNode {
 
-	@Children private final StatementNode[] bodyNodes;
-	
-	public BlockNode(StatementNode[] bodyNodes){
+	@Children
+	private final StatementNode[] bodyNodes;
+
+	public BlockNode(StatementNode[] bodyNodes) {
 		this.bodyNodes = bodyNodes;
 	}
-	
+
 	@Override
 	public void executeVoid(VirtualFrame virtualFrame) {
-		
+
 		CompilerAsserts.compilationConstant(bodyNodes.length);
-		
-		for(StatementNode statement : bodyNodes){
+
+		for (StatementNode statement : bodyNodes) {
 			statement.executeVoid(virtualFrame);
 		}
 	}

@@ -8,12 +8,12 @@ import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
 
 @NodeInfo(shortName = "<")
 public abstract class LessThanOrEqualNode extends BinaryNode {
-	
+
 	@Override
-    public abstract boolean executeBoolean(VirtualFrame frame);
-	
+	public abstract boolean executeBoolean(VirtualFrame frame);
+
 	@Specialization
-    protected boolean lessThanOrEqual(long left, long right) {
-        return left <= right;
-    }
+	protected boolean lessThanOrEqual(long left, long right) {
+		return left <= right;
+	}
 }

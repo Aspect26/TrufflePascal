@@ -7,35 +7,35 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 @NodeInfo(shortName = "write")
-public abstract class WriteBuiltinNode extends BuiltinNode{
+public abstract class WriteBuiltinNode extends BuiltinNode {
 
-	//TODO specializations
+	// TODO specializations
 
-    @Specialization
-    public String write(String[] values) {
-    	doWrite(getContext().getOutput(), values);
-    	
-    	//TODO: this return value
-        return values[0];
-    }
+	@Specialization
+	public String write(String[] values) {
+		doWrite(getContext().getOutput(), values);
 
-    @TruffleBoundary
-    private static void doWrite(PrintStream out, String[] values) {
-    	for(Object value : values)
-    		out.print(value);
-    }
-    
-    @Specialization
-    public Object write(Object[] values) {
-    	doWrite(getContext().getOutput(), values);
-    	
-    	//TODO: this return value
-        return values[0];
-    }
+		// TODO: this return value
+		return values[0];
+	}
 
-    @TruffleBoundary
-    private static void doWrite(PrintStream out, Object[] values) {
-    	for(Object value : values)
-    		out.print(value);
-    }
+	@TruffleBoundary
+	private static void doWrite(PrintStream out, String[] values) {
+		for (Object value : values)
+			out.print(value);
+	}
+
+	@Specialization
+	public Object write(Object[] values) {
+		doWrite(getContext().getOutput(), values);
+
+		// TODO: this return value
+		return values[0];
+	}
+
+	@TruffleBoundary
+	private static void doWrite(PrintStream out, Object[] values) {
+		for (Object value : values)
+			out.print(value);
+	}
 }

@@ -11,53 +11,53 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 public abstract class ReadSubroutineArgumentNode extends ExpressionNode {
 
 	protected abstract FrameSlotKind getSlotKind();
-	
+
 	private final int index;
-	
-	public ReadSubroutineArgumentNode(int index){
+
+	public ReadSubroutineArgumentNode(int index) {
 		this.index = index;
 	}
-	
+
 	@Specialization(guards = "isLongKind()")
-	protected long readLong(VirtualFrame frame){
+	protected long readLong(VirtualFrame frame) {
 		Object[] args = frame.getArguments();
 		if (index < args.length) {
-            return (long)args[index];
-		} 
-		
+			return (long) args[index];
+		}
+
 		throw new RuntimeException("Wrong number of parmeters passed.");
 	}
-	
+
 	@Specialization(guards = "isBoolKind()")
-	protected boolean readBoolean(VirtualFrame frame){
+	protected boolean readBoolean(VirtualFrame frame) {
 		Object[] args = frame.getArguments();
 		if (index < args.length) {
-            return (boolean)args[index];
-		} 
-		
+			return (boolean) args[index];
+		}
+
 		throw new RuntimeException("Wrong number of parmeters passed.");
 	}
-	
+
 	@Specialization(guards = "isCharKind()")
-	protected char readChar(VirtualFrame frame){
+	protected char readChar(VirtualFrame frame) {
 		Object[] args = frame.getArguments();
 		if (index < args.length) {
-            return (char)args[index];
-		} 
-		
+			return (char) args[index];
+		}
+
 		throw new RuntimeException("Wrong number of parmeters passed.");
 	}
-	
-	protected boolean isLongKind(){
+
+	protected boolean isLongKind() {
 		return getSlotKind() == FrameSlotKind.Long;
 	}
-	
-	protected boolean isBoolKind(){
+
+	protected boolean isBoolKind() {
 		return getSlotKind() == FrameSlotKind.Boolean;
 	}
-	
-	protected boolean isCharKind(){
+
+	protected boolean isCharKind() {
 		return getSlotKind() == FrameSlotKind.Byte;
 	}
-	
+
 }

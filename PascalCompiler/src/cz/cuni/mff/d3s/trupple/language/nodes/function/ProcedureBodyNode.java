@@ -9,18 +9,19 @@ import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 
 @NodeInfo(shortName = "function body")
 public final class ProcedureBodyNode extends ExpressionNode {
-	
+
 	/** The body. */
-	@Child private StatementNode bodyNode;
-	
-	public ProcedureBodyNode(StatementNode bodyNode){
+	@Child
+	private StatementNode bodyNode;
+
+	public ProcedureBodyNode(StatementNode bodyNode) {
 		this.bodyNode = bodyNode;
 	}
 
 	@Override
 	public Object executeGeneric(VirtualFrame frame) {
 		bodyNode.executeVoid(frame);
-		
+
 		return Null.SINGLETON;
 	}
 }

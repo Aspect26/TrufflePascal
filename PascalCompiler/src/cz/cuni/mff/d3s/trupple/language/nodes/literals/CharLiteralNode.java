@@ -5,10 +5,10 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 public class CharLiteralNode extends ExpressionNode {
-	
+
 	private final char value;
-	
-	public CharLiteralNode(char value){
+
+	public CharLiteralNode(char value) {
 		this.value = value;
 	}
 

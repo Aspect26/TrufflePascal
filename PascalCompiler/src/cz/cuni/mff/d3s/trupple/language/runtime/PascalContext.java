@@ -22,43 +22,43 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 
 public final class PascalContext extends ExecutionContext {
 	private final BufferedReader input;
-    private final PrintStream output;
-    //private final TruffleLanguage.Env env;
-    private final PascalFunctionRegistry functionRegistry;
-    
-    public PascalContext(){
-    	this(null, null, System.out);
-    }
-    
+	private final PrintStream output;
+	// private final TruffleLanguage.Env env;
+	private final PascalFunctionRegistry functionRegistry;
+
+	public PascalContext() {
+		this(null, null, System.out);
+	}
+
 	private PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintStream output) {
-        this.input = input;
-        this.output = output;
-        //this.env = env;
-        this.functionRegistry = new PascalFunctionRegistry(this);
-    }
-	
+		this.input = input;
+		this.output = output;
+		// this.env = env;
+		this.functionRegistry = new PascalFunctionRegistry(this);
+	}
+
 	public BufferedReader getInput() {
-        return input;
-    }
-	
+		return input;
+	}
+
 	public PrintStream getOutput() {
-        return output;
-    }
-	
-    public PascalFunctionRegistry getFunctionRegistry() {
-        return functionRegistry;
-    }
-    
-    public static Object fromForeignValue(Object a) {
-        if (a instanceof Long || a instanceof BigInteger || a instanceof String) {
-            return a;
-        } else if (a instanceof Number) {
-            return ((Number) a).longValue();
-        } else if (a instanceof TruffleObject) {
-            return a;
-        } else if (a instanceof PascalContext) {
-            return a;
-        }
-        throw new IllegalStateException(a + " is not a Truffle value");
-    }
+		return output;
+	}
+
+	public PascalFunctionRegistry getFunctionRegistry() {
+		return functionRegistry;
+	}
+
+	public static Object fromForeignValue(Object a) {
+		if (a instanceof Long || a instanceof BigInteger || a instanceof String) {
+			return a;
+		} else if (a instanceof Number) {
+			return ((Number) a).longValue();
+		} else if (a instanceof TruffleObject) {
+			return a;
+		} else if (a instanceof PascalContext) {
+			return a;
+		}
+		throw new IllegalStateException(a + " is not a Truffle value");
+	}
 }

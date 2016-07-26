@@ -12,25 +12,27 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
 @NodeInfo(shortName = "invoke")
-@NodeChildren({@NodeChild(value = "functionNode", type = ExpressionNode.class)})
+@NodeChildren({ @NodeChild(value = "functionNode", type = ExpressionNode.class) })
 public abstract class InvokeNode extends ExpressionNode {
-	@Children private final ExpressionNode[] argumentNodes;
-    @Child private DispatchNode dispatchNode;
-    
-    InvokeNode(ExpressionNode[] argumentNodes){
-    	this.argumentNodes = argumentNodes;
-    	this.dispatchNode = DispatchNodeGen.create();
-    }
-    
-    @Specialization
-    @ExplodeLoop
-    public Object executeGeneric(VirtualFrame frame, PascalFunction function) {
-        CompilerAsserts.compilationConstant(argumentNodes.length);
+	@Children
+	private final ExpressionNode[] argumentNodes;
+	@Child
+	private DispatchNode dispatchNode;
 
-        Object[] argumentValues = new Object[argumentNodes.length];
-        for (int i = 0; i < argumentNodes.length; i++) {
-            argumentValues[i] = argumentNodes[i].executeGeneric(frame);
-        }
-        return dispatchNode.executeDispatch(frame, function, argumentValues);
-    }
+	InvokeNode(ExpressionNode[] argumentNodes) {
+		this.argumentNodes = argumentNodes;
+		this.dispatchNode = DispatchNodeGen.create();
+	}
+
+	@Specialization
+	@ExplodeLoop
+	public Object executeGeneric(VirtualFrame frame, PascalFunction function) {
+		CompilerAsserts.compilationConstant(argumentNodes.length);
+
+		Object[] argumentValues = new Object[argumentNodes.length];
+		for (int i = 0; i < argumentNodes.length; i++) {
+			argumentValues[i] = argumentNodes[i].executeGeneric(frame);
+		}
+		return dispatchNode.executeDispatch(frame, function, argumentValues);
+	}
 }

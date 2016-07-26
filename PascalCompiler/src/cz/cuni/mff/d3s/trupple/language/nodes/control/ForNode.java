@@ -17,14 +17,18 @@ public class ForNode extends StatementNode {
 
 	private final boolean ascending;
 	private FrameSlot slot;
-	@Child ExpressionNode startValue;
-	@Child ExpressionNode finalValue;
-	@Child AssignmentNode assignment;
-	@Child StatementNode body;
-	
+	@Child
+	ExpressionNode startValue;
+	@Child
+	ExpressionNode finalValue;
+	@Child
+	AssignmentNode assignment;
+	@Child
+	StatementNode body;
+
 	public ForNode(boolean ascending, FrameSlot slot, ExpressionNode startValue, ExpressionNode finalValue,
-			StatementNode body){
-		
+			StatementNode body) {
+
 		this.ascending = ascending;
 		this.slot = slot;
 		this.startValue = startValue;
@@ -32,24 +36,23 @@ public class ForNode extends StatementNode {
 		this.assignment = AssignmentNodeGen.create(startValue, slot);
 		this.body = body;
 	}
-	
+
 	@Override
 	public void executeVoid(VirtualFrame frame) {
 		try {
 			assignment.executeVoid(frame);
-			if(ascending){
-				while(frame.getLong(slot) <= finalValue.executeLong(frame)){
+			if (ascending) {
+				while (frame.getLong(slot) <= finalValue.executeLong(frame)) {
 					body.executeVoid(frame);
 					frame.setLong(slot, frame.getLong(slot) + 1);
 				}
-			}
-			else{
-				while(frame.getLong(slot) >= finalValue.executeLong(frame)){
+			} else {
+				while (frame.getLong(slot) >= finalValue.executeLong(frame)) {
 					body.executeVoid(frame);
 					frame.setLong(slot, frame.getLong(slot) - 1);
 				}
 			}
-		} catch(BreakException e){
+		} catch (BreakException e) {
 		} catch (UnexpectedResultException | FrameSlotTypeException e) {
 			// TODO HANDLE THIS ERROR
 		}
