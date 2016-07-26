@@ -56,6 +56,7 @@ public class NodeFactory {
     static class LexicalScope {
         protected final LexicalScope outer;
         protected final Map<String, FrameSlot> locals;
+        protected final Map<String, Constant> constants;
         protected final String name;
         
         public FrameDescriptor frameDescriptor;
@@ -66,12 +67,20 @@ public class NodeFactory {
         	this.name = name;
             this.outer = outer;
             this.locals = new HashMap<>();
+            this.constants = new HashMap<>();
             this.frameDescriptor = new FrameDescriptor();
             if (outer != null) {
                 locals.putAll(outer.locals);
             }
         }
     }
+    
+    
+    interface Constant{
+    	
+    }
+    
+    class IntegerConstant implements Constant{}
     
     /**
      * WTF -> FrameDescriptor.copy() function does not copy slot kinds
@@ -386,7 +395,26 @@ public class NodeFactory {
 		return new NopNode();
 	}
 	
-	public ExpressionNode createCharLiteral(Token literalToken){
+	public void createIntegerConstant(Token identifier, Token value){
+		LexicalScope ls = (currentUnit==null)? lexicalScope : currentUnit.getLexicalScope();
+		
+		ls.locals.put(identifier.val.toLowerCase(), null);
+		//ls.constants.put(identifier.val.toLowerCase(), new IntegerConstant(value.val.toLowerCase()));
+	}
+	
+	public void createFloatConstant(Token identifier, Token value){
+		
+	}
+	
+	public void createStringOrCharConstant(Token identifier, Token value){
+		
+	}
+	
+	public void createBooleanConstant(Token identifier, boolean value){
+		
+	}
+	
+	public ExpressionNode createCharOrStringLiteral(Token literalToken){
 		String literal = literalToken.val;
 		assert literal.length() >= 2 && literal.startsWith("'") && literal.endsWith("'");
 		literal = literal.substring(1, literal.length() - 1);

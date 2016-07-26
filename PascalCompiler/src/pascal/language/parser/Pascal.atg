@@ -58,7 +58,38 @@ PreDeclaration
 ( 
 	VariableDefinitions 
 |
+	ConstantDefinition
+|
 	Subroutine
+)
+.
+
+
+ConstantDefinition
+=
+"const"
+identifier										(. Token identifier = t; .)
+"="
+(
+	floatLiteral								(. factory.createFloatConstant(identifier, t); .)	
+|
+	numericLiteral								(. factory.createIntegerConstant(identifier, t); .)	
+|
+	stringLiteral								(. factory.createStringOrCharConstant(identifier, t); .)	
+|
+												(. boolean l; .)
+	LogicLiteral<out l>							(. factory.createBooleanConstant(identifier, l); .)	
+)
+";"
+.
+
+
+LogicLiteral<out boolean result>
+=												(. result = false; .)
+(
+	"true"										(. result = true; .)
+|
+	"false"										(. result = false; .)
 )
 .
 
@@ -383,7 +414,7 @@ Factor<out ExpressionNode expression>
     Expression<out expression>                  
     ")"
 |
-	stringLiteral					            (. expression = factory.createCharLiteral(t); .)
+	stringLiteral					            (. expression = factory.createCharOrStringLiteral(t); .)
 |
 	floatLiteral								(. expression = factory.createFloatLiteral(t); .)
 |
@@ -391,17 +422,8 @@ Factor<out ExpressionNode expression>
                                                 (. if(expression == null) .)
                                                 (.      SemErr("Constant out of range!"); .)
 |
-    LogicLiteral<out expression>
-)
-.
-
-
-LogicLiteral<out ExpressionNode expression>
-=                                               (. expression = null; .)
-(
-    "true"                                      (. expression = factory.createLogicLiteral(true); .)
-|
-    "false"                                     (. expression = factory.createLogicLiteral(false); .)
+												(. boolean val; .)
+    LogicLiteral<out val>						(. expression = factory.createLogicLiteral(val); .)
 )
 .
 

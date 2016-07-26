@@ -252,8 +252,8 @@ class StartStates {
 public class Scanner {
 	static final char EOL = '\n';
 	static final int  eofSym = 0;
-	static final int maxT = 49;
-	static final int noSym = 49;
+	static final int maxT = 50;
+	static final int noSym = 50;
 	char valCh;       // current input character (for token.val)
 
 	public Buffer buffer; // scanner buffer
@@ -284,45 +284,46 @@ public class Scanner {
 		start.set(48, 15); 
 		start.set(44, 16); 
 		start.set(59, 17); 
+		start.set(61, 18); 
 		start.set(58, 29); 
-		start.set(40, 18); 
-		start.set(41, 19); 
-		start.set(46, 20); 
+		start.set(40, 19); 
+		start.set(41, 20); 
+		start.set(46, 21); 
 		start.set(62, 30); 
 		start.set(60, 31); 
-		start.set(61, 24); 
 		start.set(43, 26); 
 		start.set(45, 27); 
 		start.set(42, 28); 
 		start.set(Buffer.EOF, -1);
 		literals.put("uses", new Integer(5));
-		literals.put("var", new Integer(8));
-		literals.put("procedure", new Integer(10));
-		literals.put("function", new Integer(11));
-		literals.put("begin", new Integer(15));
-		literals.put("end", new Integer(16));
-		literals.put("break", new Integer(17));
-		literals.put("case", new Integer(18));
-		literals.put("of", new Integer(19));
-		literals.put("for", new Integer(20));
-		literals.put("to", new Integer(22));
-		literals.put("downto", new Integer(23));
-		literals.put("do", new Integer(24));
-		literals.put("repeat", new Integer(25));
-		literals.put("until", new Integer(26));
-		literals.put("while", new Integer(27));
-		literals.put("if", new Integer(28));
-		literals.put("then", new Integer(29));
-		literals.put("else", new Integer(30));
-		literals.put("or", new Integer(31));
-		literals.put("and", new Integer(32));
-		literals.put("div", new Integer(42));
-		literals.put("mod", new Integer(43));
-		literals.put("true", new Integer(44));
-		literals.put("false", new Integer(45));
-		literals.put("unit", new Integer(46));
-		literals.put("interface", new Integer(47));
-		literals.put("implementation", new Integer(48));
+		literals.put("const", new Integer(8));
+		literals.put("true", new Integer(10));
+		literals.put("false", new Integer(11));
+		literals.put("var", new Integer(12));
+		literals.put("procedure", new Integer(14));
+		literals.put("function", new Integer(15));
+		literals.put("begin", new Integer(19));
+		literals.put("end", new Integer(20));
+		literals.put("break", new Integer(21));
+		literals.put("case", new Integer(22));
+		literals.put("of", new Integer(23));
+		literals.put("for", new Integer(24));
+		literals.put("to", new Integer(26));
+		literals.put("downto", new Integer(27));
+		literals.put("do", new Integer(28));
+		literals.put("repeat", new Integer(29));
+		literals.put("until", new Integer(30));
+		literals.put("while", new Integer(31));
+		literals.put("if", new Integer(32));
+		literals.put("then", new Integer(33));
+		literals.put("else", new Integer(34));
+		literals.put("or", new Integer(35));
+		literals.put("and", new Integer(36));
+		literals.put("div", new Integer(45));
+		literals.put("mod", new Integer(46));
+		literals.put("unit", new Integer(47));
+		literals.put("interface", new Integer(48));
+		literals.put("implementation", new Integer(49));
 
 	}
 	
@@ -517,40 +518,40 @@ public class Scanner {
 				case 17:
 					{t.kind = 7; break loop;}
 				case 18:
-					{t.kind = 12; break loop;}
+					{t.kind = 9; break loop;}
 				case 19:
-					{t.kind = 13; break loop;}
+					{t.kind = 16; break loop;}
 				case 20:
-					{t.kind = 14; break loop;}
+					{t.kind = 17; break loop;}
 				case 21:
-					{t.kind = 21; break loop;}
+					{t.kind = 18; break loop;}
 				case 22:
-					{t.kind = 34; break loop;}
+					{t.kind = 25; break loop;}
 				case 23:
-					{t.kind = 36; break loop;}
-				case 24:
-					{t.kind = 37; break loop;}
-				case 25:
 					{t.kind = 38; break loop;}
-				case 26:
-					{t.kind = 39; break loop;}
-				case 27:
+				case 24:
 					{t.kind = 40; break loop;}
-				case 28:
+				case 25:
 					{t.kind = 41; break loop;}
+				case 26:
+					{t.kind = 42; break loop;}
+				case 27:
+					{t.kind = 43; break loop;}
+				case 28:
+					{t.kind = 44; break loop;}
 				case 29:
-					recEnd = pos; recKind = 9;
-					if (ch == '=') {AddCh(); state = 21; break;}
-					else {t.kind = 9; break loop;}
-				case 30:
-					recEnd = pos; recKind = 33;
+					recEnd = pos; recKind = 13;
 					if (ch == '=') {AddCh(); state = 22; break;}
-					else {t.kind = 33; break loop;}
-				case 31:
-					recEnd = pos; recKind = 35;
+					else {t.kind = 13; break loop;}
+				case 30:
+					recEnd = pos; recKind = 37;
 					if (ch == '=') {AddCh(); state = 23; break;}
+					else {t.kind = 37; break loop;}
+				case 31:
+					recEnd = pos; recKind = 39;
+					if (ch == '=') {AddCh(); state = 24; break;}
 					else if (ch == '>') {AddCh(); state = 25; break;}
-					else {t.kind = 35; break loop;}
+					else {t.kind = 39; break loop;}
 
 			}
 		}

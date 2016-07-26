@@ -30,6 +30,15 @@ import pascal.language.runtime.PascalContext;
  * unit - can't have it's own "private" methods
  * unit - variable declared only in IMPLEMENTATION section are visible from the outside
  * unit - no support for initialization and finalization section
+ * -------------------------------------------
+ * pascal library -> cuni. ... (univerzitny + katedra)
+ * parsovanie vstupnych parametrov -> kniznica nejaka
+ * sformatovat kod
+ * chyby do system.err
+ * niekde je SLNull
+ * for len JEDNO vyhodnotenie poctu cyklov! (na zaciatku)
+ * break nie je vstd
+ * UNIT TESTY!
  * 
  * --------- PLAN ------------------------------
  * --- PHASE 1 DONE
