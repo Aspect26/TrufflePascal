@@ -2,7 +2,7 @@
 
 <project name="Trupple v0.6" default="info">
 
-    <property name="src.dir" value="PascalCompiler/src"/>
+    <property name="src.dir" value="PascalCompiler/src/"/>
     <property name="srcgen.dir" value="PascalCompiler/src_gen"/>
     <property name="lib.dir" value="PascalCompiler/lib" />
     <property name="build.dir" value="Trupple" />
