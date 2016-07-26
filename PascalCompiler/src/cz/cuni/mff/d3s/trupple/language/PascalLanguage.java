@@ -13,36 +13,56 @@ import com.oracle.truffle.api.source.Source;
 import cz.cuni.mff.d3s.trupple.language.parser.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
-/**
+/*
  * QUSTIONS LIST how to use Graal integer range check (ako riesit unsigned ??)
  * 
  * TODO LIST
  *
- * ReadArgumentNode -> Object[] -> no specialization ' in string type check in
- * assignment in parser type check in all operations in parser type check in if
- * condition (is it boolean?) support for not switch na error pokial sa neda
- * vyhodnotit case unit - can't have it's own "private" methods unit - variable
- * declared only in IMPLEMENTATION section are visible from the outside unit -
- * no support for initialization and finalization section
- * ------------------------------------------- parsovanie vstupnych parametrov
- * -> kniznica nejaka sformatovat kod chyby do system.err niekde je SLNull for
- * len JEDNO vyhodnotenie poctu cyklov! (na zaciatku) break nie je vstd UNIT
- * TESTY!
+ * ReadArgumentNode -> Object[] -> no specialization 
+ * ' in string 
+ * type check in assignment in parser 
+ * type check in all operations in parser 
+ * type check in if condition (is it boolean?) 
+ * support for not switch na error pokial sa neda vyhodnotit case 
+ * unit - can't have it's own "private" methods 
+ * unit - variables declared only in IMPLEMENTATION section are visible from the outside 
+ * unit - no support for initialization and finalization section
+ * subroutines - declare nestedd subroutines
+ * parsovanie vstupnych parametrov -> kniznica nejaka
+ * chyby do system.err 
+ * niekde je SLNull 
+ * for len JEDNO vyhodnotenie poctu cyklov! (na zaciatku) 
+ * break nie je vstd 
+ * UNIT TESTY!
  * 
- * --------- PLAN ------------------------------ --- PHASE 1 DONE --- PHASE 2
- * DONE --- PHASE 5 DONE
+ * --------- PLAN ------------------------------ 
+ * --- PHASE 1 DONE
+ * --- PHASE 2 DONE 
+ * --- PHASE 5 DONE
  * 
- * --- PHASE 3: readln read
+ * --- PHASE 3: 
+ * readln 
+ * read
  * 
- * --- PHASE 4: goto
+ * --- PHASE 4:
+ * goto (later)
  * 
- * --- PHASE 6: enum array record
+ * --- PHASE 6 -- CURRENT: 
+ * enum 
+ * array 
+ * record
  * 
- * --- PHASE 7: files
+ * --- PHASE 7: 
+ * files
  * 
- * --- PHASE 8: pointers
+ * --- PHASE 8: 
+ * pointers
  * 
- * --- PHASE 9: crt graph string dos
+ * --- PHASE 9: 
+ * crt 
+ * graph 
+ * string 
+ * dos
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.6", mimeType = "text/x-pascal")
@@ -95,14 +115,14 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		for (String imp : imports) {
 			parser.Parse(Source.fromFileName(imp));
 			if (!parser.noErrors()) {
-				System.out.println("Errors while parsing import file " + imp + ".");
+				System.err.println("Errors while parsing import file " + imp + ".");
 				return;
 			}
 		}
 
 		parser.Parse(Source.fromFileName(sourcePath));
 		if (!parser.noErrors()) {
-			System.out.println("Errors while parsing source file, the code cannot be interpreted...");
+			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
 			return;
 		}
 

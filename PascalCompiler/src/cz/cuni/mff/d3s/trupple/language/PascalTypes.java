@@ -18,7 +18,7 @@ public class PascalTypes {
 	}
 
 	@TypeCast(Null.class)
-	public static Null asSLNull(Object value) {
+	public static Null asPascalNull(Object value) {
 		assert isNull(value);
 		return Null.SINGLETON;
 	}

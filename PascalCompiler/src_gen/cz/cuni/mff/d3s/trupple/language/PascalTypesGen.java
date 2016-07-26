@@ -96,7 +96,7 @@ public final class PascalTypesGen extends PascalTypes {
 
     public static Null expectNull(Object value) throws UnexpectedResultException {
         if (PascalTypes.isNull(value)) {
-            return PascalTypes.asSLNull(value);
+            return PascalTypes.asPascalNull(value);
         }
         throw new UnexpectedResultException(value);
     }

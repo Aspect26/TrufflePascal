@@ -53,18 +53,18 @@ public class CompilerMain {
 
 	public static void main(String[] args) throws IOException {
 		if (args.length == 0) {
-			System.out.println("Please specify a source file to interpret.");
+			System.err.println("You have to specify a source file.");
 			return;
 		}
 
 		// process parameters
 		if (!processParameters(args)) {
-			System.out.println("Error processing arguments. The interpreter will close now.");
+			System.err.println("Error processing arguments. The interpreter will close now.");
 			return;
 		}
 
 		if (!(new File(settings.sourcePath).exists())) {
-			System.out.println("The specified source doesn't exist: " + settings.sourcePath + ".");
+			System.err.println("The specified source doesn't exist: " + settings.sourcePath + ".");
 			return;
 		}
 
@@ -103,14 +103,14 @@ public class CompilerMain {
 			while (scanner.isNextArgument()) {
 				String arg = scanner.getNext(false);
 				if (arg == null) {
-					System.out.println("Wrong argument given for parameter " + param);
+					System.err.println("Wrong argument given for parameter " + param);
 					return false;
 				}
 
 				settings.imports.add(arg);
 			}
 		} else {
-			System.out.println("Unknown parameter " + param);
+			System.err.println("Unknown parameter " + param);
 			return false;
 		}
 
