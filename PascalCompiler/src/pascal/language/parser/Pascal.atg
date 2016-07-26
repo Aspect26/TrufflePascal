@@ -19,6 +19,7 @@ TOKENS
 identifier = letter {letter | digit}.
 stringLiteral = "'" { stringChar } "'".
 numericLiteral = "0" | nonZeroDigit { digit }.
+floatLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] ("0" | nonZeroDigit { digit }) | ("0" | nonZeroDigit { digit }) "." ("0" | nonZeroDigit { digit }) ["e" ["-"|"+"] ("0" | nonZeroDigit { digit })].
 
 PRAGMAS
 
@@ -384,31 +385,11 @@ Factor<out ExpressionNode expression>
 |
 	stringLiteral					            (. expression = factory.createCharLiteral(t); .)
 |
-    numericLiteral                              (. Token integerPartToken; .)
-												(. Token fractionalPartToken = null; .)
-												(. Token exponentOpToken = null; .)
-												(. Token exponentToken = null; .)
-												(. integerPartToken = t; .)
-    (
-    											(. expression = factory.createNumericLiteral(integerPartToken); .)
+	floatLiteral								(. expression = factory.createFloatLiteral(t); .)
+|
+    numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
                                                 (. if(expression == null) .)
                                                 (.      SemErr("Constant out of range!"); .)
-    |
-		(
-			"."
-			numericLiteral						(. fractionalPartToken = t; .)
-			[
-				"e"
-				[ ( "+" | "-" ) ]				(. exponentOpToken = t; .)
-				numericLiteral					(. exponentToken = t; .)
-			]
-		|
-			"e"
-			[ ( "+" | "-" ) ]					(. exponentOpToken = t; .)
-			numericLiteral						(. exponentToken = t; .)
-		)										(. expression = factory.createRealLiteral(integerPartToken, .)
-												(. fractionalPartToken, exponentOpToken, exponentToken); .)    	
-    )
 |
     LogicLiteral<out expression>
 )

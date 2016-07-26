@@ -403,6 +403,11 @@ public class NodeFactory {
 		}
 	}
 	
+	public ExpressionNode createFloatLiteral(Token token){
+		double value = Float.parseFloat(token.val.toString());
+		return new DoubleLiteralNode(value);
+	}
+	
 	public ExpressionNode createRealLiteral(Token integerPart, Token fractionalPart, Token exponentOp, Token exponent){
 		int integer = Integer.parseInt(integerPart.val);
 		double fractional = (fractionalPart == null)? 0 : Double.parseDouble(fractionalPart.val);

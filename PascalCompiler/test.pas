@@ -17,6 +17,7 @@ end;
 var a:integer;
 
 begin
+ writeln(25.5e+5);
  writeln(factorial(12));
  writeln(fib(30));
  
