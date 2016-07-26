@@ -1,30 +1,43 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project PascalCompiler">
-    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
-    <!--ANT 1.7 is required                                        -->
-    <!--define folder properties-->
-    <property name="dir.buildfile" value="."/>
-    <property name="dir.workspace" value="/home/oem/workspaceGraal"/>
-    <property name="dir.jarfile" value="${dir.buildfile}"/>
-    <target name="create_run_jar">
-        <jar destfile="${dir.jarfile}/Trupple.jar" filesetmanifest="mergewithoutmain">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Trupple v0.6" default="info">
+
+    <property name="src.dir" value="PascalCompiler/src"/>
+    <property name="srcgen.dir" value="PascalCompiler/src_gen"/>
+    <property name="lib.dir" value="PascalCompiler/lib" />
+    <property name="build.dir" value="Trupple" />
+
+    <target name="info">
+        <echo> 
+            Trupple - A Pascal interpreter made in Truffle framework by Aspect!  
+        </echo>
+    </target>
+
+    <target name="build" description="Compiles all Trupple sources">
+        <mkdir dir="${build.dir}"/>
+        <javac destdir="${build.dir}" source="1.8" target="1.8">
+            <src path="${src.dir}"/>
+            
+            <classpath>
+                <pathelement path="${lib.dir}/truffle.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="clean" description="Removes build directory">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="make" depends="build" description="Create executable jar file">
+        <jar destfile="${build.dir}/Trupple.jar"
+             basedir="${build.dir}/pascal">
+
+
             <manifest>
                 <attribute name="Main-Class" value="pascal.compiler.CompilerMain"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="/home/oem/Graal/graal/truffle/PascalCompiler/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.debug/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.dsl/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.instrumentation/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.interop/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.interop.java/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.vm/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.object/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.object.dsl/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.api.profiles/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.object/bin"/>
-            <fileset dir="/home/oem/Graal/graal/truffle/mxbuild/truffle/com.oracle.truffle.object.basic/bin"/>
         </jar>
     </target>
-</project>
+
+</project> 
