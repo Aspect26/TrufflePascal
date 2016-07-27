@@ -1,31 +1,30 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.arithmetic;
 
-import com.oracle.truffle.api.ExactMath;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
 
-@NodeInfo(shortName = "-")
-public abstract class SubstractNode extends BinaryNode {
+@NodeInfo(shortName = "/")
+public abstract class DivideNode extends BinaryNode {
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-	protected long sub(long left, long right) {
-		return ExactMath.subtractExact(left, right);
+	protected double div(long left, long right) {
+		return (double) left / right;
 	}
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-	protected double sub(double left, long right) {
-		return left - right;
+	protected double div(double left, long right) {
+		return left / right;
 	}
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-	protected double sub(long left, double right) {
-		return left - right;
+	protected double div(long left, double right) {
+		return left / right;
 	}
 
 	@Specialization(rewriteOn = ArithmeticException.class)
-	protected double sub(double left, double right) {
-		return left - right;
+	protected double div(double left, double right) {
+		return left / right;
 	}
 }

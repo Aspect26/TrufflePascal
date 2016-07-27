@@ -14,11 +14,14 @@ import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 
 public abstract class UnitTest {
 
-	protected final ByteArrayOutputStream output = new ByteArrayOutputStream();
-	protected final ByteArrayOutputStream error = new ByteArrayOutputStream();
+	protected ByteArrayOutputStream output;
+	protected ByteArrayOutputStream error;
 
 	@Before
 	public void setUpStreams() {
+		output = new ByteArrayOutputStream();
+		error = new ByteArrayOutputStream();
+
 		System.setOut(new PrintStream(output));
 		System.setErr(new PrintStream(error));
 	}
@@ -27,6 +30,9 @@ public abstract class UnitTest {
 	public void cleanUpStreams() {
 		System.setOut(null);
 		System.setErr(null);
+
+		output = null;
+		error = null;
 	}
 
 	protected void test(String sourceCode, String expectedOutput) {
@@ -38,6 +44,7 @@ public abstract class UnitTest {
 	}
 
 	protected void test(String sourceCode, List<String> imports, String codeDecription, String expectedOutput) {
+		setUpStreams();
 		PascalLanguage.startFromCodes(sourceCode, imports, codeDecription);
 		assertTrue(output.toString().equals(expectedOutput));
 	}

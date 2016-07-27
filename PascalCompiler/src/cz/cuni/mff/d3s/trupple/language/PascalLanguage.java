@@ -35,7 +35,9 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * break nie je v std (treba prepinac --std=turbo)
  * poriesit prepinac -I (nech funguje podobne ako v gcc (neimportuje subor ale dir, v ktorom ma hladat 
  * 	  kniznice importovane zo zdrojaku)
- * UNIT TESTY!
+ * volanie subroutine bez zatvoriek pokial nema parametre
+ * predavanie premennych referenciou
+ * else vetva v case
  * 
  * --------- PLAN ------------------------------ 
  * --- PHASE 1 DONE

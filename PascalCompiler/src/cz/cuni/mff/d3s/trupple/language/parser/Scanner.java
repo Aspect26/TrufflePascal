@@ -252,8 +252,8 @@ class StartStates {
 public class Scanner {
 	static final char EOL = '\n';
 	static final int  eofSym = 0;
-	static final int maxT = 50;
-	static final int noSym = 50;
+	static final int maxT = 51;
+	static final int noSym = 51;
 	char valCh;       // current input character (for token.val)
 
 	public Buffer buffer; // scanner buffer
@@ -285,15 +285,16 @@ public class Scanner {
 		start.set(44, 16); 
 		start.set(59, 17); 
 		start.set(61, 18); 
-		start.set(58, 29); 
+		start.set(58, 30); 
 		start.set(40, 19); 
 		start.set(41, 20); 
 		start.set(46, 21); 
-		start.set(62, 30); 
-		start.set(60, 31); 
+		start.set(62, 31); 
+		start.set(60, 32); 
 		start.set(43, 26); 
 		start.set(45, 27); 
 		start.set(42, 28); 
+		start.set(47, 29); 
 		start.set(Buffer.EOF, -1);
 		literals.put("uses", new Integer(5));
 		literals.put("const", new Integer(8));
@@ -319,11 +320,11 @@ public class Scanner {
 		literals.put("else", new Integer(34));
 		literals.put("or", new Integer(35));
 		literals.put("and", new Integer(36));
-		literals.put("div", new Integer(45));
-		literals.put("mod", new Integer(46));
-		literals.put("unit", new Integer(47));
-		literals.put("interface", new Integer(48));
-		literals.put("implementation", new Integer(49));
+		literals.put("div", new Integer(46));
+		literals.put("mod", new Integer(47));
+		literals.put("unit", new Integer(48));
+		literals.put("interface", new Integer(49));
+		literals.put("implementation", new Integer(50));
 
 	}
 	
@@ -540,14 +541,16 @@ public class Scanner {
 				case 28:
 					{t.kind = 44; break loop;}
 				case 29:
+					{t.kind = 45; break loop;}
+				case 30:
 					recEnd = pos; recKind = 13;
 					if (ch == '=') {AddCh(); state = 22; break;}
 					else {t.kind = 13; break loop;}
-				case 30:
+				case 31:
 					recEnd = pos; recKind = 37;
 					if (ch == '=') {AddCh(); state = 23; break;}
 					else {t.kind = 37; break loop;}
-				case 31:
+				case 32:
 					recEnd = pos; recKind = 39;
 					if (ch == '=') {AddCh(); state = 24; break;}
 					else if (ch == '>') {AddCh(); state = 25; break;}

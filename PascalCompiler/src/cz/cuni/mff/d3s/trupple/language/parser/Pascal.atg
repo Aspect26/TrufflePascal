@@ -380,7 +380,7 @@ Term<out ExpressionNode expression>
 =
 SignedFactor<out expression>
 {
-    ( "*" | "div" | "mod")                      (. Token op = t; .)
+    ( "*" | "/" | "div" | "mod")                (. Token op = t; .)
     SignedFactor<out ExpressionNode right>      (. expression = factory.createBinary(op, expression, right); .)
 }
 .

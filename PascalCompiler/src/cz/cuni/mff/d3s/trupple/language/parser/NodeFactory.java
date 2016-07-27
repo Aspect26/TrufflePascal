@@ -18,6 +18,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.AddNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.DivideIntegerNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.DivideNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.ModuloNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.MultiplyNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.NegationNodeGen;
@@ -491,6 +492,8 @@ public class NodeFactory {
 			return SubstractNodeGen.create(leftNode, rightNode);
 		case "*":
 			return MultiplyNodeGen.create(leftNode, rightNode);
+		case "/":
+			return DivideNodeGen.create(leftNode, rightNode);
 		case "div":
 			return DivideIntegerNodeGen.create(leftNode, rightNode);
 		case "mod":
