@@ -27,12 +27,14 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * unit - can't have it's own "private" methods 
  * unit - variables declared only in IMPLEMENTATION section are visible from the outside 
  * unit - no support for initialization and finalization section
- * subroutines - declare nestedd subroutines
+ * subroutines - support nested subroutines
  * parsovanie vstupnych parametrov -> kniznica nejaka
  * chyby do system.err 
  * niekde je SLNull 
  * for len JEDNO vyhodnotenie poctu cyklov! (na zaciatku) 
- * break nie je vstd 
+ * break nie je v std (treba prepinac --std=turbo)
+ * poriesit prepinac -I (nech funguje podobne ako v gcc (neimportuje subor ale dir, v ktorom ma hladat 
+ * 	  kniznice importovane zo zdrojaku)
  * UNIT TESTY!
  * 
  * --------- PLAN ------------------------------ 
@@ -108,6 +110,10 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		return null;
 	}
 
+	/*
+	 * *************************************************************************
+	 * ******* START FROM FILE PATHS
+	 */
 	public static void start(String sourcePath, List<String> imports) throws IOException {
 		PascalContext context = new PascalContext();
 		Parser parser = new Parser(context);
@@ -121,6 +127,32 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		}
 
 		parser.Parse(Source.fromFileName(sourcePath));
+		if (!parser.noErrors()) {
+			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
+			return;
+		}
+
+		Truffle.getRuntime().createCallTarget(parser.mainNode).call();
+	}
+
+	/*
+	 * *************************************************************************
+	 * START FROM CODES
+	 */
+	public static void startFromCodes(String sourceCode, List<String> imports, String codeDescription) {
+		PascalContext context = new PascalContext();
+		Parser parser = new Parser(context);
+
+		int i = 0;
+		for (String imp : imports) {
+			parser.Parse(Source.fromText(imp, "import" + (i++)));
+			if (!parser.noErrors()) {
+				System.err.println("Errors while parsing import file " + imp + ".");
+				return;
+			}
+		}
+
+		parser.Parse(Source.fromText(sourceCode, codeDescription));
 		if (!parser.noErrors()) {
 			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
 			return;
