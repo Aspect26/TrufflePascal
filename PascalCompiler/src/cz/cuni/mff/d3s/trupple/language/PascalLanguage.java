@@ -31,7 +31,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * parsovanie vstupnych parametrov -> kniznica nejaka
  * chyby do system.err 
  * niekde je SLNull 
- * for len JEDNO vyhodnotenie poctu cyklov! (na zaciatku) 
  * break nie je v std (treba prepinac --std=turbo)
  * poriesit prepinac -I (nech funguje podobne ako v gcc (neimportuje subor ale dir, v ktorom ma hladat 
  * 	  kniznice importovane zo zdrojaku)

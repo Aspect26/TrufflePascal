@@ -16,15 +16,15 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 public class ForNode extends StatementNode {
 
 	private final boolean ascending;
-	private FrameSlot slot;
+	private final FrameSlot slot;
 	@Child
-	ExpressionNode startValue;
+	private ExpressionNode startValue;
 	@Child
-	ExpressionNode finalValue;
+	private ExpressionNode finalValue;
 	@Child
-	AssignmentNode assignment;
+	private AssignmentNode assignment;
 	@Child
-	StatementNode body;
+	private StatementNode body;
 
 	public ForNode(boolean ascending, FrameSlot slot, ExpressionNode startValue, ExpressionNode finalValue,
 			StatementNode body) {
@@ -42,12 +42,14 @@ public class ForNode extends StatementNode {
 		try {
 			assignment.executeVoid(frame);
 			if (ascending) {
-				while (frame.getLong(slot) <= finalValue.executeLong(frame)) {
+				final long topLimit = finalValue.executeLong(frame);
+				while (frame.getLong(slot) <= topLimit) {
 					body.executeVoid(frame);
 					frame.setLong(slot, frame.getLong(slot) + 1);
 				}
 			} else {
-				while (frame.getLong(slot) >= finalValue.executeLong(frame)) {
+				final long bottomLimit = finalValue.executeLong(frame);
+				while (frame.getLong(slot) >= bottomLimit) {
 					body.executeVoid(frame);
 					frame.setLong(slot, frame.getLong(slot) - 1);
 				}
