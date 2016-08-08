@@ -16,7 +16,6 @@ public final class ModuloNodeGen extends ModuloNode {
 
     @Child private ExpressionNode leftNode_;
     @Child private ExpressionNode rightNode_;
-    @CompilationFinal private boolean excludeMod_;
     @CompilationFinal private boolean seenUnsupported0;
 
     private ModuloNodeGen(ExpressionNode leftNode, ExpressionNode rightNode) {
@@ -55,12 +54,7 @@ public final class ModuloNodeGen extends ModuloNode {
         } catch (UnexpectedResultException ex) {
             throw unsupported(leftNodeValue_, ex.getResult());
         }
-        try {
-            return this.mod(leftNodeValue_, rightNodeValue_);
-        } catch (ArithmeticException ex) {
-            excludeMod_ = true;
-            throw unsupported(leftNodeValue_, rightNodeValue_);
-        }
+        return this.mod(leftNodeValue_, rightNodeValue_);
     }
 
     private UnsupportedSpecializationException unsupported(Object leftNodeValue, Object rightNodeValue) {

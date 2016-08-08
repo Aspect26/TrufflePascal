@@ -21,10 +21,6 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
     @Child private ExpressionNode rightNode_;
     @CompilationFinal private Class<?> leftNodeType_;
     @CompilationFinal private Class<?> rightNodeType_;
-    @CompilationFinal private boolean excludeAdd0_;
-    @CompilationFinal private boolean excludeAdd1_;
-    @CompilationFinal private boolean excludeAdd2_;
-    @CompilationFinal private boolean excludeAdd3_;
     @Child private BaseNode_ specialization_;
 
     private AddNodeGen(ExpressionNode leftNode, ExpressionNode rightNode) {
@@ -114,26 +110,18 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
         protected final SpecializationNode createNext(Frame frameValue, Object leftNodeValue, Object rightNodeValue) {
             if (rightNodeValue instanceof Long) {
                 if (leftNodeValue instanceof Long) {
-                    if (!root.excludeAdd0_) {
-                        return Add0Node_.create(root);
-                    }
+                    return Add0Node_.create(root);
                 }
                 if (leftNodeValue instanceof Double) {
-                    if (!root.excludeAdd1_) {
-                        return Add1Node_.create(root);
-                    }
+                    return Add1Node_.create(root);
                 }
             }
             if (rightNodeValue instanceof Double) {
                 if (leftNodeValue instanceof Long) {
-                    if (!root.excludeAdd2_) {
-                        return Add2Node_.create(root);
-                    }
+                    return Add2Node_.create(root);
                 }
                 if (leftNodeValue instanceof Double) {
-                    if (!root.excludeAdd3_) {
-                        return Add3Node_.create(root);
-                    }
+                    return Add3Node_.create(root);
                 }
             }
             return null;
@@ -275,12 +263,7 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
             } catch (UnexpectedResultException ex) {
                 return PascalTypesGen.expectLong(getNext().execute_(frameValue, leftNodeValue_, ex.getResult()));
             }
-            try {
-                return root.add(leftNodeValue_, rightNodeValue_);
-            } catch (ArithmeticException ex) {
-                root.excludeAdd0_ = true;
-                return PascalTypesGen.expectLong(remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_));
-            }
+            return root.add(leftNodeValue_, rightNodeValue_);
         }
 
         @Override
@@ -288,12 +271,7 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
             if (leftNodeValue instanceof Long && rightNodeValue instanceof Long) {
                 long leftNodeValue_ = (long) leftNodeValue;
                 long rightNodeValue_ = (long) rightNodeValue;
-                try {
-                    return root.add(leftNodeValue_, rightNodeValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeAdd0_ = true;
-                    return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-                }
+                return root.add(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
@@ -325,12 +303,7 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
             } catch (UnexpectedResultException ex) {
                 return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
             }
-            try {
-                return root.add(leftNodeValue_, rightNodeValue_);
-            } catch (ArithmeticException ex) {
-                root.excludeAdd1_ = true;
-                return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-            }
+            return root.add(leftNodeValue_, rightNodeValue_);
         }
 
         @Override
@@ -338,12 +311,7 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
             if (leftNodeValue instanceof Double && rightNodeValue instanceof Long) {
                 double leftNodeValue_ = (double) leftNodeValue;
                 long rightNodeValue_ = (long) rightNodeValue;
-                try {
-                    return root.add(leftNodeValue_, rightNodeValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeAdd1_ = true;
-                    return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-                }
+                return root.add(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
@@ -375,12 +343,7 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
             } catch (UnexpectedResultException ex) {
                 return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
             }
-            try {
-                return root.add(leftNodeValue_, rightNodeValue_);
-            } catch (ArithmeticException ex) {
-                root.excludeAdd2_ = true;
-                return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-            }
+            return root.add(leftNodeValue_, rightNodeValue_);
         }
 
         @Override
@@ -388,12 +351,7 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
             if (leftNodeValue instanceof Long && rightNodeValue instanceof Double) {
                 long leftNodeValue_ = (long) leftNodeValue;
                 double rightNodeValue_ = (double) rightNodeValue;
-                try {
-                    return root.add(leftNodeValue_, rightNodeValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeAdd2_ = true;
-                    return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-                }
+                return root.add(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
@@ -415,12 +373,7 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
             if (leftNodeValue instanceof Double && rightNodeValue instanceof Double) {
                 double leftNodeValue_ = (double) leftNodeValue;
                 double rightNodeValue_ = (double) rightNodeValue;
-                try {
-                    return root.add(leftNodeValue_, rightNodeValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeAdd3_ = true;
-                    return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-                }
+                return root.add(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }

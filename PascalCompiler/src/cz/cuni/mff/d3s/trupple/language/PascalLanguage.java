@@ -66,6 +66,9 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * graph 
  * string 
  * dos
+ * 
+ * LATEST CHANGELOG:
+ * make for loop execute limiting expression only once
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.6", mimeType = "text/x-pascal")

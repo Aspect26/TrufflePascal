@@ -19,8 +19,6 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
 
     @Child private ExpressionNode son_;
     @CompilationFinal private Class<?> sonType_;
-    @CompilationFinal private boolean excludeNeg0_;
-    @CompilationFinal private boolean excludeNeg1_;
     @Child private BaseNode_ specialization_;
 
     private NegationNodeGen(ExpressionNode son) {
@@ -107,14 +105,10 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object sonValue) {
             if (sonValue instanceof Long) {
-                if (!root.excludeNeg0_) {
-                    return Neg0Node_.create(root);
-                }
+                return Neg0Node_.create(root);
             }
             if (sonValue instanceof Double) {
-                if (!root.excludeNeg1_) {
-                    return Neg1Node_.create(root);
-                }
+                return Neg1Node_.create(root);
             }
             return null;
         }
@@ -220,24 +214,14 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
             } catch (UnexpectedResultException ex) {
                 return PascalTypesGen.expectLong(getNext().execute_(frameValue, ex.getResult()));
             }
-            try {
-                return root.neg(sonValue_);
-            } catch (ArithmeticException ex) {
-                root.excludeNeg0_ = true;
-                return PascalTypesGen.expectLong(remove("threw rewrite exception", frameValue, sonValue_));
-            }
+            return root.neg(sonValue_);
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object sonValue) {
             if (sonValue instanceof Long) {
                 long sonValue_ = (long) sonValue;
-                try {
-                    return root.neg(sonValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeNeg0_ = true;
-                    return remove("threw rewrite exception", frameValue, sonValue_);
-                }
+                return root.neg(sonValue_);
             }
             return getNext().execute_(frameValue, sonValue);
         }
@@ -258,12 +242,7 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
         public Object execute_(VirtualFrame frameValue, Object sonValue) {
             if (sonValue instanceof Double) {
                 double sonValue_ = (double) sonValue;
-                try {
-                    return root.neg(sonValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeNeg1_ = true;
-                    return remove("threw rewrite exception", frameValue, sonValue_);
-                }
+                return root.neg(sonValue_);
             }
             return getNext().execute_(frameValue, sonValue);
         }

@@ -21,10 +21,6 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
     @Child private ExpressionNode rightNode_;
     @CompilationFinal private Class<?> leftNodeType_;
     @CompilationFinal private Class<?> rightNodeType_;
-    @CompilationFinal private boolean excludeSub0_;
-    @CompilationFinal private boolean excludeSub1_;
-    @CompilationFinal private boolean excludeSub2_;
-    @CompilationFinal private boolean excludeSub3_;
     @Child private BaseNode_ specialization_;
 
     private SubstractNodeGen(ExpressionNode leftNode, ExpressionNode rightNode) {
@@ -114,26 +110,18 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
         protected final SpecializationNode createNext(Frame frameValue, Object leftNodeValue, Object rightNodeValue) {
             if (rightNodeValue instanceof Long) {
                 if (leftNodeValue instanceof Long) {
-                    if (!root.excludeSub0_) {
-                        return Sub0Node_.create(root);
-                    }
+                    return Sub0Node_.create(root);
                 }
                 if (leftNodeValue instanceof Double) {
-                    if (!root.excludeSub1_) {
-                        return Sub1Node_.create(root);
-                    }
+                    return Sub1Node_.create(root);
                 }
             }
             if (rightNodeValue instanceof Double) {
                 if (leftNodeValue instanceof Long) {
-                    if (!root.excludeSub2_) {
-                        return Sub2Node_.create(root);
-                    }
+                    return Sub2Node_.create(root);
                 }
                 if (leftNodeValue instanceof Double) {
-                    if (!root.excludeSub3_) {
-                        return Sub3Node_.create(root);
-                    }
+                    return Sub3Node_.create(root);
                 }
             }
             return null;
@@ -275,12 +263,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             } catch (UnexpectedResultException ex) {
                 return PascalTypesGen.expectLong(getNext().execute_(frameValue, leftNodeValue_, ex.getResult()));
             }
-            try {
-                return root.sub(leftNodeValue_, rightNodeValue_);
-            } catch (ArithmeticException ex) {
-                root.excludeSub0_ = true;
-                return PascalTypesGen.expectLong(remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_));
-            }
+            return root.sub(leftNodeValue_, rightNodeValue_);
         }
 
         @Override
@@ -288,12 +271,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             if (leftNodeValue instanceof Long && rightNodeValue instanceof Long) {
                 long leftNodeValue_ = (long) leftNodeValue;
                 long rightNodeValue_ = (long) rightNodeValue;
-                try {
-                    return root.sub(leftNodeValue_, rightNodeValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeSub0_ = true;
-                    return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-                }
+                return root.sub(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
@@ -325,12 +303,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             } catch (UnexpectedResultException ex) {
                 return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
             }
-            try {
-                return root.sub(leftNodeValue_, rightNodeValue_);
-            } catch (ArithmeticException ex) {
-                root.excludeSub1_ = true;
-                return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-            }
+            return root.sub(leftNodeValue_, rightNodeValue_);
         }
 
         @Override
@@ -338,12 +311,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             if (leftNodeValue instanceof Double && rightNodeValue instanceof Long) {
                 double leftNodeValue_ = (double) leftNodeValue;
                 long rightNodeValue_ = (long) rightNodeValue;
-                try {
-                    return root.sub(leftNodeValue_, rightNodeValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeSub1_ = true;
-                    return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-                }
+                return root.sub(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
@@ -375,12 +343,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             } catch (UnexpectedResultException ex) {
                 return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
             }
-            try {
-                return root.sub(leftNodeValue_, rightNodeValue_);
-            } catch (ArithmeticException ex) {
-                root.excludeSub2_ = true;
-                return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-            }
+            return root.sub(leftNodeValue_, rightNodeValue_);
         }
 
         @Override
@@ -388,12 +351,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             if (leftNodeValue instanceof Long && rightNodeValue instanceof Double) {
                 long leftNodeValue_ = (long) leftNodeValue;
                 double rightNodeValue_ = (double) rightNodeValue;
-                try {
-                    return root.sub(leftNodeValue_, rightNodeValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeSub2_ = true;
-                    return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-                }
+                return root.sub(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
@@ -415,12 +373,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             if (leftNodeValue instanceof Double && rightNodeValue instanceof Double) {
                 double leftNodeValue_ = (double) leftNodeValue;
                 double rightNodeValue_ = (double) rightNodeValue;
-                try {
-                    return root.sub(leftNodeValue_, rightNodeValue_);
-                } catch (ArithmeticException ex) {
-                    root.excludeSub3_ = true;
-                    return remove("threw rewrite exception", frameValue, leftNodeValue_, rightNodeValue_);
-                }
+                return root.sub(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }

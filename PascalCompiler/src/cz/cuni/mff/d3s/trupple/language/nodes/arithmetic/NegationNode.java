@@ -8,12 +8,12 @@ import cz.cuni.mff.d3s.trupple.language.nodes.UnaryNode;
 @NodeInfo(shortName = "neg")
 public abstract class NegationNode extends UnaryNode {
 
-	@Specialization(rewriteOn = ArithmeticException.class)
+	@Specialization
 	protected long neg(long val) {
 		return -val;
 	}
 
-	@Specialization(rewriteOn = ArithmeticException.class)
+	@Specialization
 	protected double neg(double val) {
 		return -val;
 	}

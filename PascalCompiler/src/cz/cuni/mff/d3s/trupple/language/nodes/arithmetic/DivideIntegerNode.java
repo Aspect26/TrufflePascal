@@ -8,30 +8,10 @@ import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
 @NodeInfo(shortName = "div")
 public abstract class DivideIntegerNode extends BinaryNode {
 
-	@Specialization(rewriteOn = ArithmeticException.class)
+	// in the standard, there is specified that DIV operator only takes
+	// integer types as operands
+	@Specialization
 	protected long div(long left, long right) {
-		long result = left / right;
-		/*
-		 * The division overflows if left is Long.MIN_VALUE and right is -1.
-		 */
-		if ((left & right & result) < 0) {
-			throw new ArithmeticException("Long overflow.");
-		}
-		return result;
-	}
-
-	@Specialization(rewriteOn = ArithmeticException.class)
-	protected double div(double left, long right) {
-		return left / right;
-	}
-
-	@Specialization(rewriteOn = ArithmeticException.class)
-	protected double div(long left, double right) {
-		return left / right;
-	}
-
-	@Specialization(rewriteOn = ArithmeticException.class)
-	protected double div(double left, double right) {
 		return left / right;
 	}
 }
