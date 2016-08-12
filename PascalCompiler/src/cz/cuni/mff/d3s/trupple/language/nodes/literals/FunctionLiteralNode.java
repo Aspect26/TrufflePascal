@@ -19,6 +19,13 @@ public final class FunctionLiteralNode extends ExpressionNode {
 
 	@Override
 	public PascalFunction executeGeneric(VirtualFrame frame) {
-		return context.getGlobalFunctionRegistry().lookup(value);
+		PascalFunction function = context.getGlobalFunctionRegistry().lookup(value);
+		if(function == null)
+			function = context.getPrivateFunctionRegistry().lookup(value);
+		
+		if(function == null)
+			throw new RuntimeException("Function " + function + " does not exist in this context.");
+		
+		return function;
 	}
 }

@@ -59,20 +59,24 @@ public class NodeFactory {
 		protected final Map<String, FrameSlot> locals;
 		protected final Map<String, Constant> constants;
 		protected final String name;
+		protected final PascalContext context;
 
 		public FrameDescriptor frameDescriptor;
 		public List<StatementNode> scopeNodes = new ArrayList<>();
 		public FrameSlot returnSlot = null;
-		public final PascalContext context = new PascalContext();
 
 		LexicalScope(LexicalScope outer, String name) {
 			this.name = name;
+			this.context = new PascalContext();
 			this.outer = outer;
 			this.locals = new HashMap<>();
 			this.constants = new HashMap<>();
 			this.frameDescriptor = new FrameDescriptor();
+			
 			if (outer != null) {
 				locals.putAll(outer.locals);
+				this.context.getGlobalFunctionRegistry().addAll(outer.context.getGlobalFunctionRegistry());
+				this.context.getPrivateFunctionRegistry().addAll(outer.context.getPrivateFunctionRegistry());
 			}
 		}
 	}
@@ -537,7 +541,7 @@ public class NodeFactory {
 
 	/*****************************************************************************
 	 * UNIT SECTION
-	 */
+	 *****************************************************************************/
 
 	public void startUnit(Token t) {
 		String unitName = t.val.toLowerCase();

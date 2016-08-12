@@ -1,6 +1,6 @@
 uses customunit;
 
 begin   
- notseen();
  wb();
+ writeln(b);
 end.
