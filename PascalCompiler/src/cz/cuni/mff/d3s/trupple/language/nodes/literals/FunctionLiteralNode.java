@@ -19,6 +19,6 @@ public final class FunctionLiteralNode extends ExpressionNode {
 
 	@Override
 	public PascalFunction executeGeneric(VirtualFrame frame) {
-		return context.getFunctionRegistry().lookup(value);
+		return context.getGlobalFunctionRegistry().lookup(value);
 	}
 }

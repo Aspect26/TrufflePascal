@@ -14,7 +14,6 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WriteBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WritelnBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
@@ -27,9 +26,11 @@ public class PascalFunctionRegistry {
 	private final Map<String, PascalFunction> functions = new HashMap<>();
 	private final PascalContext context;
 
-	public PascalFunctionRegistry(PascalContext context) {
+	public PascalFunctionRegistry(PascalContext context, boolean installBuiltins) {
 		this.context = context;
-		installBuiltins();
+		if(installBuiltins) {
+			installBuiltins();
+		}
 	}
 
 	/**
@@ -81,6 +82,7 @@ public class PascalFunctionRegistry {
 		// registerRootNodes);
 	}
 
+	@SuppressWarnings("unused")
 	private void installBuiltin(NodeFactory<? extends BuiltinNode> factory) {
 		int argumentCount = factory.getExecutionSignature().size();
 		ExpressionNode[] argumentNodes = new ExpressionNode[argumentCount];

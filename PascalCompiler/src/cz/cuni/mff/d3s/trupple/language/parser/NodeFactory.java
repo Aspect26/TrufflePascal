@@ -63,6 +63,7 @@ public class NodeFactory {
 		public FrameDescriptor frameDescriptor;
 		public List<StatementNode> scopeNodes = new ArrayList<>();
 		public FrameSlot returnSlot = null;
+		public final PascalContext context = new PascalContext();
 
 		LexicalScope(LexicalScope outer, String name) {
 			this.name = name;
@@ -87,8 +88,7 @@ public class NodeFactory {
 	 * WTF -> FrameDescriptor.copy() function does not copy slot kinds
 	 * 
 	 * @see com.oracle.truffle.api.frame.FrameDescriptor#copy
-	 * @param original
-	 *            descriptor to be copied
+	 * @param original descriptor to be copied
 	 * @return new descriptor with the same default value and slots
 	 */
 	public static FrameDescriptor copyFrameDescriptor(FrameDescriptor original) {
@@ -102,8 +102,6 @@ public class NodeFactory {
 	// Reference to parser -> needed for throwing semantic errors
 	private Parser parser;
 
-	/* State while parsing a source unit. */
-	private final PascalContext context;
 	// private final Source source;
 
 	/* State while parsing a block. */
@@ -118,7 +116,6 @@ public class NodeFactory {
 	private UnitInterface currentUnit = null;
 
 	public NodeFactory(Parser parser, PascalContext context) {
-		this.context = context;
 		this.parser = parser;
 
 		this.lexicalScope = new LexicalScope(null, null);
@@ -193,11 +190,10 @@ public class NodeFactory {
 		final PascalRootNode rootNode = new PascalRootNode(ls.frameDescriptor, functionBodyNode);
 
 		if (currentUnit == null) {
-			context.getFunctionRegistry().register(ls.name, rootNode);
+			ls.context.getGlobalFunctionRegistry().register(ls.name, rootNode);
 			lexicalScope = lexicalScope.outer;
 		} else {
-			currentUnit.getFunctionRegistry().register(ls.name, rootNode);
-			currentUnit.leaveLexicalScope();
+			currentUnit.registerProcedure(ls.name, rootNode);
 		}
 	}
 
@@ -220,11 +216,10 @@ public class NodeFactory {
 		final PascalRootNode rootNode = new PascalRootNode(ls.frameDescriptor, functionBodyNode);
 
 		if (currentUnit == null) {
-			context.getFunctionRegistry().register(ls.name, rootNode);
+			ls.context.getGlobalFunctionRegistry().register(ls.name, rootNode);
 			lexicalScope = lexicalScope.outer;
 		} else {
-			currentUnit.getFunctionRegistry().register(ls.name, rootNode);
-			currentUnit.leaveLexicalScope();
+			currentUnit.registerFunction(ls.name, rootNode);
 		}
 	}
 
@@ -232,37 +227,36 @@ public class NodeFactory {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 
 		if (ls.outer != null) {
-			context.getOutput().println("Nested subroutines are not supported.");
+			ls.context.getOutput().println("Nested subroutines are not supported.");
+			return;
+		}
+		
+		String identifier = name.val.toLowerCase();
+		if(ls.context.containsIdentifier(identifier)){
+			ls.context.getOutput().println("Duplicate identifier.");
 			return;
 		}
 
-		String identifier = name.val.toLowerCase();
 		if (currentUnit == null) {
-			context.getFunctionRegistry().registerFunctionName(identifier);
+			ls.context.getGlobalFunctionRegistry().registerFunctionName(identifier);
 			lexicalScope = new LexicalScope(lexicalScope, identifier);
 			lexicalScope.frameDescriptor = copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
 		} else {
-			if (!currentUnit.startSubroutineImplementation(identifier)) {
-				parser.SemErr("Subroutine already defined: " + identifier + ",");
-			}
+			currentUnit.startSubroutineImplementation(identifier);
 		}
 	}
 
 	private StatementNode finishSubroutine(StatementNode bodyNode) {
-		if (currentUnit == null && lexicalScope.outer == null) {
-			context.getOutput().println("Can't leave subroutine.");
-			return null;
-		}
-
-		if (currentUnit != null && currentUnit.getLexicalScope().outer == null) {
-			context.getOutput().println("Can't leave subroutine.");
-			return null;
-		}
-
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		if (ls.outer == null) {
+			ls.context.getOutput().println("Can't leave subroutine.");
+			return null;
+		}
+
 		ls.scopeNodes.add(bodyNode);
 		final StatementNode subroutineNode = new BlockNode(
 				ls.scopeNodes.toArray(new StatementNode[ls.scopeNodes.size()]));
+		
 		return subroutineNode;
 	}
 
@@ -334,22 +328,14 @@ public class NodeFactory {
 	}
 
 	public ExpressionNode createFunctionNode(Token tokenName) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 		String functionName = tokenName.val.toLowerCase();
 
-		if (currentUnit == null) {
-			if (context.getFunctionRegistry().lookup(functionName) == null) {
-				parser.SemErr("Undefined function: " + functionName);
-				return null;
-			} else {
-				return new FunctionLiteralNode(context, tokenName.val.toLowerCase());
-			}
+		if(!ls.context.containsIdentifier(functionName)){
+			parser.SemErr("Undefined function: " + functionName);
+			return null;
 		} else {
-			if (currentUnit.getFunctionRegistry().lookup(functionName) == null) {
-				parser.SemErr("Undefined function: " + functionName);
-				return null;
-			} else {
-				return new FunctionLiteralNode(currentUnit.getCotnext(), tokenName.val.toLowerCase());
-			}
+			return new FunctionLiteralNode(ls.context, tokenName.val.toLowerCase());
 		}
 	}
 
@@ -545,9 +531,8 @@ public class NodeFactory {
 			parser.SemErr("Unknown unit. Did you imported it to compiler? - " + importingUnit);
 			return;
 		}
-		PascalFunctionRegistry fRegistry = units.get(importingUnit).getFunctionRegistry();
-
-		this.context.getFunctionRegistry().addAll(fRegistry);
+		PascalFunctionRegistry fRegistry = units.get(importingUnit).getContext().getGlobalFunctionRegistry();
+		lexicalScope.context.getGlobalFunctionRegistry().addAll(fRegistry);
 	}
 
 	/*****************************************************************************
@@ -581,13 +566,13 @@ public class NodeFactory {
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
 	}
-
+	
 	public void checkUnitInterfaceMatchProcedure(Token name, List<VariableDeclaration> parameters) {
 		if (currentUnit == null)
 			return;
 
 		String identifier = name.val.toLowerCase();
-		if (!currentUnit.checkProcedureMatch(identifier, parameters)) {
+		if (!currentUnit.checkProcedureMatchInterface(identifier, parameters)) {
 			parser.SemErr("Procedure heading for " + identifier + " does not match any procedure from the interface.");
 		}
 	}
@@ -597,8 +582,9 @@ public class NodeFactory {
 			return;
 
 		String identifier = name.val.toLowerCase();
-		if (!currentUnit.checkFunctionMatch(identifier, parameters, returnType)) {
+		if (!currentUnit.checkFunctionMatchInterface(identifier, parameters, returnType)) {
 			parser.SemErr("Function heading for " + identifier + " does not match any function from the interface.");
 		}
 	}
+	
 }

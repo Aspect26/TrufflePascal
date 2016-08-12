@@ -2,30 +2,18 @@ package cz.cuni.mff.d3s.trupple.language.runtime;
 
 import java.io.BufferedReader;
 import java.io.PrintStream;
-import java.math.BigInteger;
 
 import com.oracle.truffle.api.ExecutionContext;
 import com.oracle.truffle.api.TruffleLanguage;
-import com.oracle.truffle.api.dsl.NodeFactory;
-import com.oracle.truffle.api.frame.FrameDescriptor;
-import com.oracle.truffle.api.interop.TruffleObject;
-import com.oracle.truffle.api.nodes.NodeInfo;
-
-import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNodeFactory;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WriteBuiltinNodeFactory;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WritelnBuiltinNodeFactory;
-import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 
 public final class PascalContext extends ExecutionContext {
 	private final BufferedReader input;
 	private final PrintStream output;
 	// private final TruffleLanguage.Env env;
-	private final PascalFunctionRegistry functionRegistry;
-
+	
+	private final PascalFunctionRegistry globalFunctionRegistry;
+	private final PascalFunctionRegistry privateFunctionRegistry;
+	
 	public PascalContext() {
 		this(null, null, System.out);
 	}
@@ -34,7 +22,9 @@ public final class PascalContext extends ExecutionContext {
 		this.input = input;
 		this.output = output;
 		// this.env = env;
-		this.functionRegistry = new PascalFunctionRegistry(this);
+		
+		this.globalFunctionRegistry = new PascalFunctionRegistry(this, true);
+		this.privateFunctionRegistry = new PascalFunctionRegistry(this, false);
 	}
 
 	public BufferedReader getInput() {
@@ -45,20 +35,16 @@ public final class PascalContext extends ExecutionContext {
 		return output;
 	}
 
-	public PascalFunctionRegistry getFunctionRegistry() {
-		return functionRegistry;
+	public PascalFunctionRegistry getGlobalFunctionRegistry() {
+		return globalFunctionRegistry;
 	}
-
-	public static Object fromForeignValue(Object a) {
-		if (a instanceof Long || a instanceof BigInteger || a instanceof String) {
-			return a;
-		} else if (a instanceof Number) {
-			return ((Number) a).longValue();
-		} else if (a instanceof TruffleObject) {
-			return a;
-		} else if (a instanceof PascalContext) {
-			return a;
-		}
-		throw new IllegalStateException(a + " is not a Truffle value");
+	
+	public PascalFunctionRegistry getPrivateFunctionRegistry() {
+		return privateFunctionRegistry;
+	}
+	
+	public boolean containsIdentifier(String identifier){
+		return globalFunctionRegistry.lookup(identifier) != null ||
+				privateFunctionRegistry.lookup(identifier) != null;
 	}
 }

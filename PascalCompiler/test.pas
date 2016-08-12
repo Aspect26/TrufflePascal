@@ -1,1 +1,6 @@
-begin write(3>3); end.
+uses customunit;
+
+begin   
+ notseen();
+ wb();
+end.

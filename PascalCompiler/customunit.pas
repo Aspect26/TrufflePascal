@@ -14,7 +14,7 @@ IMPLEMENTATION
  procedure wb;
  begin
   a:=8;
-  writeln(a);
+  writeln(b);
  end;
 
  procedure notseen;
