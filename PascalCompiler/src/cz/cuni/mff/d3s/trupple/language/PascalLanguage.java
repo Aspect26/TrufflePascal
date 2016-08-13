@@ -18,6 +18,16 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * 
  * TODO LIST
  *
+ * READ / READLN
+ * PREDAVANIE REFERENCIOU
+ * GOTO
+ * ENUM
+ * ARRAY
+ * RECORD
+ * FILES
+ * POINTERS
+ * CRT, GRAPH, STRING, DOS
+ * 
  * ReadArgumentNode -> Object[] -> no specialization 
  * ' in string 
  * type check in assignment in parser 
@@ -35,39 +45,9 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * volanie subroutine bez zatvoriek pokial nema parametre
  * predavanie premennych referenciou
  * else vetva v case
- * 
- * --------- PLAN ------------------------------ 
- * --- PHASE 1 DONE
- * --- PHASE 2 DONE 
- * --- PHASE 5 DONE
- * 
- * --- PHASE 3: 
- * readln 
- * read
- * 
- * --- PHASE 4:
- * goto (later)
- * 
- * --- PHASE 6 -- CURRENT: 
- * enum 
- * array 
- * record
- * 
- * --- PHASE 7: 
- * files
- * 
- * --- PHASE 8: 
- * pointers
- * 
- * --- PHASE 9: 
- * crt 
- * graph 
- * string 
- * dos
- * 
- * --- MISSING
- * constants inner subroutines
- * 
+ * private/public premenne
+ * constants
+ *  
  * LATEST CHANGELOG:
  * make for loop execute limiting expression only once
  * private/public methods in units

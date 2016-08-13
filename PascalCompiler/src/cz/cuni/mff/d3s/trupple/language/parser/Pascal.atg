@@ -60,9 +60,38 @@ PreDeclaration
 |
 	ConstantDefinition
 |
+	TypeDefinition
+|
 	Subroutine
 )
 .
+
+
+
+TypeDefinition
+=
+"type"
+identifier										(. Token identifier = t; .)
+"="
+(
+	Enum<identifier>
+)
+";"
+.
+
+
+
+Enum<Token identifier>
+=
+"("												(. List<String> identifiers = new ArrayList<String>(); .)
+	identifier									(. identifiers.add(t.val.toLowerCase()); .)
+	{ 
+		","
+		identifier 								(. identifiers.add(t.val.toLowerCase()); .)
+	}
+")"												(. factory.registerEnumType(identifier.val.toLowerCase(), identifiers); .)
+.
+
 
 
 ConstantDefinition

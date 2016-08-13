@@ -49,6 +49,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
+import cz.cuni.mff.d3s.trupple.language.parser.ICustomType.CustomType;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
 
@@ -60,6 +61,9 @@ public class NodeFactory {
 		protected final Map<String, Constant> constants;
 		protected final String name;
 		protected final PascalContext context;
+		
+		protected final Map<String, ICustomType> customTypes = new HashMap<>();
+		protected final Map<String, String> variablesOfCustomType = new HashMap<>();
 
 		public FrameDescriptor frameDescriptor;
 		public List<StatementNode> scopeNodes = new ArrayList<>();
@@ -79,6 +83,23 @@ public class NodeFactory {
 			else{
 				this.context = new PascalContext(null);
 			}
+		}
+		
+		public String registerEnumType(String identifier, List<String> identifiers){
+			if(customTypes.containsKey(identifier))
+				return identifier;
+
+			customTypes.put(identifier, new ICustomType.EnumType(identifier, identifiers));
+			locals.put(identifier, null);
+			
+			for(String value : identifiers){
+				if(locals.containsKey(value))
+					return value;
+				
+				locals.put(value, null);
+			}
+			
+			return null;
 		}
 	}
 
@@ -181,6 +202,14 @@ public class NodeFactory {
 				continue;
 			}
 		}
+	}
+	
+	public void registerEnumType(String identifier, List<String> identifiers){
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+
+		String duplicity = ls.registerEnumType(identifier, identifiers);
+		if(duplicity != null)
+			parser.SemErr("Duplicate variable: " + duplicity + ".");
 	}
 
 	public void startProcedure(Token name) {
