@@ -33,8 +33,8 @@ public class Parser{
 
 	
 
-	public Parser(PascalContext context) {
-		this.factory = new NodeFactory(this, context);
+	public Parser() {
+		this.factory = new NodeFactory(this);
 		errors = new Errors();
 	}
 

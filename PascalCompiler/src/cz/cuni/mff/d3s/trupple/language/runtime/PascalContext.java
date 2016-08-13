@@ -13,18 +13,24 @@ public final class PascalContext extends ExecutionContext {
 	
 	private final PascalFunctionRegistry globalFunctionRegistry;
 	private final PascalFunctionRegistry privateFunctionRegistry;
+	private final PascalContext outerContext;
 	
-	public PascalContext() {
-		this(null, null, System.out);
+	public PascalContext(PascalContext outerContext) {
+		this(outerContext, null, null, System.out);
 	}
 
-	private PascalContext(TruffleLanguage.Env env, BufferedReader input, PrintStream output) {
+	private PascalContext(PascalContext outerContext, TruffleLanguage.Env env, BufferedReader input, PrintStream output) {
 		this.input = input;
 		this.output = output;
+		this.outerContext = outerContext;
 		// this.env = env;
 		
 		this.globalFunctionRegistry = new PascalFunctionRegistry(this, true);
 		this.privateFunctionRegistry = new PascalFunctionRegistry(this, false);
+	}
+	
+	public PascalContext getOuterContext(){
+		return outerContext;
 	}
 
 	public BufferedReader getInput() {

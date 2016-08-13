@@ -67,7 +67,6 @@ public class NodeFactory {
 
 		LexicalScope(LexicalScope outer, String name) {
 			this.name = name;
-			this.context = new PascalContext();
 			this.outer = outer;
 			this.locals = new HashMap<>();
 			this.constants = new HashMap<>();
@@ -75,8 +74,10 @@ public class NodeFactory {
 			
 			if (outer != null) {
 				locals.putAll(outer.locals);
-				this.context.getGlobalFunctionRegistry().addAll(outer.context.getGlobalFunctionRegistry());
-				this.context.getPrivateFunctionRegistry().addAll(outer.context.getPrivateFunctionRegistry());
+				this.context = new PascalContext(outer.context);
+			}
+			else{
+				this.context = new PascalContext(null);
 			}
 		}
 	}
@@ -116,10 +117,10 @@ public class NodeFactory {
 	private List<StatementNode> caseStatements;
 
 	/* List of units found in sources given (name -> function registry) */
-	private Map<String, UnitInterface> units = new HashMap<>();
-	private UnitInterface currentUnit = null;
+	private Map<String, Unit> units = new HashMap<>();
+	private Unit currentUnit = null;
 
-	public NodeFactory(Parser parser, PascalContext context) {
+	public NodeFactory(Parser parser) {
 		this.parser = parser;
 
 		this.lexicalScope = new LexicalScope(null, null);
@@ -173,7 +174,7 @@ public class NodeFactory {
 					FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
 					lexicalScope.locals.put(identifier, newSlot);
 				} else {
-					currentUnit.addGlobalVariable(identifier, slotKind);
+					currentUnit.addVariable(identifier, slotKind);
 				}
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
@@ -194,10 +195,10 @@ public class NodeFactory {
 		final PascalRootNode rootNode = new PascalRootNode(ls.frameDescriptor, functionBodyNode);
 
 		if (currentUnit == null) {
-			ls.context.getGlobalFunctionRegistry().register(ls.name, rootNode);
 			lexicalScope = lexicalScope.outer;
+			lexicalScope.context.getGlobalFunctionRegistry().register(ls.name, rootNode);
 		} else {
-			currentUnit.registerProcedure(ls.name, rootNode);
+			currentUnit.registerProcedure(rootNode);
 		}
 	}
 
@@ -220,10 +221,10 @@ public class NodeFactory {
 		final PascalRootNode rootNode = new PascalRootNode(ls.frameDescriptor, functionBodyNode);
 
 		if (currentUnit == null) {
-			ls.context.getGlobalFunctionRegistry().register(ls.name, rootNode);
 			lexicalScope = lexicalScope.outer;
+			lexicalScope.context.getGlobalFunctionRegistry().register(ls.name, rootNode);
 		} else {
-			currentUnit.registerFunction(ls.name, rootNode);
+			currentUnit.registerFunction(rootNode);
 		}
 	}
 
@@ -335,12 +336,16 @@ public class NodeFactory {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 		String functionName = tokenName.val.toLowerCase();
 
-		if(!ls.context.containsIdentifier(functionName)){
-			parser.SemErr("Undefined function: " + functionName);
-			return null;
-		} else {
-			return new FunctionLiteralNode(ls.context, tokenName.val.toLowerCase());
+		PascalContext context = ls.context;
+		while(context != null){
+			if(!context.containsIdentifier(functionName)){
+				context = context.getOuterContext();
+			} else {
+				return new FunctionLiteralNode(context, functionName);
+			}
 		}
+		parser.SemErr("Undefined function: " + functionName);
+		return null;
 	}
 
 	public StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
@@ -461,9 +466,9 @@ public class NodeFactory {
 		else {
 			slot = lexicalScope.frameDescriptor.findFrameSlot(identifier);
 			if (slot == null) {
-				Iterator<Entry<String, UnitInterface>> it = units.entrySet().iterator();
+				Iterator<Entry<String, Unit>> it = units.entrySet().iterator();
 				while (it.hasNext()) {
-					Map.Entry<String, UnitInterface> pair = it.next();
+					Map.Entry<String, Unit> pair = it.next();
 					slot = pair.getValue().getSlot(identifier);
 				}
 			}
@@ -551,7 +556,7 @@ public class NodeFactory {
 			return;
 		}
 
-		currentUnit = new UnitInterface(unitName);
+		currentUnit = new Unit(unitName);
 		this.units.put(unitName, currentUnit);
 	}
 

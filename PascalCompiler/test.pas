@@ -1,6 +1,13 @@
-uses customunit;
+uses testunit;
 
-begin   
- wb();
- writeln(b);
+var i:integer;
+
+procedure h;
+begin
+ i:=5;
+end;
+
+begin
+ h();
+ writeln(i);
 end.

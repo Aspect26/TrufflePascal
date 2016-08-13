@@ -23,14 +23,12 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * type check in assignment in parser 
  * type check in all operations in parser 
  * type check in if condition (is it boolean?) 
- * support for not switch na error pokial sa neda vyhodnotit case 
- * unit - can't have it's own "private" methods 
+ * support not 
+ * switch na error pokial sa neda vyhodnotit case 
  * unit - variables declared only in IMPLEMENTATION section are visible from the outside 
- * unit - no support for initialization and finalization section
+ * unit - support for initialization and finalization section
  * subroutines - support nested subroutines
  * parsovanie vstupnych parametrov -> kniznica nejaka
- * chyby do system.err 
- * niekde je SLNull 
  * break nie je v std (treba prepinac --std=turbo)
  * poriesit prepinac -I (nech funguje podobne ako v gcc (neimportuje subor ale dir, v ktorom ma hladat 
  * 	  kniznice importovane zo zdrojaku)
@@ -67,8 +65,12 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * string 
  * dos
  * 
+ * --- MISSING
+ * constants inner subroutines
+ * 
  * LATEST CHANGELOG:
  * make for loop execute limiting expression only once
+ * private/public methods in units
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.6", mimeType = "text/x-pascal")
@@ -119,8 +121,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	 * ******* START FROM FILE PATHS
 	 */
 	public static void start(String sourcePath, List<String> imports) throws IOException {
-		PascalContext context = new PascalContext();
-		Parser parser = new Parser(context);
+		Parser parser = new Parser();
 
 		for (String imp : imports) {
 			parser.Parse(Source.fromFileName(imp));
@@ -144,8 +145,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	 * START FROM CODES
 	 */
 	public static void startFromCodes(String sourceCode, List<String> imports, String codeDescription) {
-		PascalContext context = new PascalContext();
-		Parser parser = new Parser(context);
+		Parser parser = new Parser();
 
 		int i = 0;
 		for (String imp : imports) {
@@ -157,6 +157,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		}
 
 		parser.Parse(Source.fromText(sourceCode, codeDescription));
+		System.out.println("Parsed");
 		if (!parser.noErrors()) {
 			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
 			return;

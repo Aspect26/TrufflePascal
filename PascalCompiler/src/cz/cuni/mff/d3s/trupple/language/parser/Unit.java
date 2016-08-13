@@ -11,14 +11,14 @@ import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.parser.NodeFactory.LexicalScope;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
-public class UnitInterface {
+public class Unit {
 	public final String name;
 
 	private LexicalScope lexicalScope;
 	private final Map<String, List<VariableDeclaration>> interfaceProcedures;
 	private final Map<String, FunctionFormalParameters> interfaceFunctions;
 
-	public UnitInterface(String name) {
+	public Unit(String name) {
 		this.name = name;
 		this.interfaceProcedures = new HashMap<>();
 		this.interfaceFunctions = new HashMap<>();
@@ -29,7 +29,7 @@ public class UnitInterface {
 		return lexicalScope.context;
 	}
 
-	public void addGlobalVariable(String identifier, FrameSlotKind slotKind) {
+	public void addVariable(String identifier, FrameSlotKind slotKind) {
 		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
 		lexicalScope.locals.put(identifier, newSlot);
 	}
@@ -96,7 +96,8 @@ public class UnitInterface {
 		return true;
 	}
 	
-	public void registerProcedure(String identifier, PascalRootNode rootNode){
+	public void registerProcedure(PascalRootNode rootNode){
+		String identifier = lexicalScope.name;
 		leaveLexicalScope();
 		
 		if(interfaceProcedures.containsKey(identifier))
@@ -105,7 +106,8 @@ public class UnitInterface {
 			lexicalScope.context.getPrivateFunctionRegistry().register(identifier, rootNode);
 	}
 	
-	public void registerFunction(String identifier, PascalRootNode rootNode){
+	public void registerFunction(PascalRootNode rootNode){
+		String identifier = lexicalScope.name;
 		leaveLexicalScope();
 		
 		if(interfaceProcedures.containsKey(identifier))
