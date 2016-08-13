@@ -6,11 +6,12 @@ INTERFACE
  var a:integer;
  procedure wb;
  procedure wb2;
-
+ type Color = (red,green,blue);
 
 
 IMPLEMENTATION
  var b:integer;
+ var red:integer;
  
  procedure notseen;
  begin

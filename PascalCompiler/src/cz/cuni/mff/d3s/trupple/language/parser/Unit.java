@@ -13,13 +13,15 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 public class Unit {
 	public final String name;
-
+	
+	private boolean inInterfaceSection;
 	private LexicalScope lexicalScope;
 	private final Map<String, List<VariableDeclaration>> interfaceProcedures;
 	private final Map<String, FunctionFormalParameters> interfaceFunctions;
 
 	public Unit(String name) {
 		this.name = name;
+		this.inInterfaceSection = true;
 		this.interfaceProcedures = new HashMap<>();
 		this.interfaceFunctions = new HashMap<>();
 		this.lexicalScope = new LexicalScope(null, name);
@@ -27,6 +29,14 @@ public class Unit {
 	
 	public PascalContext getContext(){
 		return lexicalScope.context;
+	}
+	
+	public boolean isInInterfaceSection(){
+		return inInterfaceSection;
+	}
+	
+	public void leaveInterfaceSection(){
+		inInterfaceSection = false;
 	}
 
 	public void addVariable(String identifier, FrameSlotKind slotKind) {

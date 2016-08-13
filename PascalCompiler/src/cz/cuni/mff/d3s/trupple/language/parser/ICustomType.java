@@ -8,6 +8,7 @@ public interface ICustomType {
 	
 	String getIdentifier();
 	boolean containsCustomValue(String identifier);
+	boolean isGlobal();
 	long getCustomValue(String identifier);
 	
 	
@@ -15,17 +16,25 @@ public interface ICustomType {
 		
 		private static int id = 0;
 		private String identifier;
+		private boolean global;
 		
-		public CustomType(String identifier){
+		public CustomType(String identifier, boolean global){
 			this.identifier = identifier;
+			this.global = global;
 		}
 		
 		public static int getNextId(){
 			return id++;
 		}
 		
+		@Override
 		public String getIdentifier(){
 			return identifier;
+		}
+		
+		@Override
+		public boolean isGlobal(){
+			return global;
 		}
 	}
 	
@@ -33,8 +42,8 @@ public interface ICustomType {
 		
 		private Map<String, Integer> values;
 		
-		public EnumType(String identifier, List<String> identifiers){
-			super(identifier);
+		public EnumType(String identifier, List<String> identifiers, boolean global){
+			super(identifier, global);
 			
 			this.values = new HashMap<>();
 			for(String value : identifiers){

@@ -111,12 +111,12 @@ public class NodeFactory {
 			this.variablesOfCustomType.put(identifier, type);
 		}
 		
-		public String registerEnumType(String identifier, List<String> identifiers){
+		public String registerEnumType(String identifier, List<String> identifiers, boolean global){
 			if(customTypes.containsKey(identifier))
 				return identifier;
 
-			customTypes.put(identifier, new ICustomType.EnumType(identifier, identifiers));
-			locals.put(identifier, null);
+			customTypes.put(identifier, new ICustomType.EnumType(identifier, identifiers, global));
+			locals.put(identifier, frameDescriptor.addFrameSlot(identifier));
 			
 			for(String value : identifiers){
 				if(locals.containsKey(value))
@@ -241,8 +241,9 @@ public class NodeFactory {
 	
 	public void registerEnumType(String identifier, List<String> identifiers){
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-
-		String duplicity = ls.registerEnumType(identifier, identifiers);
+		boolean global = (currentUnit==null)? true : currentUnit.isInInterfaceSection();
+		
+		String duplicity = ls.registerEnumType(identifier, identifiers, global);
 		if(duplicity != null)
 			parser.SemErr("Duplicate variable: " + duplicity + ".");
 	}
@@ -611,8 +612,19 @@ public class NodeFactory {
 			parser.SemErr("Unknown unit. Did you imported it to compiler? - " + importingUnit);
 			return;
 		}
-		PascalFunctionRegistry fRegistry = units.get(importingUnit).getContext().getGlobalFunctionRegistry();
+		
+		Unit unit = units.get(importingUnit);
+		// functions
+		PascalFunctionRegistry fRegistry = unit.getContext().getGlobalFunctionRegistry();
 		lexicalScope.context.getGlobalFunctionRegistry().addAll(fRegistry);
+		
+		// custom types
+		for(String typeIdentifier : unit.getLexicalScope().customTypes.keySet()){
+			ICustomType custom = unit.getLexicalScope().customTypes.get(typeIdentifier);
+			if(custom.isGlobal()){
+				lexicalScope.customTypes.put(typeIdentifier, custom);
+			}
+		}
 	}
 
 	/*****************************************************************************
@@ -648,9 +660,9 @@ public class NodeFactory {
 	}
 	
 	public void checkUnitInterfaceMatchProcedure(Token name, List<VariableDeclaration> parameters) {
-		if (currentUnit == null)
+		if(currentUnit == null)
 			return;
-
+		
 		String identifier = name.val.toLowerCase();
 		if (!currentUnit.checkProcedureMatchInterface(identifier, parameters)) {
 			parser.SemErr("Procedure heading for " + identifier + " does not match any procedure from the interface.");
@@ -658,13 +670,18 @@ public class NodeFactory {
 	}
 
 	public void checkUnitInterfaceMatchFunction(Token name, List<VariableDeclaration> parameters, String returnType) {
-		if (currentUnit == null)
+		if(currentUnit == null)
 			return;
-
+		
 		String identifier = name.val.toLowerCase();
 		if (!currentUnit.checkFunctionMatchInterface(identifier, parameters, returnType)) {
 			parser.SemErr("Function heading for " + identifier + " does not match any function from the interface.");
 		}
 	}
 	
+	public void leaveUnitInterfaceSection(){
+		assert currentUnit != null;
+		
+		currentUnit.leaveInterfaceSection();
+	}
 }

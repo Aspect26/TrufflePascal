@@ -144,6 +144,7 @@ public class Parser{
 		Expect(50);
 		InterfaceSection();
 		Expect(51);
+		factory.leaveUnitInterfaceSection(); 
 		ImplementationSection();
 		Expect(21);
 		factory.endUnit(); 
@@ -704,23 +705,27 @@ public class Parser{
 	}
 
 	void InterfaceSection() {
-		while (la.kind == 15 || la.kind == 17 || la.kind == 18) {
+		while (StartOf(9)) {
 			if (la.kind == 17) {
 				ProcedureHeading();
 			} else if (la.kind == 18) {
 				FunctionHeading();
-			} else {
+			} else if (la.kind == 15) {
 				VariableDefinitions();
+			} else {
+				TypeDefinition();
 			}
 		}
 	}
 
 	void ImplementationSection() {
-		while (la.kind == 15 || la.kind == 17 || la.kind == 18) {
+		while (StartOf(9)) {
 			if (la.kind == 17 || la.kind == 18) {
 				Subroutine();
-			} else {
+			} else if (la.kind == 15) {
 				VariableDefinitions();
+			} else {
+				TypeDefinition();
 			}
 		}
 	}
@@ -835,7 +840,8 @@ public class Parser{
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x}
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
 
 	};
 	

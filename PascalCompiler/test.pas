@@ -1,9 +1,11 @@
 uses testunit;
 
-type Color = (red,green,blue);
-
 var c:Color;
     b:integer;
+
+procedure hello;
+begin
+end;
 
 begin
  c:=green;

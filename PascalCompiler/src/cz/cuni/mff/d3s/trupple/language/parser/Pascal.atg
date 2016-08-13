@@ -493,9 +493,9 @@ identifier										(. factory.startUnit(t); .)
 ";"
 "interface"
 InterfaceSection
-"implementation"
+"implementation"								(. factory.leaveUnitInterfaceSection(); .)
 ImplementationSection
-"end"										(. factory.endUnit(); .)
+"end"											(. factory.endUnit(); .)
 "."
 .
 
@@ -509,6 +509,8 @@ InterfaceSection
 		FunctionHeading
 	|
 		VariableDefinitions
+	|
+		TypeDefinition
 	)
 }
 .
@@ -599,6 +601,8 @@ ImplementationSection
 		Subroutine
 	|
 		VariableDefinitions
+	|
+		TypeDefinition
 	)
 }
 .
