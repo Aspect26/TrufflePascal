@@ -434,7 +434,7 @@ Factor<out ExpressionNode expression>
     (
 	    MemberExpression<out expression, t>
     |
-                                                (. expression = factory.readVariable(t); .)
+                                                (. expression = factory.readExpression(t); .)
                                                 (. if(expression == null) .)
                                                 (.      SemErr("Undefined variable " + t.val + "."); .)
     )

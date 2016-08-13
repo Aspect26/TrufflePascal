@@ -630,7 +630,7 @@ public class Parser{
 			if (la.kind == 10 || la.kind == 26) {
 				expression = MemberExpression(t);
 			} else if (StartOf(7)) {
-				expression = factory.readVariable(t); 
+				expression = factory.readExpression(t); 
 				if(expression == null) 
 				SemErr("Undefined variable " + t.val + "."); 
 			} else SynErr(62);

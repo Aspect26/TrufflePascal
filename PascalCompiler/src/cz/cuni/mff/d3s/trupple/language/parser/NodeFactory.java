@@ -89,6 +89,24 @@ public class NodeFactory {
 			return customTypes.containsKey(typeName);
 		}
 		
+		public boolean containsCustomValue(String identifier){
+			for(ICustomType custom : customTypes.values()){
+				if(custom.containsCustomValue(identifier))
+					return true;
+			}
+			
+			return false;
+		}
+		
+		public long getCustomValue(String identifier){
+			for(ICustomType custom : customTypes.values()){
+				if(custom.containsCustomValue(identifier))
+					return custom.getCustomValue(identifier);
+			}
+			
+			return 0;
+		}
+		
 		public void addCustomTypeVariable(String identifier, String type){
 			this.variablesOfCustomType.put(identifier, type);
 		}
@@ -417,12 +435,19 @@ public class NodeFactory {
 		return new BreakNode();
 	}
 
-	public ExpressionNode readVariable(Token nameToken) {
+	public ExpressionNode readExpression(Token nameToken) {
 		String identifier = nameToken.val.toLowerCase();
 		FrameSlot frameSlot = getVisibleSlot(identifier);
 
-		if (frameSlot == null)
+		if (frameSlot == null){
+			LexicalScope ls = (currentUnit==null)? lexicalScope : currentUnit.getLexicalScope();
+			
+			if(ls.containsCustomValue(identifier))
+				// TODO: for constants -> change this so it gets the type firtsly (it might not be long)
+				return new LongLiteralNode(ls.getCustomValue(identifier));
+						
 			return null;
+		}
 
 		return ReadVariableNodeGen.create(frameSlot);
 	}

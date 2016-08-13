@@ -7,6 +7,8 @@ import java.util.Map;
 public interface ICustomType {
 	
 	String getIdentifier();
+	boolean containsCustomValue(String identifier);
+	long getCustomValue(String identifier);
 	
 	
 	public abstract class CustomType implements ICustomType{
@@ -38,6 +40,16 @@ public interface ICustomType {
 			for(String value : identifiers){
 				values.put(value, CustomType.getNextId());
 			}
+		}
+		
+		@Override
+		public boolean containsCustomValue(String identifier){
+			return values.containsKey(identifier);
+		}
+		
+		@Override
+		public long getCustomValue(String identifier){
+			return values.get(identifier);
 		}
 	}
 }

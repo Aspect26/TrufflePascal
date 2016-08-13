@@ -18,6 +18,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * 
  * TODO LIST
  *
+ * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!!
  * READ / READLN
  * PREDAVANIE REFERENCIOU
  * GOTO
