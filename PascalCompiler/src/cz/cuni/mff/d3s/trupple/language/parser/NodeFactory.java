@@ -85,6 +85,14 @@ public class NodeFactory {
 			}
 		}
 		
+		public boolean containsCustomType(String typeName){
+			return customTypes.containsKey(typeName);
+		}
+		
+		public void addCustomTypeVariable(String identifier, String type){
+			this.variablesOfCustomType.put(identifier, type);
+		}
+		
 		public String registerEnumType(String identifier, List<String> identifiers){
 			if(customTypes.containsKey(identifier))
 				return identifier;
@@ -149,6 +157,11 @@ public class NodeFactory {
 	}
 
 	private FrameSlotKind getSlotByTypeName(String type) {
+		// firstly check if it is not a custom type
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		if(ls.containsCustomType(type))
+			return FrameSlotKind.Object;
+		
 		switch (type) {
 
 		// ordinals
@@ -183,19 +196,23 @@ public class NodeFactory {
 	}
 
 	public void finishVariableLineDefinition(List<String> identifiers, Token variableType) {
-		FrameSlotKind slotKind = getSlotByTypeName(variableType.val);
+		FrameSlotKind slotKind = getSlotByTypeName(variableType.val.toLowerCase());
 
 		if (slotKind == FrameSlotKind.Illegal) {
 			parser.SemErr("Unkown variable type: " + variableType.val);
 		}
 
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		boolean isCustomType = slotKind == FrameSlotKind.Object;
+		if(isCustomType)
+			slotKind = FrameSlotKind.Long;
+		
 		for (String identifier : identifiers) {
 			try {
-				if (currentUnit == null) {
-					FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
-					lexicalScope.locals.put(identifier, newSlot);
-				} else {
-					currentUnit.addVariable(identifier, slotKind);
+				FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(identifier, slotKind);
+				ls.locals.put(identifier, newSlot);
+				if(isCustomType){
+					ls.addCustomTypeVariable(identifier, variableType.val.toLowerCase());
 				}
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
