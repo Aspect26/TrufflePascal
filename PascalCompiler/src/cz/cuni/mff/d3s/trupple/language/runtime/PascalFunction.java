@@ -9,16 +9,30 @@ public class PascalFunction implements TruffleObject {
 	/** The current implementation of this function. */
 	private RootCallTarget callTarget;
 
-	private final String name;
+	private String name;
+	private int parametersCount;
 
 	public PascalFunction(String name) {
 		this.name = name;
+		this.parametersCount = -1;
 	}
 
 	protected void setCallTarget(RootCallTarget callTarget) {
 		this.callTarget = callTarget;
 	}
+	
+	public void setName(String identifier){
+		this.name = identifier;
+	}
+	
+	public void setParametersCount(int count){
+		this.parametersCount = count;
+	}
 
+	public int getParametersCount(){
+		return this.parametersCount;
+	}
+	
 	public RootCallTarget getCallTarget() {
 		return callTarget;
 	}

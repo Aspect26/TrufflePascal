@@ -159,7 +159,7 @@ identifier										(. factory.startProcedure(t); .)
 												(. Token name = t; .)
 												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
-";" 											(. factory.checkUnitInterfaceMatchProcedure(name, formalParameters); .)
+";" 											(. factory.finishFormalParameterListProcedure(name, formalParameters); .)
 [ VariableDefinitions ]
 Block<out StatementNode bodyNode>				(. factory.finishProcedure(bodyNode); .)
 ";"
@@ -176,7 +176,7 @@ identifier										(. factory.startFunction(t); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
 ":"
 identifier										(. factory.setFunctionReturnValue(t); .)
-												(. factory.checkUnitInterfaceMatchFunction(name, formalParameters,t.val.toLowerCase()); .)
+												(. factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); .)
 ";"
 [ VariableDefinitions ]
 Block<out StatementNode bodyNode>				(. factory.finishFunction(bodyNode); .)
@@ -311,7 +311,7 @@ Statement<out StatementNode caseStatement>		(. factory.addCaseOption(caseConstan
 												(. StatementNode elseStatement = null; .)
 [
 	"else"
-	Statement<out elseStatement>
+	Statement<out elseStatement>				(. factory.setCaseElse(elseStatement); .)
 ]
 [ ";" ]
 .
@@ -440,9 +440,9 @@ Factor<out ExpressionNode expression>
     (
 	    MemberExpression<out expression, t>
     |
-                                                (. expression = factory.readExpression(t); .)
+                                                (. expression = factory.readSingleIdentifier(t); .)
                                                 (. if(expression == null) .)
-                                                (.      SemErr("Undefined variable " + t.val + "."); .)
+                                                (.      SemErr("Undefined identifier " + t.val + "."); .)
     )
 |
     "("

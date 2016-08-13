@@ -18,11 +18,12 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * 
  * TODO LIST
  *
- * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (aj enum)
+ * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (assignment, operations, if condition, enum)
  * READ / READLN
  * PREDAVANIE REFERENCIOU
  * GOTO
  * ARRAY
+ * CONSTANTS
  * RECORD
  * FILES
  * POINTERS
@@ -30,11 +31,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * 
  * ReadArgumentNode -> Object[] -> no specialization 
  * ' in string 
- * type check in assignment in parser 
- * type check in all operations in parser 
- * type check in if condition (is it boolean?) 
  * support not 
- * switch na error pokial sa neda vyhodnotit case 
  * unit - variables declared only in IMPLEMENTATION section are visible from the outside 
  * unit - support for initialization and finalization section
  * subroutines - support nested subroutines
@@ -44,13 +41,13 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * 	  kniznice importovane zo zdrojaku)
  * volanie subroutine bez zatvoriek pokial nema parametre
  * predavanie premennych referenciou
- * private/public premenne
- * constants
+ * private/global variables
  *  
  * LATEST CHANGELOG:
  * make for loop execute limiting expression only once
  * private/public methods in units
  * else vetva v case
+ * support parameterless subroutine calls without parenteses
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.6", mimeType = "text/x-pascal")
@@ -137,7 +134,6 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		}
 
 		parser.Parse(Source.fromText(sourceCode, codeDescription));
-		System.out.println("Parsed");
 		if (!parser.noErrors()) {
 			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
 			return;

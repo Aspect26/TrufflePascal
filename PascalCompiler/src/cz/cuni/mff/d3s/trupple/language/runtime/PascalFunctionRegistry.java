@@ -36,20 +36,22 @@ public class PascalFunctionRegistry {
 	/**
 	 * Returns new node representing the function with name given.
 	 */
-	public PascalFunction lookup(String name) {
-		PascalFunction result = functions.get(name);
+	public PascalFunction lookup(String identifier) {
+		PascalFunction result = functions.get(identifier);
 		return result;
 	}
 
-	public void registerFunctionName(String name) {
-		functions.put(name, new PascalFunction("__UnimplementedFunction"));
+	public void registerFunctionName(String identifier) {
+		functions.put(identifier, new PascalFunction("__UnimplementedFunctionYet"));
 	}
 
-	public void register(String name, PascalRootNode rootNode) {
-		PascalFunction func = new PascalFunction(name);
-		functions.put(name, func);
+	public void setFunctionRootNode(String identifier, PascalRootNode rootNode) {
+		PascalFunction func = functions.get(identifier);
+		assert func != null;
+		
 		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
 		func.setCallTarget(callTarget);
+		func.setName(identifier);
 	}
 
 	public void addAll(PascalFunctionRegistry registry) {
@@ -115,6 +117,13 @@ public class PascalFunctionRegistry {
 
 		String name = lookupNodeInfo(bodyNode.getClass()).shortName();
 		this.register(name, rootNode);
+	}
+	
+	private void register(String identifier, PascalRootNode rootNode){
+		PascalFunction func = new PascalFunction(identifier);
+		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
+		func.setCallTarget(callTarget);
+		functions.put(identifier, func);
 	}
 
 	public static NodeInfo lookupNodeInfo(Class<?> clazz) {

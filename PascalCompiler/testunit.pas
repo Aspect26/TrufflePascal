@@ -7,11 +7,18 @@ INTERFACE
  procedure wb;
  procedure wb2;
  type Color = (red,green,blue);
+ function factorial(n:integer):integer;
 
 
 IMPLEMENTATION
  var b:integer;
  var red:integer;
+
+ function factorial(n:integer):integer;
+ begin
+  if(n<2) then factorial:=1
+  else factorial:=n*factorial(n-1);
+ end;
  
  procedure notseen;
  begin

@@ -13,11 +13,15 @@ public class CaseNode extends StatementNode {
 	private final StatementNode[] caseStatements;
 	@Child
 	private ExpressionNode caseValue;
+	@Child
+	private StatementNode elseBranch;
 
-	public CaseNode(ExpressionNode caseValue, ExpressionNode[] caseExpressions, StatementNode[] caseStatements) {
+	public CaseNode(ExpressionNode caseValue, ExpressionNode[] caseExpressions, StatementNode[] caseStatements,
+			StatementNode elseBranch) {
 		this.caseExpressions = caseExpressions;
 		this.caseStatements = caseStatements;
 		this.caseValue = caseValue;
+		this.elseBranch = elseBranch;
 	}
 
 	@Override
@@ -31,6 +35,6 @@ public class CaseNode extends StatementNode {
 			}
 		}
 
-		// TODO default case option
+		elseBranch.executeVoid(frame);
 	}
 }

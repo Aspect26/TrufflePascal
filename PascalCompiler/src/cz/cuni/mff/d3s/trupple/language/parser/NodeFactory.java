@@ -2,10 +2,8 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
@@ -49,7 +47,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
-import cz.cuni.mff.d3s.trupple.language.parser.ICustomType.CustomType;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
 
@@ -160,8 +157,10 @@ public class NodeFactory {
 	private LexicalScope lexicalScope;
 
 	/* State while parsing case statement */
+	// --> TODO: this causes to be enable to create nested cases....
 	private List<ExpressionNode> caseExpressions;
 	private List<StatementNode> caseStatements;
+	private StatementNode caseElse;
 
 	/* List of units found in sources given (name -> function registry) */
 	private Map<String, Unit> units = new HashMap<>();
@@ -261,7 +260,7 @@ public class NodeFactory {
 
 		if (currentUnit == null) {
 			lexicalScope = lexicalScope.outer;
-			lexicalScope.context.getGlobalFunctionRegistry().register(ls.name, rootNode);
+			lexicalScope.context.getGlobalFunctionRegistry().setFunctionRootNode(ls.name, rootNode);
 		} else {
 			currentUnit.registerProcedure(rootNode);
 		}
@@ -287,7 +286,7 @@ public class NodeFactory {
 
 		if (currentUnit == null) {
 			lexicalScope = lexicalScope.outer;
-			lexicalScope.context.getGlobalFunctionRegistry().register(ls.name, rootNode);
+			lexicalScope.context.getGlobalFunctionRegistry().setFunctionRootNode(ls.name, rootNode);
 		} else {
 			currentUnit.registerFunction(rootNode);
 		}
@@ -386,13 +385,18 @@ public class NodeFactory {
 		this.caseExpressions.add(expression);
 		this.caseStatements.add(statement);
 	}
+	
+	public void setCaseElse(StatementNode statement){
+		this.caseElse = statement;
+	}
 
 	public CaseNode finishCaseStatement(ExpressionNode caseIndex) {
 		CaseNode node = new CaseNode(caseIndex, caseExpressions.toArray(new ExpressionNode[caseExpressions.size()]),
-				caseStatements.toArray(new StatementNode[caseStatements.size()]));
+				caseStatements.toArray(new StatementNode[caseStatements.size()]), caseElse);
 
 		caseExpressions = null;
 		caseStatements = null;
+		caseElse = null;
 
 		return node;
 	}
@@ -436,21 +440,30 @@ public class NodeFactory {
 		return new BreakNode();
 	}
 
-	public ExpressionNode readExpression(Token nameToken) {
+	public ExpressionNode readSingleIdentifier(Token nameToken) {
 		String identifier = nameToken.val.toLowerCase();
+		
+		// firstly try to read a variable
 		FrameSlot frameSlot = getVisibleSlot(identifier);
-
-		if (frameSlot == null){
+		if (frameSlot != null){
+			return ReadVariableNodeGen.create(frameSlot);
+		} else {
+			// secondly, try to return a custom value (enum or constant (constants are not currently supported although))
 			LexicalScope ls = (currentUnit==null)? lexicalScope : currentUnit.getLexicalScope();
 			
-			if(ls.containsCustomValue(identifier))
+			if(ls.containsCustomValue(identifier)) {
 				// TODO: for constants -> change this so it gets the type firtsly (it might not be long)
 				return new LongLiteralNode(ls.getCustomValue(identifier));
-						
-			return null;
+			} else {
+				// finally, try to create a procedure or function literal (with no arguments)
+				if(ls.context.containsParameterlessSubroutine(identifier)) {
+					ExpressionNode literal = this.createFunctionNode(nameToken);
+					return this.createCall(literal, new ArrayList<>());
+				}
+				
+				return null;
+			}
 		}
-
-		return ReadVariableNodeGen.create(frameSlot);
 	}
 
 	public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
@@ -532,17 +545,14 @@ public class NodeFactory {
 	}
 
 	private FrameSlot getVisibleSlot(String identifier) {
-		FrameSlot slot;
+		FrameSlot slot = null;
 		if (currentUnit != null)
 			slot = currentUnit.getSlot(identifier);
 		else {
-			slot = lexicalScope.frameDescriptor.findFrameSlot(identifier);
-			if (slot == null) {
-				Iterator<Entry<String, Unit>> it = units.entrySet().iterator();
-				while (it.hasNext()) {
-					Map.Entry<String, Unit> pair = it.next();
-					slot = pair.getValue().getSlot(identifier);
-				}
+			LexicalScope ls = lexicalScope;
+			while(ls != null && slot == null){
+				slot = lexicalScope.frameDescriptor.findFrameSlot(identifier);
+				ls = ls.outer;
 			}
 		}
 
@@ -659,21 +669,31 @@ public class NodeFactory {
 		}
 	}
 	
-	public void checkUnitInterfaceMatchProcedure(Token name, List<VariableDeclaration> parameters) {
+	public void finishFormalParameterListProcedure(Token name, List<VariableDeclaration> parameters) {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		String identifier = name.val.toLowerCase();
+		
+		// the subroutine is in outer context because now the praser is in the subroutine's own context
+		ls.outer.context.setMySubroutineParametersCount(identifier, parameters.size());
+		
 		if(currentUnit == null)
 			return;
 		
-		String identifier = name.val.toLowerCase();
 		if (!currentUnit.checkProcedureMatchInterface(identifier, parameters)) {
 			parser.SemErr("Procedure heading for " + identifier + " does not match any procedure from the interface.");
 		}
 	}
 
-	public void checkUnitInterfaceMatchFunction(Token name, List<VariableDeclaration> parameters, String returnType) {
+	public void finishFormalParameterListFunction(Token name, List<VariableDeclaration> parameters, String returnType) {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		String identifier = name.val.toLowerCase();
+		
+		// the subroutine is in outer context because now the praser is in the subroutine's own context
+		ls.outer.context.setMySubroutineParametersCount(identifier, parameters.size());
+		
 		if(currentUnit == null)
 			return;
 		
-		String identifier = name.val.toLowerCase();
 		if (!currentUnit.checkFunctionMatchInterface(identifier, parameters, returnType)) {
 			parser.SemErr("Function heading for " + identifier + " does not match any function from the interface.");
 		}

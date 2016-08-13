@@ -254,7 +254,7 @@ public class Parser{
 		Expect(16);
 		Expect(1);
 		factory.setFunctionReturnValue(t); 
-		factory.checkUnitInterfaceMatchFunction(name, formalParameters,t.val.toLowerCase()); 
+		factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); 
 		Expect(7);
 		if (la.kind == 15) {
 			VariableDefinitions();
@@ -275,7 +275,7 @@ public class Parser{
 		}
 		factory.addFormalParameters(formalParameters); 
 		Expect(7);
-		factory.checkUnitInterfaceMatchProcedure(name, formalParameters); 
+		factory.finishFormalParameterListProcedure(name, formalParameters); 
 		if (la.kind == 15) {
 			VariableDefinitions();
 		}
@@ -521,6 +521,7 @@ public class Parser{
 		if (la.kind == 25) {
 			Get();
 			elseStatement = Statement();
+			factory.setCaseElse(elseStatement); 
 		}
 		if (la.kind == 7) {
 			Get();
@@ -639,7 +640,7 @@ public class Parser{
 			if (la.kind == 10 || la.kind == 27) {
 				expression = MemberExpression(t);
 			} else if (StartOf(7)) {
-				expression = factory.readExpression(t); 
+				expression = factory.readSingleIdentifier(t); 
 				if(expression == null) 
 				SemErr("Undefined variable " + t.val + "."); 
 			} else SynErr(62);
@@ -860,7 +861,7 @@ public class Parser{
     public boolean caseEnds(){
     	if(la.val.toLowerCase().equals("end") && !t.val.toLowerCase().equals(":"))
     		return true;
-    	
+    		
     	if(la.val.toLowerCase().equals("else"))
     		return true;
     		

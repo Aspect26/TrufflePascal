@@ -29,6 +29,36 @@ public final class PascalContext extends ExecutionContext {
 		this.privateFunctionRegistry = new PascalFunctionRegistry(this, false);
 	}
 	
+	public boolean containsParameterlessSubroutine(String identifier){
+		PascalContext context = this;
+		PascalFunction func;
+		
+		while(context != null){
+			func = globalFunctionRegistry.lookup(identifier);
+			if(func != null && func.getParametersCount() == 0)
+				return true;
+			
+			func = privateFunctionRegistry.lookup(identifier);
+			if(func != null && func.getParametersCount() == 0)
+				return true;
+			
+			context = context.outerContext;
+		}
+		
+		return false;
+	}
+	
+	public void setMySubroutineParametersCount(String identifier, int count) {
+		PascalFunction func = this.globalFunctionRegistry.lookup(identifier);
+		if(func == null){
+			func = this.privateFunctionRegistry.lookup(identifier);
+		}
+		
+		assert func != null;
+		
+		func.setParametersCount(count);
+	}
+	
 	public PascalContext getOuterContext(){
 		return outerContext;
 	}

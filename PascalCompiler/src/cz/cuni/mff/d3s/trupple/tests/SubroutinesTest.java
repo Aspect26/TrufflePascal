@@ -47,6 +47,35 @@ public class SubroutinesTest extends UnitTest {
 		test(code, "40320");
 	}
 	
+	@Test
+	public void procedureCallNoParentheses(){
+		String code = "procedure p;\n" + 
+				"begin\n" + 
+				"write('Metallica!');" + 
+				"end;\n" + 
+				"\n" + 
+				"begin\n" + 
+				" p;\n" + 
+				"end.";
+		
+		test(code, "Metallica!");
+	}
+	
+	@Test
+	public void functionCallNoParentheses(){
+		String code = "function f:integer;\n" + 
+				"begin\n" + 
+				"f:=26270;" + 
+				"end;\n" + 
+				"\n" + 
+				"begin\n" + 
+				"write(f);\n" + 
+				"end.";
+		
+		test(code, "26270");
+	}
+	
+	// TODO
 	/*
 	@Test
 	public void globalVarTest(){

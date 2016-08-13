@@ -70,6 +70,11 @@ public class Unit {
 	}
 
 	public void startSubroutineImplementation(String identifier) {
+		if(this.interfaceFunctions.containsKey(identifier) || this.interfaceProcedures.containsKey(identifier))
+			lexicalScope.context.getGlobalFunctionRegistry().registerFunctionName(identifier);
+		else
+			lexicalScope.context.getPrivateFunctionRegistry().registerFunctionName(identifier);
+			
 		lexicalScope = new LexicalScope(lexicalScope, identifier);
 		lexicalScope.frameDescriptor = NodeFactory.copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
 	}
@@ -111,21 +116,21 @@ public class Unit {
 		leaveLexicalScope();
 		
 		if(interfaceProcedures.containsKey(identifier))
-			lexicalScope.context.getGlobalFunctionRegistry().register(identifier, rootNode);
+			lexicalScope.context.getGlobalFunctionRegistry().setFunctionRootNode(identifier, rootNode);
 		else
-			lexicalScope.context.getPrivateFunctionRegistry().register(identifier, rootNode);
+			lexicalScope.context.getPrivateFunctionRegistry().setFunctionRootNode(identifier, rootNode);
 	}
 	
 	public void registerFunction(PascalRootNode rootNode){
 		String identifier = lexicalScope.name;
 		leaveLexicalScope();
 		
-		if(interfaceProcedures.containsKey(identifier))
-			lexicalScope.context.getGlobalFunctionRegistry().register(identifier, rootNode);
+		if(interfaceFunctions.containsKey(identifier))
+			lexicalScope.context.getGlobalFunctionRegistry().setFunctionRootNode(identifier, rootNode);
 		else
-			lexicalScope.context.getPrivateFunctionRegistry().register(identifier, rootNode);
+			lexicalScope.context.getPrivateFunctionRegistry().setFunctionRootNode(identifier, rootNode);
 	}
-
+	
 	private void leaveLexicalScope() {
 		this.lexicalScope = lexicalScope.outer;
 	}
