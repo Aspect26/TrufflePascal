@@ -1,13 +1,9 @@
-uses testunit;
-
-var c:Color;
-    b:integer;
-
-procedure hello;
 begin
-end;
+ 
+ case 2 of
+  3: begin end;
+  4: begin end
+  else begin writeln('df') end;
+ end;
 
-begin
- c:=green;
- b:=15;
 end.

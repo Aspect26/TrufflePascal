@@ -309,16 +309,16 @@ public class Scanner {
 		literals.put("break", new Integer(22));
 		literals.put("case", new Integer(23));
 		literals.put("of", new Integer(24));
-		literals.put("for", new Integer(25));
-		literals.put("to", new Integer(27));
-		literals.put("downto", new Integer(28));
-		literals.put("do", new Integer(29));
-		literals.put("repeat", new Integer(30));
-		literals.put("until", new Integer(31));
-		literals.put("while", new Integer(32));
-		literals.put("if", new Integer(33));
-		literals.put("then", new Integer(34));
-		literals.put("else", new Integer(35));
+		literals.put("else", new Integer(25));
+		literals.put("for", new Integer(26));
+		literals.put("to", new Integer(28));
+		literals.put("downto", new Integer(29));
+		literals.put("do", new Integer(30));
+		literals.put("repeat", new Integer(31));
+		literals.put("until", new Integer(32));
+		literals.put("while", new Integer(33));
+		literals.put("if", new Integer(34));
+		literals.put("then", new Integer(35));
 		literals.put("or", new Integer(36));
 		literals.put("and", new Integer(37));
 		literals.put("div", new Integer(47));
@@ -528,7 +528,7 @@ public class Scanner {
 				case 21:
 					{t.kind = 19; break loop;}
 				case 22:
-					{t.kind = 26; break loop;}
+					{t.kind = 27; break loop;}
 				case 23:
 					{t.kind = 39; break loop;}
 				case 24:

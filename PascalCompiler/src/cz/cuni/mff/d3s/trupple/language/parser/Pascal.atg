@@ -308,6 +308,12 @@ Statement<out StatementNode caseStatement>		(. factory.addCaseOption(caseConstan
 	Statement<out caseStatement>				(. factory.addCaseOption(caseConstant, caseStatement); .)
 }
 [ ";" ]
+												(. StatementNode elseStatement = null; .)
+[
+	"else"
+	Statement<out elseStatement>
+]
+[ ";" ]
 .
 
 

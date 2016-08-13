@@ -18,11 +18,10 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * 
  * TODO LIST
  *
- * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!!
+ * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (aj enum)
  * READ / READLN
  * PREDAVANIE REFERENCIOU
  * GOTO
- * ENUM
  * ARRAY
  * RECORD
  * FILES
@@ -45,13 +44,13 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * 	  kniznice importovane zo zdrojaku)
  * volanie subroutine bez zatvoriek pokial nema parametre
  * predavanie premennych referenciou
- * else vetva v case
  * private/public premenne
  * constants
  *  
  * LATEST CHANGELOG:
  * make for loop execute limiting expression only once
  * private/public methods in units
+ * else vetva v case
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.6", mimeType = "text/x-pascal")

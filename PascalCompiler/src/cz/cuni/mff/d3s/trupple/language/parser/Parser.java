@@ -370,7 +370,7 @@ public class Parser{
 		StatementNode  statement;
 		statement = null; 
 		switch (la.kind) {
-		case 7: case 21: case 31: case 35: {
+		case 7: case 21: case 25: case 32: {
 			statement = factory.createEmptyStatement(); 
 			break;
 		}
@@ -378,19 +378,19 @@ public class Parser{
 			statement = Expression();
 			break;
 		}
-		case 33: {
+		case 34: {
 			statement = IfStatement();
 			break;
 		}
-		case 25: {
+		case 26: {
 			statement = ForLoop();
 			break;
 		}
-		case 32: {
+		case 33: {
 			statement = WhileLoop();
 			break;
 		}
-		case 30: {
+		case 31: {
 			statement = RepeatLoop();
 			break;
 		}
@@ -428,12 +428,12 @@ public class Parser{
 
 	StatementNode  IfStatement() {
 		StatementNode  statement;
-		Expect(33);
-		ExpressionNode condition = Expression();
 		Expect(34);
+		ExpressionNode condition = Expression();
+		Expect(35);
 		StatementNode thenStatement = Statement();
 		StatementNode elseStatement = null; 
-		if (la.kind == 35) {
+		if (la.kind == 25) {
 			Get();
 			elseStatement = Statement();
 		}
@@ -444,21 +444,21 @@ public class Parser{
 	StatementNode  ForLoop() {
 		StatementNode  statement;
 		loopDepth++; 
-		Expect(25);
+		Expect(26);
 		boolean ascending = true; 
 		Expect(1);
 		Token variableToken = t; 
-		Expect(26);
+		Expect(27);
 		ExpressionNode startValue = Expression();
-		if (la.kind == 27) {
+		if (la.kind == 28) {
 			Get();
 			ascending = true; 
-		} else if (la.kind == 28) {
+		} else if (la.kind == 29) {
 			Get();
 			ascending = false; 
 		} else SynErr(60);
 		ExpressionNode finalValue = Expression();
-		Expect(29);
+		Expect(30);
 		StatementNode loopBody = Statement();
 		statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); 
 		loopDepth--; 
@@ -468,9 +468,9 @@ public class Parser{
 	StatementNode  WhileLoop() {
 		StatementNode  statement;
 		loopDepth++; 
-		Expect(32);
+		Expect(33);
 		ExpressionNode condition = Expression();
-		Expect(29);
+		Expect(30);
 		StatementNode loopBody = Statement();
 		statement = factory.createWhileLoop(condition, loopBody); 
 		loopDepth--; 
@@ -480,10 +480,10 @@ public class Parser{
 	StatementNode  RepeatLoop() {
 		StatementNode  statement;
 		loopDepth++; 
-		Expect(30);
+		Expect(31);
 		List<StatementNode> bodyNodes = new ArrayList<>(); 
 		StatementSequence(bodyNodes);
-		Expect(31);
+		Expect(32);
 		ExpressionNode condition = Expression();
 		statement = factory.createRepeatLoop(condition, factory.finishBlock(bodyNodes)); 
 		loopDepth--; 
@@ -513,6 +513,14 @@ public class Parser{
 			Expect(16);
 			caseStatement = Statement();
 			factory.addCaseOption(caseConstant, caseStatement); 
+		}
+		if (la.kind == 7) {
+			Get();
+		}
+		StatementNode elseStatement = null; 
+		if (la.kind == 25) {
+			Get();
+			elseStatement = Statement();
 		}
 		if (la.kind == 7) {
 			Get();
@@ -628,7 +636,7 @@ public class Parser{
 		switch (la.kind) {
 		case 1: {
 			Get();
-			if (la.kind == 10 || la.kind == 26) {
+			if (la.kind == 10 || la.kind == 27) {
 				expression = MemberExpression(t);
 			} else if (StartOf(7)) {
 				expression = factory.readExpression(t); 
@@ -690,7 +698,7 @@ public class Parser{
 			}
 			Expect(11);
 			expression = factory.createCall(functionNode, parameters); 
-		} else if (la.kind == 26) {
+		} else if (la.kind == 27) {
 			Get();
 			ExpressionNode value = Expression();
 			if(identifierName == null) { 
@@ -835,11 +843,11 @@ public class Parser{
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _T,_x,_x,_T, _x,_T,_T,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _T,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_x,_T, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _T,_T,_T,_T, _x,_T,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_T,_T,_T, _T,_x,_x,_T, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _T,_T,_T,_T, _x,_x,_T,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_T,_x,_x, _T,_T,_x,_x, _T,_T,_T,_x, _T,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
 
@@ -852,10 +860,13 @@ public class Parser{
     public boolean caseEnds(){
     	if(la.val.toLowerCase().equals("end") && !t.val.toLowerCase().equals(":"))
     		return true;
+    	
+    	if(la.val.toLowerCase().equals("else"))
+    		return true;
     		
     	else if(la.val.toLowerCase().equals(";")){
     		Token next = scanner.Peek();
-    		return next.val.toLowerCase().equals("end");
+    		return next.val.toLowerCase().equals("end") || next.val.toLowerCase().equals("else");
     	}
     	
     	return false;
@@ -916,17 +927,17 @@ class Errors {
 			case 22: s = "\"break\" expected"; break;
 			case 23: s = "\"case\" expected"; break;
 			case 24: s = "\"of\" expected"; break;
-			case 25: s = "\"for\" expected"; break;
-			case 26: s = "\":=\" expected"; break;
-			case 27: s = "\"to\" expected"; break;
-			case 28: s = "\"downto\" expected"; break;
-			case 29: s = "\"do\" expected"; break;
-			case 30: s = "\"repeat\" expected"; break;
-			case 31: s = "\"until\" expected"; break;
-			case 32: s = "\"while\" expected"; break;
-			case 33: s = "\"if\" expected"; break;
-			case 34: s = "\"then\" expected"; break;
-			case 35: s = "\"else\" expected"; break;
+			case 25: s = "\"else\" expected"; break;
+			case 26: s = "\"for\" expected"; break;
+			case 27: s = "\":=\" expected"; break;
+			case 28: s = "\"to\" expected"; break;
+			case 29: s = "\"downto\" expected"; break;
+			case 30: s = "\"do\" expected"; break;
+			case 31: s = "\"repeat\" expected"; break;
+			case 32: s = "\"until\" expected"; break;
+			case 33: s = "\"while\" expected"; break;
+			case 34: s = "\"if\" expected"; break;
+			case 35: s = "\"then\" expected"; break;
 			case 36: s = "\"or\" expected"; break;
 			case 37: s = "\"and\" expected"; break;
 			case 38: s = "\">\" expected"; break;

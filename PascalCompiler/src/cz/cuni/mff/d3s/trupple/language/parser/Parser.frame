@@ -134,9 +134,12 @@ public class Parser{
     	if(la.val.toLowerCase().equals("end") && !t.val.toLowerCase().equals(":"))
     		return true;
     		
+    	if(la.val.toLowerCase().equals("else"))
+    		return true;
+    		
     	else if(la.val.toLowerCase().equals(";")){
     		Token next = scanner.Peek();
-    		return next.val.toLowerCase().equals("end");
+    		return next.val.toLowerCase().equals("end") || next.val.toLowerCase().equals("else");
     	}
     	
     	return false;
