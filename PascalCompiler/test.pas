@@ -1,5 +1,7 @@
-uses testunit;
+//uses testunit;
+var b:boolean;
 
 begin
- writeln(factorial(7));
+ b:=false;
+ writeln(not b);
 end.

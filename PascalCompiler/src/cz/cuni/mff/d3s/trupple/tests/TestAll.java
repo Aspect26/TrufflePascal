@@ -6,7 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ WriteTest.class, ArithmeticTest.class, IfTest.class, CaseTest.class, LoopsTest.class,
-		SubroutinesTest.class, LogicOperatorsTest.class, EnumTest.class })
+		SubroutinesTest.class, LogicOperatorsTest.class, EnumTest.class, LogicNegationTest.class })
 public class TestAll {
 
 }

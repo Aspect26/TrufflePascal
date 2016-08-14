@@ -383,12 +383,24 @@ LogicTerm<out expression>
 
 LogicTerm<out ExpressionNode expression>
 =
-LogicFactor<out expression>
+SignedLogicFactor<out expression>
 {
     "and"                                       (. Token op = t; .)
-    LogicFactor<out ExpressionNode right>       (. expression = factory.createBinary(op, expression, right); .)
+    SignedLogicFactor<out ExpressionNode right> (. expression = factory.createBinary(op, expression, right); .)
 }
 .
+
+
+SignedLogicFactor<out ExpressionNode expression>
+=												(. expression = null; .)
+(
+	"not"										(. Token op = t; .)
+	SignedLogicFactor<out ExpressionNode right>	(. expression = factory.createUnary(op, right); .)
+|
+	LogicFactor<out expression>
+)
+.
+
 
 
 LogicFactor<out ExpressionNode expression>
