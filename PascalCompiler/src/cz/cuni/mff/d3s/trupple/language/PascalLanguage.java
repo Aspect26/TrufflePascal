@@ -1,6 +1,10 @@
 package cz.cuni.mff.d3s.trupple.language;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import com.oracle.truffle.api.CallTarget;
@@ -31,7 +35,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * 
  * ReadArgumentNode -> Object[] -> no specialization 
  * ' in string 
- * support not 
  * unit - variables declared only in IMPLEMENTATION section are visible from the outside 
  * unit - support for initialization and finalization section
  * subroutines - support nested subroutines
@@ -39,18 +42,19 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * break nie je v std (treba prepinac --std=turbo)
  * poriesit prepinac -I (nech funguje podobne ako v gcc (neimportuje subor ale dir, v ktorom ma hladat 
  * 	  kniznice importovane zo zdrojaku)
- * volanie subroutine bez zatvoriek pokial nema parametre
  * predavanie premennych referenciou
  * private/global variables
  *  
  * LATEST CHANGELOG:
- * make for loop execute limiting expression only once
- * private/public methods in units
+ * support enums
+ * support not statement
  * else vetva v case
+ * private/public methods in units
  * support parameterless subroutine calls without parenteses
+ * make for loop execute limiting expression only once
  */
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.6", mimeType = "text/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.7", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();
@@ -100,14 +104,27 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	public static void start(String sourcePath, List<String> imports) throws IOException {
 		Parser parser = new Parser();
 
-		for (String imp : imports) {
-			parser.Parse(Source.fromFileName(imp));
-			if (!parser.noErrors()) {
-				System.err.println("Errors while parsing import file " + imp + ".");
-				return;
+		for (String dir : imports) {
+			try{
+				Files.walk(Paths.get(dir)).forEach(filePath -> {
+					int a=5;
+					if(filePath.toString().endsWith(".pas")){
+						try{
+							parser.Parse(Source.fromFileName(filePath.toString()));
+							if (!parser.noErrors()) {
+								System.err.println("Errors while parsing import file " + filePath + ".");
+								return;
+							}
+						} catch (IOException e){
+						
+						}
+					}
+				});
+			} catch(NoSuchFileException e){
+				System.err.println("No such file or directory " + e.getFile());
 			}
 		}
-
+		
 		parser.Parse(Source.fromFileName(sourcePath));
 		if (!parser.noErrors()) {
 			System.err.println("Errors while parsing source file, the code cannot be interpreted...");

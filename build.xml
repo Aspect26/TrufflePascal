@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Trupple v0.6" default="info">
+<project name="Trupple v0.7" default="info">
 
     <property name="src.dir" value="PascalCompiler/src/"/>
     <property name="srcgen.dir" value="PascalCompiler/src_gen"/>
     <property name="lib.dir" value="PascalCompiler/lib" />
     <property name="build.dir" value="Trupple" />
-
+    
     <target name="info">
         <echo> 
             Trupple - A Pascal interpreter made in Truffle framework by Aspect!  
         </echo>
     </target>
 
+
     <target name="build" description="Compiles all Trupple sources">
         <mkdir dir="${build.dir}"/>
-        <javac destdir="${build.dir}" source="1.8" target="1.8">
-            <src path="${src.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.8" target="1.8">
+            <exclude name="**/tests/**"/>
             
             <classpath>
                 <pathelement path="${lib.dir}/truffle.jar"/>
+                <pathelement path="${lib.dir}/args4j-2.33.jar"/>
             </classpath>
         </javac>
     </target>
@@ -30,7 +32,7 @@
 
     <target name="make" depends="build" description="Create executable jar file">
         <jar destfile="${build.dir}/Trupple.jar"
-             basedir="${build.dir}/pascal">
+             basedir="${build.dir}">
 
 
             <manifest>
