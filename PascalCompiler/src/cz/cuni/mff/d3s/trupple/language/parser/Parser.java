@@ -680,7 +680,7 @@ public class Parser{
 		switch (la.kind) {
 		case 1: {
 			Get();
-			if (la.kind == 10 || la.kind == 31) {
+			if (la.kind == 10 || la.kind == 18 || la.kind == 31) {
 				expression = MemberExpression(t);
 			} else if (StartOf(8)) {
 				expression = factory.readSingleIdentifier(t); 
@@ -752,7 +752,17 @@ public class Parser{
 			if(expression == null) 
 			SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); 
 			} 
-		} else SynErr(72);
+		} else if (la.kind == 18) {
+			Get();
+			if (!isSingleIdentifier()) {
+				ExpressionNode indexNode = Expression();
+				expression = factory.createReadArrayValue(identifierName, indexNode); 
+			} else if (la.kind == 1) {
+				Get();
+				expression = factory.createReadArrayValue(identifierName, t); 
+			} else SynErr(72);
+			Expect(19);
+		} else SynErr(73);
 		return expression;
 	}
 
@@ -832,7 +842,7 @@ public class Parser{
 			formalParameter = IValueParameter();
 		} else if (la.kind == 15) {
 			formalParameter = IVariableParameter();
-		} else SynErr(73);
+		} else SynErr(74);
 		return formalParameter;
 	}
 
@@ -892,7 +902,7 @@ public class Parser{
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_x,_x, _T,_T,_T,_x, _T,_x,_x,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_x,_x, _T,_T,_T,_x, _T,_x,_x,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
 
@@ -914,6 +924,14 @@ public class Parser{
     		return next.val.toLowerCase().equals("end") || next.val.toLowerCase().equals("else");
     	}
     	
+    	return false;
+    }
+    
+    public boolean isSingleIdentifier(){
+    	Token next = scanner.Peek();
+    	if(next.val.equals("]") && factory.containsIdentifier(la.val.toLowerCase()))
+    		return true;
+
     	return false;
     }
 } // end Parser
@@ -1020,7 +1038,8 @@ class Errors {
 			case 70: s = "invalid Factor"; break;
 			case 71: s = "invalid Factor"; break;
 			case 72: s = "invalid MemberExpression"; break;
-			case 73: s = "invalid IFormalParameter"; break;
+			case 73: s = "invalid MemberExpression"; break;
+			case 74: s = "invalid IFormalParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

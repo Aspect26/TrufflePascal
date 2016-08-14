@@ -22,4 +22,10 @@ public class EnumOrdinal implements IOrdinalType {
 	public Type getType() {
 		return IOrdinalType.Type.ENUM;
 	}
+
+	@Override
+	public int getRealIndex(Object index) {
+		String identifier = (String)index;
+		return sourceType.getIndex(identifier);
+	}
 }

@@ -320,6 +320,8 @@ CaseList
 "end"											(. statement = factory.finishCaseStatement(caseIndex); .)
 .
 
+
+
 CaseList
 =
 Expression<out ExpressionNode caseConstant>
@@ -524,6 +526,15 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
                                                 (.      if(expression == null) .)
                                                 (.          SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); .)
                                                 (. } .)
+|
+	"["
+	(
+		IF(!isSingleIdentifier())
+		Expression<out ExpressionNode indexNode>(.  expression = factory.createReadArrayValue(identifierName, indexNode); .)
+	|
+		identifier								(. expression = factory.createReadArrayValue(identifierName, t); .)
+	)
+	"]"
 )
 .
 

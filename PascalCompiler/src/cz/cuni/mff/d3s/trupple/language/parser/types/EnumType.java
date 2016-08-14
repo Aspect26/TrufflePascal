@@ -28,6 +28,10 @@ public class EnumType extends CustomType {
 		return this.size;
 	}
 	
+	public int getIndex(String identifier) {
+		return values.get(identifier);
+	}
+	
 	@Override
 	public boolean containsCustomValue(String identifier){
 		return values.containsKey(identifier);

@@ -47,6 +47,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayEnumIndexNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
 import cz.cuni.mff.d3s.trupple.language.parser.types.EnumOrdinal;
 import cz.cuni.mff.d3s.trupple.language.parser.types.EnumType;
@@ -234,6 +237,11 @@ public class NodeFactory {
 			return FrameSlotKind.Illegal;
 		}
 	}
+	
+	public boolean containsIdentifier(String identifier) {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return ls.containsCustomValue(identifier);
+	}
 
 	public void finishVariableLineDefinition(List<String> identifiers, Token variableType) {
 		FrameSlotKind slotKind = getSlotByTypeName(variableType.val.toLowerCase());
@@ -271,7 +279,7 @@ public class NodeFactory {
 				FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, FrameSlotKind.Object);
 				lexicalScope.locals.put(identifier, newSlot);
 				this.initializationNodes.add(new InitializationNode(newSlot, new PascalArray(
-						returnTypeToken.val.toLowerCase(), ordinalRange.getSize(), ordinalRange.getFirstIndex()
+						returnTypeToken.val.toLowerCase(), ordinalRange
 						)));
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
@@ -402,19 +410,14 @@ public class NodeFactory {
 	public IOrdinalType createSimpleOrdinal(Token lowerBound, Token upperBound) {
 		final int firstIndex = Integer.parseInt(lowerBound.val);
 		final int lastIndex = Integer.parseInt(upperBound.val);
-		final int size = lastIndex - firstIndex;
+		final int size = lastIndex - firstIndex + 1;
 		
-		if(size == 0) {
-			parser.SemErr("Zero size range given.");
-			return null;
-		}
-		
-		if(size < 0) {
+		if(size <= 0) {
 			parser.SemErr("Greater lower bound then upper bound.");
 			return null;
 		}
 		
-		return new SimpleOrdinal(firstIndex, size, IOrdinalType.Type.INTEGER);
+		return new SimpleOrdinal(firstIndex, size, IOrdinalType.Type.NUMERIC);
 	}
 	
 	public IOrdinalType createSimpleOrdinal(Token name){
@@ -444,7 +447,6 @@ public class NodeFactory {
 		initializationNodes.add(blockNode);
 		StatementNode mainNode = new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
 		return new PascalRootNode(lexicalScope.frameDescriptor, new ProcedureBodyNode(mainNode));
-		//return new PascalRootNode(lexicalScope.frameDescriptor, new ProcedureBodyNode(blockNode));
 	}
 
 	public void startMainBlock() {
@@ -521,6 +523,16 @@ public class NodeFactory {
 
 	public StatementNode createBreak() {
 		return new BreakNode();
+	}
+	
+	public ExpressionNode createReadArrayValue(Token identifier, ExpressionNode indexNode) {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return ReadArrayIndexNodeGen.create(indexNode, ls.locals.get(identifier.val.toLowerCase()));
+	}
+	
+	public ExpressionNode createReadArrayValue(Token identifier, Token indexIdentifier) {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return ReadArrayEnumIndexNodeGen.create(indexIdentifier.val.toLowerCase(), ls.locals.get(identifier.val.toLowerCase()));
 	}
 
 	public ExpressionNode readSingleIdentifier(Token nameToken) {

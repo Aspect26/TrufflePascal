@@ -145,6 +145,14 @@ public class Parser{
     	
     	return false;
     }
+    
+    public boolean isSingleIdentifier(){
+    	Token next = scanner.Peek();
+    	if(next.val.equals("]") && factory.containsIdentifier(la.val.toLowerCase()))
+    		return true;
+
+    	return false;
+    }
 } // end Parser
 
 class VariableDeclaration{
