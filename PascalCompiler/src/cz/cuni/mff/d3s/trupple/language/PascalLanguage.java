@@ -106,7 +106,6 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		for (String dir : imports) {
 			try{
 				Files.walk(Paths.get(dir)).forEach(filePath -> {
-					int a=5;
 					if(filePath.toString().endsWith(".pas")){
 						try{
 							parser.Parse(Source.fromFileName(filePath.toString()));

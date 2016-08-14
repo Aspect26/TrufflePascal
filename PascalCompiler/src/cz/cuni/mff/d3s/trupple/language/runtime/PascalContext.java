@@ -90,23 +90,4 @@ public final class PascalContext extends ExecutionContext {
 		return globalFunctionRegistry.lookup(identifier) != null ||
 				privateFunctionRegistry.lookup(identifier) != null;
 	}
-	
-	// ARRAYS
-	private class ArrayInfo {
-		public final Object[] array;
-		public final IOrdinalType ordinal;
-		private final int offset;
-		
-		public ArrayInfo(IOrdinalType ordinal) {
-			this.ordinal = ordinal;
-			this.offset = ordinal.getFirstIndex();
-			this.array = new Object[ordinal.getSize()];
-		}
-	}
-	
-	private Map<String, ArrayInfo> arrays = new HashMap<>();
-	
-	public void registerArray(String identifier, IOrdinalType ordinal) {
-		arrays.put(identifier, new ArrayInfo(ordinal));
-	}
 }

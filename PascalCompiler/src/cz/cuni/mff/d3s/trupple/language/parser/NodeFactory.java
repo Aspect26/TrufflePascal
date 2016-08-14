@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
@@ -54,6 +55,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
 import cz.cuni.mff.d3s.trupple.language.parser.types.SimpleOrdinal;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
+import cz.cuni.mff.d3s.trupple.language.types.PascalArray;
 
 public class NodeFactory {
 
@@ -183,12 +185,19 @@ public class NodeFactory {
 	/* List of units found in sources given (name -> function registry) */
 	private Map<String, Unit> units = new HashMap<>();
 	private Unit currentUnit = null;
+	
+	/* List of initialization nodes (variables like array and enums are represented as Objects
+	 * (duh) and they need to be initialized otherwise their value would be null)
+	 */
+	private final List<StatementNode> initializationNodes;
 
 	public NodeFactory(Parser parser) {
 		this.parser = parser;
 
 		this.lexicalScope = new LexicalScope(null, null);
 		this.lexicalScope.frameDescriptor = new FrameDescriptor();
+		
+		this.initializationNodes = new ArrayList<>();
 	}
 
 	private FrameSlotKind getSlotByTypeName(String type) {
@@ -201,14 +210,10 @@ public class NodeFactory {
 
 		// ordinals
 		case "integer":
-		case "cardinal":
 		case "shortint":
-		case "smallint":
 		case "longint":
-		case "int64":
 		case "byte":
 		case "word":
-		case "longword":
 			return FrameSlotKind.Long;
 
 		// floating points
@@ -257,26 +262,17 @@ public class NodeFactory {
 	}
 	
 	public void finishArrayDefinition(List<String> identifiers, IOrdinalType ordinalRange, Token returnTypeToken) {
-		String returnType = returnTypeToken.val.toLowerCase();
-		FrameSlotKind slotKind = getSlotByTypeName(returnType);
+		//TODO: this!
+		if(currentUnit != null)
+			return;
 		
-		if (slotKind == FrameSlotKind.Illegal) {
-			parser.SemErr("Unkown variable type: " + returnType);
-		}
-		
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		boolean isCustomType = slotKind == FrameSlotKind.Object;
-		if(isCustomType)
-			slotKind = FrameSlotKind.Long;
-		
-		for (String identifier : identifiers) {
+		for(String identifier : identifiers) {
 			try {
-				FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(identifier, slotKind);
-				ls.locals.put(identifier, newSlot);
-				if(isCustomType){
-					ls.addCustomTypeVariable(identifier, returnType);
-				}
-				ls.context.registerArray(identifier, ordinalRange);
+				FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, FrameSlotKind.Object);
+				lexicalScope.locals.put(identifier, newSlot);
+				this.initializationNodes.add(new InitializationNode(newSlot, new PascalArray(
+						returnTypeToken.val.toLowerCase(), ordinalRange.getSize(), ordinalRange.getFirstIndex()
+						)));
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
 				continue;
@@ -445,7 +441,10 @@ public class NodeFactory {
 	}
 
 	public PascalRootNode finishMainFunction(StatementNode blockNode) {
-		return new PascalRootNode(lexicalScope.frameDescriptor, new ProcedureBodyNode(blockNode));
+		initializationNodes.add(blockNode);
+		StatementNode mainNode = new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
+		return new PascalRootNode(lexicalScope.frameDescriptor, new ProcedureBodyNode(mainNode));
+		//return new PascalRootNode(lexicalScope.frameDescriptor, new ProcedureBodyNode(blockNode));
 	}
 
 	public void startMainBlock() {

@@ -41,7 +41,7 @@ public abstract class AssignmentNode extends ExpressionNode {
 		frame.setDouble(getSlot(), value);
 		return value;
 	}
-
+	
 	/**
 	 * guard functions
 	 */
