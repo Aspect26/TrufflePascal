@@ -47,6 +47,11 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
+import cz.cuni.mff.d3s.trupple.language.parser.types.EnumOrdinal;
+import cz.cuni.mff.d3s.trupple.language.parser.types.EnumType;
+import cz.cuni.mff.d3s.trupple.language.parser.types.ICustomType;
+import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
+import cz.cuni.mff.d3s.trupple.language.parser.types.SimpleOrdinal;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
 
@@ -112,7 +117,7 @@ public class NodeFactory {
 			if(customTypes.containsKey(identifier))
 				return identifier;
 
-			customTypes.put(identifier, new ICustomType.EnumType(identifier, identifiers, global));
+			customTypes.put(identifier, new EnumType(identifier, identifiers, global));
 			locals.put(identifier, frameDescriptor.addFrameSlot(identifier));
 			
 			for(String value : identifiers){
@@ -120,6 +125,19 @@ public class NodeFactory {
 					return value;
 				
 				locals.put(value, null);
+			}
+			
+			return null;
+		}
+		
+		public EnumType getEnumType(String identifier) {
+			LexicalScope ls = this;
+			while(ls != null) {
+				ICustomType customType = customTypes.get(identifier);
+				if(customType != null && customType instanceof EnumType)
+					return (EnumType) customType;
+				
+				ls = ls.outer;
 			}
 			
 			return null;
@@ -231,6 +249,34 @@ public class NodeFactory {
 				if(isCustomType){
 					ls.addCustomTypeVariable(identifier, variableType.val.toLowerCase());
 				}
+			} catch (IllegalArgumentException e) {
+				parser.SemErr("Duplicate variable: " + identifier + ".");
+				continue;
+			}
+		}
+	}
+	
+	public void finishArrayDefinition(List<String> identifiers, IOrdinalType ordinalRange, Token returnTypeToken) {
+		String returnType = returnTypeToken.val.toLowerCase();
+		FrameSlotKind slotKind = getSlotByTypeName(returnType);
+		
+		if (slotKind == FrameSlotKind.Illegal) {
+			parser.SemErr("Unkown variable type: " + returnType);
+		}
+		
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		boolean isCustomType = slotKind == FrameSlotKind.Object;
+		if(isCustomType)
+			slotKind = FrameSlotKind.Long;
+		
+		for (String identifier : identifiers) {
+			try {
+				FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(identifier, slotKind);
+				ls.locals.put(identifier, newSlot);
+				if(isCustomType){
+					ls.addCustomTypeVariable(identifier, returnType);
+				}
+				ls.context.registerArray(identifier, ordinalRange);
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
 				continue;
@@ -355,6 +401,44 @@ public class NodeFactory {
 			ls.locals.put(param.identifier, newSlot);
 			ls.scopeNodes.add(assignment);
 		}
+	}
+	
+	public IOrdinalType createSimpleOrdinal(Token lowerBound, Token upperBound) {
+		final int firstIndex = Integer.parseInt(lowerBound.val);
+		final int lastIndex = Integer.parseInt(upperBound.val);
+		final int size = lastIndex - firstIndex;
+		
+		if(size == 0) {
+			parser.SemErr("Zero size range given.");
+			return null;
+		}
+		
+		if(size < 0) {
+			parser.SemErr("Greater lower bound then upper bound.");
+			return null;
+		}
+		
+		return new SimpleOrdinal(firstIndex, size, IOrdinalType.Type.INTEGER);
+	}
+	
+	public IOrdinalType createSimpleOrdinal(Token name){
+		String identifier = name.val.toLowerCase();
+		
+		// TODO: is it good to be hardcoded?
+		switch(identifier) {
+			case "boolean": return new SimpleOrdinal(0, 2, IOrdinalType.Type.BOOLEAN);
+			case "char": return new SimpleOrdinal(0, 256, IOrdinalType.Type.CHAR);
+		}
+		
+		// search in custom defined enums
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		EnumType enumType = ls.getEnumType(identifier);
+		if(enumType == null) {
+			parser.SemErr("Unknown enumerable type " + identifier + ".");
+			return null;
+		}
+		
+		return new EnumOrdinal(enumType);
 	}
 
 	public void startMainFunction() {

@@ -2,17 +2,20 @@ package cz.cuni.mff.d3s.trupple.language.runtime;
 
 import java.io.BufferedReader;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.oracle.truffle.api.ExecutionContext;
 import com.oracle.truffle.api.TruffleLanguage;
 
+import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
+
 public final class PascalContext extends ExecutionContext {
+	
+	// GENERIC 
 	private final BufferedReader input;
 	private final PrintStream output;
-	// private final TruffleLanguage.Env env;
-	
-	private final PascalFunctionRegistry globalFunctionRegistry;
-	private final PascalFunctionRegistry privateFunctionRegistry;
 	private final PascalContext outerContext;
 	
 	public PascalContext(PascalContext outerContext) {
@@ -23,11 +26,15 @@ public final class PascalContext extends ExecutionContext {
 		this.input = input;
 		this.output = output;
 		this.outerContext = outerContext;
-		// this.env = env;
 		
 		this.globalFunctionRegistry = new PascalFunctionRegistry(this, true);
 		this.privateFunctionRegistry = new PascalFunctionRegistry(this, false);
 	}
+	
+	
+	// FUNCTIONS
+	private final PascalFunctionRegistry globalFunctionRegistry;
+	private final PascalFunctionRegistry privateFunctionRegistry;
 	
 	public boolean containsParameterlessSubroutine(String identifier){
 		PascalContext context = this;
@@ -82,5 +89,24 @@ public final class PascalContext extends ExecutionContext {
 	public boolean containsIdentifier(String identifier){
 		return globalFunctionRegistry.lookup(identifier) != null ||
 				privateFunctionRegistry.lookup(identifier) != null;
+	}
+	
+	// ARRAYS
+	private class ArrayInfo {
+		public final Object[] array;
+		public final IOrdinalType ordinal;
+		private final int offset;
+		
+		public ArrayInfo(IOrdinalType ordinal) {
+			this.ordinal = ordinal;
+			this.offset = ordinal.getFirstIndex();
+			this.array = new Object[ordinal.getSize()];
+		}
+	}
+	
+	private Map<String, ArrayInfo> arrays = new HashMap<>();
+	
+	public void registerArray(String identifier, IOrdinalType ordinal) {
+		arrays.put(identifier, new ArrayInfo(ordinal));
 	}
 }

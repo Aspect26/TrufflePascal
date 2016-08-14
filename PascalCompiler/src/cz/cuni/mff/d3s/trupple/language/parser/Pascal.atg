@@ -142,8 +142,33 @@ identifier                                      (. identifiers.add(t.val.toLower
     identifier                                  (. identifiers.add(t.val.toLowerCase()); .)
 }
 ":"
-identifier                                      (. factory.finishVariableLineDefinition(identifiers, t); .) 
+(
+	identifier                                  (. factory.finishVariableLineDefinition(identifiers, t); .) 
+|
+	"array"										
+	"["
+	Ordinal<out IOrdinalType ordinal>
+	"]"
+	"of"
+	identifier									(. factory.finishArrayDefinition(identifiers, ordinal, t); .)
+)
 .
+
+
+
+Ordinal<out IOrdinalType ordinal>
+=												(. ordinal = null; .)
+(												
+	numericLiteral								(. Token lowerBound = t; .)
+	".."
+	numericLiteral								(. Token upperBound = t; .)
+												(. ordinal = factory.createSimpleOrdinal(lowerBound, upperBound); .)
+|
+	identifier									(. Token identifier = t; .)
+												(. ordinal = factory.createSimpleOrdinal(identifier); .)
+)
+.
+
 
 
 Subroutine

@@ -18,14 +18,17 @@ import cz.cuni.mff.d3s.trupple.language.parser.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 /*
- * QUSTIONS LIST how to use Graal integer range check (ako riesit unsigned ??)
+ * QUSTIONS LIST 
+ * how to use Graal
+ * unit - support for initialization and finalization section ?? (v tp nie je, vo freepas je)
+ *  
  * 
  * TODO LIST
  *
  * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (assignment, operations, if condition, enum)
  * READ / READLN
  * PREDAVANIE REFERENCIOU
- * GOTO
+ * GOTO (PROBLEM)
  * ARRAY
  * CONSTANTS
  * RECORD
@@ -33,25 +36,21 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * POINTERS
  * CRT, GRAPH, STRING, DOS
  * 
- * ReadArgumentNode -> Object[] -> no specialization 
  * ' in string 
  * unit - variables declared only in IMPLEMENTATION section are visible from the outside 
- * unit - support for initialization and finalization section
  * subroutines - support nested subroutines
- * parsovanie vstupnych parametrov -> kniznica nejaka
- * break nie je v std (treba prepinac --std=turbo)
- * poriesit prepinac -I (nech funguje podobne ako v gcc (neimportuje subor ale dir, v ktorom ma hladat 
- * 	  kniznice importovane zo zdrojaku)
- * predavanie premennych referenciou
  * private/global variables
+ * break nie je v std (treba prepinac --std=turbo)
  *  
  * LATEST CHANGELOG:
  * support enums
  * support not statement
  * else vetva v case
  * private/public methods in units
- * support parameterless subroutine calls without parenteses
+ * support parameterless subroutine calls without parenthesses
  * make for loop execute limiting expression only once
+ * added args4j library
+ * -I option syntax changed to gcc-like
  */
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.7", mimeType = "text/x-pascal")
