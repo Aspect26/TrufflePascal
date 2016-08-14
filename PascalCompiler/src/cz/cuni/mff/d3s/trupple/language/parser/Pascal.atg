@@ -527,16 +527,38 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
                                                 (.          SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); .)
                                                 (. } .)
 |
-	"["
-	(
-		IF(!isSingleIdentifier())
-		Expression<out ExpressionNode indexNode>(.  expression = factory.createReadArrayValue(identifierName, indexNode); .)
-	|
-		identifier								(. expression = factory.createReadArrayValue(identifierName, t); .)
-	)
-	"]"
+	ArrayAccessing<out expression, identifierName>
 )
 .
+
+
+
+ArrayAccessing<out ExpressionNode expression, Token identifierName>
+=												(. expression = null; .)
+"["
+	ArrayIndex<out ExpressionNode indexingNode, identifierName>
+"]"
+(
+												(. expression = factory.createReadArrayValue(identifierName, indexingNode); .)
+|
+	":="
+	Expression<out ExpressionNode value>		(. expression = factory.createArrayIndexAssignment( .)
+												(.		identifierName, indexingNode, value); .)
+)
+.
+
+
+
+ArrayIndex<out ExpressionNode indexingNode, Token identifierName>
+=												(. indexingNode = null; .)
+(
+	IF(!isSingleIdentifier())
+	Expression<out ExpressionNode indexNode>	(. indexingNode = indexNode; .)
+|
+	identifier									(. indexingNode = factory.createIndexingNode(t); .)
+)
+.
+
 
 
 

@@ -45,4 +45,33 @@ public class ArrayTest extends UnitTest {
 		
 		test(code, "falsefalse");
 	}
+	
+	@Test
+	public void simpleEnumAccess(){
+		String code = 
+				"type e = (r,g,b);" +
+				"var a:array[e] of boolean;" + 
+				"begin" + 
+				" write(a[r]);" +
+				" write(a[b]); " +
+				"end.";
+		
+		test(code, "falsefalse");
+	}
+	
+	@Test
+	public void assignmentTest(){
+		String code =
+				"type e = (red,green,blue);"+
+				"var a:array[e] of integer;"+
+
+				"begin"+
+				" a[blue] := 5;"+
+				" a[green] := 8;"+
+				" write(a[blue]);"+
+				" write(a[green]);"+
+				"end.";
+		
+		test(code, "58");
+	}
 }

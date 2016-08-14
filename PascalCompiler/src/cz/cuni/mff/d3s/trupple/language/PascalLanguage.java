@@ -29,7 +29,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * READ / READLN
  * PREDAVANIE REFERENCIOU
  * GOTO (PROBLEM)
- * ARRAY
  * CONSTANTS
  * RECORD
  * FILES
@@ -41,8 +40,13 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * subroutines - support nested subroutines
  * private/global variables
  * break nie je v std (treba prepinac --std=turbo)
+ * array v unite
+ * !premenit enum na FrameSlot.Object namiesto vlastnych premennych v contexte
+ * !assigning array
+ * !multidimensional array
  *  
  * LATEST CHANGELOG:
+ * support arrays
  * support enums
  * support not statement
  * else vetva v case

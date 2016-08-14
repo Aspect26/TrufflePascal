@@ -753,17 +753,39 @@ public class Parser{
 			SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); 
 			} 
 		} else if (la.kind == 18) {
+			expression = ArrayAccessing(identifierName);
+		} else SynErr(72);
+		return expression;
+	}
+
+	ExpressionNode  ArrayAccessing(Token identifierName) {
+		ExpressionNode  expression;
+		expression = null; 
+		Expect(18);
+		ExpressionNode indexingNode = ArrayIndex(identifierName);
+		Expect(19);
+		if (StartOf(8)) {
+			expression = factory.createReadArrayValue(identifierName, indexingNode); 
+		} else if (la.kind == 31) {
 			Get();
-			if (!isSingleIdentifier()) {
-				ExpressionNode indexNode = Expression();
-				expression = factory.createReadArrayValue(identifierName, indexNode); 
-			} else if (la.kind == 1) {
-				Get();
-				expression = factory.createReadArrayValue(identifierName, t); 
-			} else SynErr(72);
-			Expect(19);
+			ExpressionNode value = Expression();
+			expression = factory.createArrayIndexAssignment( 
+					identifierName, indexingNode, value); 
 		} else SynErr(73);
 		return expression;
+	}
+
+	ExpressionNode  ArrayIndex(Token identifierName) {
+		ExpressionNode  indexingNode;
+		indexingNode = null; 
+		if (!isSingleIdentifier()) {
+			ExpressionNode indexNode = Expression();
+			indexingNode = indexNode; 
+		} else if (la.kind == 1) {
+			Get();
+			indexingNode = factory.createIndexingNode(t); 
+		} else SynErr(74);
+		return indexingNode;
 	}
 
 	void InterfaceSection() {
@@ -842,7 +864,7 @@ public class Parser{
 			formalParameter = IValueParameter();
 		} else if (la.kind == 15) {
 			formalParameter = IVariableParameter();
-		} else SynErr(74);
+		} else SynErr(75);
 		return formalParameter;
 	}
 
@@ -1038,8 +1060,9 @@ class Errors {
 			case 70: s = "invalid Factor"; break;
 			case 71: s = "invalid Factor"; break;
 			case 72: s = "invalid MemberExpression"; break;
-			case 73: s = "invalid MemberExpression"; break;
-			case 74: s = "invalid IFormalParameter"; break;
+			case 73: s = "invalid ArrayAccessing"; break;
+			case 74: s = "invalid ArrayIndex"; break;
+			case 75: s = "invalid IFormalParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

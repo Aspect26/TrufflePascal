@@ -45,6 +45,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.ArrayIndexAssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayEnumIndexNodeGen;
@@ -530,9 +531,14 @@ public class NodeFactory {
 		return ReadArrayIndexNodeGen.create(indexNode, ls.locals.get(identifier.val.toLowerCase()));
 	}
 	
-	public ExpressionNode createReadArrayValue(Token identifier, Token indexIdentifier) {
+	public ExpressionNode createIndexingNode(Token identifier) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return ReadArrayEnumIndexNodeGen.create(indexIdentifier.val.toLowerCase(), ls.locals.get(identifier.val.toLowerCase()));
+		return new StringLiteralNode(identifier.val.toLowerCase());
+	}
+	
+	public ExpressionNode createArrayIndexAssignment(Token name, ExpressionNode indexNode, ExpressionNode valueNode) {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return new ArrayIndexAssignmentNode(ls.locals.get(name.val.toLowerCase()), indexNode, valueNode);
 	}
 
 	public ExpressionNode readSingleIdentifier(Token nameToken) {

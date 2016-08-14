@@ -79,22 +79,11 @@ public class PascalArray {
 	
 	public Object getValueAt(Object index) {
 		int realIndex = 0;
-		
-		Type type = this.sourceOrdinal.getType();
-		if(type == Type.NUMERIC) {
-			//TODO: thisssssss casssssstsssssss :'(
-			realIndex = (int)((Long)index - offset);
-		}
-		else if(type == Type.BOOLEAN) {
-			realIndex = ((Boolean)index)? 1 : 0;
-		}
-		else if(type == Type.CHAR) {
-			realIndex = (Character)index;
-		}
-		else if(type == Type.ENUM) {
-			realIndex = sourceOrdinal.getRealIndex(index);
-		}
 		realIndex = sourceOrdinal.getRealIndex(index);
 		return array[realIndex];
+	}
+	
+	public void setValueAt(Object index, Object value) {
+		array[sourceOrdinal.getRealIndex(index)] = value;
 	}
 }
