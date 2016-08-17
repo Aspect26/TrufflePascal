@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.tests;
 
 import org.junit.Test;
 
-public class LogicNegationTest extends UnitTest {
+public class LogicNegationTest extends JUnitTest {
 
 	@Test
 	public void simple() {

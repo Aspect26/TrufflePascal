@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.tests;
 
 import org.junit.Test;
 
-public class IfTest extends UnitTest {
+public class IfTest extends JUnitTest {
 
 	@Test
 	public void ifTrueTest() {

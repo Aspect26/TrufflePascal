@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.tests;
 
 import org.junit.Test;
 
-public class SubroutinesTest extends UnitTest {
+public class SubroutinesTest extends JUnitTest {
 
 	@Test
 	public void simpleProcedureTest(){

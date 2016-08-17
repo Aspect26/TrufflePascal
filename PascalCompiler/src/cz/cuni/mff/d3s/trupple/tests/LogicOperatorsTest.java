@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.tests;
 
 import org.junit.Test;
 
-public class LogicOperatorsTest extends UnitTest {
+public class LogicOperatorsTest extends JUnitTest {
 
 	@Test
 	public void greaterThanTest() {

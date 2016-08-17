@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.tests;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -12,7 +13,7 @@ import org.junit.Before;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 
-public abstract class UnitTest {
+public abstract class JUnitTest {
 
 	protected ByteArrayOutputStream output;
 	protected ByteArrayOutputStream error;
@@ -46,6 +47,6 @@ public abstract class UnitTest {
 	protected void test(String sourceCode, List<String> imports, String codeDecription, String expectedOutput) {
 		setUpStreams();
 		PascalLanguage.startFromCodes(sourceCode, imports, codeDecription);
-		assertTrue(output.toString().equals(expectedOutput));
+		assertEquals(output.toString(), expectedOutput);
 	}
 }

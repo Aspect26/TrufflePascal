@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.tests;
 
 import org.junit.Test;
 
-public class ArithmeticTest extends UnitTest {
+public class ArithmeticTest extends JUnitTest {
 
 	@Test
 	public void plusTest() {

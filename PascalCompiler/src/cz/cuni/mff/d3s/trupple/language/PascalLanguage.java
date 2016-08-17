@@ -41,13 +41,22 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * private/global variables
  * break nie je v std (treba prepinac --std=turbo)
  * array v unite
+ * enum v unite
+ * array of array of array...
+ * packed array
  * !premenit enum na FrameSlot.Object namiesto vlastnych premennych v contexte
  * !assigning array
  * !multidimensional array
  *  
- * LATEST CHANGELOG:
+ * CHANGELOG:
+ * v0.8
+ * Break now throws ControlFlowException (instead of PascalRuntimeException) so Graal doesn't deoptimize the code
+ * Unit tests now use assertEquals instead of assertTrue
+ * 
+ * v0.7
  * support arrays
  * support enums
+ * added JUnit tests
  * support not statement
  * else vetva v case
  * private/public methods in units

@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.tests;
 
 import org.junit.Test;
 
-public class EnumTest extends UnitTest {
+public class EnumTest extends JUnitTest {
 
 	@Test
 	public void simpleEnum() {

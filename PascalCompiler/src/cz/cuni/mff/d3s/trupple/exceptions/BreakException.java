@@ -1,6 +1,8 @@
 package cz.cuni.mff.d3s.trupple.exceptions;
 
-public class BreakException extends PascalRuntimeException {
+import com.oracle.truffle.api.nodes.ControlFlowException;
+
+public class BreakException extends ControlFlowException {
 
 	private static final long serialVersionUID = 1461738434684232542L;
 

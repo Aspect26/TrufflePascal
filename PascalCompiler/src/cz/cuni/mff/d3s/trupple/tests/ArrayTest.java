@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.tests;
 
 import org.junit.Test;
 
-public class ArrayTest extends UnitTest {
+public class ArrayTest extends JUnitTest {
 	
 	@Test
 	public void verySimple(){
