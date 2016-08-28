@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.trupple.tests;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
@@ -29,11 +28,11 @@ public abstract class JUnitTest {
 
 	@After
 	public void cleanUpStreams() {
-		System.setOut(null);
+		/*System.setOut(null);
 		System.setErr(null);
 
 		output = null;
-		error = null;
+		error = null;*/
 	}
 
 	protected void test(String sourceCode, String expectedOutput) {
@@ -48,5 +47,6 @@ public abstract class JUnitTest {
 		setUpStreams();
 		PascalLanguage.startFromCodes(sourceCode, imports, codeDecription);
 		assertEquals(output.toString(), expectedOutput);
+		cleanUpStreams();
 	}
 }

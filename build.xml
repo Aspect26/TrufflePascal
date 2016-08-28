@@ -5,7 +5,8 @@
     <property name="src.dir" value="PascalCompiler/src/"/>
     <property name="srcgen.dir" value="PascalCompiler/src_gen"/>
     <property name="lib.dir" value="PascalCompiler/lib" />
-    <property name="build.dir" value="Trupple" />
+    <property name="build.dir" value="build" />
+    <property name="reports.dir" value="${build.dir}/junit-report" />
     
     <target name="info">
         <echo> 
@@ -42,4 +43,50 @@
         </jar>
     </target>
 
+    <target name="build-with-tests" description="Compiles all Trupple sources including test cases">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.8" target="1.8">
+            <classpath>
+                <pathelement path="${lib.dir}/truffle.jar"/>
+                <pathelement path="${lib.dir}/args4j-2.33.jar"/>
+                <pathelement path="${lib.dir}/junit-4.11.jar" />
+                <pathelement path="${lib.dir}/hamcrest-all-1.3.jar" />
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="unit-tests" depends="build-with-tests">
+        <mkdir dir="${reports.dir}" />
+
+        <junit printsummary="yes">
+            <formatter type="xml"/>
+
+            <classpath>
+                <pathelement path="${lib.dir}/junit-4.11.jar" />
+                <pathelement path="${lib.dir}/truffle.jar"/>
+                <pathelement path="${lib.dir}/args4j-2.33.jar"/>
+                <pathelement path="${lib.dir}/hamcrest-all-1.3.jar" />
+                <pathelement path="${build.dir}"/>
+                <pathelement path="/" />
+            </classpath>
+
+            <batchtest todir="${reports.dir}">
+                <fileset dir="${build.dir}" >
+                    <include name="**/*Test*.class" />
+                    <exclude name="**/TestAll.class" />
+                    <exclude name="**/JUnitTest.class" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <junitreport todir="${reports.dir}">
+            <fileset dir="${reports.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+    
+            <report todir="${reports.dir}/html"  format="frames">
+            </report>
+        </junitreport>
+
+    </target>  
 </project> 
