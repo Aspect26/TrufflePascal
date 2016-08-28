@@ -32,12 +32,15 @@
     </target>
 
     <target name="make" depends="build" description="Create executable jar file">
-        <jar destfile="${build.dir}/Trupple.jar"
+        <jar destfile="Trupple.jar"
              basedir="${build.dir}">
 
+            <zipgroupfileset dir="${lib.dir}">
+			    <include name="**/*.jar" />
+		    </zipgroupfileset>
 
             <manifest>
-                <attribute name="Main-Class" value="pascal.compiler.CompilerMain"/>
+                <attribute name="Main-Class" value="cz.cuni.mff.d3s.trupple.compiler.CompilerMain"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
         </jar>

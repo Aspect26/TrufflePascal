@@ -45,7 +45,7 @@ public class CompilerMain {
 		try {
 			parser.parseArgument(args);
 			
-			if(settings.arguments.size() == 0)
+			if(settings.arguments == null || settings.arguments.size() == 0)
                 throw new CmdLineException("You must specify a source file.");
 			
 			settings.sourcePath = settings.arguments.get(settings.arguments.size()-1);
@@ -54,6 +54,7 @@ public class CompilerMain {
             System.err.println("java -jar Trupple.jar [options...] sourcefile");
             parser.printUsage(System.err);
             System.err.println();
+            return;
 		}
 		
 		if (!(new File(settings.sourcePath).exists())) {
