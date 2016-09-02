@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.parser.types;
+package cz.cuni.mff.d3s.trupple.language.customtypes;
 
 import java.util.HashMap;
 import java.util.List;

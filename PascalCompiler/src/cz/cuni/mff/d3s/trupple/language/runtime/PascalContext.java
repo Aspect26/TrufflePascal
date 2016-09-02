@@ -9,7 +9,7 @@ import java.util.Map;
 import com.oracle.truffle.api.ExecutionContext;
 import com.oracle.truffle.api.TruffleLanguage;
 
-import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
+import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 
 public final class PascalContext extends ExecutionContext {
 	

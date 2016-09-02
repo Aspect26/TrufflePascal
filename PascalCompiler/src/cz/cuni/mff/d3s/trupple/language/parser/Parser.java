@@ -1,9 +1,9 @@
 
 package cz.cuni.mff.d3s.trupple.language.parser;
 
+import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
 
 import com.oracle.truffle.api.source.Source;
 

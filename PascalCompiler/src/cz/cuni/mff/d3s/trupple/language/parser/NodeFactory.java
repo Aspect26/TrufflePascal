@@ -9,6 +9,11 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
+import cz.cuni.mff.d3s.trupple.language.customtypes.EnumOrdinal;
+import cz.cuni.mff.d3s.trupple.language.customtypes.EnumType;
+import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
+import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
+import cz.cuni.mff.d3s.trupple.language.customtypes.SimpleOrdinal;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
@@ -52,11 +57,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
-import cz.cuni.mff.d3s.trupple.language.parser.types.EnumOrdinal;
-import cz.cuni.mff.d3s.trupple.language.parser.types.EnumType;
-import cz.cuni.mff.d3s.trupple.language.parser.types.ICustomType;
-import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
-import cz.cuni.mff.d3s.trupple.language.parser.types.SimpleOrdinal;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
 

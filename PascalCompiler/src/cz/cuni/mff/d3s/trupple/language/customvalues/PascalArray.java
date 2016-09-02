@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
-import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
+import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 
 public class PascalArray implements ICustomValue {
 	private final Object[] array;
