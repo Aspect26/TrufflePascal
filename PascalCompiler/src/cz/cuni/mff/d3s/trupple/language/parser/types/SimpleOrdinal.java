@@ -1,7 +1,5 @@
 package cz.cuni.mff.d3s.trupple.language.parser.types;
 
-import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType.Type;
-
 public class SimpleOrdinal implements IOrdinalType {
 
 	private final int firstIndex;

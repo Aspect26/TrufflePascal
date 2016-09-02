@@ -9,6 +9,8 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNode;
@@ -48,8 +50,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ArrayIndexAssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayEnumIndexNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
 import cz.cuni.mff.d3s.trupple.language.parser.types.EnumOrdinal;
@@ -59,20 +59,23 @@ import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
 import cz.cuni.mff.d3s.trupple.language.parser.types.SimpleOrdinal;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
-import cz.cuni.mff.d3s.trupple.language.types.PascalArray;
 
 public class NodeFactory {
 
+	// todo: pls move this to its own class
 	static class LexicalScope {
 		protected final LexicalScope outer;
-		protected final Map<String, FrameSlot> locals;
+		protected final Map<String, FrameSlot> localIdentifiers;
 		protected final Map<String, Constant> constants;
 		protected final String name;
 		protected final PascalContext context;
-		
 		protected final Map<String, ICustomType> customTypes = new HashMap<>();
-		protected final Map<String, String> variablesOfCustomType = new HashMap<>();
-
+		
+		/* List of initialization nodes (variables like array and enums are represented as Objects
+		 * (duh) and they need to be initialized otherwise their value would be null)
+		 */
+		public final List<StatementNode> initializationNodes;
+		
 		public FrameDescriptor frameDescriptor;
 		public List<StatementNode> scopeNodes = new ArrayList<>();
 		public FrameSlot returnSlot = null;
@@ -80,12 +83,13 @@ public class NodeFactory {
 		LexicalScope(LexicalScope outer, String name) {
 			this.name = name;
 			this.outer = outer;
-			this.locals = new HashMap<>();
+			this.localIdentifiers = new HashMap<>();
 			this.constants = new HashMap<>();
 			this.frameDescriptor = new FrameDescriptor();
+			this.initializationNodes = new ArrayList<>();
 			
 			if (outer != null) {
-				locals.putAll(outer.locals);
+				localIdentifiers.putAll(outer.localIdentifiers);
 				this.context = new PascalContext(outer.context);
 			}
 			else{
@@ -106,31 +110,30 @@ public class NodeFactory {
 			return false;
 		}
 		
-		public long getCustomValue(String identifier){
-			for(ICustomType custom : customTypes.values()){
-				if(custom.containsCustomValue(identifier))
-					return custom.getCustomValue(identifier);
-			}
-			
-			return 0;
-		}
-		
-		public void addCustomTypeVariable(String identifier, String type){
-			this.variablesOfCustomType.put(identifier, type);
-		}
-		
+		/**
+		 * Registers a new identifier. 
+		 * @param identifier
+		 * @param identifiers
+		 * @param global
+		 * @return null if successful or name of already existing identifier.
+ 		 */
 		public String registerEnumType(String identifier, List<String> identifiers, boolean global){
 			if(customTypes.containsKey(identifier))
 				return identifier;
 
-			customTypes.put(identifier, new EnumType(identifier, identifiers, global));
-			locals.put(identifier, frameDescriptor.addFrameSlot(identifier));
+			EnumType enumType = new EnumType(identifier, identifiers, global);
+			customTypes.put(identifier, enumType);
+			localIdentifiers.put(identifier, frameDescriptor.addFrameSlot(identifier));
 			
-			for(String value : identifiers){
-				if(locals.containsKey(value))
-					return value;
+			for(String elementIdentifier : identifiers){
+				if(localIdentifiers.containsKey(elementIdentifier)) {
+					return elementIdentifier;
+				}
+				FrameSlot slot = this.frameDescriptor.addFrameSlot(elementIdentifier, FrameSlotKind.Object);
+				this.initializationNodes.add(new InitializationNode(slot, 
+						new EnumValue(enumType, enumType.getFirstIndex())));
 				
-				locals.put(value, null);
+				localIdentifiers.put(elementIdentifier, null);
 			}
 			
 			return null;
@@ -181,7 +184,7 @@ public class NodeFactory {
 	private LexicalScope lexicalScope;
 
 	/* State while parsing case statement */
-	// --> TODO: this causes to be enable to create nested cases....
+	// --> TODO: this causes to be unable to create nested cases....
 	private List<ExpressionNode> caseExpressions;
 	private List<StatementNode> caseStatements;
 	private StatementNode caseElse;
@@ -189,19 +192,12 @@ public class NodeFactory {
 	/* List of units found in sources given (name -> function registry) */
 	private Map<String, Unit> units = new HashMap<>();
 	private Unit currentUnit = null;
-	
-	/* List of initialization nodes (variables like array and enums are represented as Objects
-	 * (duh) and they need to be initialized otherwise their value would be null)
-	 */
-	private final List<StatementNode> initializationNodes;
 
 	public NodeFactory(Parser parser) {
 		this.parser = parser;
 
 		this.lexicalScope = new LexicalScope(null, null);
 		this.lexicalScope.frameDescriptor = new FrameDescriptor();
-		
-		this.initializationNodes = new ArrayList<>();
 	}
 
 	private FrameSlotKind getSlotByTypeName(String type) {
@@ -245,23 +241,22 @@ public class NodeFactory {
 	}
 
 	public void finishVariableLineDefinition(List<String> identifiers, Token variableType) {
-		FrameSlotKind slotKind = getSlotByTypeName(variableType.val.toLowerCase());
-
+		String typeName = variableType.val.toLowerCase();
+		FrameSlotKind slotKind = getSlotByTypeName(typeName);
+		
 		if (slotKind == FrameSlotKind.Illegal) {
-			parser.SemErr("Unkown variable type: " + variableType.val);
+			parser.SemErr("Unkown variable type: " + typeName);
 		}
-
+		
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		boolean isCustomType = slotKind == FrameSlotKind.Object;
-		if(isCustomType)
-			slotKind = FrameSlotKind.Long;
+		EnumType enumType = ls.getEnumType(typeName);
 		
 		for (String identifier : identifiers) {
 			try {
 				FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(identifier, slotKind);
-				ls.locals.put(identifier, newSlot);
-				if(isCustomType){
-					ls.addCustomTypeVariable(identifier, variableType.val.toLowerCase());
+				ls.localIdentifiers.put(identifier, newSlot);
+				if (enumType != null) {
+					ls.initializationNodes.add(new InitializationNode(newSlot, new EnumValue(enumType)));
 				}
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
@@ -271,15 +266,15 @@ public class NodeFactory {
 	}
 	
 	public void finishArrayDefinition(List<String> identifiers, IOrdinalType ordinalRange, Token returnTypeToken) {
-		//TODO: this!
+		//TODO: this! -> arrays in units
 		if(currentUnit != null)
 			return;
 		
 		for(String identifier : identifiers) {
 			try {
 				FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, FrameSlotKind.Object);
-				lexicalScope.locals.put(identifier, newSlot);
-				this.initializationNodes.add(new InitializationNode(newSlot, new PascalArray(
+				lexicalScope.localIdentifiers.put(identifier, newSlot);
+				this.lexicalScope.initializationNodes.add(new InitializationNode(newSlot, new PascalArray(
 						returnTypeToken.val.toLowerCase(), ordinalRange
 						)));
 			} catch (IllegalArgumentException e) {
@@ -325,7 +320,7 @@ public class NodeFactory {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 
 		ls.returnSlot = ls.frameDescriptor.addFrameSlot(ls.name, getSlotByTypeName(type.val));
-		ls.locals.put(ls.name, ls.returnSlot);
+		ls.localIdentifiers.put(ls.name, ls.returnSlot);
 	}
 
 	public void finishFunction(StatementNode bodyNode) {
@@ -403,7 +398,7 @@ public class NodeFactory {
 			final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(ls.scopeNodes.size(), slotKind);
 			FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(param.identifier, slotKind);
 			final AssignmentNode assignment = AssignmentNodeGen.create(readNode, newSlot);
-			ls.locals.put(param.identifier, newSlot);
+			ls.localIdentifiers.put(param.identifier, newSlot);
 			ls.scopeNodes.add(assignment);
 		}
 	}
@@ -421,16 +416,17 @@ public class NodeFactory {
 		return new SimpleOrdinal(firstIndex, size, IOrdinalType.Type.NUMERIC);
 	}
 	
-	public IOrdinalType createSimpleOrdinal(Token name){
+	public IOrdinalType createSimpleOrdinalFromTypename(Token name){
 		String identifier = name.val.toLowerCase();
 		
 		// TODO: is it good to be hardcoded?
+		// TODO: name constants
 		switch(identifier) {
 			case "boolean": return new SimpleOrdinal(0, 2, IOrdinalType.Type.BOOLEAN);
 			case "char": return new SimpleOrdinal(0, 256, IOrdinalType.Type.CHAR);
 		}
 		
-		// search in custom defined enums
+		// search in custom defined types (only enum currently)
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		EnumType enumType = ls.getEnumType(identifier);
 		if(enumType == null) {
@@ -445,6 +441,7 @@ public class NodeFactory {
 	}
 
 	public PascalRootNode finishMainFunction(StatementNode blockNode) {
+		List<StatementNode> initializationNodes = this.lexicalScope.initializationNodes;
 		initializationNodes.add(blockNode);
 		StatementNode mainNode = new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
 		return new PascalRootNode(lexicalScope.frameDescriptor, new ProcedureBodyNode(mainNode));
@@ -519,7 +516,7 @@ public class NodeFactory {
 			ExpressionNode finalValue, StatementNode loopBody) {
 
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		return new ForNode(ascending, ls.locals.get(variableToken.val.toLowerCase()), startValue, finalValue, loopBody);
+		return new ForNode(ascending, ls.localIdentifiers.get(variableToken.val.toLowerCase()), startValue, finalValue, loopBody);
 	}
 
 	public StatementNode createBreak() {
@@ -528,17 +525,16 @@ public class NodeFactory {
 	
 	public ExpressionNode createReadArrayValue(Token identifier, ExpressionNode indexNode) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return ReadArrayIndexNodeGen.create(indexNode, ls.locals.get(identifier.val.toLowerCase()));
+		return ReadArrayIndexNodeGen.create(indexNode, ls.localIdentifiers.get(identifier.val.toLowerCase()));
 	}
 	
 	public ExpressionNode createIndexingNode(Token identifier) {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		return new StringLiteralNode(identifier.val.toLowerCase());
 	}
 	
 	public ExpressionNode createArrayIndexAssignment(Token name, ExpressionNode indexNode, ExpressionNode valueNode) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return new ArrayIndexAssignmentNode(ls.locals.get(name.val.toLowerCase()), indexNode, valueNode);
+		return new ArrayIndexAssignmentNode(ls.localIdentifiers.get(name.val.toLowerCase()), indexNode, valueNode);
 	}
 
 	public ExpressionNode readSingleIdentifier(Token nameToken) {
@@ -549,21 +545,14 @@ public class NodeFactory {
 		if (frameSlot != null){
 			return ReadVariableNodeGen.create(frameSlot);
 		} else {
-			// secondly, try to return a custom value (enum or constant (constants are not currently supported although))
+			// secondly, try to create a procedure or function literal (with no arguments)
 			LexicalScope ls = (currentUnit==null)? lexicalScope : currentUnit.getLexicalScope();
-			
-			if(ls.containsCustomValue(identifier)) {
-				// TODO: for constants -> change this so it gets the type firtsly (it might not be long)
-				return new LongLiteralNode(ls.getCustomValue(identifier));
-			} else {
-				// finally, try to create a procedure or function literal (with no arguments)
-				if(ls.context.containsParameterlessSubroutine(identifier)) {
-					ExpressionNode literal = this.createFunctionNode(nameToken);
-					return this.createCall(literal, new ArrayList<>());
-				}
-				
-				return null;
+			if(ls.context.containsParameterlessSubroutine(identifier)) {
+				ExpressionNode literal = this.createFunctionNode(nameToken);
+				return this.createCall(literal, new ArrayList<>());
 			}
+				
+			return null;
 		}
 	}
 
@@ -578,7 +567,7 @@ public class NodeFactory {
 	public void createIntegerConstant(Token identifier, Token value) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 
-		ls.locals.put(identifier.val.toLowerCase(), null);
+		ls.localIdentifiers.put(identifier.val.toLowerCase(), null);
 		// ls.constants.put(identifier.val.toLowerCase(), new
 		// IntegerConstant(value.val.toLowerCase()));
 	}

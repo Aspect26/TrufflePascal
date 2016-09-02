@@ -3,6 +3,8 @@ package cz.cuni.mff.d3s.trupple.language;
 
 import com.oracle.truffle.api.dsl.GeneratedBy;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
@@ -90,6 +92,38 @@ public final class PascalTypesGen extends PascalTypes {
     public static PascalFunction expectPascalFunction(Object value) throws UnexpectedResultException {
         if (value instanceof PascalFunction) {
             return (PascalFunction) value;
+        }
+        throw new UnexpectedResultException(value);
+    }
+
+    public static boolean isEnumValue(Object value) {
+        return value instanceof EnumValue;
+    }
+
+    public static EnumValue asEnumValue(Object value) {
+        assert value instanceof EnumValue : "PascalTypesGen.asEnumValue: EnumValue expected";
+        return (EnumValue) value;
+    }
+
+    public static EnumValue expectEnumValue(Object value) throws UnexpectedResultException {
+        if (value instanceof EnumValue) {
+            return (EnumValue) value;
+        }
+        throw new UnexpectedResultException(value);
+    }
+
+    public static boolean isPascalArray(Object value) {
+        return value instanceof PascalArray;
+    }
+
+    public static PascalArray asPascalArray(Object value) {
+        assert value instanceof PascalArray : "PascalTypesGen.asPascalArray: PascalArray expected";
+        return (PascalArray) value;
+    }
+
+    public static PascalArray expectPascalArray(Object value) throws UnexpectedResultException {
+        if (value instanceof PascalArray) {
+            return (PascalArray) value;
         }
         throw new UnexpectedResultException(value);
     }

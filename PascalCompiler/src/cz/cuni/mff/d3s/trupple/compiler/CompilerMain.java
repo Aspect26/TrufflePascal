@@ -3,17 +3,12 @@ package cz.cuni.mff.d3s.trupple.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.OptionDef;
-import org.kohsuke.args4j.spi.OptionHandler;
-import org.kohsuke.args4j.spi.Parameters;
-import org.kohsuke.args4j.spi.Setter;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 
@@ -24,10 +19,10 @@ public class CompilerMain {
 	    public boolean verbose;
 		
 		@Option(name="-I",handler=ImportsOptionHandler.class,usage="specifies directories, where unit .tpa files are located")
-	    public List<String> imports;
+	    public List<String> imports = new ArrayList<>();
 		
 		@Argument
-		public List<String> arguments;
+		public List<String> arguments = new ArrayList<>();
 		
 		
 		public String sourcePath;
@@ -38,6 +33,7 @@ public class CompilerMain {
 	
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void start(String[] args) throws IOException{
 		
 		Settings settings = new Settings();

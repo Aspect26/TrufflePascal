@@ -9,11 +9,12 @@ public class EnumTest extends JUnitTest {
 		String code = 
 				"type Color = (red,green,blue);"+
 				"var c:Color;"+
-				"begin"+
+				"begin "+
 				"c:=red;"+
+				"write('asd');"+
 				"end.";
 
-		String output = "";
+		String output = "asd";
 		test(code, output);
 	}
 	
@@ -22,12 +23,31 @@ public class EnumTest extends JUnitTest {
 		String code = 
 				"type Color = (red,green,blue);"+
 				"var b,c:Color;"+
-				"begin"+
+				"begin "+
 				"c:=red;"+
-				"b:=c"+
+				"b:=c;"+
+				"write('asd');"+
 				"end.";
 
-		String output = "";
+		String output = "asd";
+		test(code, output);
+	}
+	
+	@Test
+	public void switchEnum() {
+		String code = 
+				"type Color = (red,green,blue);"+
+				"var b:Color;"+
+				"begin "+
+				"b:=green; "+
+				"case b of "+
+				" red: write('1651'); "+
+				" green: write('Luke Skywalker'); "+
+				" blue: write('onomatopoje'); "+
+				"end;"+
+				"end.";
+
+		String output = "Luke Skywalker";
 		test(code, output);
 	}
 }

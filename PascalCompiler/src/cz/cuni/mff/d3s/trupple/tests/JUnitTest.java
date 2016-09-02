@@ -7,7 +7,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
@@ -26,15 +25,6 @@ public abstract class JUnitTest {
 		System.setErr(new PrintStream(error));
 	}
 
-	@After
-	public void cleanUpStreams() {
-		/*System.setOut(null);
-		System.setErr(null);
-
-		output = null;
-		error = null;*/
-	}
-
 	protected void test(String sourceCode, String expectedOutput) {
 		test(sourceCode, "UnnamedTest", expectedOutput);
 	}
@@ -46,7 +36,6 @@ public abstract class JUnitTest {
 	protected void test(String sourceCode, List<String> imports, String codeDecription, String expectedOutput) {
 		setUpStreams();
 		PascalLanguage.startFromCodes(sourceCode, imports, codeDecription);
-		assertEquals(output.toString(), expectedOutput);
-		cleanUpStreams();
+		assertEquals(expectedOutput, output.toString() + error.toString());
 	}
 }

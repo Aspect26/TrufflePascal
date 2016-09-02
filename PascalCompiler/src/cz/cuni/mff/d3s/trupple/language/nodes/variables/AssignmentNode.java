@@ -6,8 +6,11 @@ import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeChild("valueNode")
@@ -42,9 +45,29 @@ public abstract class AssignmentNode extends ExpressionNode {
 		return value;
 	}
 	
+	@Specialization(guards = "isEnum(frame)")
+	protected Object writeChar(VirtualFrame frame, EnumValue value) {
+		try { 
+			if (((EnumValue)frame.getObject(getSlot())).getEnumType() != value.getEnumType()) {
+				throw new PascalRuntimeException("Wrong enum types assignment.");
+			}
+		} catch (FrameSlotTypeException e) {}
+		frame.setObject(getSlot(), value);
+		return value;
+	}
+	
 	/**
 	 * guard functions
 	 */
+	protected boolean isEnum(VirtualFrame frame) {
+		try {
+			Object obj = frame.getObject(getSlot());
+			return obj instanceof EnumValue;
+		} catch (FrameSlotTypeException e) {
+			return false;
+		}
+	}
+	
 	protected boolean isLongKind(VirtualFrame frame) {
 		return isKind(FrameSlotKind.Long);
 	}

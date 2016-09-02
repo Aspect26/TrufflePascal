@@ -5,10 +5,13 @@ import com.oracle.truffle.api.dsl.TypeCheck;
 import com.oracle.truffle.api.dsl.TypeSystem;
 import com.oracle.truffle.api.dsl.internal.DSLOptions;
 
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
-@TypeSystem({ long.class, boolean.class, char.class, double.class, PascalFunction.class, Null.class })
+@TypeSystem({ long.class, boolean.class, char.class, double.class, PascalFunction.class, EnumValue.class, PascalArray.class,
+	Null.class })
 @DSLOptions
 public class PascalTypes {
 

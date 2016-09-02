@@ -265,7 +265,7 @@ public class Parser{
 		} else if (la.kind == 1) {
 			Get();
 			Token identifier = t; 
-			ordinal = factory.createSimpleOrdinal(identifier); 
+			ordinal = factory.createSimpleOrdinalFromTypename(identifier); 
 		} else SynErr(64);
 		return ordinal;
 	}

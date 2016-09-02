@@ -165,7 +165,7 @@ Ordinal<out IOrdinalType ordinal>
 												(. ordinal = factory.createSimpleOrdinal(lowerBound, upperBound); .)
 |
 	identifier									(. Token identifier = t; .)
-												(. ordinal = factory.createSimpleOrdinal(identifier); .)
+												(. ordinal = factory.createSimpleOrdinalFromTypename(identifier); .)
 )
 .
 

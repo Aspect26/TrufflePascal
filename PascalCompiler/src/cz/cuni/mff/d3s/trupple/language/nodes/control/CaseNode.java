@@ -34,7 +34,9 @@ public class CaseNode extends StatementNode {
 				return;
 			}
 		}
-
-		elseBranch.executeVoid(frame);
+		
+		if (elseBranch != null) {
+			elseBranch.executeVoid(frame);
+		}
 	}
 }

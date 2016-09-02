@@ -13,6 +13,7 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(AssignmentNode.class)
@@ -152,6 +153,12 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
                 if ((root.isDoubleKind((VirtualFrame) frameValue))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return WriteChar1Node_.create(root);
+                }
+            }
+            if (valueNodeValue instanceof EnumValue) {
+                if ((root.isEnum((VirtualFrame) frameValue))) {
+                    CompilerDirectives.transferToInterpreterAndInvalidate();
+                    return WriteChar2Node_.create(root);
                 }
             }
             return null;
@@ -400,6 +407,29 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
 
         static BaseNode_ create(AssignmentNodeGen root) {
             return new WriteChar1Node_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "writeChar(VirtualFrame, EnumValue)", value = AssignmentNode.class)
+    private static final class WriteChar2Node_ extends BaseNode_ {
+
+        WriteChar2Node_(AssignmentNodeGen root) {
+            super(root, 5);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof EnumValue) {
+                EnumValue valueNodeValue_ = (EnumValue) valueNodeValue;
+                if ((root.isEnum(frameValue))) {
+                    return root.writeChar(frameValue, valueNodeValue_);
+                }
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new WriteChar2Node_(root);
         }
 
     }

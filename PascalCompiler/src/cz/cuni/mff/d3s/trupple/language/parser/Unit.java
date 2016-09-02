@@ -41,7 +41,7 @@ public class Unit {
 
 	public void addVariable(String identifier, FrameSlotKind slotKind) {
 		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
-		lexicalScope.locals.put(identifier, newSlot);
+		lexicalScope.localIdentifiers.put(identifier, newSlot);
 	}
 
 	public boolean addProcedureInterface(String name, List<VariableDeclaration> parameters) {

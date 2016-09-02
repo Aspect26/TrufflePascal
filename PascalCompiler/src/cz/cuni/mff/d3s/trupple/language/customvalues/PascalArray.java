@@ -1,16 +1,12 @@
-package cz.cuni.mff.d3s.trupple.language.types;
+package cz.cuni.mff.d3s.trupple.language.customvalues;
 
 import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType;
-import cz.cuni.mff.d3s.trupple.language.parser.types.IOrdinalType.Type;
-import cz.cuni.mff.d3s.trupple.language.parser.types.EnumOrdinal;
 
-public class PascalArray {
+public class PascalArray implements ICustomValue {
 	private final Object[] array;
-	private final int offset;
 	private final IOrdinalType sourceOrdinal;
 	
 	public PascalArray(String typeIdentifier, IOrdinalType ordinal) {
-		this.offset = ordinal.getFirstIndex();
 		this.sourceOrdinal = ordinal;
 		final int size = ordinal.getSize();
 		
@@ -85,5 +81,10 @@ public class PascalArray {
 	
 	public void setValueAt(Object index, Object value) {
 		array[sourceOrdinal.getRealIndex(index)] = value;
+	}
+
+	@Override
+	public Object getValue() {
+		return array;
 	}
 }
