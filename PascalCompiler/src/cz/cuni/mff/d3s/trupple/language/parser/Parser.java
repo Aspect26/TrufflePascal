@@ -1,9 +1,8 @@
 
 package cz.cuni.mff.d3s.trupple.language.parser;
 
-import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 
 import com.oracle.truffle.api.source.Source;
 
@@ -98,7 +97,7 @@ public class Parser{
 				ImportsSection();
 			}
 			while (StartOf(2)) {
-				PreDeclaration();
+				Declaration();
 			}
 			MainFunction();
 		} else if (la.kind == 54) {
@@ -118,7 +117,7 @@ public class Parser{
 		Expect(7);
 	}
 
-	void PreDeclaration() {
+	void Declaration() {
 		if (la.kind == 15) {
 			VariableDefinitions();
 		} else if (la.kind == 12) {
@@ -285,8 +284,8 @@ public class Parser{
 		factory.setFunctionReturnValue(t); 
 		factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); 
 		Expect(7);
-		if (la.kind == 15) {
-			VariableDefinitions();
+		while (StartOf(2)) {
+			Declaration();
 		}
 		StatementNode bodyNode = Block();
 		factory.finishFunction(bodyNode); 
@@ -305,8 +304,8 @@ public class Parser{
 		factory.addFormalParameters(formalParameters); 
 		Expect(7);
 		factory.finishFormalParameterListProcedure(name, formalParameters); 
-		if (la.kind == 15) {
-			VariableDefinitions();
+		while (StartOf(2)) {
+			Declaration();
 		}
 		StatementNode bodyNode = Block();
 		factory.finishProcedure(bodyNode); 
@@ -770,7 +769,7 @@ public class Parser{
 			Get();
 			ExpressionNode value = Expression();
 			expression = factory.createArrayIndexAssignment( 
-					identifierName, indexingNode, value); 
+			identifierName, indexingNode, value); 
 		} else SynErr(73);
 		return expression;
 	}
@@ -1046,7 +1045,7 @@ class Errors {
 			case 56: s = "\"implementation\" expected"; break;
 			case 57: s = "??? expected"; break;
 			case 58: s = "invalid Pascal"; break;
-			case 59: s = "invalid PreDeclaration"; break;
+			case 59: s = "invalid Declaration"; break;
 			case 60: s = "invalid ConstantDefinition"; break;
 			case 61: s = "invalid Subroutine"; break;
 			case 62: s = "invalid LogicLiteral"; break;

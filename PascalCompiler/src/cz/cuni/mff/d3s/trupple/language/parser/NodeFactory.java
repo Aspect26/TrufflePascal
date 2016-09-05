@@ -297,6 +297,7 @@ public class NodeFactory {
 		startSubroutine(name);
 	}
 
+	// TODO: remove this duplicit with finishFunction
 	public void finishProcedure(StatementNode bodyNode) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 
@@ -341,11 +342,6 @@ public class NodeFactory {
 	private void startSubroutine(Token name) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 
-		if (ls.outer != null) {
-			ls.context.getOutput().println("Nested subroutines are not supported.");
-			return;
-		}
-		
 		String identifier = name.val.toLowerCase();
 		if(ls.context.containsIdentifier(identifier)){
 			ls.context.getOutput().println("Duplicate identifier.");
@@ -363,10 +359,7 @@ public class NodeFactory {
 
 	private StatementNode finishSubroutine(StatementNode bodyNode) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		if (ls.outer == null) {
-			ls.context.getOutput().println("Can't leave subroutine.");
-			return null;
-		}
+		assert ls.outer == null;
 
 		ls.scopeNodes.add(bodyNode);
 		final StatementNode subroutineNode = new BlockNode(
@@ -547,9 +540,13 @@ public class NodeFactory {
 		} else {
 			// secondly, try to create a procedure or function literal (with no arguments)
 			LexicalScope ls = (currentUnit==null)? lexicalScope : currentUnit.getLexicalScope();
-			if(ls.context.containsParameterlessSubroutine(identifier)) {
-				ExpressionNode literal = this.createFunctionNode(nameToken);
-				return this.createCall(literal, new ArrayList<>());
+			while(ls != null) {
+				if(ls.context.containsParameterlessSubroutine(identifier)) {
+					ExpressionNode literal = this.createFunctionNode(nameToken);
+					return this.createCall(literal, new ArrayList<>());
+				} else {
+					ls = ls.outer;
+				}
 			}
 				
 			return null;
