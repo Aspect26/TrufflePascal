@@ -33,6 +33,24 @@ public class SubroutinesTest extends JUnitTest {
 	}
 	
 	@Test
+	public void simpleArgumentsTest() {
+		String code="procedure w(a:integer);\n"+
+				"begin\n"+
+				" a:=a+1;\n"+
+				" write(a);\n"+
+				"end;\n"+
+				"\n"+
+				"var b:integer;\n"+
+				"begin\n"+
+				" b:=5;\n"+
+				" w(b);\n"+
+				" write(b);\n"+
+				"end.";
+		String output="65";
+		this.test(code, output);
+	}
+	
+	@Test
 	public void factorialTest(){
 		String code = "function factorial(n:integer):integer;\n" + 
 				"begin\n" + 
@@ -48,7 +66,7 @@ public class SubroutinesTest extends JUnitTest {
 	}
 	
 	@Test
-	public void procedureCallNoParentheses(){
+	public void procedureCallNoParentheses() {
 		String code = "procedure p;\n" + 
 				"begin\n" + 
 				"write('Metallica!');" + 
@@ -62,7 +80,7 @@ public class SubroutinesTest extends JUnitTest {
 	}
 	
 	@Test
-	public void functionCallNoParentheses(){
+	public void functionCallNoParentheses() {
 		String code = "function f:integer;\n" + 
 				"begin\n" + 
 				"f:=26270;" + 
@@ -75,24 +93,24 @@ public class SubroutinesTest extends JUnitTest {
 		test(code, "26270");
 	}
 	
-	// TODO
-	/*
 	@Test
-	public void globalVarTest(){
-		String code="var j:integer;\n" + 
-				"\n" + 
-				"procedure incJ;\n" + 
-				"begin\n" + 
-				" j:=j+5;\n" + 
-				"end;\n" + 
-				"\n" + 
-				"begin\n" + 
-				" j:=7;\n" + 
-				" incJ();\n" + 
-				" write(j);\n" + 
+	public void forwardTest() {
+		String code="procedure b; forward;\n"+
+				"\n"+
+				"procedure a;\n"+
+				" begin\n"+
+				" b;\n"+
+				" end;\n"+
+				"\n"+
+				"procedure b;\n"+
+				" begin;\n"+
+				" write(\'You not prepared!\');\n"+
+				" end;\n"+
+				"\n"+
+				"begin\n"+
+				" a;\n"+
 				"end.";
-		
-		test(code, "12");
+		String output = "You not prepared!";
+		this.test(code, output);
 	}
-	*/
 }

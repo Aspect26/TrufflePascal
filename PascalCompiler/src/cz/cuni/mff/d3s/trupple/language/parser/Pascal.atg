@@ -180,34 +180,40 @@ Subroutine
 )
 identifier										(. if(isFunction) factory.startFunction(t); else factory.startProcedure(t); .)
 												(. Token name = t; .)
+												(. Token returnType = null; .)
 												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
 [ 
 	IF(isFunction) 
 	":"
 	identifier									(. factory.setFunctionReturnValue(t); .)
+												(. returnType = t; .)
 ]
 												(. if(isFunction)  factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); .)
 												(. else factory.finishFormalParameterListProcedure(name, formalParameters); .)
 ";"
-{ Declaration }
-Block<out StatementNode bodyNode>				(. if(isFunction) factory.finishFunction(bodyNode); .)
+(
+	{ Declaration }
+	Block<out StatementNode bodyNode>			(. if(isFunction) factory.finishFunction(bodyNode); .)
 												(. else factory.finishProcedure(bodyNode); .)
-";"
+	";"
+|
+	"forward;"									(. if(isFunction) factory.addFunctionInterface(name, formalParameters, returnType.val.toLowerCase()); .)
+												(. else factory.addProcedureInterface(name, formalParameters); .)
+)
 .
 
 
 FormalParameterList<out List formalParameters>
 =
-(
-	"("											(. List<VariableDeclaration> parameters = new ArrayList<>(); .)
+"("												(. formalParameters = new ArrayList<>(); .)
 												(. List<VariableDeclaration> parameter = new ArrayList<>(); .)
-	FormalParameter<out parameter>				(. factory.appendFormalParameter(parameter, parameters); .)						
-	{ 
-		";" FormalParameter<out parameter> 		(. factory.appendFormalParameter(parameter, parameters); .)
-	}
-	")"
-)												(. formalParameters = parameters; .)
+FormalParameter<out parameter>					(. factory.appendFormalParameter(parameter, formalParameters); .)						
+{ 
+	";" 
+	FormalParameter<out parameter> 				(. factory.appendFormalParameter(parameter, formalParameters); .)
+}
+")"
 .
 
 
@@ -586,7 +592,7 @@ ProcedureHeading
 "procedure"
 identifier										(. Token name = t; .)
 												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
-[ IFormalParameterList<out formalParameters> ] 		
+[ FormalParameterList<out formalParameters> ] 		
 												(. factory.addProcedureInterface(name, formalParameters); .)
 ";"
 .
@@ -598,64 +604,13 @@ FunctionHeading
 "function"
 identifier										(. Token name = t; .)
 												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
-[ IFormalParameterList<out formalParameters> ] 
+[ FormalParameterList<out formalParameters> ] 
 ":"
 identifier										(. String returnValue = t.val; .)
 												(. factory.addFunctionInterface(name, formalParameters, returnValue); .)
 ";"
 .
 
-
-IFormalParameterList<out List formalParameters>
-=												(. formalParameters = new ArrayList<VariableDeclaration>(); .)
-"("												(. List<VariableDeclaration> formalParameter = new ArrayList<>(); .)
-	IFormalParameter<out formalParameter>		(. factory.appendFormalParameter(formalParameter, formalParameters); .)
-	{
-		";"
-		IFormalParameter<out formalParameter>	(. factory.appendFormalParameter(formalParameter, formalParameters); .)
-	}											
-")"
-.
-
-
-
-IFormalParameter<out List formalParameter>
-=												(. formalParameter = new ArrayList<VariableDeclaration>(); .)
-(
-	IValueParameter<out formalParameter>
-|
-	IVariableParameter<out formalParameter>
-)
-.
-
-
-
-IValueParameter<out List formalParameter>
-=												(. List<String> identifiers = new ArrayList<>(); .)
-identifier										(. identifiers.add(t.val); .)
-{
-	","
-	identifier									(. identifiers.add(t.val); .)
-}
-":"
-identifier										(. String typeName = t.val; .)
-												(. formalParameter = factory.createFormalParametersList(identifiers, typeName); .)
-.
-
-
-
-IVariableParameter<out List formalParameter>
-=												(. List<String> identifiers = new ArrayList<>(); .)
-"var"
-identifier										(. identifiers.add(t.val); .)			
-{
-	","
-	identifier									(. identifiers.add(t.val); .)
-}
-":"
-identifier										(. String typeName = t.val; .)
-												(. formalParameter = factory.createFormalParametersList(identifiers, typeName); .)
-.
 
 
 ImplementationSection

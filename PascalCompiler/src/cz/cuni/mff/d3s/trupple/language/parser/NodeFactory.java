@@ -308,6 +308,7 @@ public class NodeFactory {
 		if (currentUnit == null) {
 			lexicalScope = lexicalScope.outer;
 			lexicalScope.context.getGlobalFunctionRegistry().setFunctionRootNode(ls.name, rootNode);
+			lexicalScope.context.getGlobalFunctionRegistry().lookup(ls.name).setImplemented(true);
 		} else {
 			currentUnit.registerProcedure(rootNode);
 		}
@@ -334,6 +335,7 @@ public class NodeFactory {
 		if (currentUnit == null) {
 			lexicalScope = lexicalScope.outer;
 			lexicalScope.context.getGlobalFunctionRegistry().setFunctionRootNode(ls.name, rootNode);
+			lexicalScope.context.getGlobalFunctionRegistry().lookup(ls.name).setImplemented(true);
 		} else {
 			currentUnit.registerFunction(rootNode);
 		}
@@ -343,8 +345,7 @@ public class NodeFactory {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 
 		String identifier = name.val.toLowerCase();
-		if(ls.context.containsIdentifier(identifier)){
-			ls.context.getOutput().println("Duplicate identifier.");
+		if(!checkSubroutineCanBeImplemented(identifier)) {
 			return;
 		}
 
@@ -355,6 +356,29 @@ public class NodeFactory {
 		} else {
 			currentUnit.startSubroutineImplementation(identifier);
 		}
+	}
+	
+	private boolean checkSubroutineCanBeImplemented(String identifier) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		
+		if(ls.context.containsIdentifier(identifier) && 
+				ls.context.getGlobalFunctionRegistry().lookup(identifier) == null &&
+				ls.context.getPrivateFunctionRegistry().lookup(identifier) == null) {
+			ls.context.getOutput().println("Duplicate identifier.");
+			return false;
+		}
+		
+		if (ls.context.getGlobalFunctionRegistry().lookup(identifier) != null && ls.context.getGlobalFunctionRegistry().lookup(identifier).isImplemented()){
+			ls.context.getOutput().println("Subroutine is already implemented.");
+			return false;
+		}
+		
+		if (ls.context.getPrivateFunctionRegistry().lookup(identifier) != null && ls.context.getPrivateFunctionRegistry().lookup(identifier).isImplemented()){
+			ls.context.getOutput().println("Subroutine is already implemented.");
+			return false;
+		}
+		
+		return true;
 	}
 
 	private StatementNode finishSubroutine(StatementNode bodyNode) {
@@ -745,13 +769,17 @@ public class NodeFactory {
 	}
 
 	public void addProcedureInterface(Token name, List<VariableDeclaration> formalParameters) {
-		if (!currentUnit.addProcedureInterface(name.val.toLowerCase(), formalParameters)) {
+		if(currentUnit == null) {
+			lexicalScope.context.getGlobalFunctionRegistry().registerFunctionName(name.val.toLowerCase());
+		} else if (!currentUnit.addProcedureInterface(name.val.toLowerCase(), formalParameters)) {
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
 	}
 
 	public void addFunctionInterface(Token name, List<VariableDeclaration> formalParameters, String returnType) {
-		if (!currentUnit.addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)) {
+		if(currentUnit == null) {
+			lexicalScope.context.getGlobalFunctionRegistry().registerFunctionName(name.val.toLowerCase());
+		} else if (!currentUnit.addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)) {
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
 	}
@@ -763,7 +791,7 @@ public class NodeFactory {
 		// the subroutine is in outer context because now the praser is in the subroutine's own context
 		ls.outer.context.setMySubroutineParametersCount(identifier, parameters.size());
 		
-		if(currentUnit == null)
+		if (currentUnit == null)
 			return;
 		
 		if (!currentUnit.checkProcedureMatchInterface(identifier, parameters)) {

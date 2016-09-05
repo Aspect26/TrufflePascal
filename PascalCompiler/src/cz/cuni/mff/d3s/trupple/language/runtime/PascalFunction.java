@@ -6,15 +6,15 @@ import com.oracle.truffle.api.interop.TruffleObject;
 
 public class PascalFunction implements TruffleObject {
 
-	/** The current implementation of this function. */
 	private RootCallTarget callTarget;
-
-	private String name;
+	private String identifier;
 	private int parametersCount;
+	private boolean isImplemented;
 
 	public PascalFunction(String name) {
-		this.name = name;
+		this.identifier = name;
 		this.parametersCount = -1;
+		this.isImplemented = false;
 	}
 
 	protected void setCallTarget(RootCallTarget callTarget) {
@@ -22,7 +22,7 @@ public class PascalFunction implements TruffleObject {
 	}
 	
 	public void setName(String identifier){
-		this.name = identifier;
+		this.identifier = identifier;
 	}
 	
 	public void setParametersCount(int count){
@@ -36,10 +36,18 @@ public class PascalFunction implements TruffleObject {
 	public RootCallTarget getCallTarget() {
 		return callTarget;
 	}
+	
+	public boolean isImplemented() {
+		return isImplemented;
+	}
+	
+	public void setImplemented(boolean isImplemented) {
+		this.isImplemented = isImplemented;
+	}
 
 	@Override
 	public String toString() {
-		return name;
+		return identifier;
 	}
 
 	@Override

@@ -75,7 +75,7 @@
 
             <batchtest todir="${reports.dir}">
                 <fileset dir="${build.dir}" >
-                    <include name="**/*Test*.class" />
+                    <include name="**/tests/*.class" />
                     <exclude name="**/TestAll.class" />
                     <exclude name="**/JUnitTest.class" />
                 </fileset>
