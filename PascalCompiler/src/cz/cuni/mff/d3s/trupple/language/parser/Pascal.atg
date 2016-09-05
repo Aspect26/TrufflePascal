@@ -172,39 +172,27 @@ Ordinal<out IOrdinalType ordinal>
 
 
 Subroutine
-=
-( Function | Procedure )
-.
-
-
-Procedure
-=
-"procedure"									
-identifier										(. factory.startProcedure(t); .)
+=												(. boolean isFunction = false; .)
+(
+	"function"									(. isFunction = true; .)
+|
+	"procedure"
+)
+identifier										(. if(isFunction) factory.startFunction(t); else factory.startProcedure(t); .)
 												(. Token name = t; .)
 												(. List<VariableDeclaration> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
-";" 											(. factory.finishFormalParameterListProcedure(name, formalParameters); .)
-{ Declaration }
-Block<out StatementNode bodyNode>				(. factory.finishProcedure(bodyNode); .)
-";"
-.
-
-
-
-Function
-=												
-"function"									
-identifier										(. factory.startFunction(t); .)
-												(. Token name = t; .)
-												(. List<VariableDeclaration> formalParameters= new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
-":"
-identifier										(. factory.setFunctionReturnValue(t); .)
-												(. factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); .)
+[ 
+	IF(isFunction) 
+	":"
+	identifier									(. factory.setFunctionReturnValue(t); .)
+]
+												(. if(isFunction)  factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); .)
+												(. else factory.finishFormalParameterListProcedure(name, formalParameters); .)
 ";"
 { Declaration }
-Block<out StatementNode bodyNode>				(. factory.finishFunction(bodyNode); .)
+Block<out StatementNode bodyNode>				(. if(isFunction) factory.finishFunction(bodyNode); .)
+												(. else factory.finishProcedure(bodyNode); .)
 ";"
 .
 

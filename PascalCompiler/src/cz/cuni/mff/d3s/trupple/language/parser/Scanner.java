@@ -306,8 +306,8 @@ public class Scanner {
 		literals.put("var", new Integer(15));
 		literals.put("array", new Integer(17));
 		literals.put("of", new Integer(20));
-		literals.put("procedure", new Integer(22));
-		literals.put("function", new Integer(23));
+		literals.put("function", new Integer(22));
+		literals.put("procedure", new Integer(23));
 		literals.put("begin", new Integer(25));
 		literals.put("end", new Integer(26));
 		literals.put("break", new Integer(27));

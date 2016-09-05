@@ -193,11 +193,36 @@ public class Parser{
 	}
 
 	void Subroutine() {
-		if (la.kind == 23) {
-			Function();
-		} else if (la.kind == 22) {
-			Procedure();
+		boolean isFunction = false; 
+		if (la.kind == 22) {
+			Get();
+			isFunction = true; 
+		} else if (la.kind == 23) {
+			Get();
 		} else SynErr(61);
+		Expect(1);
+		if(isFunction) factory.startFunction(t); else factory.startProcedure(t); 
+		Token name = t; 
+		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
+		if (la.kind == 10) {
+			formalParameters = FormalParameterList();
+		}
+		factory.addFormalParameters(formalParameters); 
+		if (isFunction) {
+			Expect(16);
+			Expect(1);
+			factory.setFunctionReturnValue(t); 
+		}
+		if(isFunction)  factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); 
+		else factory.finishFormalParameterListProcedure(name, formalParameters); 
+		Expect(7);
+		while (StartOf(2)) {
+			Declaration();
+		}
+		StatementNode bodyNode = Block();
+		if(isFunction) factory.finishFunction(bodyNode); 
+		else factory.finishProcedure(bodyNode); 
+		Expect(7);
 	}
 
 	void Enum(Token identifier) {
@@ -269,49 +294,6 @@ public class Parser{
 		return ordinal;
 	}
 
-	void Function() {
-		Expect(23);
-		Expect(1);
-		factory.startFunction(t); 
-		Token name = t; 
-		List<VariableDeclaration> formalParameters= new ArrayList<>(); 
-		if (la.kind == 10) {
-			formalParameters = FormalParameterList();
-		}
-		factory.addFormalParameters(formalParameters); 
-		Expect(16);
-		Expect(1);
-		factory.setFunctionReturnValue(t); 
-		factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); 
-		Expect(7);
-		while (StartOf(2)) {
-			Declaration();
-		}
-		StatementNode bodyNode = Block();
-		factory.finishFunction(bodyNode); 
-		Expect(7);
-	}
-
-	void Procedure() {
-		Expect(22);
-		Expect(1);
-		factory.startProcedure(t); 
-		Token name = t; 
-		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
-		if (la.kind == 10) {
-			formalParameters = FormalParameterList();
-		}
-		factory.addFormalParameters(formalParameters); 
-		Expect(7);
-		factory.finishFormalParameterListProcedure(name, formalParameters); 
-		while (StartOf(2)) {
-			Declaration();
-		}
-		StatementNode bodyNode = Block();
-		factory.finishProcedure(bodyNode); 
-		Expect(7);
-	}
-
 	List  FormalParameterList() {
 		List  formalParameters;
 		Expect(10);
@@ -339,6 +321,49 @@ public class Parser{
 		Expect(26);
 		blockNode = factory.finishBlock(body); 
 		return blockNode;
+	}
+
+	void Procedure() {
+		Expect(23);
+		Expect(1);
+		factory.startProcedure(t); 
+		Token name = t; 
+		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
+		if (la.kind == 10) {
+			formalParameters = FormalParameterList();
+		}
+		factory.addFormalParameters(formalParameters); 
+		Expect(7);
+		factory.finishFormalParameterListProcedure(name, formalParameters); 
+		while (StartOf(2)) {
+			Declaration();
+		}
+		StatementNode bodyNode = Block();
+		factory.finishProcedure(bodyNode); 
+		Expect(7);
+	}
+
+	void Function() {
+		Expect(22);
+		Expect(1);
+		factory.startFunction(t); 
+		Token name = t; 
+		List<VariableDeclaration> formalParameters= new ArrayList<>(); 
+		if (la.kind == 10) {
+			formalParameters = FormalParameterList();
+		}
+		factory.addFormalParameters(formalParameters); 
+		Expect(16);
+		Expect(1);
+		factory.setFunctionReturnValue(t); 
+		factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); 
+		Expect(7);
+		while (StartOf(2)) {
+			Declaration();
+		}
+		StatementNode bodyNode = Block();
+		factory.finishFunction(bodyNode); 
+		Expect(7);
 	}
 
 	List  FormalParameter() {
@@ -789,9 +814,9 @@ public class Parser{
 
 	void InterfaceSection() {
 		while (StartOf(10)) {
-			if (la.kind == 22) {
+			if (la.kind == 23) {
 				ProcedureHeading();
-			} else if (la.kind == 23) {
+			} else if (la.kind == 22) {
 				FunctionHeading();
 			} else if (la.kind == 15) {
 				VariableDefinitions();
@@ -814,7 +839,7 @@ public class Parser{
 	}
 
 	void ProcedureHeading() {
-		Expect(22);
+		Expect(23);
 		Expect(1);
 		Token name = t; 
 		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
@@ -826,7 +851,7 @@ public class Parser{
 	}
 
 	void FunctionHeading() {
-		Expect(23);
+		Expect(22);
 		Expect(1);
 		Token name = t; 
 		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
@@ -1008,8 +1033,8 @@ class Errors {
 			case 19: s = "\"]\" expected"; break;
 			case 20: s = "\"of\" expected"; break;
 			case 21: s = "\"..\" expected"; break;
-			case 22: s = "\"procedure\" expected"; break;
-			case 23: s = "\"function\" expected"; break;
+			case 22: s = "\"function\" expected"; break;
+			case 23: s = "\"procedure\" expected"; break;
 			case 24: s = "\".\" expected"; break;
 			case 25: s = "\"begin\" expected"; break;
 			case 26: s = "\"end\" expected"; break;
