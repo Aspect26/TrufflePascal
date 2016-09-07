@@ -81,9 +81,53 @@ public class ArrayTest extends JUnitTest {
 				"\n"+
 				"begin\n"+
 				" multi[1,\'3\',true,8] := 326545;\n"+
-				" writeln(multi[1,\'3\',true,8]);\n"+
+				" write(multi[1,\'3\',true,8]);\n"+
 				"end.";
 		String result = "326545";
+		
+		test(s, result);
+	}
+	
+	@Test
+	public void lessSimpleMultidimensionalTest(){
+		String s="var arr: array[1..3,10..15,0..6] of integer;\n"+
+				"var i,j,k:integer;\n"+
+				"\n"+
+				"begin\n"+
+				" for i:=1 to 3 do\n"+
+				" for j:=10 to 15 do\n"+
+				" for k:=6 downto 0 do\n"+
+				" arr[i,j,k]:=i+j+k;\n"+
+				"\n"+
+				" for i:=1 to 3 do\n"+
+				" for j:=10 to 15 do\n"+
+				" for k:=6 downto 0 do\n"+
+				" write(arr[i,j,k]:=i+j+k,\',\');\n"+
+				"end.";
+		String result = "17,16,15,14,13,12,11,18,17,16,15,14,13,12,19,18,17,16,15,14,13,20,19,18,17,16,15,14,21,20,19,18,17,16,15,22,21,20,19,18,17,16,18,17,16,15,14,13,12,19,18,17,16,15,14,13,20,19,18,17,16,15,14,21,20,19,18,17,16,15,22,21,20,19,18,17,16,23,22,21,20,19,18,17,19,18,17,16,15,14,13,20,19,18,17,16,15,14,21,20,19,18,17,16,15,22,21,20,19,18,17,16,23,22,21,20,19,18,17,24,23,22,21,20,19,18,";
+		
+		test(s, result);
+	}
+	
+	@Test
+	public void differentMultidimensionalArrayDefinitionsTest(){
+		String s="var arr1:array [Boolean] of array [1..10] of array [1..3] of real;\n"+
+				" arr2:array [Boolean] of array [1..10, 1..3] of real;\n"+
+				" arr3:array [Boolean, 1..10, 1..3] of real;\n"+
+				" arr4:array [Boolean, 1..10] of array [1..3] of real;\n"+
+				"\n"+
+				"begin\n"+
+				" arr1[true, 8, 2] := 2.5;\n"+
+				" arr2[true, 8, 2] := 2.5;\n"+
+				" arr3[true, 8, 2] := 2.5;\n"+
+				" arr4[true, 8, 2] := 2.5;\n"+
+				"\n"+
+				" write(arr1[true, 8, 2]);\n"+
+				" write(arr2[true, 8, 2]);\n"+
+				" write(arr3[true, 8, 2]);\n"+
+				" write(arr4[true, 8, 2]);\n"+
+				"end.";
+		String result = "2.52.52.52.5";
 		
 		test(s, result);
 	}

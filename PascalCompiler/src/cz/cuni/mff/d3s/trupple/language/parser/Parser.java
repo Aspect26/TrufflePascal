@@ -273,26 +273,37 @@ public class Parser{
 		if (la.kind == 1) {
 			Get();
 			factory.finishVariableLineDefinition(identifiers, t); 
-		} else if (la.kind == 17 || la.kind == 18) {
-			if (la.kind == 17) {
-				Get();
+		} else if (la.kind == 18 || la.kind == 19) {
+			List ordinalDimensions = ArrayDefinition();
+			while (continuesArray()) {
+				Expect(17);
+				List additionalDimensions = ArrayDefinition();
+				ordinalDimensions.addAll(additionalDimensions); 
 			}
-			Expect(18);
-			List<IOrdinalType> ordinalDimensions = new ArrayList<>(); 
-			Expect(19);
-			IOrdinalType ordinal = null; 
-			ordinal = Ordinal();
-			ordinalDimensions.add(ordinal); 
-			while (la.kind == 6) {
-				Get();
-				ordinal = Ordinal();
-				ordinalDimensions.add(ordinal); 
-			}
-			Expect(20);
-			Expect(21);
+			Expect(17);
 			Expect(1);
 			factory.finishArrayDefinition(identifiers, ordinalDimensions, t); 
 		} else SynErr(66);
+	}
+
+	List  ArrayDefinition() {
+		List  ordinalDimensions;
+		if (la.kind == 18) {
+			Get();
+		}
+		Expect(19);
+		ordinalDimensions = new ArrayList<>(); 
+		Expect(20);
+		IOrdinalType ordinal = null; 
+		ordinal = Ordinal();
+		ordinalDimensions.add(ordinal); 
+		while (la.kind == 6) {
+			Get();
+			ordinal = Ordinal();
+			ordinalDimensions.add(ordinal); 
+		}
+		Expect(21);
+		return ordinalDimensions;
 	}
 
 	IOrdinalType  Ordinal() {
@@ -522,7 +533,7 @@ public class Parser{
 		StatementNode  statement;
 		Expect(30);
 		ExpressionNode caseIndex = Expression();
-		Expect(21);
+		Expect(17);
 		factory.startCaseList();	
 		CaseList();
 		Expect(28);
@@ -679,7 +690,7 @@ public class Parser{
 		switch (la.kind) {
 		case 1: {
 			Get();
-			if (la.kind == 10 || la.kind == 19 || la.kind == 33) {
+			if (la.kind == 10 || la.kind == 20 || la.kind == 33) {
 				expression = MemberExpression(t);
 			} else if (StartOf(9)) {
 				expression = factory.readSingleIdentifier(t); 
@@ -751,7 +762,7 @@ public class Parser{
 			if(expression == null) 
 			SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); 
 			} 
-		} else if (la.kind == 19) {
+		} else if (la.kind == 20) {
 			expression = ArrayAccessing(identifierName);
 		} else SynErr(75);
 		return expression;
@@ -762,7 +773,7 @@ public class Parser{
 		expression = null; 
 		List<ExpressionNode> indexingNodes = new ArrayList<>(); 
 		ExpressionNode indexingNode = null; 
-		Expect(19);
+		Expect(20);
 		indexingNode = ArrayIndex();
 		indexingNodes.add(indexingNode); 
 		while (la.kind == 6) {
@@ -770,7 +781,7 @@ public class Parser{
 			indexingNode = ArrayIndex();
 			indexingNodes.add(indexingNode); 
 		}
-		Expect(20);
+		Expect(21);
 		if (StartOf(9)) {
 			expression = factory.createReadArrayValue(identifierName, indexingNodes); 
 		} else if (la.kind == 33) {
@@ -870,7 +881,7 @@ public class Parser{
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _x,_x,_x,_x, _x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _x,_x,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _x,_x,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x}
 
@@ -898,6 +909,14 @@ public class Parser{
     public boolean isSingleIdentifier(){
     	Token next = scanner.Peek();
     	if(next.val.equals("]") && factory.containsIdentifier(la.val.toLowerCase()))
+    		return true;
+
+    	return false;
+    }
+    
+    public boolean continuesArray(){
+    	Token next = scanner.Peek();
+    	if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
     		return true;
 
     	return false;
@@ -950,11 +969,11 @@ class Errors {
 			case 14: s = "\"false\" expected"; break;
 			case 15: s = "\"var\" expected"; break;
 			case 16: s = "\":\" expected"; break;
-			case 17: s = "\"packed\" expected"; break;
-			case 18: s = "\"array\" expected"; break;
-			case 19: s = "\"[\" expected"; break;
-			case 20: s = "\"]\" expected"; break;
-			case 21: s = "\"of\" expected"; break;
+			case 17: s = "\"of\" expected"; break;
+			case 18: s = "\"packed\" expected"; break;
+			case 19: s = "\"array\" expected"; break;
+			case 20: s = "\"[\" expected"; break;
+			case 21: s = "\"]\" expected"; break;
 			case 22: s = "\"..\" expected"; break;
 			case 23: s = "\"function\" expected"; break;
 			case 24: s = "\"procedure\" expected"; break;

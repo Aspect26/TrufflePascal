@@ -306,9 +306,9 @@ public class Scanner {
 		literals.put("true", new Integer(13));
 		literals.put("false", new Integer(14));
 		literals.put("var", new Integer(15));
-		literals.put("packed", new Integer(17));
-		literals.put("array", new Integer(18));
-		literals.put("of", new Integer(21));
+		literals.put("of", new Integer(17));
+		literals.put("packed", new Integer(18));
+		literals.put("array", new Integer(19));
 		literals.put("function", new Integer(23));
 		literals.put("procedure", new Integer(24));
 		literals.put("begin", new Integer(27));
@@ -533,9 +533,9 @@ public class Scanner {
 				case 20:
 					{t.kind = 11; break loop;}
 				case 21:
-					{t.kind = 19; break loop;}
-				case 22:
 					{t.kind = 20; break loop;}
+				case 22:
+					{t.kind = 21; break loop;}
 				case 23:
 					{t.kind = 22; break loop;}
 				case 24:

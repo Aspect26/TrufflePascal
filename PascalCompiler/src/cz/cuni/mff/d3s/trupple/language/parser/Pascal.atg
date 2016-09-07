@@ -145,18 +145,30 @@ identifier                                      (. identifiers.add(t.val.toLower
 (
 	identifier                                  (. factory.finishVariableLineDefinition(identifiers, t); .) 
 |
-	[ "packed" ]
-	"array"										(. List<IOrdinalType> ordinalDimensions = new ArrayList<>(); .)
-	"["											(. IOrdinalType ordinal = null; .)
-	Ordinal<out ordinal>						(. ordinalDimensions.add(ordinal); .)
+	ArrayDefinition<out List ordinalDimensions>
 	{
-		","
-		Ordinal<out ordinal>					(. ordinalDimensions.add(ordinal); .)
+		IF(continuesArray())
+		"of"
+		ArrayDefinition<out List additionalDimensions>
+												(. ordinalDimensions.addAll(additionalDimensions); .)
 	}
-	"]"
 	"of"
 	identifier									(. factory.finishArrayDefinition(identifiers, ordinalDimensions, t); .)
 )
+.
+
+
+ArrayDefinition<out List ordinalDimensions>
+=
+[ "packed" ]
+"array"											(. ordinalDimensions = new ArrayList<>(); .)
+"["												(. IOrdinalType ordinal = null; .)
+Ordinal<out ordinal>							(. ordinalDimensions.add(ordinal); .)
+{
+	","
+	Ordinal<out ordinal>						(. ordinalDimensions.add(ordinal); .)
+}
+"]"
 .
 
 

@@ -44,10 +44,11 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * array of array of array...
  * packed array
  * !assigning array
- * !multidimensional array
+ * negative bound in array indexing
  *  
  * CHANGELOG:
  * v0.8
+ * support multidimensional arrays
  * support nested subroutines
  * support subroutine forwarding
  * enums are now stored as objects in frame descriptors

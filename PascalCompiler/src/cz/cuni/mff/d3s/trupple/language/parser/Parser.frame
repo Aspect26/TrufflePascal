@@ -152,6 +152,14 @@ public class Parser{
 
     	return false;
     }
+    
+    public boolean continuesArray(){
+    	Token next = scanner.Peek();
+    	if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
+    		return true;
+
+    	return false;
+    }
 } // end Parser
 
 class VariableDeclaration{
