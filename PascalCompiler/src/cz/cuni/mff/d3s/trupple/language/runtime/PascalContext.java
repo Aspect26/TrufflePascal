@@ -1,15 +1,11 @@
 package cz.cuni.mff.d3s.trupple.language.runtime;
 
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.oracle.truffle.api.ExecutionContext;
 import com.oracle.truffle.api.TruffleLanguage;
-
-import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 
 public final class PascalContext extends ExecutionContext {
 	
@@ -19,7 +15,7 @@ public final class PascalContext extends ExecutionContext {
 	private final PascalContext outerContext;
 	
 	public PascalContext(PascalContext outerContext) {
-		this(outerContext, null, null, System.out);
+		this(outerContext, null, new BufferedReader(new InputStreamReader(System.in)), System.out);
 	}
 
 	private PascalContext(PascalContext outerContext, TruffleLanguage.Env env, BufferedReader input, PrintStream output) {

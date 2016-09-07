@@ -25,8 +25,8 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * TODO LIST
  *
  * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (assignment, operations, if condition, enum)
- * READ / READLN
  * PREDAVANIE REFERENCIOU
+ * READ
  * GOTO (PROBLEM)
  * CONSTANTS
  * RECORD + WITH
@@ -48,6 +48,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  *  
  * CHANGELOG:
  * v0.8
+ * support readln
  * support multidimensional arrays
  * support nested subroutines
  * support subroutine forwarding

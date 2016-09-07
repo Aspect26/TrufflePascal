@@ -318,6 +318,30 @@ Statement<out StatementNode statement>
 												(. statement = factory.createBreak(); .)
 |
     Block<out statement>
+|
+	ReadStatement<out statement>				
+)
+.
+
+
+
+ReadStatement<out StatementNode statement>
+=
+"readln"										(. statement = null; .)
+(
+												(. statement = factory.createReadLine(); .)
+|
+	"("											(. List<String> identifiers = new ArrayList<>(); .)
+	(
+		")"										(. statement = factory.createReadLine(); .)
+	|
+		identifier								(. identifiers.add(t.val.toLowerCase()); .)
+		{
+			","
+			identifier							(. identifiers.add(t.val.toLowerCase()); .)
+		}
+	")"											(. statement = factory.createReadLine(identifiers); .)
+	)
 )
 .
 

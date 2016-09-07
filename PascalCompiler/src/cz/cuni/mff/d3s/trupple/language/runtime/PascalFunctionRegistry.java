@@ -76,7 +76,6 @@ public class PascalFunctionRegistry {
 
 		installBuiltinInfiniteArguments(WritelnBuiltinNodeFactory.getInstance());
 		installBuiltinInfiniteArguments(WriteBuiltinNodeFactory.getInstance());
-		// installBuiltinInfiniteArguments(ReadlnBuiltinNodeFactory.getInstance());
 
 		// installBuiltin(IncBuiltinNodeFactory.getInstance(),
 		// registerRootNodes);
@@ -118,6 +117,7 @@ public class PascalFunctionRegistry {
 		String name = lookupNodeInfo(bodyNode.getClass()).shortName();
 		this.register(name, rootNode);
 	}
+	
 	
 	private void register(String identifier, PascalRootNode rootNode){
 		PascalFunction func = new PascalFunction(identifier);

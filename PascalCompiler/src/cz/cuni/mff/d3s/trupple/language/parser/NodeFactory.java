@@ -29,6 +29,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.ModuloNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.MultiplyNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.NegationNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.SubstractNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.CaseNode;
@@ -575,13 +576,14 @@ public class NodeFactory {
 
 	public ExpressionNode readSingleIdentifier(Token nameToken) {
 		String identifier = nameToken.val.toLowerCase();
+		FrameSlot frameSlot = getVisibleSlot(identifier);
 		
 		// firstly try to read a variable
-		FrameSlot frameSlot = getVisibleSlot(identifier);
 		if (frameSlot != null){
 			return ReadVariableNodeGen.create(frameSlot);
+			
+		// secondly, try to create a procedure or function literal (with no arguments)
 		} else {
-			// secondly, try to create a procedure or function literal (with no arguments)
 			LexicalScope ls = (currentUnit==null)? lexicalScope : currentUnit.getLexicalScope();
 			while(ls != null) {
 				if(ls.context.containsParameterlessSubroutine(identifier)) {
@@ -598,6 +600,27 @@ public class NodeFactory {
 
 	public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
 		return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
+	}
+	
+	public StatementNode createReadLine() {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return new ReadlnBuiltinNode(ls.context);
+	}
+	
+	public StatementNode createReadLine(List<String> identifiers){
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		
+		FrameSlot[] slots = new FrameSlot[identifiers.size()];
+		for(int i = 0; i < slots.length; i++) {
+			String currentIdentifier = identifiers.get(i);
+			slots[i] = ls.localIdentifiers.get(currentIdentifier);
+			if(slots[i] == null) {
+				parser.SemErr("Unknown identifier: " + currentIdentifier + ".");
+			}
+		}
+		
+		ReadlnBuiltinNode readln = new ReadlnBuiltinNode(ls.context, slots);
+		return readln;
 	}
 
 	public StatementNode createEmptyStatement() {
