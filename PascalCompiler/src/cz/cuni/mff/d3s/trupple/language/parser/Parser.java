@@ -204,7 +204,7 @@ public class Parser{
 		if(isFunction) factory.startFunction(t); else factory.startProcedure(t); 
 		Token name = t; 
 		Token returnType = null; 
-		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
+		List<FormalParameter> formalParameters = new ArrayList<>(); 
 		if (la.kind == 10) {
 			formalParameters = FormalParameterList();
 		}
@@ -328,7 +328,7 @@ public class Parser{
 		List  formalParameters;
 		Expect(10);
 		formalParameters = new ArrayList<>(); 
-		List<VariableDeclaration> parameter = new ArrayList<>(); 
+		List<FormalParameter> parameter = new ArrayList<>(); 
 		parameter = FormalParameter();
 		factory.appendFormalParameter(parameter, formalParameters); 
 		while (la.kind == 7) {
@@ -354,18 +354,12 @@ public class Parser{
 
 	List  FormalParameter() {
 		List  formalParameter;
-		formalParameter = new ArrayList<>(); 
-		if (la.kind == 1) {
-			formalParameter = ValueParameter();
-		} else if (la.kind == 1) {
-			formalParameter = VariableParameter();
-		} else SynErr(71);
-		return formalParameter;
-	}
-
-	List  ValueParameter() {
-		List  formalParameter;
 		List<String> identifiers = new ArrayList<>(); 
+		boolean isOutput = false; 
+		if (la.kind == 15) {
+			Get();
+			isOutput = true; 
+		}
 		Expect(1);
 		identifiers.add(t.val.toLowerCase()); 
 		while (la.kind == 6) {
@@ -375,23 +369,7 @@ public class Parser{
 		}
 		Expect(16);
 		Expect(1);
-		formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase()); 
-		return formalParameter;
-	}
-
-	List  VariableParameter() {
-		List  formalParameter;
-		List<String> identifiers = new ArrayList<>(); 
-		Expect(1);
-		identifiers.add(t.val.toLowerCase()); 
-		while (la.kind == 6) {
-			Get();
-			Expect(1);
-			identifiers.add(t.val.toLowerCase()); 
-		}
-		Expect(16);
-		Expect(1);
-		formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase()); 
+		formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isOutput); 
 		return formalParameter;
 	}
 
@@ -457,7 +435,7 @@ public class Parser{
 			statement = factory.createRandomizeNode(); 
 			break;
 		}
-		default: SynErr(72); break;
+		default: SynErr(71); break;
 		}
 		return statement;
 	}
@@ -504,7 +482,7 @@ public class Parser{
 		} else if (la.kind == 37) {
 			Get();
 			ascending = false; 
-		} else SynErr(73);
+		} else SynErr(72);
 		ExpressionNode finalValue = Expression();
 		Expect(38);
 		StatementNode loopBody = Statement();
@@ -572,8 +550,8 @@ public class Parser{
 				}
 				Expect(11);
 				statement = factory.createReadLine(identifiers); 
-			} else SynErr(74);
-		} else SynErr(75);
+			} else SynErr(73);
+		} else SynErr(74);
 		return statement;
 	}
 
@@ -625,7 +603,7 @@ public class Parser{
 			expression = factory.createUnary(op, right); 
 		} else if (StartOf(6)) {
 			expression = LogicFactor();
-		} else SynErr(76);
+		} else SynErr(75);
 		return expression;
 	}
 
@@ -716,7 +694,7 @@ public class Parser{
 			expression = factory.createUnary(unOp, expression); 
 		} else if (StartOf(9)) {
 			expression = Factor();
-		} else SynErr(77);
+		} else SynErr(76);
 		return expression;
 	}
 
@@ -736,7 +714,7 @@ public class Parser{
 				expression = factory.readSingleIdentifier(t); 
 				if(expression == null) 
 				SemErr("Undefined identifier " + t.val + "."); 
-			} else SynErr(78);
+			} else SynErr(77);
 			break;
 		}
 		case 10: {
@@ -768,7 +746,7 @@ public class Parser{
 			expression = factory.createLogicLiteral(val); 
 			break;
 		}
-		default: SynErr(79); break;
+		default: SynErr(78); break;
 		}
 		return expression;
 	}
@@ -788,8 +766,8 @@ public class Parser{
 				Get();
 				expression = factory.createRandomNode(t); 
 				Expect(11);
-			} else SynErr(80);
-		} else SynErr(81);
+			} else SynErr(79);
+		} else SynErr(80);
 		return expression;
 	}
 
@@ -824,7 +802,7 @@ public class Parser{
 			} 
 		} else if (la.kind == 20) {
 			expression = ArrayAccessing(identifierName);
-		} else SynErr(82);
+		} else SynErr(81);
 		return expression;
 	}
 
@@ -849,7 +827,7 @@ public class Parser{
 			ExpressionNode value = Expression();
 			expression = factory.createArrayIndexAssignment( 
 			identifierName, indexingNodes, value); 
-		} else SynErr(83);
+		} else SynErr(82);
 		return expression;
 	}
 
@@ -862,7 +840,7 @@ public class Parser{
 		} else if (la.kind == 1) {
 			Get();
 			indexingNode = factory.createIndexingNode(t); 
-		} else SynErr(84);
+		} else SynErr(83);
 		return indexingNode;
 	}
 
@@ -896,7 +874,7 @@ public class Parser{
 		Expect(24);
 		Expect(1);
 		Token name = t; 
-		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
+		List<FormalParameter> formalParameters = new ArrayList<>(); 
 		if (la.kind == 10) {
 			formalParameters = FormalParameterList();
 		}
@@ -908,7 +886,7 @@ public class Parser{
 		Expect(23);
 		Expect(1);
 		Token name = t; 
-		List<VariableDeclaration> formalParameters = new ArrayList<>(); 
+		List<FormalParameter> formalParameters = new ArrayList<>(); 
 		if (la.kind == 10) {
 			formalParameters = FormalParameterList();
 		}
@@ -984,14 +962,16 @@ public class Parser{
     }
 } // end Parser
 
-class VariableDeclaration{
-	public VariableDeclaration(String id, String type){
+class FormalParameter{
+	public FormalParameter(String id, String type, boolean isOutput){
 		this.type = type;
 		this.identifier = id;
+		this.isOutput = isOutput;
 	}
 	
 	public String type;
 	public String identifier;
+	public boolean isOutput;
 }
 
 class Errors {
@@ -1084,20 +1064,19 @@ class Errors {
 			case 68: s = "invalid LogicLiteral"; break;
 			case 69: s = "invalid VariableLineDefinition"; break;
 			case 70: s = "invalid Ordinal"; break;
-			case 71: s = "invalid FormalParameter"; break;
-			case 72: s = "invalid Statement"; break;
-			case 73: s = "invalid ForLoop"; break;
+			case 71: s = "invalid Statement"; break;
+			case 72: s = "invalid ForLoop"; break;
+			case 73: s = "invalid ReadStatement"; break;
 			case 74: s = "invalid ReadStatement"; break;
-			case 75: s = "invalid ReadStatement"; break;
-			case 76: s = "invalid SignedLogicFactor"; break;
-			case 77: s = "invalid SignedFactor"; break;
+			case 75: s = "invalid SignedLogicFactor"; break;
+			case 76: s = "invalid SignedFactor"; break;
+			case 77: s = "invalid Factor"; break;
 			case 78: s = "invalid Factor"; break;
-			case 79: s = "invalid Factor"; break;
+			case 79: s = "invalid Random"; break;
 			case 80: s = "invalid Random"; break;
-			case 81: s = "invalid Random"; break;
-			case 82: s = "invalid MemberExpression"; break;
-			case 83: s = "invalid ArrayAccessing"; break;
-			case 84: s = "invalid ArrayIndex"; break;
+			case 81: s = "invalid MemberExpression"; break;
+			case 82: s = "invalid ArrayAccessing"; break;
+			case 83: s = "invalid ArrayIndex"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

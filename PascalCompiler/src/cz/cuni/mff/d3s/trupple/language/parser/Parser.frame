@@ -162,14 +162,16 @@ public class Parser{
     }
 } // end Parser
 
-class VariableDeclaration{
-	public VariableDeclaration(String id, String type){
+class FormalParameter{
+	public FormalParameter(String id, String type, boolean isOutput){
 		this.type = type;
 		this.identifier = id;
+		this.isOutput = isOutput;
 	}
 	
 	public String type;
 	public String identifier;
+	public boolean isOutput;
 }
 
 class Errors {

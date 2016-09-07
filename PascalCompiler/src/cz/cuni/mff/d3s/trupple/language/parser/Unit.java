@@ -16,7 +16,7 @@ public class Unit {
 	
 	private boolean inInterfaceSection;
 	private LexicalScope lexicalScope;
-	private final Map<String, List<VariableDeclaration>> interfaceProcedures;
+	private final Map<String, List<FormalParameter>> interfaceProcedures;
 	private final Map<String, FunctionFormalParameters> interfaceFunctions;
 
 	public Unit(String name) {
@@ -44,7 +44,7 @@ public class Unit {
 		lexicalScope.localIdentifiers.put(identifier, newSlot);
 	}
 
-	public boolean addProcedureInterface(String name, List<VariableDeclaration> parameters) {
+	public boolean addProcedureInterface(String name, List<FormalParameter> parameters) {
 		if (subroutineExists(name))
 			return false;
 
@@ -52,7 +52,7 @@ public class Unit {
 		return true;
 	}
 
-	public boolean addFunctionInterface(String name, List<VariableDeclaration> parameters, String returnType) {
+	public boolean addFunctionInterface(String name, List<FormalParameter> parameters, String returnType) {
 		if (subroutineExists(name))
 			return false;
 
@@ -79,14 +79,14 @@ public class Unit {
 		lexicalScope.frameDescriptor = NodeFactory.copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
 	}
 
-	public boolean checkProcedureMatchInterface(String name, List<VariableDeclaration> params) {
+	public boolean checkProcedureMatchInterface(String name, List<FormalParameter> params) {
 		if (!interfaceProcedures.containsKey(name))
 			return true;
 
 		return compareFormalParametersList(interfaceProcedures.get(name), params);
 	}
 
-	public boolean checkFunctionMatchInterface(String name, List<VariableDeclaration> params, String returnType) {
+	public boolean checkFunctionMatchInterface(String name, List<FormalParameter> params, String returnType) {
 		if (!interfaceFunctions.containsKey(name))
 			return true;
 
@@ -96,7 +96,7 @@ public class Unit {
 		return interfaceFunctions.get(name).typeName.equals(returnType);
 	}
 
-	private boolean compareFormalParametersList(List<VariableDeclaration> left, List<VariableDeclaration> right) {
+	private boolean compareFormalParametersList(List<FormalParameter> left, List<FormalParameter> right) {
 		if (left.size() != right.size())
 			return false;
 
@@ -145,11 +145,11 @@ public class Unit {
 }
 
 class FunctionFormalParameters {
-	public FunctionFormalParameters(List<VariableDeclaration> formalParameters, String typeName) {
+	public FunctionFormalParameters(List<FormalParameter> formalParameters, String typeName) {
 		this.formalParameters = formalParameters;
 		this.typeName = typeName;
 	}
 
-	public List<VariableDeclaration> formalParameters;
+	public List<FormalParameter> formalParameters;
 	public String typeName;
 }

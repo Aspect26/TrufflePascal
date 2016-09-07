@@ -73,6 +73,7 @@ public class NodeFactory {
 		protected final String name;
 		protected final PascalContext context;
 		protected final Map<String, ICustomType> customTypes = new HashMap<>();
+		protected final List<FrameSlot> outputSlots;
 		
 		/* List of initialization nodes (variables like array and enums are represented as Objects
 		 * (duh) and they need to be initialized otherwise their value would be null)
@@ -90,6 +91,7 @@ public class NodeFactory {
 			this.constants = new HashMap<>();
 			this.frameDescriptor = new FrameDescriptor();
 			this.initializationNodes = new ArrayList<>();
+			this.outputSlots = new ArrayList<>();
 			
 			if (outer != null) {
 				localIdentifiers.putAll(outer.localIdentifiers);
@@ -412,31 +414,34 @@ public class NodeFactory {
 		return subroutineNode;
 	}
 
-	public void appendFormalParameter(List<VariableDeclaration> parameter, List<VariableDeclaration> params) {
-		for (VariableDeclaration param : parameter) {
+	public void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params) {
+		for (FormalParameter param : parameter) {
 			params.add(param);
 		}
 	}
 
-	public List<VariableDeclaration> createFormalParametersList(List<String> identifiers, String typeName) {
-		List<VariableDeclaration> paramList = new ArrayList<>();
+	public List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName, boolean isOutput) {
+		List<FormalParameter> paramList = new ArrayList<>();
 		for (String identifier : identifiers) {
-			paramList.add(new VariableDeclaration(identifier, typeName));
+			paramList.add(new FormalParameter(identifier, typeName, isOutput));
 		}
 
 		return paramList;
 	}
 
-	public void addFormalParameters(List<VariableDeclaration> params) {
+	public void addFormalParameters(List<FormalParameter> params) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 
-		for (VariableDeclaration param : params) {
+		for (FormalParameter param : params) {
 			FrameSlotKind slotKind = getSlotByTypeName(param.type);
 			final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(ls.scopeNodes.size(), slotKind);
 			FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(param.identifier, slotKind);
 			final AssignmentNode assignment = AssignmentNodeGen.create(readNode, newSlot);
 			ls.localIdentifiers.put(param.identifier, newSlot);
 			ls.scopeNodes.add(assignment);
+			if(param.isOutput) {
+				ls.outputSlots.add(newSlot);
+			}
 		}
 	}
 	
@@ -827,7 +832,7 @@ public class NodeFactory {
 		currentUnit = null;
 	}
 
-	public void addProcedureInterface(Token name, List<VariableDeclaration> formalParameters) {
+	public void addProcedureInterface(Token name, List<FormalParameter> formalParameters) {
 		if(currentUnit == null) {
 			lexicalScope.context.getGlobalFunctionRegistry().registerFunctionName(name.val.toLowerCase());
 		} else if (!currentUnit.addProcedureInterface(name.val.toLowerCase(), formalParameters)) {
@@ -835,7 +840,7 @@ public class NodeFactory {
 		}
 	}
 
-	public void addFunctionInterface(Token name, List<VariableDeclaration> formalParameters, String returnType) {
+	public void addFunctionInterface(Token name, List<FormalParameter> formalParameters, String returnType) {
 		if(currentUnit == null) {
 			lexicalScope.context.getGlobalFunctionRegistry().registerFunctionName(name.val.toLowerCase());
 		} else if (!currentUnit.addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)) {
@@ -843,7 +848,7 @@ public class NodeFactory {
 		}
 	}
 	
-	public void finishFormalParameterListProcedure(Token name, List<VariableDeclaration> parameters) {
+	public void finishFormalParameterListProcedure(Token name, List<FormalParameter> parameters) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		String identifier = name.val.toLowerCase();
 		
@@ -858,7 +863,7 @@ public class NodeFactory {
 		}
 	}
 
-	public void finishFormalParameterListFunction(Token name, List<VariableDeclaration> parameters, String returnType) {
+	public void finishFormalParameterListFunction(Token name, List<FormalParameter> parameters, String returnType) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		String identifier = name.val.toLowerCase();
 		
