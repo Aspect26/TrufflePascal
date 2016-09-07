@@ -15,26 +15,46 @@ public abstract class ReadVariableNode extends ExpressionNode {
 
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected long readLong(VirtualFrame frame) throws FrameSlotTypeException {
-		return frame.getLong(getSlot());
+		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+		if (slotsFrame == null) {
+			throw new FrameSlotTypeException();
+		}
+		return slotsFrame.getLong(getSlot());
 	}
-
+	
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected boolean readBool(VirtualFrame frame) throws FrameSlotTypeException {
-		return frame.getBoolean(getSlot());
+		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+		if (slotsFrame == null) {
+			throw new FrameSlotTypeException();
+		}
+		return slotsFrame.getBoolean(getSlot());
 	}
 
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected char readChar(VirtualFrame frame) throws FrameSlotTypeException {
-		return (char) (frame.getByte(getSlot()));
+		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+		if (slotsFrame == null) {
+			throw new FrameSlotTypeException();
+		}
+		return (char) (slotsFrame.getByte(getSlot()));
 	}
 
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected double readDouble(VirtualFrame frame) throws FrameSlotTypeException {
-		return frame.getDouble(getSlot());
+		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+		if (slotsFrame == null) {
+			throw new FrameSlotTypeException();
+		}
+		return slotsFrame.getDouble(getSlot());
 	}
 
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected Object readObject(VirtualFrame frame) throws FrameSlotTypeException {
-		return frame.getObject(getSlot());
+		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+		if (slotsFrame == null) {
+			throw new FrameSlotTypeException();
+		}
+		return slotsFrame.getObject(getSlot());
 	}
 }

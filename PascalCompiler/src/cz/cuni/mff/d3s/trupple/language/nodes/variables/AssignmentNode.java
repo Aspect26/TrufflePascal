@@ -22,13 +22,15 @@ public abstract class AssignmentNode extends ExpressionNode {
 
 	@Specialization(guards = "isLongKind(frame)")
 	protected long writeLong(VirtualFrame frame, long value) {
-		frame.setLong(getSlot(), value);
+		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
+		slotsFrame.setLong(getSlot(), value);
 		return value;
 	}
 
 	@Specialization(guards = "isBoolKind(frame)")
 	protected boolean writeBoolean(VirtualFrame frame, boolean value) {
-		frame.setBoolean(getSlot(), value);
+		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
+		slotsFrame.setBoolean(getSlot(), value);
 		return value;
 	}
 
@@ -36,40 +38,48 @@ public abstract class AssignmentNode extends ExpressionNode {
 	// char
 	@Specialization(guards = "isCharKind(frame)")
 	protected char writeChar(VirtualFrame frame, char value) {
-		frame.setByte(getSlot(), (byte) value);
+		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
+		slotsFrame.setByte(getSlot(), (byte) value);
 		return value;
 	}
 
 	@Specialization(guards = "isDoubleKind(frame)")
 	protected double writeChar(VirtualFrame frame, double value) {
-		frame.setDouble(getSlot(), value);
+		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
+		slotsFrame.setDouble(getSlot(), value);
 		return value;
 	}
 	
 	@Specialization(guards = "isEnum(frame)")
 	protected Object writeChar(VirtualFrame frame, EnumValue value) {
+		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
 		try { 
-			if (((EnumValue)frame.getObject(getSlot())).getEnumType() != value.getEnumType()) {
+			if (((EnumValue)slotsFrame.getObject(getSlot())).getEnumType() != value.getEnumType()) {
 				throw new PascalRuntimeException("Wrong enum types assignment.");
 			}
 		} catch (FrameSlotTypeException e) {
 			
 		}
-		frame.setObject(getSlot(), value);
+		slotsFrame.setObject(getSlot(), value);
 		return value;
 	}
 	
 	@Specialization(guards = "isPascalArray(frame)")
 	protected Object assignArray(VirtualFrame frame, PascalArray array) {
+		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
 		PascalArray arrayCopy = array.createCopy();
-		frame.setObject(getSlot(), arrayCopy);
+		slotsFrame.setObject(getSlot(), arrayCopy);
 		return arrayCopy;
 	}
-	
+
 	/**
 	 * guard functions
 	 */
 	protected boolean isPascalArray(VirtualFrame frame) {
+		frame = this.getFrameContainingSlot(frame, getSlot());
+		if(frame == null) {
+			return false;
+		}
 		try {
 			Object obj = frame.getObject(getSlot());
 			return obj instanceof PascalArray;
@@ -79,6 +89,10 @@ public abstract class AssignmentNode extends ExpressionNode {
 	}
 	
 	protected boolean isEnum(VirtualFrame frame) {
+		frame = this.getFrameContainingSlot(frame, getSlot());
+		if(frame == null) {
+			return false;
+		}
 		try {
 			Object obj = frame.getObject(getSlot());
 			return obj instanceof EnumValue;
@@ -88,23 +102,25 @@ public abstract class AssignmentNode extends ExpressionNode {
 	}
 	
 	protected boolean isLongKind(VirtualFrame frame) {
-		return isKind(FrameSlotKind.Long);
+		return isKind(frame, FrameSlotKind.Long);
 	}
 
 	protected boolean isBoolKind(VirtualFrame frame) {
-		return isKind(FrameSlotKind.Boolean);
+		return isKind(frame, FrameSlotKind.Boolean);
 	}
 
 	protected boolean isCharKind(VirtualFrame frame) {
-		return isKind(FrameSlotKind.Byte);
+		return isKind(frame, FrameSlotKind.Byte);
 	}
 
 	protected boolean isDoubleKind(VirtualFrame frame) {
-		return isKind(FrameSlotKind.Double);
+		return isKind(frame, FrameSlotKind.Double);
 	}
 
-	private boolean isKind(FrameSlotKind kind) {
-		if (getSlot().getKind() == kind) {
+	private boolean isKind(VirtualFrame frame, FrameSlotKind kind) {
+		if (getFrameContainingSlot(frame, getSlot()) == null) {
+			return false;
+		} else if (getSlot().getKind() == kind) {
 			return true;
 		} else if (getSlot().getKind() == FrameSlotKind.Illegal) {
 			CompilerDirectives.transferToInterpreterAndInvalidate();
