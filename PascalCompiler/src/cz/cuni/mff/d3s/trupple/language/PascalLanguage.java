@@ -42,17 +42,16 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * enum v unite
  * array of array of array...
  * packed array
- * !assigning array
  * negative bound in array indexing
- * random
  *  
  * CHANGELOG:
  * v0.8
  * support readln
  * support multidimensional arrays
  * support nested subroutines
+ * support random + randomize
  * support subroutine forwarding
- * support random (with parameter only) + randomize
+ * support assigning array to array
  * enums are now stored as objects in frame descriptors
  * break now throws ControlFlowException (instead of PascalRuntimeException) so Graal doesn't deoptimize the code
  * unit tests now use assertEquals instead of assertTrue

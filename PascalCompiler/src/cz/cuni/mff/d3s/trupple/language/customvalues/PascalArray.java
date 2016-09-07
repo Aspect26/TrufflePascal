@@ -117,4 +117,10 @@ public class PascalArray implements ICustomValue {
 	public Object getValue() {
 		return array;
 	}
+	
+	public PascalArray createCopy() {
+		Object[] dataCopy = new Object[this.array.length];
+		System.arraycopy(this.array, 0, dataCopy, 0, this.array.length);
+		return new PascalArray(dataCopy, this.sourceOrdinal);
+	}
 }

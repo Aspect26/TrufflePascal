@@ -14,6 +14,7 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(AssignmentNode.class)
@@ -159,6 +160,12 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
                 if ((root.isEnum((VirtualFrame) frameValue))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return WriteChar2Node_.create(root);
+                }
+            }
+            if (valueNodeValue instanceof PascalArray) {
+                if ((root.isPascalArray((VirtualFrame) frameValue))) {
+                    CompilerDirectives.transferToInterpreterAndInvalidate();
+                    return AssignArrayNode_.create(root);
                 }
             }
             return null;
@@ -430,6 +437,29 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
 
         static BaseNode_ create(AssignmentNodeGen root) {
             return new WriteChar2Node_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "assignArray(VirtualFrame, PascalArray)", value = AssignmentNode.class)
+    private static final class AssignArrayNode_ extends BaseNode_ {
+
+        AssignArrayNode_(AssignmentNodeGen root) {
+            super(root, 6);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof PascalArray) {
+                PascalArray valueNodeValue_ = (PascalArray) valueNodeValue;
+                if ((root.isPascalArray(frameValue))) {
+                    return root.assignArray(frameValue, valueNodeValue_);
+                }
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignArrayNode_(root);
         }
 
     }

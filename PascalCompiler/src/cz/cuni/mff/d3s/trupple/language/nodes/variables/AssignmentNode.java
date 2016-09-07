@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeChild("valueNode")
@@ -51,14 +52,32 @@ public abstract class AssignmentNode extends ExpressionNode {
 			if (((EnumValue)frame.getObject(getSlot())).getEnumType() != value.getEnumType()) {
 				throw new PascalRuntimeException("Wrong enum types assignment.");
 			}
-		} catch (FrameSlotTypeException e) {}
+		} catch (FrameSlotTypeException e) {
+			
+		}
 		frame.setObject(getSlot(), value);
 		return value;
+	}
+	
+	@Specialization(guards = "isPascalArray(frame)")
+	protected Object assignArray(VirtualFrame frame, PascalArray array) {
+		PascalArray arrayCopy = array.createCopy();
+		frame.setObject(getSlot(), arrayCopy);
+		return arrayCopy;
 	}
 	
 	/**
 	 * guard functions
 	 */
+	protected boolean isPascalArray(VirtualFrame frame) {
+		try {
+			Object obj = frame.getObject(getSlot());
+			return obj instanceof PascalArray;
+		} catch (FrameSlotTypeException e) {
+			return false;
+		}
+	}
+	
 	protected boolean isEnum(VirtualFrame frame) {
 		try {
 			Object obj = frame.getObject(getSlot());
