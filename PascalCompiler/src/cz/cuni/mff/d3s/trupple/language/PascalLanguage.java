@@ -17,11 +17,6 @@ import cz.cuni.mff.d3s.trupple.language.parser.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 /*
- * QUSTIONS LIST 
- * how to use Graal
- * unit - support for initialization and finalization section ?? (v tp nie je, vo freepas je)
- *  
- * 
  * TODO LIST
  *
  * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (assignment, operations, if condition, enum)
@@ -40,13 +35,12 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * break nie je v std (treba prepinac --std=turbo)
  * array v unite
  * enum v unite
- * array of array of array...
- * packed array
  * negative bound in array indexing
  *  
  * CHANGELOG:
  * v0.8
  * support readln
+ * support global variables
  * support multidimensional arrays
  * support nested subroutines
  * support random + randomize
