@@ -265,7 +265,7 @@ public class NodeFactory {
 		}
 	}
 	
-	public void finishArrayDefinition(List<String> identifiers, IOrdinalType ordinalRange, Token returnTypeToken) {
+	public void finishArrayDefinition(List<String> identifiers, List<IOrdinalType> ordinalDimensions, Token returnTypeToken) {
 		//TODO: this! -> arrays in units
 		if(currentUnit != null)
 			return;
@@ -274,13 +274,30 @@ public class NodeFactory {
 			try {
 				FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, FrameSlotKind.Object);
 				lexicalScope.localIdentifiers.put(identifier, newSlot);
-				this.lexicalScope.initializationNodes.add(new InitializationNode(newSlot, new PascalArray(
-						returnTypeToken.val.toLowerCase(), ordinalRange
-						)));
+				PascalArray array = createMultidimensionalArray(ordinalDimensions, returnTypeToken.val.toLowerCase());
+				this.lexicalScope.initializationNodes.add(new InitializationNode(newSlot, array));
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
 				continue;
 			}
+		}
+	}
+	
+	private PascalArray createMultidimensionalArray(List<IOrdinalType> ordinalDimensions, String componentType) {
+		assert ordinalDimensions.size() > 0;
+		
+		if(ordinalDimensions.size() == 1) {
+			return new PascalArray(componentType, ordinalDimensions.get(0));
+		}
+		
+		else {
+			int count = ordinalDimensions.get(0).getSize();
+			List<IOrdinalType> innerDimensions = ordinalDimensions.subList(1, ordinalDimensions.size());
+			PascalArray[] innerArrays = new PascalArray[count];
+			for(int i = 0; i < count; i++) {
+				innerArrays[i] = createMultidimensionalArray(innerDimensions, componentType);
+			}
+			return new PascalArray(innerArrays, ordinalDimensions.get(0));
 		}
 	}
 	
@@ -540,18 +557,20 @@ public class NodeFactory {
 		return new BreakNode();
 	}
 	
-	public ExpressionNode createReadArrayValue(Token identifier, ExpressionNode indexNode) {
+	public ExpressionNode createReadArrayValue(Token identifier, List<ExpressionNode> indexingNodes) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return ReadArrayIndexNodeGen.create(indexNode, ls.localIdentifiers.get(identifier.val.toLowerCase()));
+		return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), 
+				ls.localIdentifiers.get(identifier.val.toLowerCase()));
 	}
 	
 	public ExpressionNode createIndexingNode(Token identifier) {
 		return new StringLiteralNode(identifier.val.toLowerCase());
 	}
 	
-	public ExpressionNode createArrayIndexAssignment(Token name, ExpressionNode indexNode, ExpressionNode valueNode) {
+	public ExpressionNode createArrayIndexAssignment(Token name, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return new ArrayIndexAssignmentNode(ls.localIdentifiers.get(name.val.toLowerCase()), indexNode, valueNode);
+		return new ArrayIndexAssignmentNode(ls.localIdentifiers.get(name.val.toLowerCase()), 
+				indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
 	}
 
 	public ExpressionNode readSingleIdentifier(Token nameToken) {

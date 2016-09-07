@@ -13,18 +13,18 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 public abstract class ReadArrayIndexNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
-	protected final ExpressionNode indexNode;
+	protected final ExpressionNode[] indexingNodes;
 
-	public ReadArrayIndexNode(ExpressionNode indexNode) {
-		this.indexNode = indexNode;
+	public ReadArrayIndexNode(ExpressionNode[] indexingNodes) {
+		this.indexingNodes = indexingNodes;
 	}
 	
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected long readLong(VirtualFrame frame) throws FrameSlotTypeException {
-		Object index = getIndex(frame);
+		Object[] indexes = getIndexes(frame);
 		PascalArray array = (PascalArray)frame.getObject(getSlot());
 		try {
-			return (Long)array.getValueAt(index);
+			return (Long)array.getValueAt(indexes);
 		} catch(ClassCastException e) {
 			throw new FrameSlotTypeException();
 		}
@@ -32,10 +32,10 @@ public abstract class ReadArrayIndexNode extends ExpressionNode {
 
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected boolean readBool(VirtualFrame frame) throws FrameSlotTypeException {
-		Object index = getIndex(frame);
+		Object[] indexes = getIndexes(frame);
 		PascalArray array = (PascalArray)frame.getObject(getSlot());
 		try {
-			return (Boolean)array.getValueAt(index);
+			return (Boolean)array.getValueAt(indexes);
 		} catch(ClassCastException e) {
 			throw new FrameSlotTypeException();
 		}
@@ -43,11 +43,11 @@ public abstract class ReadArrayIndexNode extends ExpressionNode {
 
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected char readChar(VirtualFrame frame) throws FrameSlotTypeException {
-		Object index = getIndex(frame);
+		Object[] indexes = getIndexes(frame);
 		PascalArray array = (PascalArray)frame.getObject(getSlot());
 		try {
 			// TODO: possible cause of crash
-			return (char)array.getValueAt(index);
+			return (char)array.getValueAt(indexes);
 		} catch(ClassCastException e) {
 			throw new FrameSlotTypeException();
 		}
@@ -55,10 +55,10 @@ public abstract class ReadArrayIndexNode extends ExpressionNode {
 
 	@Specialization(rewriteOn = FrameSlotTypeException.class)
 	protected double readDouble(VirtualFrame frame) throws FrameSlotTypeException {
-		Object index = getIndex(frame);
+		Object[] indexes = getIndexes(frame);
 		PascalArray array = (PascalArray)frame.getObject(getSlot());
 		try {
-			return (Double)array.getValueAt(index);
+			return (Double)array.getValueAt(indexes);
 		} catch(ClassCastException e) {
 			throw new FrameSlotTypeException();
 		}
@@ -70,7 +70,11 @@ public abstract class ReadArrayIndexNode extends ExpressionNode {
 		return null;
 	}
 	
-	private Object getIndex(VirtualFrame frame) {
-		return indexNode.executeGeneric(frame);
+	private Object[] getIndexes(VirtualFrame frame) {
+		Object[] indexes = new Object[indexingNodes.length];
+		for(int i = 0; i < indexes.length; i++) {
+			indexes[i] = this.indexingNodes[i].executeGeneric(frame);
+		}
+		return indexes;
 	}
 }

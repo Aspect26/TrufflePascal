@@ -145,12 +145,17 @@ identifier                                      (. identifiers.add(t.val.toLower
 (
 	identifier                                  (. factory.finishVariableLineDefinition(identifiers, t); .) 
 |
-	"array"										
-	"["
-	Ordinal<out IOrdinalType ordinal>
+	[ "packed" ]
+	"array"										(. List<IOrdinalType> ordinalDimensions = new ArrayList<>(); .)
+	"["											(. IOrdinalType ordinal = null; .)
+	Ordinal<out ordinal>						(. ordinalDimensions.add(ordinal); .)
+	{
+		","
+		Ordinal<out ordinal>					(. ordinalDimensions.add(ordinal); .)
+	}
 	"]"
 	"of"
-	identifier									(. factory.finishArrayDefinition(identifiers, ordinal, t); .)
+	identifier									(. factory.finishArrayDefinition(identifiers, ordinalDimensions, t); .)
 )
 .
 
@@ -529,21 +534,27 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
 
 ArrayAccessing<out ExpressionNode expression, Token identifierName>
 =												(. expression = null; .)
+												(. List<ExpressionNode> indexingNodes = new ArrayList<>(); .)
+												(. ExpressionNode indexingNode = null; .)
 "["
-	ArrayIndex<out ExpressionNode indexingNode, identifierName>
+	ArrayIndex<out indexingNode>				(. indexingNodes.add(indexingNode); .)
+	{
+		","
+		ArrayIndex<out indexingNode>			(. indexingNodes.add(indexingNode); .)
+	}
 "]"
 (
-												(. expression = factory.createReadArrayValue(identifierName, indexingNode); .)
+												(. expression = factory.createReadArrayValue(identifierName, indexingNodes); .)
 |
 	":="
 	Expression<out ExpressionNode value>		(. expression = factory.createArrayIndexAssignment( .)
-												(.		identifierName, indexingNode, value); .)
+												(.		identifierName, indexingNodes, value); .)
 )
 .
 
 
 
-ArrayIndex<out ExpressionNode indexingNode, Token identifierName>
+ArrayIndex<out ExpressionNode indexingNode>
 =												(. indexingNode = null; .)
 (
 	IF(!isSingleIdentifier())

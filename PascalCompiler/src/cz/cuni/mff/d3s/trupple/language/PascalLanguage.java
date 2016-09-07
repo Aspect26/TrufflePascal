@@ -29,28 +29,30 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * PREDAVANIE REFERENCIOU
  * GOTO (PROBLEM)
  * CONSTANTS
- * RECORD
+ * RECORD + WITH
+ * TYPE SHORTCUT (e.g.: type i=integer; }
+ * SETS
  * FILES
  * POINTERS
  * CRT, GRAPH, STRING, DOS
  * 
  * ' in string 
- * unit - variables declared only in IMPLEMENTATION section are visible from the outside 
- * subroutines - support nested subroutines
- * private/global variables
+ * private/global variables (mainly in unit)
  * break nie je v std (treba prepinac --std=turbo)
  * array v unite
  * enum v unite
  * array of array of array...
  * packed array
- * !premenit enum na FrameSlot.Object namiesto vlastnych premennych v contexte
  * !assigning array
  * !multidimensional array
  *  
  * CHANGELOG:
  * v0.8
- * Break now throws ControlFlowException (instead of PascalRuntimeException) so Graal doesn't deoptimize the code
- * Unit tests now use assertEquals instead of assertTrue
+ * support nested subroutines
+ * support subroutine forwarding
+ * enums are now stored as objects in frame descriptors
+ * break now throws ControlFlowException (instead of PascalRuntimeException) so Graal doesn't deoptimize the code
+ * unit tests now use assertEquals instead of assertTrue
  * 
  * v0.7
  * support arrays

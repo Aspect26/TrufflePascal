@@ -74,4 +74,17 @@ public class ArrayTest extends JUnitTest {
 		
 		test(code, "58");
 	}
+	
+	@Test
+	public void simpleMultidimensionalTest(){
+		String s="var multi: array[1..5,char,boolean,8..15] of integer;\n"+
+				"\n"+
+				"begin\n"+
+				" multi[1,\'3\',true,8] := 326545;\n"+
+				" writeln(multi[1,\'3\',true,8]);\n"+
+				"end.";
+		String result = "326545";
+		
+		test(s, result);
+	}
 }
