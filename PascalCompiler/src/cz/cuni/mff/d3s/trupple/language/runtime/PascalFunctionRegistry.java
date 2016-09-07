@@ -14,6 +14,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WriteBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WritelnBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
@@ -77,6 +78,7 @@ public class PascalFunctionRegistry {
 		installBuiltinInfiniteArguments(WritelnBuiltinNodeFactory.getInstance());
 		installBuiltinInfiniteArguments(WriteBuiltinNodeFactory.getInstance());
 
+		installBuiltin(RandomBuiltinNodeFactory.getInstance());
 		// installBuiltin(IncBuiltinNodeFactory.getInstance(),
 		// registerRootNodes);
 		// installBuiltin(DecBuiltinNodeFactory.getInstance(),

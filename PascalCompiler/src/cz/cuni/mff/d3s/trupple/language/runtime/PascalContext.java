@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.runtime;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.Random;
 
 import com.oracle.truffle.api.ExecutionContext;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -13,6 +14,7 @@ public final class PascalContext extends ExecutionContext {
 	private final BufferedReader input;
 	private final PrintStream output;
 	private final PascalContext outerContext;
+	private final Random random;
 	
 	public PascalContext(PascalContext outerContext) {
 		this(outerContext, null, new BufferedReader(new InputStreamReader(System.in)), System.out);
@@ -23,6 +25,7 @@ public final class PascalContext extends ExecutionContext {
 		this.output = output;
 		this.outerContext = outerContext;
 		
+		this.random = new Random();
 		this.globalFunctionRegistry = new PascalFunctionRegistry(this, true);
 		this.privateFunctionRegistry = new PascalFunctionRegistry(this, false);
 	}
@@ -60,6 +63,14 @@ public final class PascalContext extends ExecutionContext {
 		assert func != null;
 		
 		func.setParametersCount(count);
+	}
+	
+	public long getRandom(long upperBound) {
+		return random.nextLong() % upperBound;
+	}
+	
+	public long getRandom() {
+		return random.nextLong();
 	}
 	
 	public PascalContext getOuterContext(){
