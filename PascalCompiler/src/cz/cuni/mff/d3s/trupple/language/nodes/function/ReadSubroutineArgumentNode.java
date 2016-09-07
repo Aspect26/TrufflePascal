@@ -15,7 +15,8 @@ public abstract class ReadSubroutineArgumentNode extends ExpressionNode {
 	private final int index;
 
 	public ReadSubroutineArgumentNode(int index) {
-		this.index = index;
+		// NOTE this is because the firts argument is the virtual frame from caller method
+		this.index = index + 1;
 	}
 
 	@Specialization(guards = "isLongKind()")

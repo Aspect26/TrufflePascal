@@ -29,9 +29,10 @@ public abstract class InvokeNode extends ExpressionNode {
 	public Object executeGeneric(VirtualFrame frame, PascalFunction function) {
 		CompilerAsserts.compilationConstant(argumentNodes.length);
 
-		Object[] argumentValues = new Object[argumentNodes.length];
+		Object[] argumentValues = new Object[argumentNodes.length + 1];
+		argumentValues[0] = frame;
 		for (int i = 0; i < argumentNodes.length; i++) {
-			argumentValues[i] = argumentNodes[i].executeGeneric(frame);
+			argumentValues[i+1] = argumentNodes[i].executeGeneric(frame);
 		}
 		return dispatchNode.executeDispatch(frame, function, argumentValues);
 	}

@@ -12,7 +12,7 @@ public class ReadArgumentNode extends ExpressionNode {
 
 	public ReadArgumentNode(/* FrameSlotKind type, */ int index) {
 		// this.kind = type;
-		this.index = index;
+		this.index = index + 1;
 	}
 
 	@Override
