@@ -5,21 +5,15 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
-@NodeInfo(shortName = "random")
-public class RandomBuiltinNode extends BuiltinNode {
-
+@NodeInfo(shortName = "randomize")
+public class RandomizeBuiltinNode extends BuiltinNode {
+	
 	private final PascalContext context;
-	private final long bound;
 	
-	public RandomBuiltinNode(PascalContext context, long bound) {
+	public RandomizeBuiltinNode(PascalContext context) {
 		this.context = context;
-		this.bound = bound;
 	}
-	
-	public RandomBuiltinNode(PascalContext context) {
-		this(context, Long.MAX_VALUE);
-	}
-	
+
 	@Override
 	public PascalContext getContext() {
 		return context;
@@ -27,6 +21,7 @@ public class RandomBuiltinNode extends BuiltinNode {
 
 	@Override
 	public Object executeGeneric(VirtualFrame frame) {
-		return this.getContext().getRandom(bound);
+		this.getContext().randomize();
+		return null;
 	}
 }

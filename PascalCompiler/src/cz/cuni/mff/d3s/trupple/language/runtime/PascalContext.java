@@ -14,7 +14,7 @@ public final class PascalContext extends ExecutionContext {
 	private final BufferedReader input;
 	private final PrintStream output;
 	private final PascalContext outerContext;
-	private final Random random;
+	private Random random;
 	
 	public PascalContext(PascalContext outerContext) {
 		this(outerContext, null, new BufferedReader(new InputStreamReader(System.in)), System.out);
@@ -25,7 +25,7 @@ public final class PascalContext extends ExecutionContext {
 		this.output = output;
 		this.outerContext = outerContext;
 		
-		this.random = new Random();
+		this.random = new Random(165132464);
 		this.globalFunctionRegistry = new PascalFunctionRegistry(this, true);
 		this.privateFunctionRegistry = new PascalFunctionRegistry(this, false);
 	}
@@ -66,11 +66,15 @@ public final class PascalContext extends ExecutionContext {
 	}
 	
 	public long getRandom(long upperBound) {
-		return random.nextLong() % upperBound;
+		return Math.abs(random.nextLong()) % upperBound;
 	}
 	
 	public long getRandom() {
 		return random.nextLong();
+	}
+	
+	public void randomize() {
+		this.random = new Random();
 	}
 	
 	public PascalContext getOuterContext(){

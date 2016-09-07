@@ -44,7 +44,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * packed array
  * !assigning array
  * negative bound in array indexing
- * random + randomize
+ * random
  *  
  * CHANGELOG:
  * v0.8
@@ -52,6 +52,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * support multidimensional arrays
  * support nested subroutines
  * support subroutine forwarding
+ * support random (with parameter only) + randomize
  * enums are now stored as objects in frame descriptors
  * break now throws ControlFlowException (instead of PascalRuntimeException) so Graal doesn't deoptimize the code
  * unit tests now use assertEquals instead of assertTrue

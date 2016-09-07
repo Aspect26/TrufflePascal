@@ -319,9 +319,12 @@ Statement<out StatementNode statement>
 |
     Block<out statement>
 |
-	ReadStatement<out statement>				
+	ReadStatement<out statement>	
+|
+	"randomize"									(. statement = factory.createRandomizeNode(); .)		
 )
 .
+
 
 
 
@@ -344,6 +347,7 @@ ReadStatement<out StatementNode statement>
 	)
 )
 .
+
 
 
 CaseStatement<out StatementNode statement>
@@ -510,6 +514,8 @@ SignedFactor<out ExpressionNode expression>
 Factor<out ExpressionNode expression>
 =							                    (. expression = null; .)
 (
+	Random<out expression>
+|
 	identifier
     (
 	    MemberExpression<out expression, t>
@@ -535,6 +541,25 @@ Factor<out ExpressionNode expression>
     LogicLiteral<out val>						(. expression = factory.createLogicLiteral(val); .)
 )
 .
+
+
+
+Random<out ExpressionNode expression>
+=
+"random"										(. expression = null; .)
+(
+												(. expression = factory.createRandomNode(); .)
+|
+	"("
+	(
+		")"										(. expression = factory.createRandomNode(); .)
+	|
+		numericLiteral							(. expression = factory.createRandomNode(t); .)
+		")"
+	)
+)
+.
+
 
 
 

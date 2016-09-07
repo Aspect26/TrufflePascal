@@ -29,6 +29,8 @@ import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.ModuloNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.MultiplyNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.NegationNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.SubstractNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNode;
@@ -572,6 +574,21 @@ public class NodeFactory {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		return new ArrayIndexAssignmentNode(ls.localIdentifiers.get(name.val.toLowerCase()), 
 				indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
+	}
+	
+	public StatementNode createRandomizeNode() {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return new RandomizeBuiltinNode(ls.context);
+	}
+	
+	public ExpressionNode createRandomNode() {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return new RandomBuiltinNode(ls.context);
+	}
+	
+	public ExpressionNode createRandomNode(Token numericLiteral) {
+		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
+		return new RandomBuiltinNode(ls.context, Long.parseLong(numericLiteral.val));
 	}
 
 	public ExpressionNode readSingleIdentifier(Token nameToken) {
