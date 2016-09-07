@@ -26,13 +26,12 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  *
  * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (assignment, operations, if condition, enum)
  * PREDAVANIE REFERENCIOU
- * READ
  * GOTO (PROBLEM)
  * CONSTANTS
  * RECORD + WITH
  * TYPE SHORTCUT (e.g.: type i=integer; }
  * SETS
- * FILES
+ * FILES + READ
  * POINTERS
  * CRT, GRAPH, STRING, DOS
  * 
@@ -45,6 +44,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * packed array
  * !assigning array
  * negative bound in array indexing
+ * random + randomize
  *  
  * CHANGELOG:
  * v0.8
