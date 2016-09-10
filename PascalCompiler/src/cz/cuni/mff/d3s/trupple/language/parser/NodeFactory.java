@@ -793,6 +793,34 @@ public class NodeFactory {
 		}
 	}
 	
+	public String getStringConstant(Token nameToken) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		String identifier = nameToken.val.toLowerCase();
+		Object str = getConstant(ls, identifier);
+		if (str == null) {
+			return null;
+		} else if ( str instanceof String) {
+			return (String)str;
+		} else {
+			parser.SemErr("Wrong constant type in expression " + identifier +".");
+			return null;
+		}
+	}
+	
+	public boolean getBooleanConstant(Token nameToken) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		String identifier = nameToken.val.toLowerCase();
+		Object b = getConstant(ls, identifier);
+		if (b == null) {
+			return false;
+		} else if (b instanceof Boolean){
+			return (boolean)b;
+		} else {
+			parser.SemErr("Wrong constant type in expression " + identifier +".");
+			return false;
+		}
+	}
+	
 	private Object getConstant(LexicalScope ls, String identifier) {
 		if (!ls.constants.containsKey(identifier)) {
 			parser.SemErr("Unknown constant " + identifier +".");

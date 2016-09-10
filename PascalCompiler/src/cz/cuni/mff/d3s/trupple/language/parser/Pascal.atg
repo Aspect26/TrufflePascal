@@ -104,8 +104,7 @@ identifier										(. Token identifier = t; .)
 |
 	StringConstant<out String value> 			(. factory.createStringOrCharConstant(identifier, value); .)	
 |
-												(. boolean l; .)
-	LogicLiteral<out l>							(. factory.createBooleanConstant(identifier, l); .)
+	LogicConstant<out boolean value>			(. factory.createBooleanConstant(identifier, value); .)
 |
 	identifier									(. factory.createObjectConstant(identifier, t); .)
 )
@@ -113,14 +112,67 @@ identifier										(. Token identifier = t; .)
 .
 
 
+LogicConstant<out boolean value>
+=
+LogicTermConstant<out value>
+{
+	"or"
+	LogicTermConstant<out boolean rvalue>		(. value = value || rvalue; .)
+}
+.
+
+
+LogicTermConstant<out boolean value>
+=
+LogicFactorConstant<out value>
+{
+	"and"
+	LogicFactorConstant<out boolean rvalue>		(. value = value && rvalue; .)
+}
+.
+
+
+LogicFactorConstant<out boolean value>
+=												(. value = false; .)
+(
+	"not"
+	LogicFactorConstant<out boolean negatedValue>		
+												(. value = !negatedValue; .)
+|
+	LogicSingleConstant<out value>
+)
+.
+
+
+LogicSingleConstant<out boolean value>
+=												(. value = false; .)
+(
+	LogicLiteral<out value>
+|
+	identifier									(. value = factory.getBooleanConstant(t); .)
+)
+.
+
+
+
 
 StringConstant<out String value>
 =
-stringLiteral									(. value = factory.createStringFromLiteral(t); .)
+StringValue<out value>
 {
 	"+"
-	stringLiteral								(. value = value.concat(factory.createStringFromLiteral(t)); .)
+	StringValue<out String rvalue>				(. value = value.concat(rvalue); .)
 }
+.
+
+
+StringValue<out String value>
+=												(. value = ""; .)
+(
+	stringLiteral								(. value = factory.createStringFromLiteral(t); .)
+|
+	identifier									(. value = factory.getStringConstant(t); .)
+)
 .
 
 
