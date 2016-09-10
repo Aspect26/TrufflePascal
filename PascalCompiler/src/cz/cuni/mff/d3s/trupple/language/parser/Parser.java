@@ -218,7 +218,11 @@ public class Parser{
 		if(isFunction)  factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); 
 		else factory.finishFormalParameterListProcedure(name, formalParameters); 
 		Expect(7);
-		if (StartOf(3)) {
+		if (la.kind == 25) {
+			Get();
+			if(isFunction) factory.addFunctionInterface(name, formalParameters, returnType.val.toLowerCase()); 
+			else factory.addProcedureInterface(name, formalParameters); 
+		} else if (StartOf(3)) {
 			while (StartOf(2)) {
 				Declaration();
 			}
@@ -226,10 +230,6 @@ public class Parser{
 			if(isFunction) factory.finishFunction(bodyNode); 
 			else factory.finishProcedure(bodyNode); 
 			Expect(7);
-		} else if (la.kind == 25) {
-			Get();
-			if(isFunction) factory.addFunctionInterface(name, formalParameters, returnType.val.toLowerCase()); 
-			else factory.addProcedureInterface(name, formalParameters); 
 		} else SynErr(67);
 	}
 
@@ -274,10 +274,10 @@ public class Parser{
 			Get();
 			factory.finishVariableLineDefinition(identifiers, t); 
 		} else if (la.kind == 18 || la.kind == 19) {
-			List ordinalDimensions = ArrayDefinition();
+			List<IOrdinalType> ordinalDimensions  = ArrayDefinition();
 			while (continuesArray()) {
 				Expect(17);
-				List additionalDimensions = ArrayDefinition();
+				List<IOrdinalType> additionalDimensions  = ArrayDefinition();
 				ordinalDimensions.addAll(additionalDimensions); 
 			}
 			Expect(17);
@@ -286,8 +286,8 @@ public class Parser{
 		} else SynErr(69);
 	}
 
-	List  ArrayDefinition() {
-		List  ordinalDimensions;
+	List<IOrdinalType>  ArrayDefinition() {
+		List<IOrdinalType>  ordinalDimensions;
 		if (la.kind == 18) {
 			Get();
 		}
@@ -324,8 +324,8 @@ public class Parser{
 		return ordinal;
 	}
 
-	List  FormalParameterList() {
-		List  formalParameters;
+	List<FormalParameter>  FormalParameterList() {
+		List<FormalParameter>  formalParameters;
 		Expect(10);
 		formalParameters = new ArrayList<>(); 
 		List<FormalParameter> parameter = new ArrayList<>(); 
@@ -352,8 +352,8 @@ public class Parser{
 		return blockNode;
 	}
 
-	List  FormalParameter() {
-		List  formalParameter;
+	List<FormalParameter>  FormalParameter() {
+		List<FormalParameter>  formalParameter;
 		List<String> identifiers = new ArrayList<>(); 
 		boolean isOutput = false; 
 		if (la.kind == 15) {
@@ -373,7 +373,7 @@ public class Parser{
 		return formalParameter;
 	}
 
-	void StatementSequence(List body) {
+	void StatementSequence(List<StatementNode> body ) {
 		StatementNode statement = Statement();
 		body.add(statement); 
 		while (la.kind == 7) {

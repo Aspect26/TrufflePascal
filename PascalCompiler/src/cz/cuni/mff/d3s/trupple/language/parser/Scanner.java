@@ -266,7 +266,7 @@ public class Scanner {
 	int line;          // line number of current character
 	int oldEols;       // EOLs that appeared in a comment;
 	static final StartStates start; // maps initial token character to start state
-	static final Map literals;      // maps literal strings to literal kinds
+	static final Map<String, Integer> literals;      // maps literal strings to literal kinds
 
 	Token tokens;      // list of tokens already peeked (first token is a dummy)
 	Token pt;          // current peek token
@@ -277,7 +277,7 @@ public class Scanner {
 
 	static {
 		start = new StartStates();
-		literals = new HashMap();
+		literals = new HashMap<String, Integer>();
 		for (int i = 97; i <= 101; ++i) start.set(i, 1);
 		for (int i = 103; i <= 122; ++i) start.set(i, 1);
 		for (int i = 49; i <= 57; ++i) start.set(i, 14);
@@ -397,8 +397,22 @@ public class Scanner {
 
 	}
 	
+	@SuppressWarnings("unused")
 
 	boolean Comment0() {
+		int level = 1, pos0 = pos, line0 = line, col0 = col, charPos0 = charPos;
+		NextCh();
+			for(;;) {
+				if (ch == '}') {
+					level--;
+					if (level == 0) { oldEols = line - line0; NextCh(); return true; }
+					NextCh();
+				} else if (ch == Buffer.EOF) return false;
+				else NextCh();
+			}
+	}
+
+	boolean Comment1() {
 		int level = 1, pos0 = pos, line0 = line, col0 = col, charPos0 = charPos;
 		NextCh();
 		if (ch == '*') {
@@ -420,38 +434,6 @@ public class Scanner {
 		return false;
 	}
 
-	boolean Comment1() {
-		int level = 1, pos0 = pos, line0 = line, col0 = col, charPos0 = charPos;
-		NextCh();
-		if (ch == '/') {
-			NextCh();
-			for(;;) {
-				if (ch == 10) {
-					level--;
-					if (level == 0) { oldEols = line - line0; NextCh(); return true; }
-					NextCh();
-				} else if (ch == Buffer.EOF) return false;
-				else NextCh();
-			}
-		} else {
-			buffer.setPos(pos0); NextCh(); line = line0; col = col0; charPos = charPos0;
-		}
-		return false;
-	}
-
-	boolean Comment2() {
-		int level = 1, pos0 = pos, line0 = line, col0 = col, charPos0 = charPos;
-		NextCh();
-			for(;;) {
-				if (ch == '}') {
-					level--;
-					if (level == 0) { oldEols = line - line0; NextCh(); return true; }
-					NextCh();
-				} else if (ch == Buffer.EOF) return false;
-				else NextCh();
-			}
-	}
-
 
 	void CheckLiteral() {
 		String val = t.val;
@@ -467,7 +449,7 @@ public class Scanner {
 		while (ch == ' ' ||
 			ch >= 9 && ch <= 10 || ch == 13
 		) NextCh();
-		if (ch == '(' && Comment0() ||ch == '/' && Comment1() ||ch == '{' && Comment2()) return NextToken();
+		if (ch == '{' && Comment0() ||ch == '(' && Comment1()) return NextToken();
 		int recKind = noSym;
 		int recEnd = pos;
 		t = new Token();

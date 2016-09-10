@@ -43,7 +43,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.function.FunctionBodyNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.FunctionBodyNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.ProcedureBodyNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.ReadSubroutineArgumentNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.SetOutputParameterNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.CharLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.DoubleLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
@@ -65,16 +64,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
 
 public class NodeFactory {
-	
-	private class FrameSlotTuple {
-		public FrameSlot caller;
-		public FrameSlot callee;
-		
-		public FrameSlotTuple(FrameSlot caller, FrameSlot callee) {
-			this.caller = caller;
-			this.callee = callee;
-		}
-	}
 
 	// todo: pls move this to its own class
 	static class LexicalScope {
@@ -84,7 +73,6 @@ public class NodeFactory {
 		protected final String name;
 		protected final PascalContext context;
 		protected final Map<String, ICustomType> customTypes = new HashMap<>();
-		protected final List<FrameSlotTuple> outputSlots;
 		
 		/* List of initialization nodes (variables like array and enums are represented as Objects
 		 * (duh) and they need to be initialized otherwise their value would be null)
@@ -102,7 +90,6 @@ public class NodeFactory {
 			this.constants = new HashMap<>();
 			this.frameDescriptor = new FrameDescriptor();
 			this.initializationNodes = new ArrayList<>();
-			this.outputSlots = new ArrayList<>();
 			
 			if (outer != null) {
 				//localIdentifiers.putAll(outer.localIdentifiers);
