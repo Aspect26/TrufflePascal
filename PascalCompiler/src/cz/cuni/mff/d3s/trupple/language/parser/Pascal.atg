@@ -102,7 +102,7 @@ identifier										(. Token identifier = t; .)
 (
 	NumericConstant<out NumericConstant value>	(. factory.createNumericConstant(identifier, value); .)	
 |
-	stringLiteral								(. factory.createStringOrCharConstant(identifier, t); .)	
+	StringConstant<out String value> 			(. factory.createStringOrCharConstant(identifier, value); .)	
 |
 												(. boolean l; .)
 	LogicLiteral<out l>							(. factory.createBooleanConstant(identifier, l); .)
@@ -110,6 +110,17 @@ identifier										(. Token identifier = t; .)
 	identifier									(. factory.createObjectConstant(identifier, t); .)
 )
 ";"
+.
+
+
+
+StringConstant<out String value>
+=
+stringLiteral									(. value = factory.createStringFromLiteral(t); .)
+{
+	"+"
+	stringLiteral								(. value = value.concat(factory.createStringFromLiteral(t)); .)
+}
 .
 
 

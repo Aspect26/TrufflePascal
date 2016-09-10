@@ -170,8 +170,8 @@ public class Parser{
 			NumericConstant value = NumericConstant();
 			factory.createNumericConstant(identifier, value); 
 		} else if (la.kind == 2) {
-			Get();
-			factory.createStringOrCharConstant(identifier, t); 
+			String value = StringConstant();
+			factory.createStringOrCharConstant(identifier, value); 
 		} else if (la.kind == 19 || la.kind == 20) {
 			boolean l; 
 			l = LogicLiteral();
@@ -262,6 +262,18 @@ public class Parser{
 		} else if (la.kind == 1 || la.kind == 3 || la.kind == 4) {
 			value = UnsignedNumericArithmeticConstant();
 		} else SynErr(68);
+		return value;
+	}
+
+	String  StringConstant() {
+		String  value;
+		Expect(2);
+		value = factory.createStringFromLiteral(t); 
+		while (la.kind == 13) {
+			Get();
+			Expect(2);
+			value = value.concat(factory.createStringFromLiteral(t)); 
+		}
 		return value;
 	}
 

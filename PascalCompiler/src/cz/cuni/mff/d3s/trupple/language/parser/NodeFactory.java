@@ -631,6 +631,10 @@ public class NodeFactory {
 		return new NopNode();
 	}
 	
+	public String createStringFromLiteral(Token t) {
+		return (String)t.val.subSequence(1, t.val.length() - 1);
+	}
+	
 	public void createNumericConstant(Token nameToken, NumericConstant value) {
 		if (value.isDoubleType) {
 			this.createDoubleConstant(nameToken, value.getDouble());
@@ -661,12 +665,11 @@ public class NodeFactory {
 		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, value));
 	}
 
-	public void createStringOrCharConstant(Token nameToken, Token value) {
-		String strValue = (String)value.val.subSequence(1, value.val.length() - 1);
-		if(strValue.length() == 1) {
-			createCharConstant(nameToken, strValue.charAt(0));
+	public void createStringOrCharConstant(Token nameToken, String value) {
+		if(value.length() == 1) {
+			createCharConstant(nameToken, value.charAt(0));
 		} else {
-			createStringConstant(nameToken, strValue);
+			createStringConstant(nameToken, value);
 		}
 	}
 	
