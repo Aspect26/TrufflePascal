@@ -17,4 +17,19 @@ public class ConstantsTest extends JUnitTest {
 		String output = "4212.5truea";
 		this.test(code, output);
 	}
+	
+	@Test
+	public void composedConstants() {
+		String code="const ea=53;\n"+
+				"const eb=5;\n"+
+				"const ec=eb * eb * 0.0 + ea + 8 * 9 +8 *8 *8 +8 +8;\n"+
+				"const APPLICATIONNAME=\'Super \' + \'massive \' + \'op \' + \'\' + \'compiler.\';\n"+
+				"const b=true or false or not true and false or not not true;\n"+
+				"\n"+
+				"begin\n"+
+				" write(APPLICATIONNAME,ec,b);\n"+
+				"end.";
+		String output = "Super massive op compiler.653.0true";
+		this.test(code, output);
+	}
 }
