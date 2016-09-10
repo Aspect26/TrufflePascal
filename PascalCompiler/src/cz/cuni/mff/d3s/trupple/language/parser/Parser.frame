@@ -162,7 +162,32 @@ public class Parser{
     }
 } // end Parser
 
-class FormalParameter{
+class NumericConstant { 
+	private Object value;
+	public boolean isDoubleType;
+	
+	public NumericConstant(Object value, boolean isDoubleType) {
+		this.value = value;
+		this.isDoubleType = isDoubleType;
+	}
+	
+	public NumericConstant(Object value) {
+		this.value = value;
+		this.isDoubleType = (value instanceof Double);
+	}
+	
+	public double getDouble() {
+		return (isDoubleType)? (double)value : (double)(long)value;
+	}
+	
+	public long getLong() {
+		assert !isDoubleType;
+		
+		return (long)value;
+	}
+}
+
+class FormalParameter {
 	public FormalParameter(String id, String type, boolean isOutput){
 		this.type = type;
 		this.identifier = id;

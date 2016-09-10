@@ -19,7 +19,7 @@ TOKENS
 identifier = letter {letter | digit}.
 stringLiteral = "'" { stringChar } "'".
 numericLiteral = "0" | nonZeroDigit { digit }.
-floatLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] ("0" | nonZeroDigit { digit }) | ("0" | nonZeroDigit { digit }) "." ("0" | nonZeroDigit { digit }) ["e" ["-"|"+"] ("0" | nonZeroDigit { digit })].
+doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] ("0" | nonZeroDigit { digit }) | ("0" | nonZeroDigit { digit }) "." ("0" | nonZeroDigit { digit }) ["e" ["-"|"+"] ("0" | nonZeroDigit { digit })].
 
 PRAGMAS
 
@@ -100,9 +100,7 @@ ConstantDefinition
 identifier										(. Token identifier = t; .)
 "="
 (
-	floatLiteral								(. factory.createDoubleConstant(identifier, t); .)	
-|
-	numericLiteral								(. factory.createLongConstant(identifier, t); .)	
+	NumericConstant<out NumericConstant value>	(. factory.createNumericConstant(identifier, value); .)	
 |
 	stringLiteral								(. factory.createStringOrCharConstant(identifier, t); .)	
 |
@@ -113,6 +111,54 @@ identifier										(. Token identifier = t; .)
 )
 ";"
 .
+
+
+
+NumericConstant<out NumericConstant value>
+=												(. value = null; .)
+(
+	( "+" | "-" )								(. Token signToken = t; .)
+	NumericConstant<out NumericConstant signedValue>		
+												(. value = factory.createUnsignedConstant(signedValue, signToken); .)
+|
+	UnsignedNumericArithmeticConstant<out value>
+)
+.
+
+
+UnsignedNumericArithmeticConstant<out NumericConstant value>
+=
+NumericTermConstant<out value>
+{
+	( "+" | "-" )								(. Token opToken = t; .)
+	NumericTermConstant<out NumericConstant rvalue>	
+												(. value = factory.createNumericConstantFromBinary(value, rvalue, opToken); .)
+}
+.
+
+
+NumericTermConstant<out NumericConstant value>
+=
+NumericFactorConstant<out value>
+{
+	( "*" | "/" | "div" | "mod" )				(. Token opToken = t; .)
+	NumericFactorConstant<out NumericConstant rvalue>	
+												(. value = factory.createNumericConstantFromBinary(value, rvalue, opToken); .)
+}
+.
+
+
+NumericFactorConstant<out NumericConstant value>
+=												(. value = null; .)
+(
+	numericLiteral								(. value = new NumericConstant(Long.parseLong(t.val), false); .)
+|
+	doubleLiteral								(. value = new NumericConstant(Double.parseDouble(t.val), true); .)
+|
+	identifier									(. value = factory.getNumericConstant(t); .)
+)
+.
+
 
 
 LogicLiteral<out boolean result>
@@ -516,7 +562,7 @@ Factor<out ExpressionNode expression>
 |
 	stringLiteral					            (. expression = factory.createCharOrStringLiteral(t); .)
 |
-	floatLiteral								(. expression = factory.createFloatLiteral(t); .)
+	doubleLiteral								(. expression = factory.createFloatLiteral(t); .)
 |
     numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
                                                 (. if(expression == null) .)

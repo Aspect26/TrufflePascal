@@ -21,7 +21,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  *
  * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (assignment, operations, if condition, enum)
  * PREDAVANIE REFERENCIOU
- * CONSTANTS
  * RECORD + WITH
  * TYPE SHORTCUT (e.g.: type i=integer; }
  * SETS
@@ -38,7 +37,9 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * negative bound in array indexing
  * lexical scope v node factory -> v kazdej funkcii skoro sa vybera medzi ls z unitu alebo main programu -> vymazat
  * -> refactor NodeFactory
- * rename floatLiteral to doubleLiteral in grammar file
+ * zlozene konstanty
+ * object constants
+ * rename numericLiteral to integerLiteral in pascal.atg
  *  
  * CHANGELOG:
  * v0.8
@@ -46,6 +47,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * support global variables
  * support multidimensional arrays
  * support nested subroutines
+ * support simple constants
  * support random + randomize
  * support subroutine forwarding
  * support assigning array to array

@@ -630,27 +630,35 @@ public class NodeFactory {
 	public StatementNode createEmptyStatement() {
 		return new NopNode();
 	}
-
-	public void createLongConstant(Token nameToken, Token value) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		long longValue = Long.parseLong(value.val);
-		FrameSlot newSlot = registerConstant(ls, nameToken, longValue);
-		
-		if (newSlot == null) {
-			return;
+	
+	public void createNumericConstant(Token nameToken, NumericConstant value) {
+		if (value.isDoubleType) {
+			this.createDoubleConstant(nameToken, value.getDouble());
+		} else {
+			this.createLongConstant(nameToken, value.getLong());
 		}
-		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, longValue));
 	}
 
-	public void createDoubleConstant(Token nameToken, Token value) {
+	// Tip of the day: Fuck Java
+	
+	public void createLongConstant(Token nameToken, long value) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		double longValue = Double.parseDouble(value.val);
-		FrameSlot newSlot = registerConstant(ls, nameToken, longValue);
+		FrameSlot newSlot = registerConstant(ls, nameToken, value);
 		
 		if (newSlot == null) {
 			return;
 		}
-		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, longValue));
+		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, value));
+	}
+
+	public void createDoubleConstant(Token nameToken, double value) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		
+		if (newSlot == null) {
+			return;
+		}
+		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, value));
 	}
 
 	public void createStringOrCharConstant(Token nameToken, Token value) {
@@ -693,7 +701,12 @@ public class NodeFactory {
 	}
 	
 	public void createObjectConstant(Token nameToken, Token objectNameToken) {
+		/*
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 		
+		String identifier = nameToken.val.toLowerCase();
+		FrameSlot objectValueSlot = getVisibleSlot(objectNameToken.val.toLowerCase());
+		*/
 	}
 	
 	private FrameSlot registerConstant(LexicalScope ls, Token nameToken, Object value) {
@@ -708,7 +721,84 @@ public class NodeFactory {
 		ls.localIdentifiers.put(identifier, newSlot);
 		return newSlot;
 	}
+	
+	public NumericConstant createUnsignedConstant(NumericConstant value, Token signToken) {
+		switch(signToken.val) {
+		case "-":
+			return (value.isDoubleType)?
+					new NumericConstant(-value.getDouble(), true) :
+					new NumericConstant(-value.getLong(), false);
+		case "+":
+			return value;
+		default:
+			parser.SemErr("Unkown operator " + signToken.val + ".");
+			return null;
+		}
+	}
 
+	public NumericConstant createNumericConstantFromBinary(NumericConstant value, NumericConstant rvalue, Token opToken) {
+		boolean isDoubleType = value.isDoubleType || rvalue.isDoubleType;
+		
+		switch(opToken.val) {
+		case "-":
+			return (isDoubleType)?
+				new NumericConstant(value.getDouble() - rvalue.getDouble()) :
+				new NumericConstant(value.getLong() - rvalue.getLong(), false);
+		case "+":
+			return (isDoubleType)?
+					new NumericConstant(value.getDouble() + rvalue.getDouble()) :
+					new NumericConstant(value.getLong() + rvalue.getLong(), false);
+		case "*":
+			return (isDoubleType)?
+					new NumericConstant(value.getDouble() * rvalue.getDouble()) :
+					new NumericConstant(value.getLong() * rvalue.getLong(), false);
+		case "/":
+			return new NumericConstant(value.getDouble() / rvalue.getDouble());
+		case "div":
+			if (isDoubleType) {
+				parser.SemErr("Operand types do not match operator.");
+				return null;
+			}
+			return new NumericConstant(value.getLong() / rvalue.getLong(), false);
+		case "mod":
+			if (isDoubleType) {
+				parser.SemErr("Operand types do not match operator.");
+				return null;
+			}
+			return new NumericConstant(value.getLong() % rvalue.getLong(), false);
+		default:
+			parser.SemErr("Unkown operator " + opToken.val + ".");
+			return null;
+		}
+	}
+	
+	public NumericConstant getNumericConstant(Token nameToken) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		String identifier = nameToken.val.toLowerCase();
+		Object c = getConstant(ls, identifier);
+		if (c == null) {
+			return null;
+		}
+		
+		if (c instanceof Long) {
+			return new NumericConstant(c, false);
+		} else if (c instanceof Double) {
+			return new NumericConstant(c, true);
+		} else {
+			parser.SemErr("Wrong constant type in expression " + identifier +".");
+			return null;
+		}
+	}
+	
+	private Object getConstant(LexicalScope ls, String identifier) {
+		if (!ls.constants.containsKey(identifier)) {
+			parser.SemErr("Unknown constant " + identifier +".");
+			return null;
+		}
+		
+		return ls.constants.get(identifier);
+	}
+	
 	public ExpressionNode createCharOrStringLiteral(Token literalToken) {
 		String literal = literalToken.val;
 		assert literal.length() >= 2 && literal.startsWith("'") && literal.endsWith("'");
