@@ -168,10 +168,10 @@ public class Parser{
 		Expect(9);
 		if (la.kind == 4) {
 			Get();
-			factory.createFloatConstant(identifier, t); 
+			factory.createDoubleConstant(identifier, t); 
 		} else if (la.kind == 3) {
 			Get();
-			factory.createIntegerConstant(identifier, t); 
+			factory.createLongConstant(identifier, t); 
 		} else if (la.kind == 2) {
 			Get();
 			factory.createStringOrCharConstant(identifier, t); 
@@ -179,6 +179,9 @@ public class Parser{
 			boolean l; 
 			l = LogicLiteral();
 			factory.createBooleanConstant(identifier, l); 
+		} else if (la.kind == 1) {
+			Get();
+			factory.createObjectConstant(identifier, t); 
 		} else SynErr(65);
 		Expect(7);
 	}

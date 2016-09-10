@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
@@ -76,7 +77,7 @@ public class Unit {
 			lexicalScope.context.getPrivateFunctionRegistry().registerFunctionName(identifier);
 			
 		lexicalScope = new LexicalScope(lexicalScope, identifier);
-		lexicalScope.frameDescriptor = NodeFactory.copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
+		lexicalScope.frameDescriptor = new FrameDescriptor(lexicalScope.outer.frameDescriptor.getDefaultValue());
 	}
 
 	public boolean checkProcedureMatchInterface(String name, List<FormalParameter> params) {

@@ -100,14 +100,16 @@ ConstantDefinition
 identifier										(. Token identifier = t; .)
 "="
 (
-	floatLiteral								(. factory.createFloatConstant(identifier, t); .)	
+	floatLiteral								(. factory.createDoubleConstant(identifier, t); .)	
 |
-	numericLiteral								(. factory.createIntegerConstant(identifier, t); .)	
+	numericLiteral								(. factory.createLongConstant(identifier, t); .)	
 |
 	stringLiteral								(. factory.createStringOrCharConstant(identifier, t); .)	
 |
 												(. boolean l; .)
-	LogicLiteral<out l>							(. factory.createBooleanConstant(identifier, l); .)	
+	LogicLiteral<out l>							(. factory.createBooleanConstant(identifier, l); .)
+|
+	identifier									(. factory.createObjectConstant(identifier, t); .)
 )
 ";"
 .

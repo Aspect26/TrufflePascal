@@ -18,7 +18,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
@@ -69,10 +69,10 @@ public class NodeFactory {
 	static class LexicalScope {
 		protected final LexicalScope outer;
 		protected final Map<String, FrameSlot> localIdentifiers;
-		protected final Map<String, Constant> constants;
 		protected final String name;
 		protected final PascalContext context;
-		protected final Map<String, ICustomType> customTypes = new HashMap<>();
+		protected final Map<String, ICustomType> customTypes;
+		protected final Map<String, Object> constants;
 		
 		/* List of initialization nodes (variables like array and enums are represented as Objects
 		 * (duh) and they need to be initialized otherwise their value would be null)
@@ -87,9 +87,10 @@ public class NodeFactory {
 			this.name = name;
 			this.outer = outer;
 			this.localIdentifiers = new HashMap<>();
-			this.constants = new HashMap<>();
 			this.frameDescriptor = new FrameDescriptor();
 			this.initializationNodes = new ArrayList<>();
+			this.constants = new HashMap<>();
+			this.customTypes = new HashMap<>();
 			
 			if (outer != null) {
 				//localIdentifiers.putAll(outer.localIdentifiers);
@@ -133,7 +134,7 @@ public class NodeFactory {
 					return elementIdentifier;
 				}
 				FrameSlot slot = this.frameDescriptor.addFrameSlot(elementIdentifier, FrameSlotKind.Object);
-				this.initializationNodes.add(new InitializationNode(slot, 
+				this.initializationNodes.add(InitializationNodeFactory.create(slot, 
 						new EnumValue(enumType, enumType.getFirstIndex())));
 				
 				localIdentifiers.put(elementIdentifier, null);
@@ -154,29 +155,6 @@ public class NodeFactory {
 			
 			return null;
 		}
-	}
-
-	interface Constant {
-
-	}
-
-	class IntegerConstant implements Constant {
-	}
-
-	/**
-	 * WTF -> FrameDescriptor.copy() function does not copy slot kinds
-	 * 
-	 * @see com.oracle.truffle.api.frame.FrameDescriptor#copy
-	 * @param original descriptor to be copied
-	 * @return new descriptor with the same default value and slots
-	 */
-	public static FrameDescriptor copyFrameDescriptor(FrameDescriptor original) {
-		FrameDescriptor clonedFrameDescriptor = new FrameDescriptor(original.getDefaultValue());
-		for (FrameSlot slot : original.getSlots()) {
-			clonedFrameDescriptor.addFrameSlot(slot.getIdentifier(), slot.getInfo(), slot.getKind());
-		}
-		//return clonedFrameDescriptor;
-		return new FrameDescriptor(original.getDefaultValue());
 	}
 
 	// Reference to parser -> needed for throwing semantic errors
@@ -260,7 +238,7 @@ public class NodeFactory {
 				FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(identifier, slotKind);
 				ls.localIdentifiers.put(identifier, newSlot);
 				if (enumType != null) {
-					ls.initializationNodes.add(new InitializationNode(newSlot, new EnumValue(enumType)));
+					ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, new EnumValue(enumType)));
 				}
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
@@ -279,7 +257,7 @@ public class NodeFactory {
 				FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, FrameSlotKind.Object);
 				lexicalScope.localIdentifiers.put(identifier, newSlot);
 				PascalArray array = createMultidimensionalArray(ordinalDimensions, returnTypeToken.val.toLowerCase());
-				this.lexicalScope.initializationNodes.add(new InitializationNode(newSlot, array));
+				this.lexicalScope.initializationNodes.add(InitializationNodeFactory.create(newSlot, array));
 			} catch (IllegalArgumentException e) {
 				parser.SemErr("Duplicate variable: " + identifier + ".");
 				continue;
@@ -373,7 +351,7 @@ public class NodeFactory {
 		if (currentUnit == null) {
 			ls.context.getGlobalFunctionRegistry().registerFunctionName(identifier);
 			lexicalScope = new LexicalScope(lexicalScope, identifier);
-			lexicalScope.frameDescriptor = copyFrameDescriptor(lexicalScope.outer.frameDescriptor);
+			lexicalScope.frameDescriptor = new FrameDescriptor(lexicalScope.outer.frameDescriptor.getDefaultValue());
 		} else {
 			currentUnit.startSubroutineImplementation(identifier);
 		}
@@ -653,24 +631,82 @@ public class NodeFactory {
 		return new NopNode();
 	}
 
-	public void createIntegerConstant(Token identifier, Token value) {
+	public void createLongConstant(Token nameToken, Token value) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-
-		ls.localIdentifiers.put(identifier.val.toLowerCase(), null);
-		// ls.constants.put(identifier.val.toLowerCase(), new
-		// IntegerConstant(value.val.toLowerCase()));
+		long longValue = Long.parseLong(value.val);
+		FrameSlot newSlot = registerConstant(ls, nameToken, longValue);
+		
+		if (newSlot == null) {
+			return;
+		}
+		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, longValue));
 	}
 
-	public void createFloatConstant(Token identifier, Token value) {
-
+	public void createDoubleConstant(Token nameToken, Token value) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		double longValue = Double.parseDouble(value.val);
+		FrameSlot newSlot = registerConstant(ls, nameToken, longValue);
+		
+		if (newSlot == null) {
+			return;
+		}
+		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, longValue));
 	}
 
-	public void createStringOrCharConstant(Token identifier, Token value) {
-
+	public void createStringOrCharConstant(Token nameToken, Token value) {
+		String strValue = (String)value.val.subSequence(1, value.val.length() - 1);
+		if(strValue.length() == 1) {
+			createCharConstant(nameToken, strValue.charAt(0));
+		} else {
+			createStringConstant(nameToken, strValue);
+		}
+	}
+	
+	public void createCharConstant(Token nameToken, char value) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		
+		if (newSlot == null) {
+			return;
+		}
+		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, value));
+	}
+	
+	public void createStringConstant(Token nameToken, String value) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		
+		if (newSlot == null) {
+			return;
+		}
+		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, value));
 	}
 
-	public void createBooleanConstant(Token identifier, boolean value) {
-
+	public void createBooleanConstant(Token nameToken, boolean value) {
+		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		
+		if (newSlot == null) {
+			return;
+		}
+		ls.initializationNodes.add(InitializationNodeFactory.create(newSlot, value));
+	}
+	
+	public void createObjectConstant(Token nameToken, Token objectNameToken) {
+		
+	}
+	
+	private FrameSlot registerConstant(LexicalScope ls, Token nameToken, Object value) {
+		String identifier = nameToken.val.toLowerCase();
+		if (ls.localIdentifiers.containsKey(identifier)) {
+			parser.SemErr("Duplicate identifier: " + identifier + ".");
+			return null;
+		}
+		
+		FrameSlot newSlot = ls.frameDescriptor.addFrameSlot(identifier);
+		ls.constants.put(identifier, value);
+		ls.localIdentifiers.put(identifier, newSlot);
+		return newSlot;
 	}
 
 	public ExpressionNode createCharOrStringLiteral(Token literalToken) {

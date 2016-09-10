@@ -21,7 +21,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  *
  * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (assignment, operations, if condition, enum)
  * PREDAVANIE REFERENCIOU
- * GOTO (PROBLEM)
  * CONSTANTS
  * RECORD + WITH
  * TYPE SHORTCUT (e.g.: type i=integer; }
@@ -29,6 +28,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * FILES + READ
  * POINTERS
  * CRT, GRAPH, STRING, DOS
+ * GOTO (PROBLEM)
  * 
  * ' in string 
  * private/global variables (mainly in unit)
@@ -36,6 +36,9 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * array v unite
  * enum v unite
  * negative bound in array indexing
+ * lexical scope v node factory -> v kazdej funkcii skoro sa vybera medzi ls z unitu alebo main programu -> vymazat
+ * -> refactor NodeFactory
+ * rename floatLiteral to doubleLiteral in grammar file
  *  
  * CHANGELOG:
  * v0.8
