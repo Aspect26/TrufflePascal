@@ -17,37 +17,13 @@ import cz.cuni.mff.d3s.trupple.language.parser.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 /*
- * TODO LIST
- *
- * COMPILATION TIME TYPE CHECKING!!!!!!!!!!!!!!!!!!!!!! (assignment, operations, if condition, enum)
- * PREDAVANIE REFERENCIOU
- * RECORD + WITH
- * TYPE SHORTCUT (e.g.: type i=integer; }
- * SETS
- * FILES + READ
- * POINTERS
- * CRT, GRAPH, STRING, DOS
- * GOTO (PROBLEM)
- * 
- * ' in string 
- * private/global variables (mainly in unit)
- * break nie je v std (treba prepinac --std=turbo)
- * array v unite
- * enum v unite
- * negative bound in array indexing
- * lexical scope v node factory -> v kazdej funkcii skoro sa vybera medzi ls z unitu alebo main programu -> vymazat
- * -> refactor NodeFactory
- * zlozene konstanty
- * object constants
- * rename numericLiteral to integerLiteral in pascal.atg
- *  
  * CHANGELOG:
  * v0.8
  * support readln
  * support global variables
  * support multidimensional arrays
  * support nested subroutines
- * support simple constants
+ * support constants (except for custom types)
  * support random + randomize
  * support subroutine forwarding
  * support assigning array to array
@@ -68,7 +44,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
  * -I option syntax changed to gcc-like
  */
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.7", mimeType = "text/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.8", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 
 	public static final PascalLanguage INSTANCE = new PascalLanguage();
