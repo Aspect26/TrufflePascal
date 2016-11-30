@@ -13,7 +13,7 @@ public class Parser{
 	public static final int _EOF = 0;
 	public static final int _identifier = 1;
 	public static final int _stringLiteral = 2;
-	public static final int _numericLiteral = 3;
+	public static final int _integerLiteral = 3;
 	public static final int _doubleLiteral = 4;
 	public static final int maxT = 62;
 
@@ -1175,7 +1175,7 @@ class Errors {
 			case 0: s = "EOF expected"; break;
 			case 1: s = "identifier expected"; break;
 			case 2: s = "stringLiteral expected"; break;
-			case 3: s = "numericLiteral expected"; break;
+			case 3: s = "integerLiteral expected"; break;
 			case 4: s = "doubleLiteral expected"; break;
 			case 5: s = "\"uses\" expected"; break;
 			case 6: s = "\",\" expected"; break;

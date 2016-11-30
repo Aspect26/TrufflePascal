@@ -18,7 +18,7 @@ TOKENS
 
 identifier = letter {letter | digit}.
 stringLiteral = "'" { stringChar } "'".
-numericLiteral = "0" | nonZeroDigit { digit }.
+integerLiteral = "0" | nonZeroDigit { digit }.
 doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] ("0" | nonZeroDigit { digit }) | ("0" | nonZeroDigit { digit }) "." ("0" | nonZeroDigit { digit }) ["e" ["-"|"+"] ("0" | nonZeroDigit { digit })].
 
 PRAGMAS
@@ -214,7 +214,7 @@ NumericFactorConstant<out value>
 NumericFactorConstant<out NumericConstant value>
 =												(. value = null; .)
 (
-	numericLiteral								(. value = new NumericConstant(Long.parseLong(t.val), false); .)
+	integerLiteral								(. value = new NumericConstant(Long.parseLong(t.val), false); .)
 |
 	doubleLiteral								(. value = new NumericConstant(Double.parseDouble(t.val), true); .)
 |
@@ -287,9 +287,9 @@ Ordinal<out ordinal>							(. ordinalDimensions.add(ordinal); .)
 Ordinal<out IOrdinalType ordinal>
 =												(. ordinal = null; .)
 (												
-	numericLiteral								(. Token lowerBound = t; .)
+	integerLiteral								(. Token lowerBound = t; .)
 	".."
-	numericLiteral								(. Token upperBound = t; .)
+	integerLiteral								(. Token upperBound = t; .)
 												(. ordinal = factory.createSimpleOrdinal(lowerBound, upperBound); .)
 |
 	identifier									(. Token identifier = t; .)
@@ -628,7 +628,7 @@ Factor<out ExpressionNode expression>
 |
 	doubleLiteral								(. expression = factory.createFloatLiteral(t); .)
 |
-    numericLiteral                              (. expression = factory.createNumericLiteral(t); .)
+    integerLiteral                              (. expression = factory.createNumericLiteral(t); .)
                                                 (. if(expression == null) .)
                                                 (.      SemErr("Constant out of range!"); .)
 |
@@ -658,7 +658,7 @@ Random<out ExpressionNode expression>
 	(
 		")"										(. expression = factory.createRandomNode(); .)
 	|
-		numericLiteral							(. expression = factory.createRandomNode(t); .)
+		integerLiteral							(. expression = factory.createRandomNode(t); .)
 		")"
 	)
 )
