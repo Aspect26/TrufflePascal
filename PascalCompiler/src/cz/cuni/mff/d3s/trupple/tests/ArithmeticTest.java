@@ -43,4 +43,22 @@ public class ArithmeticTest extends JUnitTest {
 	public void moduloTest() {
 		test("begin write(50 mod 3); end.", "2");
 	}
+
+	@Test
+	public void unaryMinusTest() { test("begin write(-3 + -5); end.", "-8"); }
+
+	@Test
+	public void unaryMinusTest2() { test("begin write(3 + -5); end.", "-2"); }
+
+	@Test
+	public void unaryMinusTest3() { test("begin write(-3 + 5); end.", "2"); }
+
+    @Test
+    public void unaryPlusTest() { test("begin write(+3 + +5); end.", "8"); }
+
+    @Test
+    public void unaryPlusTest2() { test("begin write(+3 + 5); end.", "8"); }
+
+    @Test
+    public void unaryPlusTest3() { test("begin write(3 + +5); end.", "8"); }
 }

@@ -382,7 +382,6 @@ public class NodeFactory {
 
 	private StatementNode finishSubroutine(StatementNode bodyNode) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		assert ls.outer == null;
 
 		ls.scopeNodes.add(bodyNode);
 		final StatementNode subroutineNode = new BlockNode(
@@ -830,12 +829,13 @@ public class NodeFactory {
 		return ls.constants.get(identifier);
 	}
 	
-	public ExpressionNode createCharOrStringLiteral(Token literalToken) {
-		String literal = literalToken.val;
-		assert literal.length() >= 2 && literal.startsWith("'") && literal.endsWith("'");
-		literal = literal.substring(1, literal.length() - 1);
-
+	public ExpressionNode createCharOrStringLiteral(String literal) {
 		return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
+	}
+
+	public String createStringFromToken(Token t) {
+		String literal = t.val;
+		return literal.substring(1, literal.length() - 1);
 	}
 
 	public ExpressionNode createNumericLiteral(Token literalToken) {

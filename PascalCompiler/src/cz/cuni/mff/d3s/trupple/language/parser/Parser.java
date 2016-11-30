@@ -864,8 +864,9 @@ public class Parser{
 			break;
 		}
 		case 2: {
-			Get();
-			expression = factory.createCharOrStringLiteral(t); 
+			String value = ""; 
+			value = StringLiteral();
+			expression = factory.createCharOrStringLiteral(value); 
 			break;
 		}
 		case 4: {
@@ -944,6 +945,17 @@ public class Parser{
 			expression = ArrayAccessing(identifierName);
 		} else SynErr(86);
 		return expression;
+	}
+
+	String  StringLiteral() {
+		String  value;
+		Expect(2);
+		value = factory.createStringFromToken(t); 
+		while (la.kind == 2) {
+			Get();
+			value += "'" + factory.createStringFromToken(t); 
+		}
+		return value;
 	}
 
 	ExpressionNode  ArrayAccessing(Token identifierName) {

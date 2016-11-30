@@ -4,7 +4,6 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.dsl.GeneratedBy;
 import com.oracle.truffle.api.dsl.NodeFactory;
-import com.oracle.truffle.api.dsl.internal.NodeFactoryBase;
 import com.oracle.truffle.api.dsl.internal.SpecializationNode;
 import com.oracle.truffle.api.dsl.internal.SpecializedNode;
 import com.oracle.truffle.api.frame.Frame;
@@ -15,14 +14,31 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import java.util.Arrays;
+import java.util.List;
 
 @GeneratedBy(WritelnBuiltinNode.class)
-public final class WritelnBuiltinNodeFactory extends NodeFactoryBase<WritelnBuiltinNode> {
+@SuppressWarnings({"unchecked", "rawtypes"})
+public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuiltinNode> {
 
     private static WritelnBuiltinNodeFactory instance;
 
     private WritelnBuiltinNodeFactory() {
-        super(WritelnBuiltinNode.class, new Class<?>[] {ExpressionNode.class}, new Class<?>[][] {new Class<?>[] {ExpressionNode[].class, PascalContext.class}});
+    }
+
+    @Override
+    public Class<WritelnBuiltinNode> getNodeClass() {
+        return WritelnBuiltinNode.class;
+    }
+
+    @Override
+    public List getExecutionSignature() {
+        return Arrays.asList(ExpressionNode.class);
+    }
+
+    @Override
+    public List getNodeSignatures() {
+        return Arrays.asList(Arrays.asList(ExpressionNode[].class, PascalContext.class));
     }
 
     @Override

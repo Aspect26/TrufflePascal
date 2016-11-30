@@ -30,10 +30,8 @@ public class CompilerMain {
 	
 	public static void main(String[] args) throws IOException {
 		new CompilerMain().start(args);
-	
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void start(String[] args) throws IOException{
 		
 		Settings settings = new Settings();
@@ -42,7 +40,8 @@ public class CompilerMain {
 			parser.parseArgument(args);
 			
 			if(settings.arguments == null || settings.arguments.size() == 0)
-                throw new CmdLineException("You must specify a source file.");
+                throw new IOException("You must specify a source file.");
+			// TODO: HIGH PRIORITY change this exception
 			
 			settings.sourcePath = settings.arguments.get(settings.arguments.size()-1);
 		} catch(CmdLineException e) {

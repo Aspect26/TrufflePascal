@@ -623,7 +623,8 @@ Factor<out ExpressionNode expression>
     Expression<out expression>                  
     ")"
 |
-	stringLiteral					            (. expression = factory.createCharOrStringLiteral(t); .)
+                                                (. String value = ""; .)
+	StringLiteral<out value>		            (. expression = factory.createCharOrStringLiteral(value); .)
 |
 	doubleLiteral								(. expression = factory.createFloatLiteral(t); .)
 |
@@ -634,6 +635,15 @@ Factor<out ExpressionNode expression>
 												(. boolean val; .)
     LogicLiteral<out val>						(. expression = factory.createLogicLiteral(val); .)
 )
+.
+
+
+StringLiteral<out String value>
+=
+stringLiteral                                   (. value = factory.createStringFromToken(t); .)
+{
+    stringLiteral                               (. value += "'" + factory.createStringFromToken(t); .)
+}
 .
 
 
