@@ -77,7 +77,7 @@ public class NodeFactory {
 
 	void startPascal() {
 		assert this.lexicalScope == null;
-		this.lexicalScope = new LexicalScope(null, null);
+		this.lexicalScope = new LexicalScope(null, "main");
 	}
 
 	public void finishVariableLineDefinition(List<String> identifiers, Token variableType) {
@@ -344,12 +344,13 @@ public class NodeFactory {
 			
 		// secondly, try to create a procedure or function literal (with no arguments)
 		} else {
-			while(lexicalScope != null) {
-				if(lexicalScope.getContext().containsParameterlessSubroutine(identifier)) {
+            LexicalScope iteratingScope = this.lexicalScope;
+			while(iteratingScope != null) {
+				if(iteratingScope.getContext().containsParameterlessSubroutine(identifier)) {
 					ExpressionNode literal = this.createFunctionNode(nameToken);
 					return this.createCall(literal, new ArrayList<>());
 				} else {
-                    lexicalScope = lexicalScope.getOuterScope();
+                    iteratingScope = iteratingScope.getOuterScope();
 				}
 			}
 				
@@ -468,10 +469,6 @@ public class NodeFactory {
             return null;
         }
 	}
-
-    /***************************
-     * REFACTOR DONE DOWNTO HERE
-     */
 
 	public NumericConstant createUnsignedConstant(NumericConstant value, Token signToken) {
 		switch(signToken.val) {
@@ -717,6 +714,7 @@ public class NodeFactory {
 	public void addProcedureInterface(Token name, List<FormalParameter> formalParameters) {
 		if(currentUnit == null) {
 			lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(name.val.toLowerCase());
+            this.lexicalScope = this.lexicalScope.getOuterScope();
 		} else if (!currentUnit.addProcedureInterface(name.val.toLowerCase(), formalParameters)) {
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}
@@ -745,11 +743,10 @@ public class NodeFactory {
 	}
 
 	public void finishFormalParameterListFunction(Token name, List<FormalParameter> parameters, String returnType) {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		String identifier = name.val.toLowerCase();
 		
 		// the subroutine is in outer context because now the parser is in the subroutine's own context
-		ls.getOuterScope().getContext().setMySubroutineParametersCount(identifier, parameters.size());
+		lexicalScope.getOuterScope().getContext().setMySubroutineParametersCount(identifier, parameters.size());
 		
 		if(currentUnit == null)
 			return;
