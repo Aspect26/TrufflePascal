@@ -104,13 +104,13 @@ public class SubroutinesTest extends JUnitTest {
 				"\n"+
 				"procedure b;\n"+
 				" begin;\n"+
-				" write(\'You not prepared!\');\n"+
+				" write(\'You are not prepared!\');\n"+
 				" end;\n"+
 				"\n"+
 				"begin\n"+
-				" a;\n"+
+				" a();\n"+
 				"end.";
-		String output = "You not prepared!";
+		String output = "You are not prepared!";
 		this.test(code, output);
 	}
 }

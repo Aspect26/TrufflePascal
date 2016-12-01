@@ -3,18 +3,17 @@ package cz.cuni.mff.d3s.trupple.language.runtime;
 import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.interop.ForeignAccess;
 import com.oracle.truffle.api.interop.TruffleObject;
+import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 
 public class PascalFunction implements TruffleObject {
 
 	private RootCallTarget callTarget;
 	private String identifier;
 	private int parametersCount;
-	private boolean isImplemented;
 
-	public PascalFunction(String name) {
-		this.identifier = name;
+	public PascalFunction(String identifier) {
+		this.identifier = identifier;
 		this.parametersCount = -1;
-		this.isImplemented = false;
 	}
 
 	protected void setCallTarget(RootCallTarget callTarget) {
@@ -38,16 +37,12 @@ public class PascalFunction implements TruffleObject {
 	}
 	
 	public boolean isImplemented() {
-		return isImplemented;
+		return callTarget != null;
 	}
 	
-	public void setImplemented(boolean isImplemented) {
-		this.isImplemented = isImplemented;
-	}
-
 	@Override
 	public String toString() {
-		return identifier;
+		return "Function: " + identifier;
 	}
 
 	@Override
@@ -55,4 +50,8 @@ public class PascalFunction implements TruffleObject {
 		// TODO Foreign access
 		return null;
 	}
+
+	public static PascalFunction createUnimplementedFunctin() {
+        return new PascalFunction("_UnimplementedFunction");
+    }
 }

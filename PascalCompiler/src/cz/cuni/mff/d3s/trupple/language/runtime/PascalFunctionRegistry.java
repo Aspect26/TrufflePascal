@@ -42,16 +42,15 @@ public class PascalFunctionRegistry {
 	}
 
 	public void registerFunctionName(String identifier) {
-		functions.put(identifier, new PascalFunction("__UnimplementedFunctionYet"));
+		functions.put(identifier, PascalFunction.createUnimplementedFunctin());
 	}
 
 	public void setFunctionRootNode(String identifier, PascalRootNode rootNode) {
-		PascalFunction func = functions.get(identifier);
-		assert func != null;
+        PascalFunction function = functions.get(identifier);
+		assert function != null;
 		
 		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
-		func.setCallTarget(callTarget);
-		func.setName(identifier);
+        function.setCallTarget(callTarget);
 	}
 
 	public void addAll(PascalFunctionRegistry registry) {

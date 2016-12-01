@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
@@ -14,8 +13,6 @@ import cz.cuni.mff.d3s.trupple.language.customtypes.EnumType;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 import cz.cuni.mff.d3s.trupple.language.customtypes.SimpleOrdinal;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
@@ -42,7 +39,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.FunctionBodyNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.FunctionBodyNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.ProcedureBodyNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.ReadSubroutineArgumentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.CharLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.DoubleLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
@@ -56,7 +52,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ArrayIndexAssignmentNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
@@ -79,184 +74,114 @@ public class NodeFactory {
 
 	public NodeFactory(Parser parser) {
 		this.parser = parser;
+	}
+
+	void startPascal() {
+		assert this.lexicalScope == null;
 		this.lexicalScope = new LexicalScope(null, null);
-	}
-
-	private FrameSlotKind getSlotByTypeName(String type) {
-		// firstly check if it is not a custom type
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		if(ls.containsCustomType(type))
-			return FrameSlotKind.Object;
-
-		switch (type) {
-
-		// ordinals
-		case "integer":
-		case "shortint":
-		case "longint":
-		case "byte":
-		case "word":
-			return FrameSlotKind.Long;
-
-		// floating points
-		case "single":
-		case "real":
-		case "double":
-			return FrameSlotKind.Double;
-
-		// logical
-		case "boolean":
-			return FrameSlotKind.Boolean;
-
-		// char
-		case "char":
-			return FrameSlotKind.Byte;
-
-		default:
-			return FrameSlotKind.Illegal;
-		}
-	}
-	
-	public boolean containsIdentifier(String identifier) {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return ls.containsCustomValue(identifier);
 	}
 
 	public void finishVariableLineDefinition(List<String> identifiers, Token variableType) {
 		String typeName = variableType.val.toLowerCase();
-		FrameSlotKind slotKind = getSlotByTypeName(typeName);
-		
-		if (slotKind == FrameSlotKind.Illegal) {
-			parser.SemErr("Unkown variable type: " + typeName);
-		}
-		
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		EnumType enumType = ls.getEnumType(typeName);
-		
+
 		for (String identifier : identifiers) {
-			ls.registerLocalIdentifier(identifier, typeName);
+			try {
+				lexicalScope.registerLocalIdentifier(identifier, typeName);
+			} catch (LexicalScope.LexicalException e) {
+				parser.SemErr(e.getMessage());
+			}
 		}
 	}
 	
 	public void finishArrayDefinition(List<String> identifiers, List<IOrdinalType> ordinalDimensions, Token returnTypeToken) {
-		//TODO: this! -> arrays in units
-		if(currentUnit != null)
-			return;
-		
 		for(String identifier : identifiers) {
             try {
                 lexicalScope.registerArrayVariable(identifier, ordinalDimensions, returnTypeToken.val.toLowerCase());
-            } catch (IllegalArgumentException e) {
+            } catch (LexicalScope.LexicalException e) {
                 parser.SemErr(e.getMessage());
             }
 		}
 	}
-	
 
-	
 	public void registerEnumType(String identifier, List<String> identifiers){
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		boolean global = (currentUnit==null)? true : currentUnit.isInInterfaceSection();
+		boolean global = (currentUnit==null) || currentUnit.isInInterfaceSection();
 		
-		String duplicity = ls.registerEnumType(identifier, identifiers, global);
-		if(duplicity != null)
-			parser.SemErr("Duplicate variable: " + duplicity + ".");
+		try {
+            lexicalScope.registerEnumType(identifier, identifiers, global);
+        } catch (LexicalScope.LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
 	}
 
-	public void startProcedure(Token name) {
-		startSubroutine(name);
+	public void startProcedureImplementation(Token name) {
+        startSubroutineImplementation(name);
 	}
 
-	// TODO: remove this duplicit with finishFunction
+    public void startFunctionImplementation(Token name) {
+        startSubroutineImplementation(name);
+    }
+
+    private void startSubroutineImplementation(Token name) {
+        String identifier = name.val.toLowerCase();
+        try {
+            lexicalScope.startSubroutineImplementation(identifier);
+        } catch (LexicalScope.LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+
+        if (currentUnit == null) {
+            lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(identifier);
+            lexicalScope = new LexicalScope(lexicalScope, identifier);
+        } else {
+            currentUnit.startSubroutineImplementation(identifier);
+        }
+    }
+
 	public void finishProcedure(StatementNode bodyNode) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+		StatementNode subroutineNode = createSubroutineNode(bodyNode);
+		final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
 
-		StatementNode subroutineNode = finishSubroutine(bodyNode);
-		final ProcedureBodyNode functionBodyNode = new ProcedureBodyNode(subroutineNode);
-		final PascalRootNode rootNode = new PascalRootNode(ls.getFrameDescriptor(), functionBodyNode);
-
-		if (currentUnit == null) {
-			lexicalScope = lexicalScope.getOuterScope();
-			lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(ls.getName(), rootNode);
-			lexicalScope.getContext().getGlobalFunctionRegistry().lookup(ls.getName()).setImplemented(true);
-		} else {
-			currentUnit.registerProcedure(rootNode);
-		}
+        finishSubroutine(procedureBodyNode);
 	}
 
-	public void startFunction(Token name) {
-		startSubroutine(name);
-	}
+    public void finishFunction(StatementNode bodyNode) {
+        StatementNode subroutineNode = createSubroutineNode(bodyNode);
+        final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(subroutineNode, lexicalScope.getReturnSlot());
+
+        finishSubroutine(functionBodyNode);
+    }
+
+    private StatementNode createSubroutineNode(StatementNode bodyNode) {
+        LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+
+        ls.scopeNodes.add(bodyNode);
+        final StatementNode subroutineNode = new BlockNode(
+                ls.scopeNodes.toArray(new StatementNode[ls.scopeNodes.size()]));
+
+        return subroutineNode;
+    }
+
+    private void finishSubroutine(ExpressionNode subroutineBodyNode) {
+        final PascalRootNode rootNode = new PascalRootNode(lexicalScope.getFrameDescriptor(), subroutineBodyNode);
+        String subroutineIdentifier = lexicalScope.getName();
+        if (currentUnit == null) {
+            lexicalScope = lexicalScope.getOuterScope();
+            lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(subroutineIdentifier, rootNode);
+        } else {
+            currentUnit.implementSubroutine(rootNode);
+        }
+    }
 
 	public void setFunctionReturnValue(Token type) {
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
         ls.setReturnSlot(type.val);
 	}
 
-	public void finishFunction(StatementNode bodyNode) {
-		StatementNode subroutineNode = finishSubroutine(bodyNode);
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+    /***************************
+     * REFACTOR DONE DOWNTO HERE
+     */
 
-		final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(subroutineNode, ls.getReturnSlot());
-		final PascalRootNode rootNode = new PascalRootNode(ls.getFrameDescriptor(), functionBodyNode);
 
-		if (currentUnit == null) {
-			lexicalScope = lexicalScope.getOuterScope();
-			lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(ls.getName(), rootNode);
-			lexicalScope.getContext().getGlobalFunctionRegistry().lookup(ls.getName()).setImplemented(true);
-		} else {
-			currentUnit.registerFunction(rootNode);
-		}
-	}
-
-	private void startSubroutine(Token name) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-
-		String identifier = name.val.toLowerCase();
-		if(!checkSubroutineCanBeImplemented(identifier)) {
-			return;
-		}
-
-		if (currentUnit == null) {
-			ls.getContext().getGlobalFunctionRegistry().registerFunctionName(identifier);
-			lexicalScope = new LexicalScope(lexicalScope, identifier);
-		} else {
-			currentUnit.startSubroutineImplementation(identifier);
-		}
-	}
-	
-	private boolean checkSubroutineCanBeImplemented(String identifier) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		
-		if(ls.getContext().containsIdentifier(identifier) &&
-				ls.getContext().getGlobalFunctionRegistry().lookup(identifier) == null &&
-				ls.getContext().getPrivateFunctionRegistry().lookup(identifier) == null) {
-			ls.getContext().getOutput().println("Duplicate identifier.");
-			return false;
-		}
-		
-		if (ls.getContext().getGlobalFunctionRegistry().lookup(identifier) != null && ls.getContext().getGlobalFunctionRegistry().lookup(identifier).isImplemented()){
-			ls.getContext().getOutput().println("Subroutine is already implemented.");
-			return false;
-		}
-		
-		if (ls.getContext().getPrivateFunctionRegistry().lookup(identifier) != null && ls.getContext().getPrivateFunctionRegistry().lookup(identifier).isImplemented()){
-			ls.getContext().getOutput().println("Subroutine is already implemented.");
-			return false;
-		}
-		
-		return true;
-	}
-
-	private StatementNode finishSubroutine(StatementNode bodyNode) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-
-		ls.scopeNodes.add(bodyNode);
-		final StatementNode subroutineNode = new BlockNode(
-				ls.scopeNodes.toArray(new StatementNode[ls.scopeNodes.size()]));
-		
-		return subroutineNode;
-	}
 
 	public void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params) {
 		for (FormalParameter param : parameter) {
@@ -306,7 +231,7 @@ public class NodeFactory {
 		
 		// search in custom defined types (only enum currently)
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		EnumType enumType = ls.getEnumType(identifier);
+		EnumType enumType = ls.getVisibleEnumType(identifier);
 		if(enumType == null) {
 			parser.SemErr("Unknown enumerable type " + identifier + ".");
 			return null;
@@ -394,7 +319,7 @@ public class NodeFactory {
 			ExpressionNode finalValue, StatementNode loopBody) {
 
 		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		return new ForNode(ascending, ls.getLocalIdentifier(variableToken.val.toLowerCase()), startValue, finalValue, loopBody);
+		return new ForNode(ascending, ls.getLocalSlot(variableToken.val.toLowerCase()), startValue, finalValue, loopBody);
 	}
 
 	public StatementNode createBreak() {
@@ -404,7 +329,7 @@ public class NodeFactory {
 	public ExpressionNode createReadArrayValue(Token identifier, List<ExpressionNode> indexingNodes) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), 
-				ls.getLocalIdentifier(identifier.val.toLowerCase()));
+				ls.getLocalSlot(identifier.val.toLowerCase()));
 	}
 	
 	public ExpressionNode createIndexingNode(Token identifier) {
@@ -413,7 +338,7 @@ public class NodeFactory {
 	
 	public ExpressionNode createArrayIndexAssignment(Token name, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return new ArrayIndexAssignmentNode(ls.getLocalIdentifier(name.val.toLowerCase()),
+		return new ArrayIndexAssignmentNode(ls.getLocalSlot(name.val.toLowerCase()),
 				indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
 	}
 	
@@ -434,7 +359,7 @@ public class NodeFactory {
 
 	public ExpressionNode readSingleIdentifier(Token nameToken) {
 		String identifier = nameToken.val.toLowerCase();
-		FrameSlot frameSlot = lexicalScope.getVisibleIdentifier(identifier);
+		FrameSlot frameSlot = lexicalScope.getVisibleSlot(identifier);
 		
 		// firstly try to read a variable
 		if (frameSlot != null){
@@ -471,7 +396,7 @@ public class NodeFactory {
 		FrameSlot[] slots = new FrameSlot[identifiers.size()];
 		for(int i = 0; i < slots.length; i++) {
 			String currentIdentifier = identifiers.get(i);
-			slots[i] = ls.getLocalIdentifier(currentIdentifier);
+			slots[i] = ls.getLocalSlot(currentIdentifier);
 			if(slots[i] == null) {
 				parser.SemErr("Unknown identifier: " + currentIdentifier + ".");
 			}
@@ -725,7 +650,7 @@ public class NodeFactory {
 	}
 
 	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode) {
-		FrameSlot slot = lexicalScope.getVisibleIdentifier(nameToken.val.toLowerCase());
+		FrameSlot slot = lexicalScope.getVisibleSlot(nameToken.val.toLowerCase());
 		if (slot == null)
 			return null;
 
@@ -811,6 +736,10 @@ public class NodeFactory {
 			}
 		}
 	}
+
+    boolean containsIdentifier(String identifier) {
+        return this.lexicalScope.containsLocalIdentifier(identifier);
+    }
 
 	/*****************************************************************************
 	 * UNIT SECTION

@@ -29,6 +29,20 @@ import java.util.Map;
 
 class LexicalScope {
 
+    class LexicalException extends Exception {
+
+        private String message;
+
+        public LexicalException(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String getMessage() {
+            return this.message;
+        }
+    }
+
     private final String name;
     private final LexicalScope outer;
     private final PascalContext context;
@@ -71,7 +85,7 @@ class LexicalScope {
         return this.context;
     }
 
-    FrameSlot getLocalIdentifier(String identifier) {
+    FrameSlot getLocalSlot(String identifier) {
         return this.localIdentifiers.get(identifier);
     }
 
@@ -91,18 +105,18 @@ class LexicalScope {
         return this.returnSlot;
     }
 
-    FrameSlot getVisibleIdentifier(String identifier) {
+    FrameSlot getVisibleSlot(String identifier) {
         FrameSlot slot = null;
         LexicalScope scope = this;
         while(scope != null && slot == null){
-            slot = scope.getLocalIdentifier(identifier);
+            slot = scope.getLocalSlot(identifier);
             scope = scope.getOuterScope();
         }
 
         return slot;
     }
 
-    EnumType getEnumType(String identifier) {
+    EnumType getVisibleEnumType(String identifier) {
         LexicalScope ls = this;
         while(ls != null) {
             ICustomType customType = customTypes.get(identifier);
@@ -119,10 +133,15 @@ class LexicalScope {
         this.customTypes.put(name, customType);
     }
 
-    FrameSlot registerLocalIdentifier(String identifier, String typeName) throws IllegalArgumentException {
+    FrameSlot registerLocalIdentifier(String identifier, String typeName) throws LexicalException {
         try {
-            FrameSlot newSlot = this.frameDescriptor.addFrameSlot(identifier, getSlotByTypeName(typeName));
+            FrameSlotKind slotKind = this.getSlotByTypeName(typeName);
+            FrameSlot newSlot = this.frameDescriptor.addFrameSlot(identifier, slotKind);
             this.localIdentifiers.put(identifier, newSlot);
+
+            if (slotKind == FrameSlotKind.Illegal) {
+                throw new LexicalException("Unkown variable type: " + typeName);
+            }
 
             ICustomType customType = tryGetCustomType(typeName);
             if (customType != null) {
@@ -133,7 +152,7 @@ class LexicalScope {
 
             return newSlot;
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Duplicate variable: " + identifier + ".");
+            throw new LexicalException("Duplicate variable: " + identifier + ".");
         }
     }
 
@@ -148,20 +167,20 @@ class LexicalScope {
         }
     }
 
-    void registerArrayVariable(String identifier, List<IOrdinalType> ordinalDimensions, String returnTypeName) {
+    void registerArrayVariable(String identifier, List<IOrdinalType> ordinalDimensions, String returnTypeName) throws LexicalException {
         try {
             FrameSlot newSlot = this.frameDescriptor.addFrameSlot(identifier, FrameSlotKind.Object);
             this.localIdentifiers.put(identifier, newSlot);
             PascalArray array = createMultidimensionalArray(ordinalDimensions, returnTypeName);
             this.addInitializationNode(InitializationNodeFactory.create(newSlot, array));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Duplicate variable: " + identifier + ".");
+            throw new LexicalException("Duplicate variable: " + identifier + ".");
         }
     }
 
-    String registerEnumType(String identifier, List<String> identifiers, boolean global){
+    void registerEnumType(String identifier, List<String> identifiers, boolean global) throws LexicalException {
         if(customTypes.containsKey(identifier))
-            return identifier;
+            throw new LexicalException("Duplicate custom type: " + identifier + ".");
 
         EnumType enumType = new EnumType(identifier, identifiers, global);
         customTypes.put(identifier, enumType);
@@ -169,7 +188,7 @@ class LexicalScope {
 
         for(String elementIdentifier : identifiers){
             if(localIdentifiers.containsKey(elementIdentifier)) {
-                return elementIdentifier;
+                throw new LexicalException("Duplicate identifier: " + elementIdentifier + ".");
             }
             FrameSlot slot = this.frameDescriptor.addFrameSlot(elementIdentifier, FrameSlotKind.Object);
             this.initializationNodes.add(InitializationNodeFactory.create(slot,
@@ -177,8 +196,6 @@ class LexicalScope {
 
             localIdentifiers.put(elementIdentifier, slot);
         }
-
-        return null;
     }
 
     void registerFormalParameter(FormalParameter parameter) {
@@ -215,6 +232,24 @@ class LexicalScope {
         }
 
         return false;
+    }
+
+    void startSubroutineImplementation(String identifier) throws LexicalException {
+        if(this.context.containsIdentifier(identifier) &&
+                this.context.getGlobalFunctionRegistry().lookup(identifier) == null &&
+                this.context.getPrivateFunctionRegistry().lookup(identifier) == null) {
+            throw new LexicalException("Duplicate identifier: " + identifier);
+        }
+
+        else if (this.context.getGlobalFunctionRegistry().lookup(identifier) != null &&
+                this.context.getGlobalFunctionRegistry().lookup(identifier).isImplemented()) {
+            throw new LexicalException("Subroutine is already implemented as public: " + identifier);
+        }
+
+        else if (this.context.getPrivateFunctionRegistry().lookup(identifier) != null &&
+                this.context.getPrivateFunctionRegistry().lookup(identifier).isImplemented()){
+            throw new LexicalException("Subroutine is already implemented as private: " + identifier);
+        }
     }
 
     void setReturnSlot(String typeName) {

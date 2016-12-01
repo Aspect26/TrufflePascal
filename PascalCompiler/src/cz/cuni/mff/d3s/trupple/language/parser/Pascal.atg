@@ -30,7 +30,7 @@ IGNORE cr + lf + tab
 PRODUCTIONS
 
 Pascal = 
-(
+(                                               (. factory.startPascal(); .)
 	[ ImportsSection ]
 	{ Declaration }
 	MainFunction
@@ -306,7 +306,7 @@ Subroutine
 |
 	"procedure"
 )
-identifier										(. if(isFunction) factory.startFunction(t); else factory.startProcedure(t); .)
+identifier										(. if(isFunction) factory.startFunctionImplementation(t); else factory.startProcedureImplementation(t); .)
 												(. Token name = t; .)
 												(. Token returnType = null; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)

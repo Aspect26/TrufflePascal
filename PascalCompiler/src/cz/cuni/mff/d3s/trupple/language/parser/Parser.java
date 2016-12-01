@@ -93,6 +93,7 @@ public class Parser{
 	
 	void Pascal() {
 		if (StartOf(1)) {
+			factory.startPascal(); 
 			if (la.kind == 5) {
 				ImportsSection();
 			}
@@ -200,7 +201,7 @@ public class Parser{
 			Get();
 		} else SynErr(66);
 		Expect(1);
-		if(isFunction) factory.startFunction(t); else factory.startProcedure(t); 
+		if(isFunction) factory.startFunctionImplementation(t); else factory.startProcedureImplementation(t); 
 		Token name = t; 
 		Token returnType = null; 
 		List<FormalParameter> formalParameters = new ArrayList<>(); 

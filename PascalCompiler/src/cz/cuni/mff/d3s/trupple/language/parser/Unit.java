@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
@@ -105,17 +103,7 @@ public class Unit {
 		return true;
 	}
 	
-	public void registerProcedure(PascalRootNode rootNode){
-		String identifier = lexicalScope.getName();
-		leaveLexicalScope();
-		
-		if(interfaceProcedures.containsKey(identifier))
-			lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(identifier, rootNode);
-		else
-			lexicalScope.getContext().getPrivateFunctionRegistry().setFunctionRootNode(identifier, rootNode);
-	}
-	
-	public void registerFunction(PascalRootNode rootNode){
+	public void implementSubroutine(PascalRootNode rootNode){
 		String identifier = lexicalScope.getName();
 		leaveLexicalScope();
 		
@@ -130,7 +118,7 @@ public class Unit {
 	}
 
 	public FrameSlot getSlot(String identifier) {
-		return lexicalScope.getLocalIdentifier(identifier);
+		return lexicalScope.getLocalSlot(identifier);
 	}
 
 	public LexicalScope getLexicalScope() {
