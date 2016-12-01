@@ -96,7 +96,7 @@ public final class PascalContext extends ExecutionContext {
 		return privateFunctionRegistry;
 	}
 	
-	public boolean containsIdentifier(String identifier){
+	public boolean containsFunction(String identifier){
 		return globalFunctionRegistry.lookup(identifier) != null ||
 				privateFunctionRegistry.lookup(identifier) != null;
 	}

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
 
 import cz.cuni.mff.d3s.trupple.language.customtypes.EnumOrdinal;
 import cz.cuni.mff.d3s.trupple.language.customtypes.EnumType;
@@ -177,16 +176,8 @@ public class NodeFactory {
         ls.setReturnSlot(type.val);
 	}
 
-    /***************************
-     * REFACTOR DONE DOWNTO HERE
-     */
-
-
-
 	public void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params) {
-		for (FormalParameter param : parameter) {
-			params.add(param);
-		}
+		params.addAll(parameter);
 	}
 
 	public List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName, boolean isOutput) {
@@ -199,10 +190,8 @@ public class NodeFactory {
 	}
 
 	public void addFormalParameters(List<FormalParameter> params) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-
 		for (FormalParameter param : params) {
-			ls.registerFormalParameter(param);
+			lexicalScope.registerFormalParameter(param);
 		}
 	}
 	
@@ -213,7 +202,7 @@ public class NodeFactory {
 		
 		if(size <= 0) {
 			parser.SemErr("Greater lower bound then upper bound.");
-			return null;
+			return new SimpleOrdinal(0, 1 , IOrdinalType.Type.NUMERIC);
 		}
 		
 		return new SimpleOrdinal(firstIndex, size, IOrdinalType.Type.NUMERIC);
@@ -225,15 +214,15 @@ public class NodeFactory {
 		// TODO: is it good to be hardcoded?
 		// TODO: name constants
 		switch(identifier) {
-			case "boolean": return new SimpleOrdinal(0, 2, IOrdinalType.Type.BOOLEAN);
-			case "char": return new SimpleOrdinal(0, 256, IOrdinalType.Type.CHAR);
+			case "boolean": return SimpleOrdinal.booleanOrdinalSingleton;
+			case "char": return SimpleOrdinal.charOrdinalSingleton;
 		}
 		
 		// search in custom defined types (only enum currently)
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		EnumType enumType = ls.getVisibleEnumType(identifier);
+        // TODO: support other types
+		EnumType enumType = lexicalScope.getVisibleEnumType(identifier);
 		if(enumType == null) {
-			parser.SemErr("Unknown enumerable type " + identifier + ".");
+			parser.SemErr("Unknown ordinal type " + identifier + ".");
 			return null;
 		}
 		
@@ -247,15 +236,8 @@ public class NodeFactory {
 		List<StatementNode> initializationNodes = this.lexicalScope.getAllInitializationNoes();
 		initializationNodes.add(blockNode);
 		StatementNode mainNode = new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
+
 		return new PascalRootNode(lexicalScope.getFrameDescriptor(), new ProcedureBodyNode(mainNode));
-	}
-
-	public void startMainBlock() {
-	}
-
-	public StatementNode finishMainBlock(List<StatementNode> bodyNodes) {
-		lexicalScope = lexicalScope.getOuterScope();
-		return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
 	}
 
 	public StatementNode finishBlock(List<StatementNode> bodyNodes) {
@@ -288,12 +270,11 @@ public class NodeFactory {
 	}
 
 	public ExpressionNode createFunctionNode(Token tokenName) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 		String functionName = tokenName.val.toLowerCase();
 
-		PascalContext context = ls.getContext();
+		PascalContext context = lexicalScope.getContext();
 		while(context != null){
-			if(!context.containsIdentifier(functionName)){
+			if(!context.containsFunction(functionName)){
 				context = context.getOuterContext();
 			} else {
 				return new FunctionLiteralNode(context, functionName);
@@ -315,21 +296,23 @@ public class NodeFactory {
 		return new RepeatNode(condition, loopBody);
 	}
 
-	public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue,
-			ExpressionNode finalValue, StatementNode loopBody) {
-
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		return new ForNode(ascending, ls.getLocalSlot(variableToken.val.toLowerCase()), startValue, finalValue, loopBody);
+	public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
+        String iteratingIdentifier = variableToken.val.toLowerCase();
+        FrameSlot iteratingSlot = lexicalScope.getLocalSlot(iteratingIdentifier);
+        if (iteratingSlot == null) {
+            parser.SemErr("Unknown identifier: " + iteratingIdentifier);
+        }
+		return new ForNode(ascending, iteratingSlot, startValue, finalValue, loopBody);
 	}
 
 	public StatementNode createBreak() {
+        // TODO: check if TP is set
 		return new BreakNode();
 	}
 	
 	public ExpressionNode createReadArrayValue(Token identifier, List<ExpressionNode> indexingNodes) {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), 
-				ls.getLocalSlot(identifier.val.toLowerCase()));
+		return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]),
+				lexicalScope.getLocalSlot(identifier.val.toLowerCase()));
 	}
 	
 	public ExpressionNode createIndexingNode(Token identifier) {
@@ -337,43 +320,38 @@ public class NodeFactory {
 	}
 	
 	public ExpressionNode createArrayIndexAssignment(Token name, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return new ArrayIndexAssignmentNode(ls.getLocalSlot(name.val.toLowerCase()),
+		return new ArrayIndexAssignmentNode(lexicalScope.getLocalSlot(name.val.toLowerCase()),
 				indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
 	}
 	
 	public StatementNode createRandomizeNode() {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return new RandomizeBuiltinNode(ls.getContext());
+		return new RandomizeBuiltinNode(lexicalScope.getContext());
 	}
 	
 	public ExpressionNode createRandomNode() {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return new RandomBuiltinNode(ls.getContext());
+		return new RandomBuiltinNode(lexicalScope.getContext());
 	}
 	
 	public ExpressionNode createRandomNode(Token numericLiteral) {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return new RandomBuiltinNode(ls.getContext(), Long.parseLong(numericLiteral.val));
+		return new RandomBuiltinNode(lexicalScope.getContext(), Long.parseLong(numericLiteral.val));
 	}
 
 	public ExpressionNode readSingleIdentifier(Token nameToken) {
 		String identifier = nameToken.val.toLowerCase();
 		FrameSlot frameSlot = lexicalScope.getVisibleSlot(identifier);
 		
-		// firstly try to read a variable
+		// firstly check if it is a variable
 		if (frameSlot != null){
 			return ReadVariableNodeGen.create(frameSlot);
 			
 		// secondly, try to create a procedure or function literal (with no arguments)
 		} else {
-			LexicalScope ls = (currentUnit==null)? lexicalScope : currentUnit.getLexicalScope();
-			while(ls != null) {
-				if(ls.getContext().containsParameterlessSubroutine(identifier)) {
+			while(lexicalScope != null) {
+				if(lexicalScope.getContext().containsParameterlessSubroutine(identifier)) {
 					ExpressionNode literal = this.createFunctionNode(nameToken);
 					return this.createCall(literal, new ArrayList<>());
 				} else {
-					ls = ls.getOuterScope();
+                    lexicalScope = lexicalScope.getOuterScope();
 				}
 			}
 				
@@ -386,23 +364,20 @@ public class NodeFactory {
 	}
 	
 	public StatementNode createReadLine() {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		return new ReadlnBuiltinNode(ls.getContext());
+		return new ReadlnBuiltinNode(lexicalScope.getContext());
 	}
 	
 	public StatementNode createReadLine(List<String> identifiers){
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
-		
 		FrameSlot[] slots = new FrameSlot[identifiers.size()];
 		for(int i = 0; i < slots.length; i++) {
 			String currentIdentifier = identifiers.get(i);
-			slots[i] = ls.getLocalSlot(currentIdentifier);
+			slots[i] = lexicalScope.getLocalSlot(currentIdentifier);
 			if(slots[i] == null) {
 				parser.SemErr("Unknown identifier: " + currentIdentifier + ".");
 			}
 		}
 		
-		ReadlnBuiltinNode readln = new ReadlnBuiltinNode(ls.getContext(), slots);
+		ReadlnBuiltinNode readln = new ReadlnBuiltinNode(lexicalScope.getContext(), slots);
 		return readln;
 	}
 
@@ -425,23 +400,21 @@ public class NodeFactory {
 	// Tip of the day: Fuck Java
 	
 	public void createLongConstant(Token nameToken, long value) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		FrameSlot newSlot = registerConstant(nameToken, value);
 		
 		if (newSlot == null) {
 			return;
 		}
-		ls.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
+        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
 	}
 
 	public void createDoubleConstant(Token nameToken, double value) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		FrameSlot newSlot = registerConstant(nameToken, value);
 		
 		if (newSlot == null) {
 			return;
 		}
-		ls.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
+        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
 	}
 
 	public void createStringOrCharConstant(Token nameToken, String value) {
@@ -453,33 +426,30 @@ public class NodeFactory {
 	}
 	
 	public void createCharConstant(Token nameToken, char value) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		FrameSlot newSlot = registerConstant(nameToken, value);
 		
 		if (newSlot == null) {
 			return;
 		}
-		ls.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
+        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
 	}
 	
 	public void createStringConstant(Token nameToken, String value) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		FrameSlot newSlot = registerConstant(nameToken, value);
 		
 		if (newSlot == null) {
 			return;
 		}
-		ls.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
+        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
 	}
 
 	public void createBooleanConstant(Token nameToken, boolean value) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-		FrameSlot newSlot = registerConstant(ls, nameToken, value);
+		FrameSlot newSlot = registerConstant(nameToken, value);
 		
 		if (newSlot == null) {
 			return;
 		}
-		ls.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
+        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
 	}
 	
 	public void createObjectConstant(Token nameToken, Token objectNameToken) {
@@ -490,17 +460,21 @@ public class NodeFactory {
 		FrameSlot objectValueSlot = getVisibleSlot(objectNameToken.val.toLowerCase());
 		*/
 	}
-	
-	private FrameSlot registerConstant(LexicalScope ls, Token nameToken, Object value) {
+
+	private FrameSlot registerConstant(Token nameToken, Object value) {
 		String identifier = nameToken.val.toLowerCase();
         try {
-            return ls.registerLocalConstant(identifier, value);
+            return lexicalScope.registerLocalConstant(identifier, value);
         } catch (IllegalArgumentException e) {
             parser.SemErr("Duplicate identifier: " + identifier + ".");
             return null;
         }
 	}
-	
+
+    /***************************
+     * REFACTOR DONE DOWNTO HERE
+     */
+
 	public NumericConstant createUnsignedConstant(NumericConstant value, Token signToken) {
 		switch(signToken.val) {
 		case "-":
@@ -552,9 +526,8 @@ public class NodeFactory {
 	}
 	
 	public NumericConstant getNumericConstant(Token nameToken) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 		String identifier = nameToken.val.toLowerCase();
-		Object c = getConstant(ls, identifier);
+		Object c = getConstant(identifier);
 		if (c == null) {
 			return null;
 		}
@@ -570,9 +543,8 @@ public class NodeFactory {
 	}
 	
 	public String getStringConstant(Token nameToken) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 		String identifier = nameToken.val.toLowerCase();
-		Object str = getConstant(ls, identifier);
+		Object str = getConstant(identifier);
 		if (str == null) {
 			return null;
 		} else if ( str instanceof String) {
@@ -584,9 +556,8 @@ public class NodeFactory {
 	}
 	
 	public boolean getBooleanConstant(Token nameToken) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
 		String identifier = nameToken.val.toLowerCase();
-		Object b = getConstant(ls, identifier);
+		Object b = getConstant(identifier);
 		if (b == null) {
 			return false;
 		} else if (b instanceof Boolean){
@@ -597,13 +568,13 @@ public class NodeFactory {
 		}
 	}
 	
-	private Object getConstant(LexicalScope ls, String identifier) {
-		if (!ls.containsLocalConstant(identifier)) {
+	private Object getConstant(String identifier) {
+		if (!lexicalScope.containsLocalConstant(identifier)) {
 			parser.SemErr("Unknown constant " + identifier +".");
 			return null;
 		}
 		
-		return ls.getLocalConstant(identifier);
+		return lexicalScope.getLocalConstant(identifier);
 	}
 	
 	public ExpressionNode createCharOrStringLiteral(String literal) {
@@ -628,23 +599,6 @@ public class NodeFactory {
 		return new DoubleLiteralNode(value);
 	}
 
-	public ExpressionNode createRealLiteral(Token integerPart, Token fractionalPart, Token exponentOp, Token exponent) {
-		int integer = Integer.parseInt(integerPart.val);
-		double fractional = (fractionalPart == null) ? 0 : Double.parseDouble(fractionalPart.val);
-		int exponentMultiplier = (exponentOp != null && exponentOp.val == "-") ? -1 : 1;
-		int exponentValue = (exponent == null) ? 0 : Integer.parseInt(exponent.val);
-
-		double value = integer;
-
-		while (fractional > 1)
-			fractional /= 10;
-		value += fractional;
-
-		value = value * Math.pow(10, exponentValue * exponentMultiplier);
-
-		return new DoubleLiteralNode(value);
-	}
-
 	public ExpressionNode createLogicLiteral(boolean value) {
 		return new LogicLiteralNode(value);
 	}
@@ -656,8 +610,6 @@ public class NodeFactory {
 
 		return AssignmentNodeGen.create(valueNode, slot);
 	}
-
-
 
 	public ExpressionNode createBinary(Token operator, ExpressionNode leftNode, ExpressionNode rightNode) {
 		switch (operator.val.toLowerCase()) {
@@ -704,7 +656,7 @@ public class NodeFactory {
 	public ExpressionNode createUnary(Token operator, ExpressionNode son) {
 		switch (operator.val) {
 		case "+":
-			return son; // unary + in Pascal markss identity
+			return son;
 		case "-":
 			return NegationNodeGen.create(son);
 		case "not":
@@ -719,11 +671,12 @@ public class NodeFactory {
 		String importingUnit = unitToken.val.toLowerCase();
 
 		if (!units.containsKey(importingUnit)) {
-			parser.SemErr("Unknown unit. Did you imported it to compiler? - " + importingUnit);
+			parser.SemErr("Unknown unit. Did you forget to import it to compiler? - " + importingUnit);
 			return;
 		}
 		
 		Unit unit = units.get(importingUnit);
+
 		// functions
 		PascalFunctionRegistry fRegistry = unit.getContext().getGlobalFunctionRegistry();
 		lexicalScope.getContext().getGlobalFunctionRegistry().addAll(fRegistry);
@@ -755,10 +708,12 @@ public class NodeFactory {
 
 		currentUnit = new Unit(unitName);
 		this.units.put(unitName, currentUnit);
+        this.lexicalScope = currentUnit.getLexicalScope();
 	}
 
 	public void endUnit() {
 		currentUnit = null;
+        this.lexicalScope = null;
 	}
 
 	public void addProcedureInterface(Token name, List<FormalParameter> formalParameters) {
@@ -778,11 +733,10 @@ public class NodeFactory {
 	}
 	
 	public void finishFormalParameterListProcedure(Token name, List<FormalParameter> parameters) {
-		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		String identifier = name.val.toLowerCase();
 		
-		// the subroutine is in outer context because now the praser is in the subroutine's own context
-		ls.getOuterScope().getContext().setMySubroutineParametersCount(identifier, parameters.size());
+		// the subroutine is in outer context because now the parser is in the subroutine's own context
+		lexicalScope.getOuterScope().getContext().setMySubroutineParametersCount(identifier, parameters.size());
 		
 		if (currentUnit == null)
 			return;
@@ -796,7 +750,7 @@ public class NodeFactory {
 		LexicalScope ls = (currentUnit == null)? lexicalScope : currentUnit.getLexicalScope();
 		String identifier = name.val.toLowerCase();
 		
-		// the subroutine is in outer context because now the praser is in the subroutine's own context
+		// the subroutine is in outer context because now the parser is in the subroutine's own context
 		ls.getOuterScope().getContext().setMySubroutineParametersCount(identifier, parameters.size());
 		
 		if(currentUnit == null)
@@ -809,7 +763,6 @@ public class NodeFactory {
 	
 	public void leaveUnitInterfaceSection(){
 		assert currentUnit != null;
-		
 		currentUnit.leaveInterfaceSection();
 	}
 }

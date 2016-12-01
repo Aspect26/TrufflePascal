@@ -11,6 +11,9 @@ public class SimpleOrdinal implements IOrdinalType {
 		this.size = size;
 		this.type = type;
 	}
+
+	public static SimpleOrdinal booleanOrdinalSingleton = new SimpleOrdinal(0, 2, IOrdinalType.Type.BOOLEAN);
+    public static SimpleOrdinal charOrdinalSingleton = new SimpleOrdinal(0, 256, IOrdinalType.Type.CHAR);
 	
 	@Override
 	public int getFirstIndex() {

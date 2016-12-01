@@ -235,7 +235,7 @@ class LexicalScope {
     }
 
     void startSubroutineImplementation(String identifier) throws LexicalException {
-        if(this.context.containsIdentifier(identifier) &&
+        if(this.context.containsFunction(identifier) &&
                 this.context.getGlobalFunctionRegistry().lookup(identifier) == null &&
                 this.context.getPrivateFunctionRegistry().lookup(identifier) == null) {
             throw new LexicalException("Duplicate identifier: " + identifier);
