@@ -9,7 +9,6 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
-import cz.cuni.mff.d3s.trupple.language.parser.NodeFactory.LexicalScope;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 public class Unit {
@@ -29,7 +28,7 @@ public class Unit {
 	}
 	
 	public PascalContext getContext(){
-		return lexicalScope.context;
+		return lexicalScope.getContext();
 	}
 	
 	public boolean isInInterfaceSection(){
@@ -38,11 +37,6 @@ public class Unit {
 	
 	public void leaveInterfaceSection(){
 		inInterfaceSection = false;
-	}
-
-	public void addVariable(String identifier, FrameSlotKind slotKind) {
-		FrameSlot newSlot = lexicalScope.frameDescriptor.addFrameSlot(identifier, slotKind);
-		lexicalScope.localIdentifiers.put(identifier, newSlot);
 	}
 
 	public boolean addProcedureInterface(String name, List<FormalParameter> parameters) {
@@ -66,18 +60,17 @@ public class Unit {
 	}
 
 	public boolean subroutineImplementationExists(String name) {
-		return lexicalScope.context.getGlobalFunctionRegistry().lookup(name) != null ||
-				lexicalScope.context.getPrivateFunctionRegistry().lookup(name) != null;
+		return lexicalScope.getContext().getGlobalFunctionRegistry().lookup(name) != null ||
+				lexicalScope.getContext().getPrivateFunctionRegistry().lookup(name) != null;
 	}
 
 	public void startSubroutineImplementation(String identifier) {
 		if(this.interfaceFunctions.containsKey(identifier) || this.interfaceProcedures.containsKey(identifier))
-			lexicalScope.context.getGlobalFunctionRegistry().registerFunctionName(identifier);
+			lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(identifier);
 		else
-			lexicalScope.context.getPrivateFunctionRegistry().registerFunctionName(identifier);
+			lexicalScope.getContext().getPrivateFunctionRegistry().registerFunctionName(identifier);
 			
 		lexicalScope = new LexicalScope(lexicalScope, identifier);
-		lexicalScope.frameDescriptor = new FrameDescriptor(lexicalScope.outer.frameDescriptor.getDefaultValue());
 	}
 
 	public boolean checkProcedureMatchInterface(String name, List<FormalParameter> params) {
@@ -113,31 +106,31 @@ public class Unit {
 	}
 	
 	public void registerProcedure(PascalRootNode rootNode){
-		String identifier = lexicalScope.name;
+		String identifier = lexicalScope.getName();
 		leaveLexicalScope();
 		
 		if(interfaceProcedures.containsKey(identifier))
-			lexicalScope.context.getGlobalFunctionRegistry().setFunctionRootNode(identifier, rootNode);
+			lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(identifier, rootNode);
 		else
-			lexicalScope.context.getPrivateFunctionRegistry().setFunctionRootNode(identifier, rootNode);
+			lexicalScope.getContext().getPrivateFunctionRegistry().setFunctionRootNode(identifier, rootNode);
 	}
 	
 	public void registerFunction(PascalRootNode rootNode){
-		String identifier = lexicalScope.name;
+		String identifier = lexicalScope.getName();
 		leaveLexicalScope();
 		
 		if(interfaceFunctions.containsKey(identifier))
-			lexicalScope.context.getGlobalFunctionRegistry().setFunctionRootNode(identifier, rootNode);
+			lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(identifier, rootNode);
 		else
-			lexicalScope.context.getPrivateFunctionRegistry().setFunctionRootNode(identifier, rootNode);
+			lexicalScope.getContext().getPrivateFunctionRegistry().setFunctionRootNode(identifier, rootNode);
 	}
 	
 	private void leaveLexicalScope() {
-		this.lexicalScope = lexicalScope.outer;
+		this.lexicalScope = lexicalScope.getOuterScope();
 	}
 
 	public FrameSlot getSlot(String identifier) {
-		return lexicalScope.frameDescriptor.findFrameSlot(identifier);
+		return lexicalScope.getLocalIdentifier(identifier);
 	}
 
 	public LexicalScope getLexicalScope() {

@@ -10,7 +10,6 @@ import com.oracle.truffle.api.TruffleLanguage;
 
 public final class PascalContext extends ExecutionContext {
 	
-	// GENERIC 
 	private final BufferedReader input;
 	private final PrintStream output;
 	private final PascalContext outerContext;
