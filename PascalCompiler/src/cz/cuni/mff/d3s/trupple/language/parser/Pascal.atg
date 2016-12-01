@@ -286,14 +286,28 @@ Ordinal<out ordinal>							(. ordinalDimensions.add(ordinal); .)
 
 Ordinal<out IOrdinalType ordinal>
 =												(. ordinal = null; .)
-(												
-	integerLiteral								(. Token lowerBound = t; .)
+(												(. int lowerBound, upperBound; .)
+	SignedIntegerLiteral<out lowerBound>
 	".."
-	integerLiteral								(. Token upperBound = t; .)
+	SignedIntegerLiteral<out upperBound>
 												(. ordinal = factory.createSimpleOrdinal(lowerBound, upperBound); .)
 |
 	identifier									(. Token identifier = t; .)
 												(. ordinal = factory.createSimpleOrdinalFromTypename(identifier); .)
+)
+.
+
+
+SignedIntegerLiteral<out int value>
+=                                               (. value = 0; .)
+(
+    "+"
+    SignedIntegerLiteral<out value>
+|
+    "-"
+    SignedIntegerLiteral<out value>             (. value = -value; .)
+|
+    integerLiteral                              (. value = Integer.parseInt(t.val); .)
 )
 .
 

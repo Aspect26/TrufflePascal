@@ -195,17 +195,15 @@ public class NodeFactory {
 		}
 	}
 	
-	public IOrdinalType createSimpleOrdinal(Token lowerBound, Token upperBound) {
-		final int firstIndex = Integer.parseInt(lowerBound.val);
-		final int lastIndex = Integer.parseInt(upperBound.val);
-		final int size = lastIndex - firstIndex + 1;
+	public IOrdinalType createSimpleOrdinal(final int lowerBound, final int upperBound) {
+		final int size = upperBound - lowerBound + 1;
 		
 		if(size <= 0) {
 			parser.SemErr("Greater lower bound then upper bound.");
 			return new SimpleOrdinal(0, 1 , IOrdinalType.Type.NUMERIC);
 		}
 		
-		return new SimpleOrdinal(firstIndex, size, IOrdinalType.Type.NUMERIC);
+		return new SimpleOrdinal(lowerBound, size, IOrdinalType.Type.NUMERIC);
 	}
 	
 	public IOrdinalType createSimpleOrdinalFromTypename(Token name){
