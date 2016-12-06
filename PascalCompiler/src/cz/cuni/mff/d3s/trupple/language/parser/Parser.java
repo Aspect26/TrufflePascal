@@ -413,7 +413,7 @@ public class Parser{
 		Expect(25);
 		if (la.kind == 1) {
 			Get();
-			factory.finishVariableLineDefinition(identifiers, t); 
+			factory.registerVariables(identifiers, t); 
 		} else if (la.kind == 27 || la.kind == 28) {
 			List<IOrdinalType> ordinalDimensions  = ArrayDefinition();
 			while (continuesArray()) {
@@ -423,7 +423,7 @@ public class Parser{
 			}
 			Expect(26);
 			Expect(1);
-			factory.finishArrayDefinition(identifiers, ordinalDimensions, t); 
+			factory.registerArrayVariable(identifiers, ordinalDimensions, t); 
 		} else SynErr(74);
 	}
 

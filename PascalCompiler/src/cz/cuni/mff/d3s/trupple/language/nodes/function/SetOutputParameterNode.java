@@ -44,7 +44,7 @@ public class SetOutputParameterNode extends StatementNode{
 		case Double:
 			setDouble(callerFrame, calleeFrame.getDouble(this.calleeSlot));
 		default:
-			throw new PascalRuntimeException("Unknown slot type in setting output parameter: " + callerSlot.getKind() + ".");
+			throw new PascalRuntimeException("UnknownDescriptor slot type in setting output parameter: " + callerSlot.getKind() + ".");
 		}
 	}
 	

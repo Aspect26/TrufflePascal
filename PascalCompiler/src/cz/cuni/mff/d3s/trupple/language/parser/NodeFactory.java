@@ -75,42 +75,43 @@ public class NodeFactory {
 		this.parser = parser;
 	}
 
+	// -------------------------------------------------------
 	void startPascal() {
 		assert this.lexicalScope == null;
 		this.lexicalScope = new LexicalScope(null, "main");
 	}
 
-	public void finishVariableLineDefinition(List<String> identifiers, Token variableType) {
+	public void registerVariables(List<String> identifiers, Token variableType) {
 		String typeName = variableType.val.toLowerCase();
 
 		for (String identifier : identifiers) {
 			try {
-				lexicalScope.registerLocalIdentifier(identifier, typeName);
-			} catch (LexicalScope.LexicalException e) {
+				lexicalScope.registerLocalVariable(identifier, typeName);
+			} catch (LexicalException e) {
 				parser.SemErr(e.getMessage());
 			}
 		}
 	}
 	
-	public void finishArrayDefinition(List<String> identifiers, List<IOrdinalType> ordinalDimensions, Token returnTypeToken) {
+	public void registerArrayVariable(List<String> identifiers, List<IOrdinalType> ordinalDimensions, Token returnTypeToken) {
 		for(String identifier : identifiers) {
             try {
-                lexicalScope.registerArrayVariable(identifier, ordinalDimensions, returnTypeToken.val.toLowerCase());
-            } catch (LexicalScope.LexicalException e) {
+                lexicalScope.registerLocalArrayVariable(identifier, ordinalDimensions, returnTypeToken.val.toLowerCase());
+            } catch (LexicalException e) {
                 parser.SemErr(e.getMessage());
             }
 		}
 	}
 
-	public void registerEnumType(String identifier, List<String> identifiers){
-		boolean global = (currentUnit==null) || currentUnit.isInInterfaceSection();
-		
-		try {
-            lexicalScope.registerEnumType(identifier, identifiers, global);
-        } catch (LexicalScope.LexicalException e) {
+    public void registerEnumType(String identifier, List<String> identifiers){
+        try {
+            lexicalScope.registerEnumType(identifier, identifiers);
+        } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
-	}
+    }
+
+	// ------------------------------------------------------
 
 	public void startProcedureImplementation(Token name) {
         startSubroutineImplementation(name);
@@ -220,7 +221,7 @@ public class NodeFactory {
         // TODO: support other types
 		EnumType enumType = lexicalScope.getVisibleEnumType(identifier);
 		if(enumType == null) {
-			parser.SemErr("Unknown ordinal type " + identifier + ".");
+			parser.SemErr("UnknownDescriptor ordinal type " + identifier + ".");
 			return null;
 		}
 		
@@ -298,7 +299,7 @@ public class NodeFactory {
         String iteratingIdentifier = variableToken.val.toLowerCase();
         FrameSlot iteratingSlot = lexicalScope.getLocalSlot(iteratingIdentifier);
         if (iteratingSlot == null) {
-            parser.SemErr("Unknown identifier: " + iteratingIdentifier);
+            parser.SemErr("UnknownDescriptor identifier: " + iteratingIdentifier);
         }
 		return new ForNode(ascending, iteratingSlot, startValue, finalValue, loopBody);
 	}
@@ -372,7 +373,7 @@ public class NodeFactory {
 			String currentIdentifier = identifiers.get(i);
 			slots[i] = lexicalScope.getLocalSlot(currentIdentifier);
 			if(slots[i] == null) {
-				parser.SemErr("Unknown identifier: " + currentIdentifier + ".");
+				parser.SemErr("UnknownDescriptor identifier: " + currentIdentifier + ".");
 			}
 		}
 		
@@ -565,7 +566,7 @@ public class NodeFactory {
 	
 	private Object getConstant(String identifier) {
 		if (!lexicalScope.containsLocalConstant(identifier)) {
-			parser.SemErr("Unknown constant " + identifier +".");
+			parser.SemErr("UnknownDescriptor constant " + identifier +".");
 			return null;
 		}
 		
@@ -666,7 +667,7 @@ public class NodeFactory {
 		String importingUnit = unitToken.val.toLowerCase();
 
 		if (!units.containsKey(importingUnit)) {
-			parser.SemErr("Unknown unit. Did you forget to import it to compiler? - " + importingUnit);
+			parser.SemErr("UnknownDescriptor unit. Did you forget to import it to compiler? - " + importingUnit);
 			return;
 		}
 		

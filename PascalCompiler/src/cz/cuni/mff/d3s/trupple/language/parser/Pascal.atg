@@ -254,7 +254,7 @@ identifier                                      (. identifiers.add(t.val.toLower
 }
 ":"
 (
-	identifier                                  (. factory.finishVariableLineDefinition(identifiers, t); .) 
+	identifier                                  (. factory.registerVariables(identifiers, t); .)
 |
 	ArrayDefinition<. out List<IOrdinalType> ordinalDimensions .>
 	{
@@ -264,7 +264,7 @@ identifier                                      (. identifiers.add(t.val.toLower
 												(. ordinalDimensions.addAll(additionalDimensions); .)
 	}
 	"of"
-	identifier									(. factory.finishArrayDefinition(identifiers, ordinalDimensions, t); .)
+	identifier									(. factory.registerArrayVariable(identifiers, ordinalDimensions, t); .)
 )
 .
 

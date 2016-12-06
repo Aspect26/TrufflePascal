@@ -14,6 +14,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.ReadSubroutineArgumentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 import java.util.ArrayList;
@@ -29,19 +30,6 @@ import java.util.Map;
 
 class LexicalScope {
 
-    class LexicalException extends Exception {
-
-        private String message;
-
-        public LexicalException(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public String getMessage() {
-            return this.message;
-        }
-    }
 
     private final String name;
     private final LexicalScope outer;
@@ -49,7 +37,7 @@ class LexicalScope {
     private final Map<String, Object> localConstants;
     private final Map<String, ICustomType> customTypes;
     private final List<StatementNode> initializationNodes;
-    private final LocalIdentifiersTable localIdentifiers;
+    private final IdentifiersTable localIdentifiers;
 
     private FrameDescriptor frameDescriptor;
     private FrameSlot returnSlot;
@@ -63,11 +51,34 @@ class LexicalScope {
         this.initializationNodes = new ArrayList<>();
         this.localConstants = new HashMap<>();
         this.customTypes = new HashMap<>();
-        this.localIdentifiers = new LocalIdentifiersTable();
+
+        this.localIdentifiers = new IdentifiersTable();
 
         this.frameDescriptor = (outer != null)? new FrameDescriptor(this.outer.frameDescriptor.getDefaultValue()) : new FrameDescriptor();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
     }
+
+    void registerLocalVariable(String identifier, String typeName) throws LexicalException {
+        this.localIdentifiers.addVariable(typeName, identifier);
+    }
+
+    void registerLocalArrayVariable(String identifier, List<IOrdinalType> ordinalDimensions, String returnTypeName) throws LexicalException {
+        this.localIdentifiers.addArrayVariable(identifier, ordinalDimensions, returnTypeName);
+    }
+
+    void registerEnumType(String identifier, List<String> identifiers) throws LexicalException {
+        this.localIdentifiers.addEnumType(identifier, identifiers);
+    }
+
+
+    // THE FRAME DESCRIPTOR WILL BE CREATED AFTER THE PARSING IS FINISHED
+    // INITIALIZATION NODES:
+    //  PRIMITIVES:
+    //   new ...
+    //  ARRAY:
+    //   PascalArray array = createMultidimensionalArray(ordinalDimensions, returnTypeName);
+    //   this.addInitializationNode(InitializationNodeFactory.create(newSlot, array));
+    // ----------------------------
 
     String getName() {
         return this.name;
@@ -133,29 +144,6 @@ class LexicalScope {
         this.customTypes.put(name, customType);
     }
 
-    FrameSlot registerLocalIdentifier(String identifier, String typeName) throws LexicalException {
-        try {
-            FrameSlotKind slotKind = this.getSlotByTypeName(typeName);
-            FrameSlot newSlot = this.frameDescriptor.addFrameSlot(identifier, slotKind);
-            this.localIdentifiers.put(identifier, newSlot);
-
-            if (slotKind == FrameSlotKind.Illegal) {
-                throw new LexicalException("Unkown variable type: " + typeName);
-            }
-
-            ICustomType customType = tryGetCustomType(typeName);
-            if (customType != null) {
-                if (customType instanceof EnumType) {
-                    this.addInitializationNode(InitializationNodeFactory.create(newSlot, new EnumValue((EnumType)customType)));
-                }
-            }
-
-            return newSlot;
-        } catch (IllegalArgumentException e) {
-            throw new LexicalException("Duplicate variable: " + identifier + ".");
-        }
-    }
-
     FrameSlot registerLocalConstant(String identifier, Object value) throws IllegalArgumentException {
         try {
             FrameSlot newSlot = frameDescriptor.addFrameSlot(identifier);
@@ -164,37 +152,6 @@ class LexicalScope {
             return newSlot;
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Duplicate variable: " + identifier + ".");
-        }
-    }
-
-    void registerArrayVariable(String identifier, List<IOrdinalType> ordinalDimensions, String returnTypeName) throws LexicalException {
-        try {
-            FrameSlot newSlot = this.frameDescriptor.addFrameSlot(identifier, FrameSlotKind.Object);
-            this.localIdentifiers.put(identifier, newSlot);
-            PascalArray array = createMultidimensionalArray(ordinalDimensions, returnTypeName);
-            this.addInitializationNode(InitializationNodeFactory.create(newSlot, array));
-        } catch (IllegalArgumentException e) {
-            throw new LexicalException("Duplicate variable: " + identifier + ".");
-        }
-    }
-
-    void registerEnumType(String identifier, List<String> identifiers, boolean global) throws LexicalException {
-        if(customTypes.containsKey(identifier))
-            throw new LexicalException("Duplicate custom type: " + identifier + ".");
-
-        EnumType enumType = new EnumType(identifier, identifiers, global);
-        customTypes.put(identifier, enumType);
-        localIdentifiers.put(identifier, frameDescriptor.addFrameSlot(identifier));
-
-        for(String elementIdentifier : identifiers){
-            if(localIdentifiers.containsKey(elementIdentifier)) {
-                throw new LexicalException("Duplicate identifier: " + elementIdentifier + ".");
-            }
-            FrameSlot slot = this.frameDescriptor.addFrameSlot(elementIdentifier, FrameSlotKind.Object);
-            this.initializationNodes.add(InitializationNodeFactory.create(slot,
-                    new EnumValue(enumType, enumType.getIndex(elementIdentifier))));
-
-            localIdentifiers.put(elementIdentifier, slot);
         }
     }
 

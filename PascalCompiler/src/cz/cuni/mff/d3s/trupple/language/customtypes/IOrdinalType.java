@@ -9,7 +9,6 @@ public interface IOrdinalType {
 		ENUM
 	}
 	
-	int getFirstIndex();
 	int getSize();
 	Type getType();
 	int getRealIndex(Object index);
