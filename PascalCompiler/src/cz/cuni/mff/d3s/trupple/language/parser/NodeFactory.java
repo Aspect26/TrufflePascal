@@ -81,7 +81,7 @@ public class NodeFactory {
 		this.lexicalScope = new LexicalScope(null, "main");
 	}
 
-	public void registerVariables(List<String> identifiers, Token variableType) {
+	void registerVariables(List<String> identifiers, Token variableType) {
 		String typeName = variableType.val.toLowerCase();
 
 		for (String identifier : identifiers) {
@@ -93,7 +93,7 @@ public class NodeFactory {
 		}
 	}
 	
-	public void registerArrayVariable(List<String> identifiers, List<IOrdinalType> ordinalDimensions, Token returnTypeToken) {
+	void registerArrayVariable(List<String> identifiers, List<IOrdinalType> ordinalDimensions, Token returnTypeToken) {
 		for(String identifier : identifiers) {
             try {
                 lexicalScope.registerLocalArrayVariable(identifier, ordinalDimensions, returnTypeToken.val.toLowerCase());
@@ -103,7 +103,7 @@ public class NodeFactory {
 		}
 	}
 
-    public void registerEnumType(String identifier, List<String> identifiers){
+    void registerEnumType(String identifier, List<String> identifiers){
         try {
             lexicalScope.registerEnumType(identifier, identifiers);
         } catch (LexicalException e) {
@@ -111,91 +111,85 @@ public class NodeFactory {
         }
     }
 
-	// ------------------------------------------------------
-
-	public void startProcedureImplementation(Token name) {
-        startSubroutineImplementation(name);
-	}
-
-    public void startFunctionImplementation(Token name) {
-        startSubroutineImplementation(name);
-    }
-
-    private void startSubroutineImplementation(Token name) {
-        String identifier = name.val.toLowerCase();
+	void startProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
         try {
-            lexicalScope.startSubroutineImplementation(identifier);
-        } catch (LexicalScope.LexicalException e) {
+            lexicalScope.registerProcedureInterface(identifier, formalParameters);
+            lexicalScope = new LexicalScope(lexicalScope, identifier);
+        } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
+	}
 
-        if (currentUnit == null) {
-            lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(identifier);
+	void startFunction(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        String returnType = this.getIdentifierFromToken(returnTypeToken);
+        try {
+            lexicalScope.registerFunctionInterface(identifier, formalParameters, returnType);
             lexicalScope = new LexicalScope(lexicalScope, identifier);
-        } else {
-            lexicalScope = currentUnit.startSubroutineImplementation(identifier);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
         }
     }
 
-	public void finishProcedure(StatementNode bodyNode) {
-		StatementNode subroutineNode = createSubroutineNode(bodyNode);
-		final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
+    void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params) {
+        params.addAll(parameter);
+    }
 
+    List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName, boolean isOutput) {
+        List<FormalParameter> paramList = new ArrayList<>();
+        for (String identifier : identifiers) {
+            paramList.add(new FormalParameter(identifier, typeName, isOutput));
+        }
+
+        return paramList;
+    }
+
+    void finishProcedure() {
+        finishSubroutine();
+    }
+
+    void finishFunction() {
+        finishSubroutine();
+    }
+
+    void finishProcedure(StatementNode bodyNode) {
+        StatementNode subroutineNode = createSubroutineNode(bodyNode);
+        final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
         finishSubroutine(procedureBodyNode);
-	}
+    }
 
-    public void finishFunction(StatementNode bodyNode) {
+    void finishFunction(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(subroutineNode, lexicalScope.getReturnSlot());
-
         finishSubroutine(functionBodyNode);
     }
 
+	private String getIdentifierFromToken(Token identifier) {
+        return identifier.val.toLowerCase();
+    }
+
     private StatementNode createSubroutineNode(StatementNode bodyNode) {
-        LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
+        List<StatementNode> subroutineNodes = lexicalScope.createInitializationNodes();
+        subroutineNodes.add(bodyNode);
 
-        ls.scopeNodes.add(bodyNode);
-        final StatementNode subroutineNode = new BlockNode(
-                ls.scopeNodes.toArray(new StatementNode[ls.scopeNodes.size()]));
+        return new BlockNode(subroutineNodes.toArray(new StatementNode[lexicalScope.scopeNodes.size()]));
+    }
 
-        return subroutineNode;
+    private void finishSubroutine() {
+        lexicalScope = lexicalScope.getOuterScope();
     }
 
     private void finishSubroutine(ExpressionNode subroutineBodyNode) {
-        final PascalRootNode rootNode = new PascalRootNode(lexicalScope.getFrameDescriptor(), subroutineBodyNode);
+        final PascalRootNode rootNode = new PascalRootNode(lexicalScope.createFrameDescriptor(), subroutineBodyNode);
+
         String subroutineIdentifier = lexicalScope.getName();
-        if (currentUnit == null) {
-            lexicalScope = lexicalScope.getOuterScope();
-            lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(subroutineIdentifier, rootNode);
-        } else {
-            currentUnit.implementSubroutine(rootNode);
-        }
+        lexicalScope = lexicalScope.getOuterScope();
+        lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(subroutineIdentifier, rootNode);
     }
 
-	public void setFunctionReturnValue(Token type) {
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-        ls.setReturnSlot(type.val);
-	}
+	// ------------------------------------------------------
 
-	public void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params) {
-		params.addAll(parameter);
-	}
-
-	public List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName, boolean isOutput) {
-		List<FormalParameter> paramList = new ArrayList<>();
-		for (String identifier : identifiers) {
-			paramList.add(new FormalParameter(identifier, typeName, isOutput));
-		}
-
-		return paramList;
-	}
-
-	public void addFormalParameters(List<FormalParameter> params) {
-		for (FormalParameter param : params) {
-			lexicalScope.registerFormalParameter(param);
-		}
-	}
-	
 	public IOrdinalType createSimpleOrdinal(final int lowerBound, final int upperBound) {
 		final int size = upperBound - lowerBound + 1;
 		

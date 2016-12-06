@@ -6,11 +6,9 @@ import cz.cuni.mff.d3s.trupple.language.customtypes.EnumType;
 import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.language.parser.LexicalException;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.ArrayDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.PrimitiveDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -68,23 +66,22 @@ public class IdentifiersTable {
         if(this.typeDescriptors.containsKey(name))
             throw new LexicalException("The type is already defined: " + name + ".");
 
-        TypeDescriptor typeDescriptor = new EnumDescriptor(name, identifiers);
+        TypeDescriptor typeDescriptor = new EnumDescriptor(identifiers);
+        this.registerNewIdentifier(name, typeDescriptor);
+    }
 
-        // UNFINISHED SECTION
+    public void addProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+        TypeDescriptor typeDescriptor = new ProcedureDescriptor(formalParameters);
+        this.registerNewIdentifier(identifier, typeDescriptor);
+    }
 
-        EnumType enumType = new EnumType(identifier, identifiers, global);
-        customTypes.put(identifier, enumType);
-        localIdentifiers.put(identifier, frameDescriptor.addFrameSlot(identifier));
+    public void addFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
+        TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
+        TypeDescriptor typeDescriptor = new FunctionDescriptor(formalParameters, returnTypeDescriptor);
+        this.registerNewIdentifier(identifier, typeDescriptor);
 
-        for(String elementIdentifier : identifiers){
-            if(localIdentifiers.containsKey(elementIdentifier)) {
-                throw new LexicalException("Duplicate identifier: " + elementIdentifier + ".");
-            }
-            FrameSlot slot = this.frameDescriptor.addFrameSlot(elementIdentifier, FrameSlotKind.Object);
-            this.initializationNodes.add(InitializationNodeFactory.create(slot,
-                    new EnumValue(enumType, enumType.getIndex(elementIdentifier))));
-
-            localIdentifiers.put(elementIdentifier, slot);
+        if (returnTypeDescriptor == UnknownDescriptor.SINGLETON) {
+            throw new LexicalException("Unknown return type: " + returnType);
         }
     }
 

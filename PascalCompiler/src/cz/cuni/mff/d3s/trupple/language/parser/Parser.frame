@@ -187,18 +187,6 @@ class NumericConstant {
 	}
 }
 
-class FormalParameter {
-	public FormalParameter(String id, String type, boolean isOutput){
-		this.type = type;
-		this.identifier = id;
-		this.isOutput = isOutput;
-	}
-	
-	public String type;
-	public String identifier;
-	public boolean isOutput;
-}
-
 class Errors {
 	public int count = 0;                                    // number of errors detected
 	public java.io.PrintStream errorStream = System.err;     // error messages go to this stream

@@ -58,6 +58,14 @@ class LexicalScope {
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
     }
 
+    String getName() {
+        return this.name;
+    }
+
+    LexicalScope getOuterScope() {
+        return this.outer;
+    }
+
     void registerLocalVariable(String identifier, String typeName) throws LexicalException {
         this.localIdentifiers.addVariable(typeName, identifier);
     }
@@ -70,6 +78,24 @@ class LexicalScope {
         this.localIdentifiers.addEnumType(identifier, identifiers);
     }
 
+    void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+        this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
+    }
+
+    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
+        this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
+    }
+
+    List<StatementNode> createInitializationNodes() {
+        // TODO: implement this
+        return null;
+    }
+
+    FrameDescriptor createFrameDescriptor() {
+        // TODO: implement this
+        return null;
+    }
+
 
     // THE FRAME DESCRIPTOR WILL BE CREATED AFTER THE PARSING IS FINISHED
     // INITIALIZATION NODES:
@@ -79,14 +105,6 @@ class LexicalScope {
     //   PascalArray array = createMultidimensionalArray(ordinalDimensions, returnTypeName);
     //   this.addInitializationNode(InitializationNodeFactory.create(newSlot, array));
     // ----------------------------
-
-    String getName() {
-        return this.name;
-    }
-
-    LexicalScope getOuterScope() {
-        return this.outer;
-    }
 
     Map<String, ICustomType> getAllCustomTypes() {
         return this.customTypes;

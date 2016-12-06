@@ -312,36 +312,46 @@ SignedIntegerLiteral<out int value>
 .
 
 
-
 Subroutine
-=												(. boolean isFunction = false; .)
+=
 (
-	"function"									(. isFunction = true; .)
+    Procedure
 |
-	"procedure"
+    Function
 )
-identifier										(. if(isFunction) factory.startFunctionImplementation(t); else factory.startProcedureImplementation(t); .)
-												(. Token name = t; .)
-												(. Token returnType = null; .)
-												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ] 	(. factory.addFormalParameters(formalParameters); .)
-[ 
-	IF(isFunction) 
-	":"
-	identifier									(. factory.setFunctionReturnValue(t); .)
-												(. returnType = t; .)
-]
-												(. if(isFunction)  factory.finishFormalParameterListFunction(name, formalParameters,t.val.toLowerCase()); .)
-												(. else factory.finishFormalParameterListProcedure(name, formalParameters); .)
-";"
+.
+
+
+Procedure
+=
+"procedure"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+";"                                             (. factory.startProcedure(identifierToken, formalParameters); .)
 (
-	"forward;"									(. if(isFunction) factory.addFunctionInterface(name, formalParameters, returnType.val.toLowerCase()); .)
-												(. else factory.addProcedureInterface(name, formalParameters); .)
+    "forward;"                                  (. factory.finishProcedure(); .)
 |
-	{ Declaration }
-	Block<out StatementNode bodyNode>			(. if(isFunction) factory.finishFunction(bodyNode); .)
-												(. else factory.finishProcedure(bodyNode); .)
-	";"
+    { Declaration }
+    Block<out StatementNode bodyNode>           (. factory.finishProcedure(bodyNode); .)
+)
+.
+
+
+Function
+=
+"function"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+":"
+identifier                                      (. Token returnTypeToken = t; .)
+";"                                             (. factory.startFunction(identifierToken, formalParameters, returnTypeToken); .)
+(
+    "forward;"                                  (. factory.finishFunction(); .)
+|
+    { Declaration }
+    Block<out StatementNode bodyNode>           (. factory.finishFunction(bodyNode); .)
 )
 .
 
@@ -349,11 +359,11 @@ identifier										(. if(isFunction) factory.startFunctionImplementation(t); el
 FormalParameterList<. out List<FormalParameter> formalParameters .>
 =
 "("												(. formalParameters = new ArrayList<>(); .)
-												(. List<FormalParameter> parameter = new ArrayList<>(); .)
-FormalParameter<out parameter>					(. factory.appendFormalParameter(parameter, formalParameters); .)						
+												(. List<FormalParameter> newParameters = new ArrayList<>(); .)
+FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParameters, formalParameters); .)
 { 
 	";" 
-	FormalParameter<out parameter> 				(. factory.appendFormalParameter(parameter, formalParameters); .)
+	FormalParameter<out newParameters> 			(. factory.appendFormalParameter(newParameters, newParameters); .)
 }
 ")"
 .
