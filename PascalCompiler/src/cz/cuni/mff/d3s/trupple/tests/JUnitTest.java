@@ -43,9 +43,9 @@ public abstract class JUnitTest {
 		test(sourceCode, new ArrayList<>(), codeDescription, expectedOutput);
 	}
 
-	protected void test(String sourceCode, List<String> imports, String codeDecription, String expectedOutput) {
+	protected void test(String sourceCode, List<String> imports, String codeDescription, String expectedOutput) {
 		setUpStreams();
-		PascalLanguage.startFromCodes(sourceCode, imports, codeDecription);
+		PascalLanguage.startFromCodes(sourceCode, imports, codeDescription);
 		assertEquals(expectedOutput, output.toString() + error.toString());
 	}
 }

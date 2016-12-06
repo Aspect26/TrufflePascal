@@ -132,7 +132,7 @@ public class NodeFactory {
             lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(identifier);
             lexicalScope = new LexicalScope(lexicalScope, identifier);
         } else {
-            currentUnit.startSubroutineImplementation(identifier);
+            lexicalScope = currentUnit.startSubroutineImplementation(identifier);
         }
     }
 

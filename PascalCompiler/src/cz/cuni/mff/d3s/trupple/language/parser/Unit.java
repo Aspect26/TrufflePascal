@@ -57,18 +57,14 @@ public class Unit {
 		return interfaceProcedures.containsKey(name) || interfaceFunctions.containsKey(name);
 	}
 
-	public boolean subroutineImplementationExists(String name) {
-		return lexicalScope.getContext().getGlobalFunctionRegistry().lookup(name) != null ||
-				lexicalScope.getContext().getPrivateFunctionRegistry().lookup(name) != null;
-	}
-
-	public void startSubroutineImplementation(String identifier) {
+	public LexicalScope startSubroutineImplementation(String identifier) {
 		if(this.interfaceFunctions.containsKey(identifier) || this.interfaceProcedures.containsKey(identifier))
 			lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(identifier);
 		else
 			lexicalScope.getContext().getPrivateFunctionRegistry().registerFunctionName(identifier);
 			
 		lexicalScope = new LexicalScope(lexicalScope, identifier);
+		return lexicalScope;
 	}
 
 	public boolean checkProcedureMatchInterface(String name, List<FormalParameter> params) {
