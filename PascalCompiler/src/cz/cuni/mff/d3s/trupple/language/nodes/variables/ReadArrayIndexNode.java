@@ -13,7 +13,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 public abstract class ReadArrayIndexNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
-	protected final ExpressionNode[] indexingNodes;
+	@Children protected final ExpressionNode[] indexingNodes;
 
 	public ReadArrayIndexNode(ExpressionNode[] indexingNodes) {
 		this.indexingNodes = indexingNodes;

@@ -981,11 +981,11 @@ public class Parser{
 		List<ExpressionNode> indexingNodes = new ArrayList<>(); 
 		ExpressionNode indexingNode = null; 
 		Expect(29);
-		indexingNode = ArrayIndex();
+		indexingNode = Expression();
 		indexingNodes.add(indexingNode); 
 		while (la.kind == 6) {
 			Get();
-			indexingNode = ArrayIndex();
+			indexingNode = Expression();
 			indexingNodes.add(indexingNode); 
 		}
 		Expect(30);
@@ -998,19 +998,6 @@ public class Parser{
 			identifierName, indexingNodes, value); 
 		} else SynErr(88);
 		return expression;
-	}
-
-	ExpressionNode  ArrayIndex() {
-		ExpressionNode  indexingNode;
-		indexingNode = null; 
-		if (!isSingleIdentifier()) {
-			ExpressionNode indexNode = Expression();
-			indexingNode = indexNode; 
-		} else if (la.kind == 1) {
-			Get();
-			indexingNode = factory.createIndexingNode(t); 
-		} else SynErr(89);
-		return indexingNode;
 	}
 
 	void InterfaceSection() {
@@ -1278,7 +1265,6 @@ class Errors {
 			case 86: s = "invalid Random"; break;
 			case 87: s = "invalid MemberExpression"; break;
 			case 88: s = "invalid ArrayAccessing"; break;
-			case 89: s = "invalid ArrayIndex"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

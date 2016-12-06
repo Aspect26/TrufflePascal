@@ -1,5 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.customtypes;
 
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+
 public class EnumOrdinal implements IOrdinalType {
 
 	private final EnumType sourceType;
@@ -25,7 +27,6 @@ public class EnumOrdinal implements IOrdinalType {
 
 	@Override
 	public int getRealIndex(Object index) {
-		String identifier = (String)index;
-		return sourceType.getIndex(identifier);
+		return ((EnumValue) index).getIndex();
 	}
 }

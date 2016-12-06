@@ -716,10 +716,10 @@ ArrayAccessing<out ExpressionNode expression, Token identifierName>
 												(. List<ExpressionNode> indexingNodes = new ArrayList<>(); .)
 												(. ExpressionNode indexingNode = null; .)
 "["
-	ArrayIndex<out indexingNode>				(. indexingNodes.add(indexingNode); .)
+	Expression<out indexingNode>	            (. indexingNodes.add(indexingNode); .)
 	{
 		","
-		ArrayIndex<out indexingNode>			(. indexingNodes.add(indexingNode); .)
+		Expression<out indexingNode>	        (. indexingNodes.add(indexingNode); .)
 	}
 "]"
 (
@@ -730,19 +730,6 @@ ArrayAccessing<out ExpressionNode expression, Token identifierName>
 												(.		identifierName, indexingNodes, value); .)
 )
 .
-
-
-
-ArrayIndex<out ExpressionNode indexingNode>
-=												(. indexingNode = null; .)
-(
-	IF(!isSingleIdentifier())
-	Expression<out ExpressionNode indexNode>	(. indexingNode = indexNode; .)
-|
-	identifier									(. indexingNode = factory.createIndexingNode(t); .)
-)
-.
-
 
 
 

@@ -192,7 +192,7 @@ class LexicalScope {
             }
             FrameSlot slot = this.frameDescriptor.addFrameSlot(elementIdentifier, FrameSlotKind.Object);
             this.initializationNodes.add(InitializationNodeFactory.create(slot,
-                    new EnumValue(enumType, enumType.getFirstIndex())));
+                    new EnumValue(enumType, enumType.getIndex(elementIdentifier))));
 
             localIdentifiers.put(elementIdentifier, slot);
         }
