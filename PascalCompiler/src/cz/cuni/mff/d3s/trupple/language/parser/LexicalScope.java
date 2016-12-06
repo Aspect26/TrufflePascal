@@ -46,10 +46,10 @@ class LexicalScope {
     private final String name;
     private final LexicalScope outer;
     private final PascalContext context;
-    private final Map<String, FrameSlot> localIdentifiers;
     private final Map<String, Object> localConstants;
     private final Map<String, ICustomType> customTypes;
     private final List<StatementNode> initializationNodes;
+    private final LocalIdentifiersTable localIdentifiers;
 
     private FrameDescriptor frameDescriptor;
     private FrameSlot returnSlot;
@@ -60,10 +60,10 @@ class LexicalScope {
         this.name = name;
         this.outer = outer;
         this.returnSlot = null;
-        this.localIdentifiers = new HashMap<>();
         this.initializationNodes = new ArrayList<>();
         this.localConstants = new HashMap<>();
         this.customTypes = new HashMap<>();
+        this.localIdentifiers = new LocalIdentifiersTable();
 
         this.frameDescriptor = (outer != null)? new FrameDescriptor(this.outer.frameDescriptor.getDefaultValue()) : new FrameDescriptor();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
