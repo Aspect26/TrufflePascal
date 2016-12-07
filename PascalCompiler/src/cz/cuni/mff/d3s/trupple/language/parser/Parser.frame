@@ -29,7 +29,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 package cz.cuni.mff.d3s.trupple.language.parser;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
-import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 
 import com.oracle.truffle.api.source.Source;
 

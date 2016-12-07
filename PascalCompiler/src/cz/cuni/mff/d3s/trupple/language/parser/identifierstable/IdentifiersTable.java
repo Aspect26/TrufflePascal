@@ -42,6 +42,10 @@ public class IdentifiersTable {
         typeDescriptors.put("char", PrimitiveDescriptor.charDescriptor());
     }
 
+    public TypeDescriptor getTypeDescriptor(String identifier) {
+        return this.identifiersMap.get(identifier);
+    }
+
     public void addVariable(String typeName, String identifier) throws LexicalException {
         TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
         this.registerNewIdentifier(identifier, typeDescriptor);
@@ -51,9 +55,9 @@ public class IdentifiersTable {
         }
     }
 
-    public void addArrayVariable(String identifier, List<IOrdinalType> ordinalDimenstions, String returnType) throws LexicalException {
+    public void addArrayVariable(String identifier, List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {
         TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
-        TypeDescriptor typeDescriptor = new ArrayDescriptor(ordinalDimenstions, returnTypeDescriptor);
+        TypeDescriptor typeDescriptor = new ArrayDescriptor(ordinalDimensions, returnTypeDescriptor);
 
         this.registerNewIdentifier(identifier, typeDescriptor);
 

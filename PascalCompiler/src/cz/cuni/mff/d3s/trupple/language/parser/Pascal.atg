@@ -256,11 +256,11 @@ identifier                                      (. identifiers.add(t.val.toLower
 (
 	identifier                                  (. factory.registerVariables(identifiers, t); .)
 |
-	ArrayDefinition<. out List<IOrdinalType> ordinalDimensions .>
+	ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
 	{
 		IF(continuesArray())
 		"of"
-		ArrayDefinition<. out List<IOrdinalType> additionalDimensions .>
+		ArrayDefinition<. out List<OrdinalDescriptor> additionalDimensions .>
 												(. ordinalDimensions.addAll(additionalDimensions); .)
 	}
 	"of"
@@ -269,31 +269,31 @@ identifier                                      (. identifiers.add(t.val.toLower
 .
 
 
-ArrayDefinition<. out List<IOrdinalType> ordinalDimensions .>
+ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
 =
 [ "packed" ]
 "array"											(. ordinalDimensions = new ArrayList<>(); .)
-"["												(. IOrdinalType ordinal = null; .)
-Ordinal<out ordinal>							(. ordinalDimensions.add(ordinal); .)
+"["												(. OrdinalDescriptor ordinalDescriptor = null; .)
+Ordinal<out ordinalDescriptor>					(. ordinalDimensions.add(ordinalDescriptor); .)
 {
 	","
-	Ordinal<out ordinal>						(. ordinalDimensions.add(ordinal); .)
+	Ordinal<out ordinalDescriptor>				(. ordinalDimensions.add(ordinalDescriptor); .)
 }
 "]"
 .
 
 
 
-Ordinal<out IOrdinalType ordinal>
+Ordinal<out OrdinalDescriptor ordinal>
 =												(. ordinal = null; .)
 (												(. int lowerBound, upperBound; .)
 	SignedIntegerLiteral<out lowerBound>
 	".."
 	SignedIntegerLiteral<out upperBound>
-												(. ordinal = factory.createSimpleOrdinal(lowerBound, upperBound); .)
+												(. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
 |
 	identifier									(. Token identifier = t; .)
-												(. ordinal = factory.createSimpleOrdinalFromTypename(identifier); .)
+												(. ordinal = factory.createSimpleOrdinalDescriptorFromTypename(identifier); .)
 )
 .
 
@@ -388,7 +388,7 @@ identifier										(. formalParameter = factory.createFormalParametersList(iden
 
 
 MainFunction 
-= 							                    (. factory.startMainFunction(); .)
+=
 Block<out StatementNode blockNode>              (. mainNode = factory.finishMainFunction(blockNode); .)
 "."
 .
@@ -396,11 +396,11 @@ Block<out StatementNode blockNode>              (. mainNode = factory.finishMain
 
 Block<out StatementNode blockNode>
 =                                               
-    "begin"                                     (. List<StatementNode> body = new ArrayList<>(); .)  
+    "begin"                                     (. List<StatementNode> bodyNodes = new ArrayList<>(); .)
     [ 
-        StatementSequence<body>
+        StatementSequence<bodyNodes>
     ]
-    "end"                                       (. blockNode = factory.finishBlock(body); .)
+    "end"                                       (. blockNode = factory.createBlockNode(bodyNodes); .)
 .
 
 
@@ -417,7 +417,7 @@ Statement<out StatementNode statement>          (. body.add(statement); .)
 Statement<out StatementNode statement>
 =                                               (. statement = null; .)
 (
-                                                (. statement = factory.createEmptyStatement(); .)
+                                                (. statement = factory.createNopStatement(); .)
 |
     Expression<out statement> 
 |
@@ -431,9 +431,7 @@ Statement<out StatementNode statement>
 |
 	CaseStatement<out statement>
 |
-	"break"										(. if(loopDepth == 0) .)
-												(. 		SemErr("Break statement outside of a loop."); .)
-												(. statement = factory.createBreak(); .)
+	"break"										(. statement = factory.createBreak(); .)
 |
     Block<out statement>
 |

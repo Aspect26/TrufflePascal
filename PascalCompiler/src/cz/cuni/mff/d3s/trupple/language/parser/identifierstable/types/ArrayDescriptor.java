@@ -7,10 +7,10 @@ import java.util.List;
 
 public class ArrayDescriptor extends TypeDescriptor{
 
-    private final List<IOrdinalType> ordinalDimenstions;
+    private final List<OrdinalDescriptor> ordinalDimenstions;
     private final TypeDescriptor returnTypeDescriptor;
 
-    public ArrayDescriptor(List<IOrdinalType> dimensions, TypeDescriptor returnTypeDescriptor) {
+    public ArrayDescriptor(List<OrdinalDescriptor> dimensions, TypeDescriptor returnTypeDescriptor) {
         this.ordinalDimenstions = dimensions;
         this.returnTypeDescriptor = returnTypeDescriptor;
     }

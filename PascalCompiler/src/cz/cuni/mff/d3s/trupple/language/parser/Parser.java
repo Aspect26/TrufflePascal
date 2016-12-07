@@ -2,7 +2,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
-import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 
 import com.oracle.truffle.api.source.Source;
 
@@ -131,7 +131,6 @@ public class Parser{
 	}
 
 	void MainFunction() {
-		factory.startMainFunction(); 
 		StatementNode blockNode = Block();
 		mainNode = factory.finishMainFunction(blockNode); 
 		Expect(35);
@@ -382,10 +381,10 @@ public class Parser{
 			Get();
 			factory.registerVariables(identifiers, t); 
 		} else if (la.kind == 27 || la.kind == 28) {
-			List<IOrdinalType> ordinalDimensions  = ArrayDefinition();
+			List<OrdinalDescriptor> ordinalDimensions  = ArrayDefinition();
 			while (continuesArray()) {
 				Expect(26);
-				List<IOrdinalType> additionalDimensions  = ArrayDefinition();
+				List<OrdinalDescriptor> additionalDimensions  = ArrayDefinition();
 				ordinalDimensions.addAll(additionalDimensions); 
 			}
 			Expect(26);
@@ -394,39 +393,39 @@ public class Parser{
 		} else SynErr(73);
 	}
 
-	List<IOrdinalType>  ArrayDefinition() {
-		List<IOrdinalType>  ordinalDimensions;
+	List<OrdinalDescriptor>  ArrayDefinition() {
+		List<OrdinalDescriptor>  ordinalDimensions;
 		if (la.kind == 27) {
 			Get();
 		}
 		Expect(28);
 		ordinalDimensions = new ArrayList<>(); 
 		Expect(29);
-		IOrdinalType ordinal = null; 
-		ordinal = Ordinal();
-		ordinalDimensions.add(ordinal); 
+		OrdinalDescriptor ordinalDescriptor = null; 
+		ordinalDescriptor = Ordinal();
+		ordinalDimensions.add(ordinalDescriptor); 
 		while (la.kind == 6) {
 			Get();
-			ordinal = Ordinal();
-			ordinalDimensions.add(ordinal); 
+			ordinalDescriptor = Ordinal();
+			ordinalDimensions.add(ordinalDescriptor); 
 		}
 		Expect(30);
 		return ordinalDimensions;
 	}
 
-	IOrdinalType  Ordinal() {
-		IOrdinalType  ordinal;
+	OrdinalDescriptor  Ordinal() {
+		OrdinalDescriptor  ordinal;
 		ordinal = null; 
 		if (la.kind == 3 || la.kind == 16 || la.kind == 17) {
 			int lowerBound, upperBound; 
 			lowerBound = SignedIntegerLiteral();
 			Expect(31);
 			upperBound = SignedIntegerLiteral();
-			ordinal = factory.createSimpleOrdinal(lowerBound, upperBound); 
+			ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); 
 		} else if (la.kind == 1) {
 			Get();
 			Token identifier = t; 
-			ordinal = factory.createSimpleOrdinalFromTypename(identifier); 
+			ordinal = factory.createSimpleOrdinalDescriptorFromTypename(identifier); 
 		} else SynErr(74);
 		return ordinal;
 	}
@@ -514,12 +513,12 @@ public class Parser{
 	StatementNode  Block() {
 		StatementNode  blockNode;
 		Expect(36);
-		List<StatementNode> body = new ArrayList<>(); 
+		List<StatementNode> bodyNodes = new ArrayList<>(); 
 		if (StartOf(7)) {
-			StatementSequence(body);
+			StatementSequence(bodyNodes);
 		}
 		Expect(37);
-		blockNode = factory.finishBlock(body); 
+		blockNode = factory.createBlockNode(bodyNodes); 
 		return blockNode;
 	}
 
@@ -559,7 +558,7 @@ public class Parser{
 		statement = null; 
 		switch (la.kind) {
 		case 7: case 37: case 42: case 49: {
-			statement = factory.createEmptyStatement(); 
+			statement = factory.createNopStatement(); 
 			break;
 		}
 		case 1: case 2: case 3: case 4: case 10: case 15: case 16: case 17: case 22: case 23: case 58: {
@@ -588,8 +587,6 @@ public class Parser{
 		}
 		case 38: {
 			Get();
-			if(loopDepth == 0) 
-			SemErr("Break statement outside of a loop."); 
 			statement = factory.createBreak(); 
 			break;
 		}
