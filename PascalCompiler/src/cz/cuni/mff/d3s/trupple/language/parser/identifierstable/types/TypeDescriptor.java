@@ -5,5 +5,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 public abstract class TypeDescriptor {
 
     public abstract FrameSlotKind getSlotKind();
+
+    public abstract boolean isVariable();
 }
 

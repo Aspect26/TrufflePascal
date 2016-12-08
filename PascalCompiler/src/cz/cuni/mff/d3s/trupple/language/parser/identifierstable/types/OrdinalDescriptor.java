@@ -22,9 +22,16 @@ public abstract class OrdinalDescriptor extends TypeDescriptor {
             return this.size;
         }
 
-        public FrameSlotKind getSlotKind() {
-            return FrameSlotKind.Object;
-        }
+    }
+
+    @Override
+    public FrameSlotKind getSlotKind() {
+        return FrameSlotKind.Object;
+    }
+
+    @Override
+    public boolean isVariable() {
+        return false;
     }
 
     public abstract int getFirstIndex();

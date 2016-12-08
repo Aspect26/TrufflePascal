@@ -2,16 +2,8 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customtypes.EnumType;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
-import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
-import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.ReadSubroutineArgumentNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
@@ -67,12 +59,32 @@ class LexicalScope {
         return this.outer;
     }
 
+    PascalContext getContext() {
+        return this.context;
+    }
+
     FrameDescriptor getFrameDescriptor() {
         return this.localIdentifiers.getFrameDescriptor();
     }
 
     FrameSlot getLocalSlot(String identifier) {
         return this.localIdentifiers.getFrameSlot(identifier);
+    }
+
+    boolean isVariable(String identifier) {
+        return this.localIdentifiers.isVariable(identifier);
+    }
+
+    boolean isParameterlessSubroutine(String identifier) {
+        return this.localIdentifiers.isParameterlessSubroutine(identifier);
+    }
+
+    boolean isSubroutine(String identifier) {
+        return this.localIdentifiers.isSubroutine(identifier);
+    }
+
+    boolean containsLocalIdentifier(String identifier) {
+        return this.localIdentifiers.containsIdentifier(identifier);
     }
 
     void registerLocalVariable(String identifier, String typeName) throws LexicalException {
@@ -155,16 +167,8 @@ class LexicalScope {
         return this.customTypes;
     }
 
-    PascalContext getContext() {
-        return this.context;
-    }
-
     Object getLocalConstant(String identifier) {
         return this.localConstants.get(identifier);
-    }
-
-    List<StatementNode> getAllInitializationNoes() {
-        return this.initializationNodes;
     }
 
     FrameSlot getReturnSlot() {
@@ -182,19 +186,6 @@ class LexicalScope {
         return slot;
     }
 
-    EnumType getVisibleEnumType(String identifier) {
-        LexicalScope ls = this;
-        while(ls != null) {
-            ICustomType customType = customTypes.get(identifier);
-            if(customType != null && customType instanceof EnumType)
-                return (EnumType) customType;
-
-            ls = ls.outer;
-        }
-
-        return null;
-    }
-
     void registerCustomType(String name, ICustomType customType) {
         this.customTypes.put(name, customType);
     }
@@ -210,126 +201,11 @@ class LexicalScope {
         }
     }
 
-    void registerFormalParameter(FormalParameter parameter) {
-        FrameSlotKind slotKind = this.getSlotByTypeName(parameter.type);
-        final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(this.scopeNodes.size(), slotKind);
-
-        FrameSlot newSlot = this.frameDescriptor.addFrameSlot(parameter.identifier, slotKind);
-        this.localIdentifiers.put(parameter.identifier, newSlot);
-
-        final AssignmentNode assignment = AssignmentNodeGen.create(readNode, newSlot);
-        this.scopeNodes.add(assignment);
-    }
-
     void addInitializationNode(StatementNode initializationNode) {
         this.initializationNodes.add(initializationNode);
     }
 
-    boolean containsLocalIdentifier(String identifier) {
-        return this.localIdentifiers.containsKey(identifier);
-    }
-
     boolean containsLocalConstant(String identifier) {
         return this.localConstants.containsKey(identifier);
-    }
-
-    boolean containsCustomType(String typeName){
-        return customTypes.containsKey(typeName);
-    }
-
-    boolean containsCustomValue(String identifier){
-        for(ICustomType custom : customTypes.values()){
-            if(custom.containsCustomValue(identifier))
-                return true;
-        }
-
-        return false;
-    }
-
-    void startSubroutineImplementation(String identifier) throws LexicalException {
-        if(this.context.containsFunction(identifier) &&
-                this.context.getGlobalFunctionRegistry().lookup(identifier) == null &&
-                this.context.getPrivateFunctionRegistry().lookup(identifier) == null) {
-            throw new LexicalException("Duplicate identifier: " + identifier);
-        }
-
-        else if (this.context.getGlobalFunctionRegistry().lookup(identifier) != null &&
-                this.context.getGlobalFunctionRegistry().lookup(identifier).isImplemented()) {
-            throw new LexicalException("Subroutine is already implemented as public: " + identifier);
-        }
-
-        else if (this.context.getPrivateFunctionRegistry().lookup(identifier) != null &&
-                this.context.getPrivateFunctionRegistry().lookup(identifier).isImplemented()){
-            throw new LexicalException("Subroutine is already implemented as private: " + identifier);
-        }
-    }
-
-    void setReturnSlot(String typeName) {
-        this.returnSlot = this.frameDescriptor.addFrameSlot(this.name, getSlotByTypeName(typeName));
-        this.localIdentifiers.put(this.name, this.returnSlot);
-    }
-
-    private PascalArray createMultidimensionalArray(List<IOrdinalType> ordinalDimensions, String componentType) {
-        assert ordinalDimensions.size() > 0;
-
-        if(ordinalDimensions.size() == 1) {
-            return new PascalArray(componentType, ordinalDimensions.get(0));
-        }
-
-        else {
-            int count = ordinalDimensions.get(0).getSize();
-            List<IOrdinalType> innerDimensions = ordinalDimensions.subList(1, ordinalDimensions.size());
-            PascalArray[] innerArrays = new PascalArray[count];
-            for(int i = 0; i < count; i++) {
-                innerArrays[i] = createMultidimensionalArray(innerDimensions, componentType);
-            }
-            return new PascalArray(innerArrays, ordinalDimensions.get(0));
-        }
-    }
-
-    private ICustomType tryGetCustomType(String typeName) {
-        LexicalScope scope = this;
-        while(scope != null) {
-            ICustomType customType = customTypes.get(typeName);
-            if(customType != null)
-                return customType;
-
-            scope = scope.getOuterScope();
-        }
-
-        return null;
-    }
-
-    private FrameSlotKind getSlotByTypeName(String type) {
-        if(this.containsCustomType(type))
-            return FrameSlotKind.Object;
-
-        switch (type) {
-
-            // ordinals
-            case "integer":
-            case "shortint":
-            case "longint":
-            case "byte":
-            case "word":
-                return FrameSlotKind.Long;
-
-            // floating points
-            case "single":
-            case "real":
-            case "double":
-                return FrameSlotKind.Double;
-
-            // logical
-            case "boolean":
-                return FrameSlotKind.Boolean;
-
-            // char
-            case "char":
-                return FrameSlotKind.Byte;
-
-            default:
-                return FrameSlotKind.Illegal;
-        }
     }
 }

@@ -4,17 +4,22 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 
 import java.util.List;
 
-public class EnumDescriptor extends TypeDescriptor {
+public class EnumTypeDescriptor extends TypeDescriptor {
 
     private List<String> identifiers;
 
-    public EnumDescriptor(List<String> identifiers) {
+    public EnumTypeDescriptor(List<String> identifiers) {
         this.identifiers = identifiers;
     }
 
+    @Override
     public FrameSlotKind getSlotKind() {
         return FrameSlotKind.Object;
     }
 
+    @Override
+    public boolean isVariable() {
+        return false;
+    }
 
 }

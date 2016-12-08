@@ -34,7 +34,13 @@ public class PrimitiveDescriptor extends TypeDescriptor {
         this.slotKind = slotKind;
     }
 
+    @Override
     public FrameSlotKind getSlotKind() {
         return this.slotKind;
+    }
+
+    @Override
+    public boolean isVariable() {
+        return true;
     }
 }

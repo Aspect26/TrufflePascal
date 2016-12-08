@@ -58,7 +58,6 @@ public class NodeFactory {
 
 	private Parser parser;
 	private LexicalScope lexicalScope;
-    private int loopDepth = 0;
 
 	/* State while parsing case statement */
 	// --> TODO: this causes to be unable to create nested cases....
@@ -283,6 +282,92 @@ public class NodeFactory {
         }
     }
 
+    ExpressionNode createAssignment(Token identifierToken, ExpressionNode valueNode) {
+        String variableIdentifier = this.getIdentifierFromToken(identifierToken);
+
+        LexicalScope ls = this.lexicalScope;
+        while (ls != null) {
+            if (lexicalScope.containsLocalIdentifier(variableIdentifier)) {
+                if (!lexicalScope.isVariable(variableIdentifier)) {
+                    parser.SemErr("Assignment target is not a variable");
+                    return null;
+                } else {
+                    FrameSlot frameSlot = lexicalScope.getLocalSlot(variableIdentifier);
+                    return AssignmentNodeGen.create(valueNode, frameSlot);
+                }
+            } else {
+                ls = ls.getOuterScope();
+            }
+        }
+
+        parser.SemErr("Assignment target is an unknown identifier");
+        return null;
+    }
+
+    ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+
+        LexicalScope ls = this.lexicalScope;
+        while (ls != null) {
+            if (ls.containsLocalIdentifier(identifier)){
+                if (ls.isVariable(identifier)) {
+                    return ReadVariableNodeGen.create(ls.getLocalSlot(identifier));
+                } else if (ls.isParameterlessSubroutine(identifier)) {
+                    PascalContext context = ls.getContext();
+                    ExpressionNode literal = new FunctionLiteralNode(context, identifier);
+                    return this.createCall(literal, new ArrayList<>());
+                } else {
+                    parser.SemErr(identifier + " is not an expression");
+                    return null;
+                }
+            } else {
+                ls = ls.getOuterScope();
+            }
+        }
+
+        parser.SemErr("Unknown identifier: " + identifier);
+        return null;
+    }
+
+    ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
+        return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
+    }
+
+    ExpressionNode createFunctionLiteralNode(Token identifierToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+
+        LexicalScope ls = this.lexicalScope;
+        while (lexicalScope != null){
+            if (lexicalScope.containsLocalIdentifier(identifier)) {
+                if (!lexicalScope.isSubroutine(identifier)) {
+                    parser.SemErr(identifier + " is not a subroutine");
+                    return null;
+                } else {
+                    return new FunctionLiteralNode(lexicalScope.getContext(), identifier);
+                }
+            } else {
+                ls = ls.getOuterScope();
+            }
+        }
+
+        parser.SemErr("Undefined subroutine: " + identifier);
+        return null;
+    }
+
+    ExpressionNode createReadArrayValue(Token identifierToken, List<ExpressionNode> indexingNodes) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+
+        return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]),
+                lexicalScope.getLocalSlot(identifier));
+    }
+
+    ExpressionNode createArrayIndexAssignment(Token identifierToken, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+
+        return new ArrayIndexAssignmentNode(lexicalScope.getLocalSlot(identifier),
+                indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
+    }
+
     ExpressionNode createLogicLiteral(boolean value) {
         return new LogicLiteralNode(value);
     }
@@ -365,35 +450,6 @@ public class NodeFactory {
 		return node;
 	}
 
-	public ExpressionNode createFunctionNode(Token tokenName) {
-		String functionName = tokenName.val.toLowerCase();
-
-		PascalContext context = lexicalScope.getContext();
-		while(context != null){
-			if(!context.containsFunction(functionName)){
-				context = context.getOuterContext();
-			} else {
-				return new FunctionLiteralNode(context, functionName);
-			}
-		}
-		parser.SemErr("Undefined function: " + functionName);
-		return null;
-	}
-
-	public ExpressionNode createReadArrayValue(Token identifier, List<ExpressionNode> indexingNodes) {
-		return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]),
-				lexicalScope.getLocalSlot(identifier.val.toLowerCase()));
-	}
-
-	public ExpressionNode createIndexingNode(Token identifier) {
-		return new StringLiteralNode(identifier.val.toLowerCase());
-	}
-
-	public ExpressionNode createArrayIndexAssignment(Token name, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
-		return new ArrayIndexAssignmentNode(lexicalScope.getLocalSlot(name.val.toLowerCase()),
-				indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
-	}
-
 	public StatementNode createRandomizeNode() {
 		return new RandomizeBuiltinNode(lexicalScope.getContext());
 	}
@@ -404,34 +460,6 @@ public class NodeFactory {
 
 	public ExpressionNode createRandomNode(Token numericLiteral) {
 		return new RandomBuiltinNode(lexicalScope.getContext(), Long.parseLong(numericLiteral.val));
-	}
-
-	public ExpressionNode readSingleIdentifier(Token nameToken) {
-		String identifier = nameToken.val.toLowerCase();
-		FrameSlot frameSlot = lexicalScope.getVisibleSlot(identifier);
-
-		// firstly check if it is a variable
-		if (frameSlot != null){
-			return ReadVariableNodeGen.create(frameSlot);
-
-		// secondly, try to create a procedure or function literal (with no arguments)
-		} else {
-            LexicalScope iteratingScope = this.lexicalScope;
-			while(iteratingScope != null) {
-				if(iteratingScope.getContext().containsParameterlessSubroutine(identifier)) {
-					ExpressionNode literal = this.createFunctionNode(nameToken);
-					return this.createCall(literal, new ArrayList<>());
-				} else {
-                    iteratingScope = iteratingScope.getOuterScope();
-				}
-			}
-
-			return null;
-		}
-	}
-
-	public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
-		return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
 	}
 
 	public StatementNode createReadLine() {
@@ -644,14 +672,6 @@ public class NodeFactory {
 	public String createStringFromToken(Token t) {
 		String literal = t.val;
 		return literal.substring(1, literal.length() - 1);
-	}
-
-	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode) {
-		FrameSlot slot = lexicalScope.getVisibleSlot(nameToken.val.toLowerCase());
-		if (slot == null)
-			return null;
-
-		return AssignmentNodeGen.create(valueNode, slot);
 	}
 
 	public void importUnit(Token unitToken) {

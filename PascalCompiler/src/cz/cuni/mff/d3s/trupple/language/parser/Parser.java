@@ -879,9 +879,7 @@ public class Parser{
 			if (la.kind == 10 || la.kind == 27 || la.kind == 42) {
 				expression = MemberExpression(t);
 			} else if (StartOf(12)) {
-				expression = factory.readSingleIdentifier(t); 
-				if(expression == null) 
-				SemErr("Undefined identifier " + t.val + "."); 
+				expression = factory.createExpressionFromSingleIdentifier(t); 
 			} else SynErr(84);
 			break;
 		}
@@ -905,8 +903,6 @@ public class Parser{
 		case 3: {
 			Get();
 			expression = factory.createNumericLiteral(t); 
-			if(expression == null) 
-			SemErr("Constant out of range!"); 
 			break;
 		}
 		case 56: case 57: {
@@ -944,31 +940,11 @@ public class Parser{
 		ExpressionNode  expression;
 		expression = null; 
 		if (la.kind == 10) {
-			Get();
-			ExpressionNode functionNode = factory.createFunctionNode(identifierName); 
-			List<ExpressionNode> parameters = new ArrayList<>(); 
-			ExpressionNode parameter; 
-			if (StartOf(13)) {
-				parameter = Expression();
-				parameters.add(parameter); 
-				while (la.kind == 6) {
-					Get();
-					parameter = Expression();
-					parameters.add(parameter); 
-				}
-			}
-			Expect(11);
-			expression = factory.createCall(functionNode, parameters); 
+			expression = SubroutineCall(identifierName);
 		} else if (la.kind == 42) {
 			Get();
 			ExpressionNode value = Expression();
-			if(identifierName == null) { 
-			SemErr("Invalid assignment target!"); 
-			} else { 
 			expression = factory.createAssignment(identifierName, value); 
-			if(expression == null) 
-			SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); 
-			} 
 		} else if (la.kind == 27) {
 			expression = ArrayAccessing(identifierName);
 		} else SynErr(88);
@@ -984,6 +960,26 @@ public class Parser{
 			value += "'" + factory.createStringFromToken(t); 
 		}
 		return value;
+	}
+
+	ExpressionNode  SubroutineCall(Token identifierToken) {
+		ExpressionNode  expression;
+		Expect(10);
+		ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); 
+		List<ExpressionNode> parameters = new ArrayList<>(); 
+		ExpressionNode parameter; 
+		if (StartOf(13)) {
+			parameter = Expression();
+			parameters.add(parameter); 
+			while (la.kind == 6) {
+				Get();
+				parameter = Expression();
+				parameters.add(parameter); 
+			}
+		}
+		Expect(11);
+		expression = factory.createCall(functionNode, parameters); 
+		return expression;
 	}
 
 	ExpressionNode  ArrayAccessing(Token identifierName) {

@@ -625,9 +625,7 @@ Factor<out ExpressionNode expression>
     (
 	    MemberExpression<out expression, t>
     |
-                                                (. expression = factory.readSingleIdentifier(t); .)
-                                                (. if(expression == null) .)
-                                                (.      SemErr("Undefined identifier " + t.val + "."); .)
+                                                (. expression = factory.createExpressionFromSingleIdentifier(t); .)
     )
 |
     "("
@@ -690,31 +688,32 @@ Random<out ExpressionNode expression>
 MemberExpression<out ExpressionNode expression, Token identifierName>
 =							                    (. expression = null; .)
 (                                               
-	"("						                    (. ExpressionNode functionNode = factory.createFunctionNode(identifierName); .)
-                                                (. List<ExpressionNode> parameters = new ArrayList<>(); .)
-                                                (. ExpressionNode parameter; .)
-		[
-			Expression<out parameter>           (. parameters.add(parameter); .)
-			{
-				","
-				Expression<out parameter>       (. parameters.add(parameter); .)
-			}
-		]
-	")"                                         (. expression = factory.createCall(functionNode, parameters); .)
+	SubroutineCall<out expression, identifierName>
 |
     ":="
-    Expression<out ExpressionNode value>        (. if(identifierName == null) { .) 
-                                                (.      SemErr("Invalid assignment target!"); .)
-                                                (. } else { .)
-                                                (.      expression = factory.createAssignment(identifierName, value); .)
-                                                (.      if(expression == null) .)
-                                                (.          SemErr("Undefined variable " + identifierName.val.toLowerCase() + "."); .)
-                                                (. } .)
+    Expression<out ExpressionNode value>        (. expression = factory.createAssignment(identifierName, value); .)
 |
 	ArrayAccessing<out expression, identifierName>
 )
 .
 
+
+
+SubroutineCall<out ExpressionNode expression, Token identifierToken>
+=
+"("						                        (. ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); .)
+
+                                                (. List<ExpressionNode> parameters = new ArrayList<>(); .)
+                                                (. ExpressionNode parameter; .)
+	[
+		Expression<out parameter>               (. parameters.add(parameter); .)
+		{
+			","
+			Expression<out parameter>           (. parameters.add(parameter); .)
+		}
+	]
+")"                                             (. expression = factory.createCall(functionNode, parameters); .)
+.
 
 
 ArrayAccessing<out ExpressionNode expression, Token identifierName>

@@ -2,11 +2,6 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customtypes.EnumType;
-import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
-import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.language.parser.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
@@ -16,6 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 public class IdentifiersTable {
+
+    /* TODO: HIGH PRIORITY oddelit types a variables
+        type color(red,green,blue);
+        identifikatory color,red,green aj blue maju rovnaky type descriptor
+     */
 
     /** Map of all identifiers: e.g.: variable names, function names, types names, ... */
     private Map<String, TypeDescriptor> identifiersMap;
@@ -58,6 +58,31 @@ public class IdentifiersTable {
         return this.identifiersMap.get(identifier);
     }
 
+    public boolean containsIdentifier(String identifier) {
+        return this.identifiersMap.containsKey(identifier);
+    }
+
+    public boolean isVariable(String identifier) {
+        return this.identifiersMap.containsKey(identifier) && this.identifiersMap.get(identifier).isVariable();
+    }
+
+    public boolean isSubroutine(String identifier) {
+        return this.identifiersMap.containsKey(identifier) && (this.identifiersMap.get(identifier) instanceof SubroutineDescriptor);
+    }
+
+    public boolean isParameterlessSubroutine(String identifier) {
+        if (!this.identifiersMap.containsKey(identifier)) {
+            return false;
+        }
+
+        TypeDescriptor descriptor = this.identifiersMap.get(identifier);
+        if (!(descriptor instanceof SubroutineDescriptor)){
+            return false;
+        } else {
+            return ((SubroutineDescriptor) descriptor).hasParameters();
+        }
+    }
+
     public void addVariable(String typeName, String identifier) throws LexicalException {
         TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
         this.registerNewIdentifier(identifier, typeDescriptor);
@@ -82,7 +107,7 @@ public class IdentifiersTable {
         if(this.typeDescriptors.containsKey(name))
             throw new LexicalException("The type is already defined: " + name + ".");
 
-        TypeDescriptor typeDescriptor = new EnumDescriptor(identifiers);
+        TypeDescriptor typeDescriptor = new EnumTypeDescriptor(identifiers);
         this.registerNewIdentifier(name, typeDescriptor);
     }
 
