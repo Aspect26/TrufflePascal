@@ -637,7 +637,7 @@ public class Parser{
 
 	StatementNode  ForLoop() {
 		StatementNode  statement;
-		loopDepth++; 
+		factory.startLoop(); 
 		Expect(43);
 		boolean ascending = true; 
 		Expect(1);
@@ -654,8 +654,7 @@ public class Parser{
 		ExpressionNode finalValue = Expression();
 		Expect(47);
 		StatementNode loopBody = Statement();
-		statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); 
-		loopDepth--; 
+		statement = factory.finishForLoop(ascending, variableToken, startValue, finalValue, loopBody); 
 		return statement;
 	}
 

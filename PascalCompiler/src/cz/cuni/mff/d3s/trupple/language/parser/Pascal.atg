@@ -501,7 +501,7 @@ Statement<out StatementNode caseStatement>		(. factory.addCaseOption(caseConstan
 
 
 ForLoop<out StatementNode statement>
-=												(. loopDepth++; .)
+=                                               (. factory.startLoop(); .)
 "for"											(. boolean ascending = true; .)
 identifier										(. Token variableToken = t; .)
 ":="
@@ -513,8 +513,7 @@ Expression<out ExpressionNode startValue>
 )
 Expression<out ExpressionNode finalValue>
 "do"
-Statement<out StatementNode loopBody>			(. statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
-												(. loopDepth--; .)
+Statement<out StatementNode loopBody>			(. statement = factory.finishForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
 .	
 
 

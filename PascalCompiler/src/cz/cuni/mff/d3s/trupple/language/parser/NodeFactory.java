@@ -182,10 +182,23 @@ public class NodeFactory {
         finishSubroutine(functionBodyNode);
     }
 
+    void startLoop() {
+        lexicalScope.increaseLoopDepth();
+    }
+
+    StatementNode finishForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
+        String iteratingIdentifier = this.getIdentifierFromToken(variableToken);
+        FrameSlot iteratingSlot = lexicalScope.getLocalSlot(iteratingIdentifier);
+        if (iteratingSlot == null) {
+            parser.SemErr("UnknownDescriptor identifier: " + iteratingIdentifier);
+        }
+        return new ForNode(ascending, iteratingSlot, startValue, finalValue, loopBody);
+    }
+
     StatementNode createBreak() {
         // TODO: check if TurboPascal standard is set
-        if (loopDepth == 0) {
-            parser.SemErr("Not in a loop: ");
+        if (lexicalScope.isInLoop()) {
+            parser.SemErr("Break outside a loop: ");
         }
         return new BreakNode();
     }
@@ -279,15 +292,6 @@ public class NodeFactory {
 
 	public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
 		return new RepeatNode(condition, loopBody);
-	}
-
-	public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
-        String iteratingIdentifier = variableToken.val.toLowerCase();
-        FrameSlot iteratingSlot = lexicalScope.getLocalSlot(iteratingIdentifier);
-        if (iteratingSlot == null) {
-            parser.SemErr("UnknownDescriptor identifier: " + iteratingIdentifier);
-        }
-		return new ForNode(ascending, iteratingSlot, startValue, finalValue, loopBody);
 	}
 
 	public ExpressionNode createReadArrayValue(Token identifier, List<ExpressionNode> indexingNodes) {

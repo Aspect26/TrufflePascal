@@ -33,13 +33,15 @@ class LexicalScope {
 
     private final String name;
     private final LexicalScope outer;
+    private final IdentifiersTable localIdentifiers;
+    private int loopDepth;
+
     private final PascalContext context;
     private final Map<String, Object> localConstants;
     private final Map<String, ICustomType> customTypes;
     private final List<StatementNode> initializationNodes;
-    private final IdentifiersTable localIdentifiers;
 
-    private FrameDescriptor frameDescriptor;
+
     private FrameSlot returnSlot;
 
     List<StatementNode> scopeNodes = new ArrayList<>();
@@ -54,7 +56,6 @@ class LexicalScope {
 
         this.localIdentifiers = new IdentifiersTable();
 
-        this.frameDescriptor = (outer != null)? new FrameDescriptor(this.outer.frameDescriptor.getDefaultValue()) : new FrameDescriptor();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
     }
 
@@ -116,9 +117,12 @@ class LexicalScope {
         return null;
     }
 
-    FrameDescriptor createFrameDescriptor() {
-        // TODO: implement this
-        return null;
+    void increaseLoopDepth() {
+        ++loopDepth;
+    }
+
+    boolean isInLoop() {
+        return loopDepth > 0;
     }
 
 

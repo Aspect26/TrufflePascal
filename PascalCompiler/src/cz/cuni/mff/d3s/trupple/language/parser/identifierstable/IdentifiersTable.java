@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable;
 
+import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customtypes.EnumType;
@@ -22,10 +23,13 @@ public class IdentifiersTable {
     /** Map of type identifiers: e.g.: integer, boolean, enums, records, ... */
     private Map<String, TypeDescriptor> typeDescriptors;
 
+    private FrameDescriptor frameDescriptor;
+
     public IdentifiersTable() {
         this.identifiersMap = new HashMap<>();
-
         this.typeDescriptors = new HashMap<>();
+        this.frameDescriptor = new FrameDescriptor();
+
         addBuiltinTypes();
     }
 
@@ -94,6 +98,7 @@ public class IdentifiersTable {
             throw new LexicalException("Duplicate identifier: " + identifier + ".");
         } else {
             this.identifiersMap.put(identifier, typeDescriptor);
+            this.frameDescriptor.addFrameSlot(identifier, typeDescriptor.getSlotKind());
         }
     }
 }
