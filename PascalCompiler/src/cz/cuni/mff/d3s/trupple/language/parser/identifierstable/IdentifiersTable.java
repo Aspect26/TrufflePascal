@@ -46,6 +46,14 @@ public class IdentifiersTable {
         typeDescriptors.put("char", PrimitiveDescriptor.charDescriptor());
     }
 
+    public FrameSlot getFrameSlot(String identifier) {
+        return this.frameDescriptor.findFrameSlot(identifier);
+    }
+
+    public FrameDescriptor getFrameDescriptor() {
+        return this.frameDescriptor;
+    }
+
     public TypeDescriptor getTypeDescriptor(String identifier) {
         return this.identifiersMap.get(identifier);
     }

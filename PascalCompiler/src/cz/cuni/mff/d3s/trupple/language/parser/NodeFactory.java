@@ -186,13 +186,21 @@ public class NodeFactory {
         lexicalScope.increaseLoopDepth();
     }
 
-    StatementNode finishForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
+    StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
         String iteratingIdentifier = this.getIdentifierFromToken(variableToken);
         FrameSlot iteratingSlot = lexicalScope.getLocalSlot(iteratingIdentifier);
         if (iteratingSlot == null) {
-            parser.SemErr("UnknownDescriptor identifier: " + iteratingIdentifier);
+            parser.SemErr("Unknown identifier: " + iteratingIdentifier);
         }
         return new ForNode(ascending, iteratingSlot, startValue, finalValue, loopBody);
+    }
+
+    StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
+        return new RepeatNode(condition, loopBody);
+    }
+
+    StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody) {
+        return new WhileNode(condition, loopBody);
     }
 
     StatementNode createBreak() {
@@ -203,8 +211,98 @@ public class NodeFactory {
         return new BreakNode();
     }
 
+	void finishLoop() {
+        try {
+            lexicalScope.decreaseLoopDepth();
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
+        return new IfNode(condition, thenNode, elseNode);
+    }
+
     StatementNode createNopStatement() {
         return new NopNode();
+    }
+
+    ExpressionNode createBinaryExpression(Token operator, ExpressionNode leftNode, ExpressionNode rightNode) {
+        switch (operator.val.toLowerCase()) {
+
+            // arithmetic
+            case "+":
+                return AddNodeGen.create(leftNode, rightNode);
+            case "-":
+                return SubstractNodeGen.create(leftNode, rightNode);
+            case "*":
+                return MultiplyNodeGen.create(leftNode, rightNode);
+            case "/":
+                return DivideNodeGen.create(leftNode, rightNode);
+            case "div":
+                return DivideIntegerNodeGen.create(leftNode, rightNode);
+            case "mod":
+                return ModuloNodeGen.create(leftNode, rightNode);
+
+            // logic
+            case "and":
+                return AndNodeGen.create(leftNode, rightNode);
+            case "or":
+                return OrNodeGen.create(leftNode, rightNode);
+
+            case "<":
+                return LessThanNodeGen.create(leftNode, rightNode);
+            case "<=":
+                return LessThanOrEqualNodeGen.create(leftNode, rightNode);
+            case ">":
+                return NotNodeGen.create(LessThanOrEqualNodeGen.create(leftNode, rightNode));
+            case ">=":
+                return NotNodeGen.create(LessThanNodeGen.create(leftNode, rightNode));
+            case "=":
+                return EqualsNodeGen.create(leftNode, rightNode);
+            case "<>":
+                return NotNodeGen.create(EqualsNodeGen.create(leftNode, rightNode));
+
+            default:
+                parser.SemErr("Unknown binary operator: " + operator.val);
+                return null;
+        }
+    }
+
+    ExpressionNode createUnaryExpression(Token operator, ExpressionNode son) {
+        switch (operator.val) {
+            case "+":
+                return son;
+            case "-":
+                return NegationNodeGen.create(son);
+            case "not":
+                return NotNodeGen.create(son);
+            default:
+                parser.SemErr("Unexpected unary operator: " + operator.val);
+                return null;
+        }
+    }
+
+    ExpressionNode createLogicLiteral(boolean value) {
+        return new LogicLiteralNode(value);
+    }
+
+    ExpressionNode createNumericLiteral(Token literalToken) {
+        try {
+            return new LongLiteralNode(Long.parseLong(literalToken.val));
+        } catch (NumberFormatException e) {
+            parser.SemErr("Integer literal out of range");
+            return new LongLiteralNode(0);
+        }
+    }
+
+    ExpressionNode createFloatLiteral(Token token) {
+        double value = Float.parseFloat(token.val.toString());
+        return new DoubleLiteralNode(value);
+    }
+
+    ExpressionNode createCharOrStringLiteral(String literal) {
+        return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
     }
 
     StatementNode createBlockNode(List<StatementNode> bodyNodes) {
@@ -214,7 +312,7 @@ public class NodeFactory {
     // TODO: this main node can be in lexical scope instead of a parser
     PascalRootNode finishMainFunction(StatementNode blockNode) {
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
-        return new PascalRootNode(lexicalScope.createFrameDescriptor(), new ProcedureBodyNode(bodyNode));
+        return new PascalRootNode(lexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
     }
 
 	private String getIdentifierFromToken(Token identifier) {
@@ -233,7 +331,7 @@ public class NodeFactory {
     }
 
     private void finishSubroutine(ExpressionNode subroutineBodyNode) {
-        final PascalRootNode rootNode = new PascalRootNode(lexicalScope.createFrameDescriptor(), subroutineBodyNode);
+        final PascalRootNode rootNode = new PascalRootNode(lexicalScope.getFrameDescriptor(), subroutineBodyNode);
 
         String subroutineIdentifier = lexicalScope.getName();
         lexicalScope = lexicalScope.getOuterScope();
@@ -280,18 +378,6 @@ public class NodeFactory {
 		}
 		parser.SemErr("Undefined function: " + functionName);
 		return null;
-	}
-
-	public StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
-		return new IfNode(condition, thenNode, elseNode);
-	}
-
-	public StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody) {
-		return new WhileNode(condition, loopBody);
-	}
-
-	public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
-		return new RepeatNode(condition, loopBody);
 	}
 
 	public ExpressionNode createReadArrayValue(Token identifier, List<ExpressionNode> indexingNodes) {
@@ -555,30 +641,9 @@ public class NodeFactory {
 		return lexicalScope.getLocalConstant(identifier);
 	}
 
-	public ExpressionNode createCharOrStringLiteral(String literal) {
-		return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
-	}
-
 	public String createStringFromToken(Token t) {
 		String literal = t.val;
 		return literal.substring(1, literal.length() - 1);
-	}
-
-	public ExpressionNode createNumericLiteral(Token literalToken) {
-		try {
-			return new LongLiteralNode(Long.parseLong(literalToken.val));
-		} catch (NumberFormatException e) {
-			return null;
-		}
-	}
-
-	public ExpressionNode createFloatLiteral(Token token) {
-		double value = Float.parseFloat(token.val.toString());
-		return new DoubleLiteralNode(value);
-	}
-
-	public ExpressionNode createLogicLiteral(boolean value) {
-		return new LogicLiteralNode(value);
 	}
 
 	public ExpressionNode createAssignment(Token nameToken, ExpressionNode valueNode) {
@@ -587,62 +652,6 @@ public class NodeFactory {
 			return null;
 
 		return AssignmentNodeGen.create(valueNode, slot);
-	}
-
-	public ExpressionNode createBinary(Token operator, ExpressionNode leftNode, ExpressionNode rightNode) {
-		switch (operator.val.toLowerCase()) {
-
-		// arithmetic
-		case "+":
-			return AddNodeGen.create(leftNode, rightNode);
-		case "-":
-			return SubstractNodeGen.create(leftNode, rightNode);
-		case "*":
-			return MultiplyNodeGen.create(leftNode, rightNode);
-		case "/":
-			return DivideNodeGen.create(leftNode, rightNode);
-		case "div":
-			return DivideIntegerNodeGen.create(leftNode, rightNode);
-		case "mod":
-			return ModuloNodeGen.create(leftNode, rightNode);
-
-		// logic
-		case "and":
-			return AndNodeGen.create(leftNode, rightNode);
-		case "or":
-			return OrNodeGen.create(leftNode, rightNode);
-
-		case "<":
-			return LessThanNodeGen.create(leftNode, rightNode);
-		case "<=":
-			return LessThanOrEqualNodeGen.create(leftNode, rightNode);
-		case ">":
-			return NotNodeGen.create(LessThanOrEqualNodeGen.create(leftNode, rightNode));
-		case ">=":
-			return NotNodeGen.create(LessThanNodeGen.create(leftNode, rightNode));
-		case "=":
-			return EqualsNodeGen.create(leftNode, rightNode);
-		case "<>":
-			return NotNodeGen.create(EqualsNodeGen.create(leftNode, rightNode));
-
-		default:
-			parser.SemErr("Unexpected binary operator: " + operator.val);
-			return null;
-		}
-	}
-
-	public ExpressionNode createUnary(Token operator, ExpressionNode son) {
-		switch (operator.val) {
-		case "+":
-			return son;
-		case "-":
-			return NegationNodeGen.create(son);
-		case "not":
-			return NotNodeGen.create(son);
-		default:
-			parser.SemErr("Unexpected unary operator: " + operator.val);
-			return null;
-		}
 	}
 
 	public void importUnit(Token unitToken) {

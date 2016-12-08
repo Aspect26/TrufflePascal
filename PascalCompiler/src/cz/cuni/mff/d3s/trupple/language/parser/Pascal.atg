@@ -224,17 +224,6 @@ NumericFactorConstant<out NumericConstant value>
 
 
 
-LogicLiteral<out boolean result>
-=												(. result = false; .)
-(
-	"true"										(. result = true; .)
-|
-	"false"										(. result = false; .)
-)
-.
-
-
-
 VariableDefinitions
 =
 "var"
@@ -513,27 +502,28 @@ Expression<out ExpressionNode startValue>
 )
 Expression<out ExpressionNode finalValue>
 "do"
-Statement<out StatementNode loopBody>			(. statement = factory.finishForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
+Statement<out StatementNode loopBody>			(. statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
+                                                (. factory.finishLoop(); .)
 .	
 
 
 RepeatLoop<out StatementNode statement>
-=												(. loopDepth++; .)
+=												(. factory.startLoop(); .)
 "repeat"										(. List<StatementNode> bodyNodes = new ArrayList<>(); .)
 StatementSequence<bodyNodes>					
 "until"
-Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.finishBlock(bodyNodes)); .)
-												(. loopDepth--; .)
+Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes)); .)
+                                                (. factory.finishLoop(); .)
 .
 
 
 WhileLoop<out StatementNode statement>
-=												(. loopDepth++; .)
+=												(. factory.startLoop(); .)
 "while"
 Expression<out ExpressionNode condition>
 "do"
 Statement<out StatementNode loopBody>			(. statement = factory.createWhileLoop(condition, loopBody); .)
-												(. loopDepth--; .)
+												(. factory.finishLoop(); .)
 .
 
 
@@ -557,7 +547,7 @@ Expression<out ExpressionNode expression>
 LogicTerm<out expression>
 {
     "or"                                        (. Token op = t; .)
-    LogicTerm<out ExpressionNode right>         (. expression = factory.createBinary(op, expression, right); .)
+    LogicTerm<out ExpressionNode right>         (. expression = factory.createBinaryExpression(op, expression, right); .)
 }
 .
 
@@ -567,7 +557,7 @@ LogicTerm<out ExpressionNode expression>
 SignedLogicFactor<out expression>
 {
     "and"                                       (. Token op = t; .)
-    SignedLogicFactor<out ExpressionNode right> (. expression = factory.createBinary(op, expression, right); .)
+    SignedLogicFactor<out ExpressionNode right> (. expression = factory.createBinaryExpression(op, expression, right); .)
 }
 .
 
@@ -576,7 +566,7 @@ SignedLogicFactor<out ExpressionNode expression>
 =												(. expression = null; .)
 (
 	"not"										(. Token op = t; .)
-	SignedLogicFactor<out ExpressionNode right>	(. expression = factory.createUnary(op, right); .)
+	SignedLogicFactor<out ExpressionNode right>	(. expression = factory.createUnaryExpression(op, right); .)
 |
 	LogicFactor<out expression>
 )
@@ -589,7 +579,7 @@ LogicFactor<out ExpressionNode expression>
 Arithmetic<out expression>
 [
     (">" | ">=" | "<" | "<=" | "=" | "<>")      (. Token op = t; .)
-    Arithmetic<out ExpressionNode right>        (. expression = factory.createBinary(op, expression, right); .)
+    Arithmetic<out ExpressionNode right>        (. expression = factory.createBinaryExpression(op, expression, right); .)
 ]
 .
 
@@ -599,7 +589,7 @@ Arithmetic<out ExpressionNode expression>
 Term<out expression>
 {
     ( "+" | "-" )                               (. Token op = t; .)
-    Term<out ExpressionNode right>              (. expression = factory.createBinary(op, expression, right); .)
+    Term<out ExpressionNode right>              (. expression = factory.createBinaryExpression(op, expression, right); .)
 }
 .
 
@@ -609,7 +599,7 @@ Term<out ExpressionNode expression>
 SignedFactor<out expression>
 {
     ( "*" | "/" | "div" | "mod")                (. Token op = t; .)
-    SignedFactor<out ExpressionNode right>      (. expression = factory.createBinary(op, expression, right); .)
+    SignedFactor<out ExpressionNode right>      (. expression = factory.createBinaryExpression(op, expression, right); .)
 }
 .
 
@@ -618,7 +608,7 @@ SignedFactor<out ExpressionNode expression>
 =                                               (. expression = null; .)
 (
     ( "+" | "-" )                               (. Token unOp = t; .)
-    SignedFactor<out expression>                (.  expression = factory.createUnary(unOp, expression); .)
+    SignedFactor<out expression>                (.  expression = factory.createUnaryExpression(unOp, expression); .)
 |
     Factor<out expression>                                        
 )
@@ -650,8 +640,6 @@ Factor<out ExpressionNode expression>
 	doubleLiteral								(. expression = factory.createFloatLiteral(t); .)
 |
     integerLiteral                              (. expression = factory.createNumericLiteral(t); .)
-                                                (. if(expression == null) .)
-                                                (.      SemErr("Constant out of range!"); .)
 |
 												(. boolean val; .)
     LogicLiteral<out val>						(. expression = factory.createLogicLiteral(val); .)
@@ -665,6 +653,17 @@ stringLiteral                                   (. value = factory.createStringF
 {
     stringLiteral                               (. value += "'" + factory.createStringFromToken(t); .)
 }
+.
+
+
+
+LogicLiteral<out boolean result>
+=												(. result = false; .)
+(
+	"true"										(. result = true; .)
+|
+	"false"										(. result = false; .)
+)
 .
 
 

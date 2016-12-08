@@ -67,6 +67,14 @@ class LexicalScope {
         return this.outer;
     }
 
+    FrameDescriptor getFrameDescriptor() {
+        return this.localIdentifiers.getFrameDescriptor();
+    }
+
+    FrameSlot getLocalSlot(String identifier) {
+        return this.localIdentifiers.getFrameSlot(identifier);
+    }
+
     void registerLocalVariable(String identifier, String typeName) throws LexicalException {
         this.localIdentifiers.addVariable(typeName, identifier);
     }
@@ -121,6 +129,14 @@ class LexicalScope {
         ++loopDepth;
     }
 
+    void decreaseLoopDepth() throws LexicalException {
+        if (loopDepth == 0) {
+            throw new LexicalException("Cannot leave cycle.");
+        } else {
+            --loopDepth;
+        }
+    }
+
     boolean isInLoop() {
         return loopDepth > 0;
     }
@@ -143,20 +159,12 @@ class LexicalScope {
         return this.context;
     }
 
-    FrameSlot getLocalSlot(String identifier) {
-        return this.localIdentifiers.get(identifier);
-    }
-
     Object getLocalConstant(String identifier) {
         return this.localConstants.get(identifier);
     }
 
     List<StatementNode> getAllInitializationNoes() {
         return this.initializationNodes;
-    }
-
-    FrameDescriptor getFrameDescriptor() {
-        return this.frameDescriptor;
     }
 
     FrameSlot getReturnSlot() {
