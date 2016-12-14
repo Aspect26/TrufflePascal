@@ -50,6 +50,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.ArrayIndexAssignmentNode
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
@@ -118,6 +119,98 @@ public class NodeFactory {
             }
 		}
 	}
+
+    void registerIntegerConstant(Token identifierToken, Token valueToken) {
+        try {
+            long value = this.createLongFromToken(valueToken);
+            String identifier = this.getIdentifierFromToken(identifierToken);
+            this.lexicalScope.registerLongConstant(identifier, value);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    void registerSignedIntegerConstant(Token identifierToken, Token sign, Token valueToken) {
+        try {
+            long value = this.createLongFromToken(valueToken);
+            value = (sign.val == "-")? -value : value;
+            String identifier = this.getIdentifierFromToken(identifierToken);
+            this.lexicalScope.registerLongConstant(identifier, value);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    void registerRealConstant(Token identifierToken, Token valueToken) {
+        try {
+            double value = Double.parseDouble(valueToken.val);
+            String identifier = this.getIdentifierFromToken(identifierToken);
+            this.lexicalScope.registerRealConstant(identifier, value);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    void registerConstantFromIdentifier(Token identifierToken, Token valueIdentifierToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        String identifierValue = this.getIdentifierFromToken(valueIdentifierToken);
+        try {
+            this.lexicalScope.registerConstantFromConstant(identifier, identifierValue);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    void registerSignedConstantFromIdentifier(Token identifierToken, Token sign, Token valueIdentifierToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        String identifierValue = this.getIdentifierFromToken(valueIdentifierToken);
+        try {
+            if (sign.val == "-") {
+                this.lexicalScope.registerConstantFromConstant(identifier, identifierValue);
+            } else {
+                this.lexicalScope.registerConstantFromNegatedConstant(identifier, identifierValue);
+            }
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    void registerSignedRealConstant(Token identifierToken, Token sign, Token valueToken) {
+        try {
+            double value = Double.parseDouble(valueToken.val);
+            value = (sign.val == "-")? -value : value;
+            String identifier = this.getIdentifierFromToken(identifierToken);
+            this.lexicalScope.registerRealConstant(identifier, value);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    void registerStringOrCharConstant(Token nameToken, String value) {
+        if(value.length() == 1) {
+            registerCharConstant(nameToken, value.charAt(0));
+        } else {
+            registerStringConstant(nameToken, value);
+        }
+    }
+
+    public void registerCharConstant(Token identifierToken, char value) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        try {
+            this.lexicalScope.registerCharConstant(identifier, value);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    public void registerStringConstant(Token identifierToken, String value) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        try {
+            this.lexicalScope.registerStringConstant(identifier, value);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
 
     void registerEnumType(String identifier, List<String> identifiers){
         try {
@@ -374,9 +467,9 @@ public class NodeFactory {
 
     ExpressionNode createNumericLiteral(Token literalToken) {
         try {
-            return new LongLiteralNode(Long.parseLong(literalToken.val));
-        } catch (NumberFormatException e) {
-            parser.SemErr("Integer literal out of range");
+            return new LongLiteralNode(createLongFromToken(literalToken));
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
             return new LongLiteralNode(0);
         }
     }
@@ -398,6 +491,21 @@ public class NodeFactory {
     PascalRootNode finishMainFunction(StatementNode blockNode) {
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
         return new PascalRootNode(lexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
+    }
+
+    String createStringFromToken(Token t) {
+        String literal = t.val;
+        literal = literal.substring(1, literal.length() - 1);
+        literal = literal.replaceAll("''", "''");
+        return literal;
+    }
+
+    long createLongFromToken(Token token) throws LexicalException {
+        try {
+            return Long.parseLong(token.val);
+        } catch (NumberFormatException e) {
+            throw new LexicalException("Integer literal out of range");
+        }
     }
 
 	private String getIdentifierFromToken(Token identifier) {
@@ -480,66 +588,8 @@ public class NodeFactory {
 		return readln;
 	}
 
-
-	public String createStringFromLiteral(Token t) {
-		return (String)t.val.subSequence(1, t.val.length() - 1);
-	}
-
-	public void createNumericConstant(Token nameToken, NumericConstant value) {
-		if (value.isDoubleType) {
-			this.createDoubleConstant(nameToken, value.getDouble());
-		} else {
-			this.createLongConstant(nameToken, value.getLong());
-		}
-	}
-
-	// Tip of the day: Fuck Java
-
-	public void createLongConstant(Token nameToken, long value) {
-		FrameSlot newSlot = registerConstant(nameToken, value);
-
-		if (newSlot == null) {
-			return;
-		}
-        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
-	}
-
-	public void createDoubleConstant(Token nameToken, double value) {
-		FrameSlot newSlot = registerConstant(nameToken, value);
-
-		if (newSlot == null) {
-			return;
-		}
-        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
-	}
-
-	public void createStringOrCharConstant(Token nameToken, String value) {
-		if(value.length() == 1) {
-			createCharConstant(nameToken, value.charAt(0));
-		} else {
-			createStringConstant(nameToken, value);
-		}
-	}
-
-	public void createCharConstant(Token nameToken, char value) {
-		FrameSlot newSlot = registerConstant(nameToken, value);
-
-		if (newSlot == null) {
-			return;
-		}
-        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
-	}
-
-	public void createStringConstant(Token nameToken, String value) {
-		FrameSlot newSlot = registerConstant(nameToken, value);
-
-		if (newSlot == null) {
-			return;
-		}
-        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
-	}
-
 	public void createBooleanConstant(Token nameToken, boolean value) {
+        // TODO: this is only in TP (not in standard)
 		FrameSlot newSlot = registerConstant(nameToken, value);
 
 		if (newSlot == null) {
@@ -667,11 +717,6 @@ public class NodeFactory {
 		}
 
 		return lexicalScope.getLocalConstant(identifier);
-	}
-
-	public String createStringFromToken(Token t) {
-		String literal = t.val;
-		return literal.substring(1, literal.length() - 1);
 	}
 
 	public void importUnit(Token unitToken) {

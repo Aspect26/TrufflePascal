@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.parser;
+package cz.cuni.mff.d3s.trupple.language.parser.exceptions;
 
 public class LexicalException extends Exception {
 

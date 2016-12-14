@@ -2,8 +2,11 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
-import cz.cuni.mff.d3s.trupple.language.parser.LexicalException;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 
 import java.util.HashMap;
@@ -88,7 +91,7 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, typeDescriptor);
 
         if (typeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new LexicalException("Unknown type: " + typeName);
+            throw new UnknownTypeException(typeName);
         }
     }
 
@@ -99,8 +102,34 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, typeDescriptor);
 
         if (returnTypeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new LexicalException("Unknown type: " + returnType);
+            throw new UnknownTypeException(returnType);
         }
+    }
+
+    public void addLongConstant(String identifier, long value) throws LexicalException {
+        this.registerNewIdentifier(identifier, new LongConstantDescriptor(value));
+    }
+
+    public void addRealConstant(String identifier, double value) throws LexicalException {
+        this.registerNewIdentifier(identifier, new RealConstantDescriptor(value));
+    }
+
+    public void addCharConstant(String identifier, char value) throws LexicalException {
+        this.registerNewIdentifier(identifier, new CharConstantDescriptor(value));
+    }
+
+    public void addStringConstant(String identifier, String value) throws LexicalException {
+        this.registerNewIdentifier(identifier, new StringConstantDescriptor(value));
+    }
+
+    public void addConstantFromConstant(String identifier, String valueIdentifier) throws LexicalException {
+        ConstantDescriptor valueDescriptor = getConstant(valueIdentifier);
+        this.registerNewIdentifier(identifier, (valueDescriptor).shallowCopy());
+    }
+
+    public void addConstantFromNegatedConstant(String identifier, String valueIdentifier) throws LexicalException {
+        ConstantDescriptor valueDescriptor = getConstant(valueIdentifier);
+        this.registerNewIdentifier(identifier, (valueDescriptor).negatedCopy());
     }
 
     public void addEnumType(String name, List<String> identifiers) throws LexicalException {
@@ -109,6 +138,7 @@ public class IdentifiersTable {
 
         TypeDescriptor typeDescriptor = new EnumTypeDescriptor(identifiers);
         this.registerNewIdentifier(name, typeDescriptor);
+        // TODO wtf -> pridat aj identifiers do tabulky ako enum values
     }
 
     public void addProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
@@ -122,13 +152,24 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, typeDescriptor);
 
         if (returnTypeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new LexicalException("Unknown return type: " + returnType);
+            throw new UnknownTypeException(returnType);
+        }
+    }
+
+    private ConstantDescriptor getConstant(String identifier) throws LexicalException {
+        TypeDescriptor descriptor = this.getTypeDescriptor(identifier);
+        if (descriptor == null) {
+            throw new UnknownIdentifierException(identifier);
+        } else if (! (descriptor instanceof ConstantDescriptor)) {
+            throw new LexicalException("Not a constant: " + identifier);
+        } else {
+            return (ConstantDescriptor)descriptor;
         }
     }
 
     private void registerNewIdentifier(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         if (this.identifiersMap.containsKey(identifier)){
-            throw new LexicalException("Duplicate identifier: " + identifier + ".");
+            throw new DuplicitIdentifierException(identifier);
         } else {
             this.identifiersMap.put(identifier, typeDescriptor);
             this.frameDescriptor.addFrameSlot(identifier, typeDescriptor.getSlotKind());

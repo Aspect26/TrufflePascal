@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
@@ -107,6 +108,30 @@ class LexicalScope {
         this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
     }
 
+    void registerLongConstant(String identifier, long value) throws LexicalException {
+        this.localIdentifiers.addLongConstant(identifier, value);
+    }
+
+    void registerRealConstant(String identifier, double value) throws LexicalException {
+        this.localIdentifiers.addRealConstant(identifier, value);
+    }
+
+    void registerCharConstant(String identifier, char value) throws LexicalException {
+        this.localIdentifiers.addCharConstant(identifier, value);
+    }
+
+    void registerStringConstant(String identifier, String value) throws LexicalException {
+        this.localIdentifiers.addStringConstant(identifier, value);
+    }
+
+    void registerConstantFromConstant(String identifier, String valueIdentifier) throws LexicalException {
+        this.localIdentifiers.addConstantFromConstant(identifier, valueIdentifier);
+    }
+
+    void registerConstantFromNegatedConstant(String identifier, String valueIdentifier) throws LexicalException {
+        this.localIdentifiers.addConstantFromNegatedConstant(identifier, valueIdentifier);
+    }
+
     OrdinalDescriptor createRangeDescriptor(int lowerBound, int upperBound)  throws LexicalException {
         if (upperBound < lowerBound) {
             throw new LexicalException("Lower upper bound than lower bound.");
@@ -161,6 +186,8 @@ class LexicalScope {
     //  ARRAY:
     //   PascalArray array = createMultidimensionalArray(ordinalDimensions, returnTypeName);
     //   this.addInitializationNode(InitializationNodeFactory.create(newSlot, array));
+    //  CONSTANTS:
+    //   from their values in descriptors
     // ----------------------------
 
     Map<String, ICustomType> getAllCustomTypes() {
@@ -173,17 +200,6 @@ class LexicalScope {
 
     FrameSlot getReturnSlot() {
         return this.returnSlot;
-    }
-
-    FrameSlot getVisibleSlot(String identifier) {
-        FrameSlot slot = null;
-        LexicalScope scope = this;
-        while(scope != null && slot == null){
-            slot = scope.getLocalSlot(identifier);
-            scope = scope.getOuterScope();
-        }
-
-        return slot;
     }
 
     void registerCustomType(String name, ICustomType customType) {
