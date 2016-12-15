@@ -7,11 +7,14 @@ import java.util.Random;
 
 import com.oracle.truffle.api.ExecutionContext;
 import com.oracle.truffle.api.TruffleLanguage;
+import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 
 public final class PascalContext extends ExecutionContext {
 	
 	private final BufferedReader input;
 	private final PrintStream output;
+    private final PascalSubroutineRegistry globalFunctionRegistry;
+    private final PascalSubroutineRegistry privateFunctionRegistry;
 	private final PascalContext outerContext;
 	private Random random;
 	
@@ -25,44 +28,27 @@ public final class PascalContext extends ExecutionContext {
 		this.outerContext = outerContext;
 		
 		this.random = new Random(165132464);
-		this.globalFunctionRegistry = new PascalFunctionRegistry(this, true);
-		this.privateFunctionRegistry = new PascalFunctionRegistry(this, false);
+		this.globalFunctionRegistry = new PascalSubroutineRegistry(this, true);
+		this.privateFunctionRegistry = new PascalSubroutineRegistry(this, false);
 	}
 	
 	
-	// FUNCTIONS
-	private final PascalFunctionRegistry globalFunctionRegistry;
-	private final PascalFunctionRegistry privateFunctionRegistry;
-	
-	public boolean containsParameterlessSubroutine(String identifier){
-		PascalContext context = this;
-		PascalFunction func;
-		
-		while(context != null){
-			func = globalFunctionRegistry.lookup(identifier);
-			if(func != null && func.getParametersCount() == 0)
-				return true;
-			
-			func = privateFunctionRegistry.lookup(identifier);
-			if(func != null && func.getParametersCount() == 0)
-				return true;
-			
-			context = context.outerContext;
-		}
-		
-		return false;
-	}
-	
-	public void setMySubroutineParametersCount(String identifier, int count) {
-		PascalFunction func = this.globalFunctionRegistry.lookup(identifier);
-		if(func == null){
-			func = this.privateFunctionRegistry.lookup(identifier);
-		}
-		
-		assert func != null;
-		
-		func.setParametersCount(count);
-	}
+    public void registerSubroutineName(String identifier, boolean isPublic) {
+        if (isPublic) {
+            this.globalFunctionRegistry.registerSubroutineName(identifier);
+        } else {
+            this.privateFunctionRegistry.registerSubroutineName(identifier);
+        }
+    }
+
+	public void setSubroutineRootNode(String identifier, PascalRootNode rootNode) {
+        if (this.globalFunctionRegistry.contains(identifier)) {
+            this.globalFunctionRegistry.setFunctionRootNode(identifier, rootNode);
+        } else {
+            this.privateFunctionRegistry.setFunctionRootNode(identifier, rootNode);
+        }
+    }
+
 	
 	public long getRandom(long upperBound) {
 		return Math.abs(random.nextLong()) % upperBound;
@@ -88,11 +74,11 @@ public final class PascalContext extends ExecutionContext {
 		return output;
 	}
 
-	public PascalFunctionRegistry getGlobalFunctionRegistry() {
+	public PascalSubroutineRegistry getGlobalFunctionRegistry() {
 		return globalFunctionRegistry;
 	}
 	
-	public PascalFunctionRegistry getPrivateFunctionRegistry() {
+	public PascalSubroutineRegistry getPrivateFunctionRegistry() {
 		return privateFunctionRegistry;
 	}
 	

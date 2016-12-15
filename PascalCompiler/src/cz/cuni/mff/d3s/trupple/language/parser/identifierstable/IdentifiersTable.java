@@ -69,6 +69,10 @@ public class IdentifiersTable {
         return this.identifiersMap.get(identifier);
     }
 
+    public Map<String, TypeDescriptor> getAll() {
+        return this.identifiersMap;
+    }
+
     public boolean containsIdentifier(String identifier) {
         return this.identifiersMap.containsKey(identifier);
     }
@@ -90,7 +94,7 @@ public class IdentifiersTable {
         if (!(descriptor instanceof SubroutineDescriptor)){
             return false;
         } else {
-            return ((SubroutineDescriptor) descriptor).hasParameters();
+            return !((SubroutineDescriptor) descriptor).hasParameters();
         }
     }
 
@@ -120,6 +124,10 @@ public class IdentifiersTable {
 
     public void addRealConstant(String identifier, double value) throws LexicalException {
         this.registerNewIdentifier(identifier, new RealConstantDescriptor(value));
+    }
+
+    public void addBooleanConstant(String identifier, boolean value) throws LexicalException {
+        this.registerNewIdentifier(identifier, new BooleanConstantDescriptor(value));
     }
 
     public void addCharConstant(String identifier, char value) throws LexicalException {

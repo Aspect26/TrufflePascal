@@ -17,7 +17,9 @@ public class ConstantsTest extends JUnitTest {
 		String output = "4212.5truea";
 		this.test(code, output);
 	}
-	
+
+	// NOTE: not supported in Wirth's standard
+    /*
 	@Test
 	public void composedConstants() {
 		String code="const ea=53;\n"+
@@ -32,4 +34,5 @@ public class ConstantsTest extends JUnitTest {
 		String output = "Super massive op compiler.653.0true";
 		this.test(code, output);
 	}
+	*/
 }

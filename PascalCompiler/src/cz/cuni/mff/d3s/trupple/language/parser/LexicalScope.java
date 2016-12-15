@@ -2,13 +2,15 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
+import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import org.junit.runners.model.Statement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,25 +24,31 @@ class LexicalScope {
     private final LexicalScope outer;
     private final IdentifiersTable localIdentifiers;
     private int loopDepth;
-
     private final PascalContext context;
+
     private final Map<String, ICustomType> customTypes;
-    private final List<StatementNode> initializationNodes;
-
-
-    private FrameSlot returnSlot;
 
     List<StatementNode> scopeNodes = new ArrayList<>();
 
-    LexicalScope(LexicalScope outer, String name) {
+    LexicalScope(LexicalScope outer, String name, String returnType) {
         this.name = name;
         this.outer = outer;
-        this.returnSlot = null;
-        this.initializationNodes = new ArrayList<>();
         this.customTypes = new HashMap<>();
 
         this.localIdentifiers = new IdentifiersTable();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
+
+        if (returnType != null) {
+            try {
+                this.registerLocalVariable(name, returnType);
+            } catch (LexicalException e) {
+                // TODO: what to do here?
+            }
+        }
+    }
+
+    LexicalScope(LexicalScope outer, String name) {
+        this(outer, name, null);
     }
 
     String getName() {
@@ -63,8 +71,16 @@ class LexicalScope {
         return this.localIdentifiers.getFrameSlot(identifier);
     }
 
+    FrameSlot getReturnSlot() {
+        return this.localIdentifiers.getFrameSlot(this.name);
+    }
+
     boolean isVariable(String identifier) {
         return this.localIdentifiers.isVariable(identifier);
+    }
+
+    boolean isConstant(String identifier) {
+        return this.localIdentifiers.getTypeDescriptor(identifier) instanceof ConstantDescriptor;
     }
 
     boolean isParameterlessSubroutine(String identifier) {
@@ -93,10 +109,12 @@ class LexicalScope {
 
     void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
         this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
+        this.context.registerSubroutineName(identifier, true);
     }
 
     void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
         this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
+        this.context.registerSubroutineName(identifier, true);
     }
 
     void registerLongConstant(String identifier, long value) throws LexicalException {
@@ -105,6 +123,10 @@ class LexicalScope {
 
     void registerRealConstant(String identifier, double value) throws LexicalException {
         this.localIdentifiers.addRealConstant(identifier, value);
+    }
+
+    void registerBooleanConstant(String identifier, boolean value) throws LexicalException {
+        this.localIdentifiers.addBooleanConstant(identifier, value);
     }
 
     void registerCharConstant(String identifier, char value) throws LexicalException {
@@ -149,8 +171,48 @@ class LexicalScope {
     }
 
     List<StatementNode> createInitializationNodes() {
-        // TODO: implement this
-        return new ArrayList<>();
+        List<StatementNode> initializationNodes = new ArrayList<>();
+
+        for (Map.Entry<String, TypeDescriptor> entry : this.localIdentifiers.getAll().entrySet()) {
+            String identifier = entry.getKey();
+            TypeDescriptor typeDescriptor = entry.getValue();
+
+            StatementNode initializationNode = createInitializationNode(identifier, typeDescriptor);
+            if (initializationNode != null)
+                initializationNodes.add(initializationNode);
+            // TODO: inform variable not initialized
+        }
+
+        return initializationNodes;
+    }
+
+    private StatementNode createInitializationNode(String identifier, TypeDescriptor typeDescriptor) {
+        FrameSlot frameSlot = this.localIdentifiers.getFrameSlot(identifier);
+        FrameSlotKind slotKind = typeDescriptor.getSlotKind();
+
+        // TODO: separate this into multiple methods
+        if (typeDescriptor instanceof PrimitiveDescriptor) {
+            switch (slotKind) {
+                case Boolean: return InitializationNodeFactory.create(frameSlot, false);
+                case Long: return InitializationNodeFactory.create(frameSlot, 0);
+                case Double: return InitializationNodeFactory.create(frameSlot, 0.0d);
+                case Byte: return InitializationNodeFactory.create(frameSlot, '0');
+            }
+        } else if (typeDescriptor instanceof ConstantDescriptor) {
+            // TODO: add boolean constant
+            if (typeDescriptor instanceof LongConstantDescriptor)
+                return InitializationNodeFactory.create(frameSlot, ((LongConstantDescriptor)typeDescriptor).getValue());
+            else if (typeDescriptor instanceof RealConstantDescriptor)
+                return InitializationNodeFactory.create(frameSlot, ((RealConstantDescriptor)typeDescriptor).getValue());
+            else if (typeDescriptor instanceof CharConstantDescriptor)
+                return InitializationNodeFactory.create(frameSlot, ((CharConstantDescriptor)typeDescriptor).getValue());
+            else if (typeDescriptor instanceof StringConstantDescriptor)
+                return InitializationNodeFactory.create(frameSlot, ((StringConstantDescriptor)typeDescriptor).getValue());
+            else if (typeDescriptor instanceof BooleanConstantDescriptor)
+                return InitializationNodeFactory.create(frameSlot, ((BooleanConstantDescriptor)typeDescriptor).getValue());
+        }
+
+        return null;
     }
 
     void increaseLoopDepth() {
@@ -183,10 +245,6 @@ class LexicalScope {
 
     Map<String, ICustomType> getAllCustomTypes() {
         return this.customTypes;
-    }
-
-    FrameSlot getReturnSlot() {
-        return this.returnSlot;
     }
 
     void registerCustomType(String name, ICustomType customType) {

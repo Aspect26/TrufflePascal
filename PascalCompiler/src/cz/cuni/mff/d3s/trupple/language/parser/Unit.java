@@ -59,9 +59,9 @@ public class Unit {
 
 	public LexicalScope startSubroutineImplementation(String identifier) {
 		if(this.interfaceFunctions.containsKey(identifier) || this.interfaceProcedures.containsKey(identifier))
-			lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(identifier);
+			lexicalScope.getContext().getGlobalFunctionRegistry().registerSubroutineName(identifier);
 		else
-			lexicalScope.getContext().getPrivateFunctionRegistry().registerFunctionName(identifier);
+			lexicalScope.getContext().getPrivateFunctionRegistry().registerSubroutineName(identifier);
 			
 		lexicalScope = new LexicalScope(lexicalScope, identifier);
 		return lexicalScope;

@@ -52,7 +52,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunctionRegistry;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutineRegistry;
 
 public class NodeFactory {
 
@@ -87,7 +87,7 @@ public class NodeFactory {
         try {
             return lexicalScope.createRangeDescriptor(lowerBound, upperBound);
         } catch (LexicalException e){
-            parser.SemErr("Greater lower bound then upper bound.");
+            parser.SemErr(e.getMessage());
             return lexicalScope.createImplicitRangeDescriptor();
         }
     }
@@ -97,7 +97,7 @@ public class NodeFactory {
         try {
             return lexicalScope.createRangeDescriptorFromTypename(identifier);
         } catch (LexicalException e){
-            parser.SemErr("Greater lower bound then upper bound.");
+            parser.SemErr(e.getMessage());
             return lexicalScope.createImplicitRangeDescriptor();
         }
     }
@@ -178,11 +178,20 @@ public class NodeFactory {
         }
     }
 
-    void registerStringOrCharConstant(Token nameToken, String value) {
+    void registerBooleanConstant(Token identifierToken, boolean value) {
+        try {
+            String identifier = this.getIdentifierFromToken(identifierToken);
+            this.lexicalScope.registerBooleanConstant(identifier, value);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    void registerStringOrCharConstant(Token identifierToken, String value) {
         if(value.length() == 1) {
-            registerCharConstant(nameToken, value.charAt(0));
+            registerCharConstant(identifierToken, value.charAt(0));
         } else {
-            registerStringConstant(nameToken, value);
+            registerStringConstant(identifierToken, value);
         }
     }
 
@@ -217,6 +226,7 @@ public class NodeFactory {
         try {
             lexicalScope.registerProcedureInterface(identifier, formalParameters);
             lexicalScope = new LexicalScope(lexicalScope, identifier);
+            addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
@@ -227,7 +237,8 @@ public class NodeFactory {
         String returnType = this.getIdentifierFromToken(returnTypeToken);
         try {
             lexicalScope.registerFunctionInterface(identifier, formalParameters, returnType);
-            lexicalScope = new LexicalScope(lexicalScope, identifier);
+            lexicalScope = new LexicalScope(lexicalScope, identifier, returnType);
+            addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
@@ -402,7 +413,7 @@ public class NodeFactory {
         LexicalScope ls = this.lexicalScope;
         while (ls != null) {
             if (ls.containsLocalIdentifier(identifier)){
-                if (ls.isVariable(identifier)) {
+                if (ls.isVariable(identifier) || ls.isConstant(identifier)) {
                     return ReadVariableNodeGen.create(ls.getLocalSlot(identifier));
                 } else if (ls.isParameterlessSubroutine(identifier)) {
                     PascalContext context = ls.getContext();
@@ -495,7 +506,7 @@ public class NodeFactory {
     String createStringFromToken(Token t) {
         String literal = t.val;
         literal = literal.substring(1, literal.length() - 1);
-        literal = literal.replaceAll("''", "''");
+        literal = literal.replaceAll("''", "'");
         return literal;
     }
 
@@ -512,10 +523,21 @@ public class NodeFactory {
     }
 
     private StatementNode createSubroutineNode(StatementNode bodyNode) {
+        // TODO: syntax tree by vyzeral lepsie keby z initialization nodes je BlockNode
         List<StatementNode> subroutineNodes = lexicalScope.createInitializationNodes();
         subroutineNodes.add(bodyNode);
 
         return new BlockNode(subroutineNodes.toArray(new StatementNode[lexicalScope.scopeNodes.size()]));
+    }
+
+    private void addParameterIdentifiersToLexicalScope(List<FormalParameter> parameters) {
+        try {
+            for (FormalParameter parameter : parameters) {
+                this.lexicalScope.registerLocalVariable(parameter.identifier, parameter.type);
+            }
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
     }
 
     private void finishSubroutine() {
@@ -527,7 +549,7 @@ public class NodeFactory {
 
         String subroutineIdentifier = lexicalScope.getName();
         lexicalScope = lexicalScope.getOuterScope();
-        lexicalScope.getContext().getGlobalFunctionRegistry().setFunctionRootNode(subroutineIdentifier, rootNode);
+        lexicalScope.getContext().setSubroutineRootNode(subroutineIdentifier, rootNode);
     }
 
 	// ------------------------------------------------------
@@ -573,7 +595,7 @@ public class NodeFactory {
 		Unit unit = units.get(importingUnit);
 
 		// functions
-		PascalFunctionRegistry fRegistry = unit.getContext().getGlobalFunctionRegistry();
+		PascalSubroutineRegistry fRegistry = unit.getContext().getGlobalFunctionRegistry();
 		lexicalScope.getContext().getGlobalFunctionRegistry().addAll(fRegistry);
 
 		// custom types
@@ -613,7 +635,7 @@ public class NodeFactory {
 
 	public void addProcedureInterface(Token name, List<FormalParameter> formalParameters) {
 		if(currentUnit == null) {
-			lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(name.val.toLowerCase());
+			lexicalScope.getContext().getGlobalFunctionRegistry().registerSubroutineName(name.val.toLowerCase());
             this.lexicalScope = this.lexicalScope.getOuterScope();
 		} else if (!currentUnit.addProcedureInterface(name.val.toLowerCase(), formalParameters)) {
 			parser.SemErr("Subroutine with this name is already defined: " + name);
@@ -622,7 +644,7 @@ public class NodeFactory {
 
 	public void addFunctionInterface(Token name, List<FormalParameter> formalParameters, String returnType) {
 		if(currentUnit == null) {
-			lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(name.val.toLowerCase());
+			lexicalScope.getContext().getGlobalFunctionRegistry().registerSubroutineName(name.val.toLowerCase());
 		} else if (!currentUnit.addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)) {
 			parser.SemErr("Subroutine with this name is already defined: " + name);
 		}

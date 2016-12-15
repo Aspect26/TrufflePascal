@@ -19,30 +19,30 @@ import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WritelnBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 
-/**
- * Manages the mapping from function names to their representing nodes.
- */
-public class PascalFunctionRegistry {
+public class PascalSubroutineRegistry {
 	private final Map<String, PascalFunction> functions = new HashMap<>();
 	private final PascalContext context;
 
-	public PascalFunctionRegistry(PascalContext context, boolean installBuiltins) {
+	public PascalSubroutineRegistry(PascalContext context, boolean installBuiltins) {
 		this.context = context;
 		if(installBuiltins) {
 			installBuiltins();
 		}
 	}
 
-	/**
-	 * Returns new node representing the function with name given.
-	 */
+	public void registerSubroutineName(String identifier) {
+		functions.put(identifier, PascalFunction.createUnimplementedFunctin());
+	}
+
+	public boolean contains(String identifier) {
+		return this.functions.get(identifier) != null;
+	}
+
+    // --------------------------------------------
+
 	public PascalFunction lookup(String identifier) {
 		PascalFunction result = functions.get(identifier);
 		return result;
-	}
-
-	public void registerFunctionName(String identifier) {
-		functions.put(identifier, PascalFunction.createUnimplementedFunctin());
 	}
 
 	public void setFunctionRootNode(String identifier, PascalRootNode rootNode) {
@@ -53,7 +53,7 @@ public class PascalFunctionRegistry {
         function.setCallTarget(callTarget);
 	}
 
-	public void addAll(PascalFunctionRegistry registry) {
+	public void addAll(PascalSubroutineRegistry registry) {
 		Iterator<Entry<String, PascalFunction>> it = registry.functions.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<String, PascalFunction> pair = it.next();
@@ -67,7 +67,7 @@ public class PascalFunctionRegistry {
 	}
 
 	/**
-	 * Adds all builtin functions to the {@link PascalFunctionRegistry}. This
+	 * Adds all builtin functions to the {@link PascalSubroutineRegistry}. This
 	 * method lists all {@link PascalBuiltinNode builtin implementation classes}
 	 * .
 	 */
