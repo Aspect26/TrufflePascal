@@ -162,29 +162,11 @@ public class Parser{
     }
 } // end Parser
 
-class NumericConstant { 
-	private Object value;
-	public boolean isDoubleType;
-	
-	public NumericConstant(Object value, boolean isDoubleType) {
-		this.value = value;
-		this.isDoubleType = isDoubleType;
-	}
-	
-	public NumericConstant(Object value) {
-		this.value = value;
-		this.isDoubleType = (value instanceof Double);
-	}
-	
-	public double getDouble() {
-		return (isDoubleType)? (double)value : (double)(long)value;
-	}
-	
-	public long getLong() {
-		assert !isDoubleType;
-		
-		return (long)value;
-	}
+class CaseStatementData {
+    public ExpressionNode caseExpression;
+    public final List<ExpressionNode> indexNodes = new ArrayList<ExpressionNode>();
+    public final List<StatementNode> statementNodes = new ArrayList<StatementNode>();
+    public StatementNode elseNode;
 }
 
 class Errors {

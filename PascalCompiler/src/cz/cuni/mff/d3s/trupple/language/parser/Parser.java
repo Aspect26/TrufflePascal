@@ -577,12 +577,12 @@ public class Parser{
 	StatementNode  CaseStatement() {
 		StatementNode  statement;
 		Expect(32);
-		ExpressionNode caseIndex = Expression();
+		ExpressionNode caseExpression = Expression();
 		Expect(17);
-		factory.startCaseList();	
-		CaseList();
+		CaseStatementData caseData = CaseList();
+		caseData.caseExpression = caseExpression; 
 		Expect(28);
-		statement = factory.finishCaseStatement(caseIndex); 
+		statement = factory.createCaseStatement(caseData); 
 		return statement;
 	}
 
@@ -613,30 +613,33 @@ public class Parser{
 		return statement;
 	}
 
-	void CaseList() {
+	CaseStatementData  CaseList() {
+		CaseStatementData  data;
+		data = new CaseStatementData(); 
 		ExpressionNode caseConstant = Expression();
+		data.indexNodes.add(caseConstant); 
 		Expect(16);
 		StatementNode caseStatement = Statement();
-		factory.addCaseOption(caseConstant, caseStatement); 
+		data.statementNodes.add(caseStatement); 
 		while (!caseEnds()) {
 			Expect(7);
 			caseConstant = Expression();
+			data.indexNodes.add(caseConstant); 
 			Expect(16);
 			caseStatement = Statement();
-			factory.addCaseOption(caseConstant, caseStatement); 
+			data.statementNodes.add(caseStatement); 
 		}
 		if (la.kind == 7) {
 			Get();
 		}
-		StatementNode elseStatement = null; 
 		if (la.kind == 33) {
 			Get();
-			elseStatement = Statement();
-			factory.setCaseElse(elseStatement); 
+			data.elseNode = Statement();
 		}
 		if (la.kind == 7) {
 			Get();
 		}
+		return data;
 	}
 
 	ExpressionNode  LogicTerm() {
@@ -1018,29 +1021,11 @@ public class Parser{
     }
 } // end Parser
 
-class NumericConstant { 
-	private Object value;
-	public boolean isDoubleType;
-	
-	public NumericConstant(Object value, boolean isDoubleType) {
-		this.value = value;
-		this.isDoubleType = isDoubleType;
-	}
-	
-	public NumericConstant(Object value) {
-		this.value = value;
-		this.isDoubleType = (value instanceof Double);
-	}
-	
-	public double getDouble() {
-		return (isDoubleType)? (double)value : (double)(long)value;
-	}
-	
-	public long getLong() {
-		assert !isDoubleType;
-		
-		return (long)value;
-	}
+class CaseStatementData {
+    public ExpressionNode caseExpression;
+    public final List<ExpressionNode> indexNodes = new ArrayList<ExpressionNode>();
+    public final List<StatementNode> statementNodes = new ArrayList<StatementNode>();
+    public StatementNode elseNode;
 }
 
 class Errors {

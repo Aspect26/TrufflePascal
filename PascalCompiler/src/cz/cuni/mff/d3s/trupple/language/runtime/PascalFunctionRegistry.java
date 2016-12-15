@@ -102,7 +102,7 @@ public class PascalFunctionRegistry {
 		this.register(name, rootNode);
 	}
 
-	public void installBuiltinInfiniteArguments(NodeFactory<? extends BuiltinNode> factory) {
+	private void installBuiltinInfiniteArguments(NodeFactory<? extends BuiltinNode> factory) {
 		ExpressionNode argumentsNode[] = new ExpressionNode[1];
 		argumentsNode[0] = new ReadAllArgumentsNode();
 		BuiltinNode bodyNode = factory.createNode(argumentsNode, context);

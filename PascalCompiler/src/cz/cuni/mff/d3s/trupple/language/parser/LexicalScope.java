@@ -15,12 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Notes:
- * constants must be separated from the localIdentifiers because local identifiers only store descriptors of their types while
- * constants need to hold their value through the process of compiling the source code (e.g.:so they can be used in case statements
- */
-
 class LexicalScope {
 
 
@@ -30,7 +24,6 @@ class LexicalScope {
     private int loopDepth;
 
     private final PascalContext context;
-    private final Map<String, Object> localConstants;
     private final Map<String, ICustomType> customTypes;
     private final List<StatementNode> initializationNodes;
 
@@ -44,11 +37,9 @@ class LexicalScope {
         this.outer = outer;
         this.returnSlot = null;
         this.initializationNodes = new ArrayList<>();
-        this.localConstants = new HashMap<>();
         this.customTypes = new HashMap<>();
 
         this.localIdentifiers = new IdentifiersTable();
-
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
     }
 
@@ -159,7 +150,7 @@ class LexicalScope {
 
     List<StatementNode> createInitializationNodes() {
         // TODO: implement this
-        return null;
+        return new ArrayList<>();
     }
 
     void increaseLoopDepth() {
@@ -194,34 +185,11 @@ class LexicalScope {
         return this.customTypes;
     }
 
-    Object getLocalConstant(String identifier) {
-        return this.localConstants.get(identifier);
-    }
-
     FrameSlot getReturnSlot() {
         return this.returnSlot;
     }
 
     void registerCustomType(String name, ICustomType customType) {
         this.customTypes.put(name, customType);
-    }
-
-    FrameSlot registerLocalConstant(String identifier, Object value) throws IllegalArgumentException {
-        try {
-            FrameSlot newSlot = frameDescriptor.addFrameSlot(identifier);
-            this.localIdentifiers.put(identifier, newSlot);
-            this.localConstants.put(identifier, value);
-            return newSlot;
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Duplicate variable: " + identifier + ".");
-        }
-    }
-
-    void addInitializationNode(StatementNode initializationNode) {
-        this.initializationNodes.add(initializationNode);
-    }
-
-    boolean containsLocalConstant(String identifier) {
-        return this.localConstants.containsKey(identifier);
     }
 }

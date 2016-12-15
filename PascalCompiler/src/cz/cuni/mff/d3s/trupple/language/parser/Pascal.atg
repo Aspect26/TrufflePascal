@@ -378,31 +378,30 @@ ReadStatement<out StatementNode statement>
 CaseStatement<out StatementNode statement>
 =
 "case"
-Expression<out ExpressionNode caseIndex>
-"of"											(. factory.startCaseList();	.)
-CaseList 										
-"end"											(. statement = factory.finishCaseStatement(caseIndex); .)
+Expression<out ExpressionNode caseExpression>
+"of"
+CaseList<out CaseStatementData caseData>        (. caseData.caseExpression = caseExpression; .)
+"end"											(. statement = factory.createCaseStatement(caseData); .)
 .
 
 
 
-CaseList
-=
-Expression<out ExpressionNode caseConstant>
+CaseList<out CaseStatementData data>
+=                                               (. data = new CaseStatementData(); .)
+Expression<out ExpressionNode caseConstant>     (. data.indexNodes.add(caseConstant); .)
 ":"
-Statement<out StatementNode caseStatement>		(. factory.addCaseOption(caseConstant, caseStatement); .)
+Statement<out StatementNode caseStatement>		(. data.statementNodes.add(caseStatement); .)
 {
 	IF(!caseEnds())
 	";"
-	Expression<out caseConstant>
+	Expression<out caseConstant>                (. data.indexNodes.add(caseConstant); .)
 	":"
-	Statement<out caseStatement>				(. factory.addCaseOption(caseConstant, caseStatement); .)
+	Statement<out caseStatement>				(. data.statementNodes.add(caseStatement); .)
 }
 [ ";" ]
-												(. StatementNode elseStatement = null; .)
 [
 	"else"
-	Statement<out elseStatement>				(. factory.setCaseElse(elseStatement); .)
+	Statement<out data.elseNode>
 ]
 [ ";" ]
 .

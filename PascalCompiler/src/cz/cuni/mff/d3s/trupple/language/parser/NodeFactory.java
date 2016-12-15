@@ -10,7 +10,6 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
@@ -60,12 +59,6 @@ public class NodeFactory {
 	private Parser parser;
 	private LexicalScope lexicalScope;
 
-	/* State while parsing case statement */
-	// --> TODO: this causes to be unable to create nested cases....
-	private List<ExpressionNode> caseExpressions;
-	private List<StatementNode> caseStatements;
-	private StatementNode caseElse;
-
 	private Map<String, Unit> units = new HashMap<>();
 	private Unit currentUnit = null;
 
@@ -73,7 +66,6 @@ public class NodeFactory {
 		this.parser = parser;
 	}
 
-	// -------------------------------------------------------
 	void startPascal() {
 		assert this.lexicalScope == null;
 		this.lexicalScope = new LexicalScope(null, "main");
@@ -133,7 +125,7 @@ public class NodeFactory {
     void registerSignedIntegerConstant(Token identifierToken, Token sign, Token valueToken) {
         try {
             long value = this.createLongFromToken(valueToken);
-            value = (sign.val == "-")? -value : value;
+            value = (sign.val.equals("-"))? -value : value;
             String identifier = this.getIdentifierFromToken(identifierToken);
             this.lexicalScope.registerLongConstant(identifier, value);
         } catch (LexicalException e) {
@@ -165,7 +157,7 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
         String identifierValue = this.getIdentifierFromToken(valueIdentifierToken);
         try {
-            if (sign.val == "-") {
+            if (sign.val.equals("-")) {
                 this.lexicalScope.registerConstantFromConstant(identifier, identifierValue);
             } else {
                 this.lexicalScope.registerConstantFromNegatedConstant(identifier, identifierValue);
@@ -178,7 +170,7 @@ public class NodeFactory {
     void registerSignedRealConstant(Token identifierToken, Token sign, Token valueToken) {
         try {
             double value = Double.parseDouble(valueToken.val);
-            value = (sign.val == "-")? -value : value;
+            value = (sign.val.equals("-"))? -value : value;
             String identifier = this.getIdentifierFromToken(identifierToken);
             this.lexicalScope.registerRealConstant(identifier, value);
         } catch (LexicalException e) {
@@ -194,7 +186,7 @@ public class NodeFactory {
         }
     }
 
-    public void registerCharConstant(Token identifierToken, char value) {
+    private void registerCharConstant(Token identifierToken, char value) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
             this.lexicalScope.registerCharConstant(identifier, value);
@@ -203,7 +195,7 @@ public class NodeFactory {
         }
     }
 
-    public void registerStringConstant(Token identifierToken, String value) {
+    private void registerStringConstant(Token identifierToken, String value) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
             this.lexicalScope.registerStringConstant(identifier, value);
@@ -297,7 +289,7 @@ public class NodeFactory {
 
     StatementNode createBreak() {
         // TODO: check if TurboPascal standard is set
-        if (lexicalScope.isInLoop()) {
+        if (!lexicalScope.isInLoop()) {
             parser.SemErr("Break outside a loop: ");
         }
         return new BreakNode();
@@ -313,6 +305,13 @@ public class NodeFactory {
 
     StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
         return new IfNode(condition, thenNode, elseNode);
+    }
+
+    CaseNode createCaseStatement(CaseStatementData data) {
+        ExpressionNode[] indexes = data.indexNodes.toArray(new ExpressionNode[data.indexNodes.size()]);
+        StatementNode[] statements = data.statementNodes.toArray(new StatementNode[data.statementNodes.size()]);
+
+        return new CaseNode(data.caseExpression, indexes, statements, data.elseNode);
     }
 
     StatementNode createNopStatement() {
@@ -430,13 +429,13 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         LexicalScope ls = this.lexicalScope;
-        while (lexicalScope != null){
-            if (lexicalScope.containsLocalIdentifier(identifier)) {
-                if (!lexicalScope.isSubroutine(identifier)) {
+        while (ls != null){
+            if (ls.containsLocalIdentifier(identifier)) {
+                if (!ls.isSubroutine(identifier)) {
                     parser.SemErr(identifier + " is not a subroutine");
                     return null;
                 } else {
-                    return new FunctionLiteralNode(lexicalScope.getContext(), identifier);
+                    return new FunctionLiteralNode(ls.getContext(), identifier);
                 }
             } else {
                 ls = ls.getOuterScope();
@@ -475,7 +474,7 @@ public class NodeFactory {
     }
 
     ExpressionNode createFloatLiteral(Token token) {
-        double value = Float.parseFloat(token.val.toString());
+        double value = Float.parseFloat(token.val);
         return new DoubleLiteralNode(value);
     }
 
@@ -500,7 +499,7 @@ public class NodeFactory {
         return literal;
     }
 
-    long createLongFromToken(Token token) throws LexicalException {
+    private long createLongFromToken(Token token) throws LexicalException {
         try {
             return Long.parseLong(token.val);
         } catch (NumberFormatException e) {
@@ -533,31 +532,6 @@ public class NodeFactory {
 
 	// ------------------------------------------------------
 
-	public void startCaseList() {
-		this.caseExpressions = new ArrayList<>();
-		this.caseStatements = new ArrayList<>();
-	}
-
-	public void addCaseOption(ExpressionNode expression, StatementNode statement) {
-		this.caseExpressions.add(expression);
-		this.caseStatements.add(statement);
-	}
-
-	public void setCaseElse(StatementNode statement){
-		this.caseElse = statement;
-	}
-
-	public CaseNode finishCaseStatement(ExpressionNode caseIndex) {
-		CaseNode node = new CaseNode(caseIndex, caseExpressions.toArray(new ExpressionNode[caseExpressions.size()]),
-				caseStatements.toArray(new StatementNode[caseStatements.size()]), caseElse);
-
-		caseExpressions = null;
-		caseStatements = null;
-		caseElse = null;
-
-		return node;
-	}
-
 	public StatementNode createRandomizeNode() {
 		return new RandomizeBuiltinNode(lexicalScope.getContext());
 	}
@@ -586,137 +560,6 @@ public class NodeFactory {
 
 		ReadlnBuiltinNode readln = new ReadlnBuiltinNode(lexicalScope.getContext(), slots);
 		return readln;
-	}
-
-	public void createBooleanConstant(Token nameToken, boolean value) {
-        // TODO: this is only in TP (not in standard)
-		FrameSlot newSlot = registerConstant(nameToken, value);
-
-		if (newSlot == null) {
-			return;
-		}
-        lexicalScope.addInitializationNode(InitializationNodeFactory.create(newSlot, value));
-	}
-
-	public void createObjectConstant(Token nameToken, Token objectNameToken) {
-		/*
-		LexicalScope ls = (currentUnit == null) ? lexicalScope : currentUnit.getLexicalScope();
-
-		String identifier = nameToken.val.toLowerCase();
-		FrameSlot objectValueSlot = getVisibleSlot(objectNameToken.val.toLowerCase());
-		*/
-	}
-
-	private FrameSlot registerConstant(Token nameToken, Object value) {
-		String identifier = nameToken.val.toLowerCase();
-        try {
-            return lexicalScope.registerLocalConstant(identifier, value);
-        } catch (IllegalArgumentException e) {
-            parser.SemErr("Duplicate identifier: " + identifier + ".");
-            return null;
-        }
-	}
-
-	public NumericConstant createUnsignedConstant(NumericConstant value, Token signToken) {
-		switch(signToken.val) {
-		case "-":
-			return (value.isDoubleType)?
-					new NumericConstant(-value.getDouble(), true) :
-					new NumericConstant(-value.getLong(), false);
-		case "+":
-			return value;
-		default:
-			parser.SemErr("Unkown operator " + signToken.val + ".");
-			return null;
-		}
-	}
-
-	public NumericConstant createNumericConstantFromBinary(NumericConstant value, NumericConstant rvalue, Token opToken) {
-		boolean isDoubleType = value.isDoubleType || rvalue.isDoubleType;
-
-		switch(opToken.val) {
-		case "-":
-			return (isDoubleType)?
-				new NumericConstant(value.getDouble() - rvalue.getDouble()) :
-				new NumericConstant(value.getLong() - rvalue.getLong(), false);
-		case "+":
-			return (isDoubleType)?
-					new NumericConstant(value.getDouble() + rvalue.getDouble()) :
-					new NumericConstant(value.getLong() + rvalue.getLong(), false);
-		case "*":
-			return (isDoubleType)?
-					new NumericConstant(value.getDouble() * rvalue.getDouble()) :
-					new NumericConstant(value.getLong() * rvalue.getLong(), false);
-		case "/":
-			return new NumericConstant(value.getDouble() / rvalue.getDouble());
-		case "div":
-			if (isDoubleType) {
-				parser.SemErr("Operand types do not match operator.");
-				return null;
-			}
-			return new NumericConstant(value.getLong() / rvalue.getLong(), false);
-		case "mod":
-			if (isDoubleType) {
-				parser.SemErr("Operand types do not match operator.");
-				return null;
-			}
-			return new NumericConstant(value.getLong() % rvalue.getLong(), false);
-		default:
-			parser.SemErr("Unkown operator " + opToken.val + ".");
-			return null;
-		}
-	}
-
-	public NumericConstant getNumericConstant(Token nameToken) {
-		String identifier = nameToken.val.toLowerCase();
-		Object c = getConstant(identifier);
-		if (c == null) {
-			return null;
-		}
-
-		if (c instanceof Long) {
-			return new NumericConstant(c, false);
-		} else if (c instanceof Double) {
-			return new NumericConstant(c, true);
-		} else {
-			parser.SemErr("Wrong constant type in expression " + identifier +".");
-			return null;
-		}
-	}
-
-	public String getStringConstant(Token nameToken) {
-		String identifier = nameToken.val.toLowerCase();
-		Object str = getConstant(identifier);
-		if (str == null) {
-			return null;
-		} else if ( str instanceof String) {
-			return (String)str;
-		} else {
-			parser.SemErr("Wrong constant type in expression " + identifier +".");
-			return null;
-		}
-	}
-
-	public boolean getBooleanConstant(Token nameToken) {
-		String identifier = nameToken.val.toLowerCase();
-		Object b = getConstant(identifier);
-		if (b == null) {
-			return false;
-		} else if (b instanceof Boolean){
-			return (boolean)b;
-		} else {
-			parser.SemErr("Wrong constant type in expression " + identifier +".");
-			return false;
-		}
-	}
-
-	private Object getConstant(String identifier) {
-		if (!lexicalScope.containsLocalConstant(identifier)) {
-			parser.SemErr("UnknownDescriptor constant " + identifier +".");
-			return null;
-		}
-
-		return lexicalScope.getLocalConstant(identifier);
 	}
 
 	public void importUnit(Token unitToken) {
@@ -782,34 +625,6 @@ public class NodeFactory {
 			lexicalScope.getContext().getGlobalFunctionRegistry().registerFunctionName(name.val.toLowerCase());
 		} else if (!currentUnit.addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)) {
 			parser.SemErr("Subroutine with this name is already defined: " + name);
-		}
-	}
-
-	public void finishFormalParameterListProcedure(Token name, List<FormalParameter> parameters) {
-		String identifier = name.val.toLowerCase();
-
-		// the subroutine is in outer context because now the parser is in the subroutine's own context
-		lexicalScope.getOuterScope().getContext().setMySubroutineParametersCount(identifier, parameters.size());
-
-		if (currentUnit == null)
-			return;
-
-		if (!currentUnit.checkProcedureMatchInterface(identifier, parameters)) {
-			parser.SemErr("Procedure heading for " + identifier + " does not match any procedure from the interface.");
-		}
-	}
-
-	public void finishFormalParameterListFunction(Token name, List<FormalParameter> parameters, String returnType) {
-		String identifier = name.val.toLowerCase();
-
-		// the subroutine is in outer context because now the parser is in the subroutine's own context
-		lexicalScope.getOuterScope().getContext().setMySubroutineParametersCount(identifier, parameters.size());
-
-		if(currentUnit == null)
-			return;
-
-		if (!currentUnit.checkFunctionMatchInterface(identifier, parameters, returnType)) {
-			parser.SemErr("Function heading for " + identifier + " does not match any function from the interface.");
 		}
 	}
 

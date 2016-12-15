@@ -34,6 +34,7 @@ public class IdentifiersTable {
         this.frameDescriptor = new FrameDescriptor();
 
         addBuiltinTypes();
+        addBuiltinFunctions();
     }
 
     private void addBuiltinTypes() {
@@ -47,6 +48,13 @@ public class IdentifiersTable {
         typeDescriptors.put("double", PrimitiveDescriptor.floatDescriptor());
         typeDescriptors.put("boolean", PrimitiveDescriptor.booleanDescriptor());
         typeDescriptors.put("char", PrimitiveDescriptor.charDescriptor());
+    }
+
+    private void addBuiltinFunctions() {
+        identifiersMap.put("write", new ProcedureDescriptor(null));
+        identifiersMap.put("writeln", new ProcedureDescriptor(null));
+        identifiersMap.put("read", new ProcedureDescriptor(null));
+        identifiersMap.put("readln", new ProcedureDescriptor(null));
     }
 
     public FrameSlot getFrameSlot(String identifier) {
