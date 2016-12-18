@@ -1,31 +1,23 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
-import cz.cuni.mff.d3s.trupple.language.customtypes.EnumType;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.EnumTypeDescriptor;
 
 public class EnumValue implements ICustomValue {
 
-	private final EnumType enumType;
-	private final int index;
+	private final EnumTypeDescriptor enumType;
+	private final String value;
 	
-	public EnumValue(EnumType type, int index) {
+	public EnumValue(EnumTypeDescriptor type, String value) {
 		this.enumType = type;
-		this.index = index;
+		this.value = value;
 	}
 	
-	public EnumValue(EnumType type) {
-		this(type, type.getFirstIndex());
+	public EnumTypeDescriptor getTypeDescriptor() {
+		return this.enumType;
 	}
 
-	public EnumType getEnumType() {
-		return enumType;
-	}
-	
-	public int getIndex() {
-		return this.index;
-	}
-	
 	@Override
 	public Object getValue() {
-		return this;
+		return value;
 	}
 }

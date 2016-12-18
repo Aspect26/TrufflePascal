@@ -147,19 +147,19 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             if (valueNodeValue instanceof Character) {
                 if ((root.isCharKind((VirtualFrame) frameValue))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
-                    return WriteChar0Node_.create(root);
+                    return WriteCharNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof Double) {
                 if ((root.isDoubleKind((VirtualFrame) frameValue))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
-                    return WriteChar1Node_.create(root);
+                    return WriteDoubleNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof EnumValue) {
                 if ((root.isEnum((VirtualFrame) frameValue))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
-                    return WriteChar2Node_.create(root);
+                    return WriteEnumNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof PascalArray) {
@@ -349,9 +349,9 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
 
     }
     @GeneratedBy(methodName = "writeChar(VirtualFrame, char)", value = AssignmentNode.class)
-    private static final class WriteChar0Node_ extends BaseNode_ {
+    private static final class WriteCharNode_ extends BaseNode_ {
 
-        WriteChar0Node_(AssignmentNodeGen root) {
+        WriteCharNode_(AssignmentNodeGen root) {
             super(root, 3);
         }
 
@@ -390,14 +390,14 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         }
 
         static BaseNode_ create(AssignmentNodeGen root) {
-            return new WriteChar0Node_(root);
+            return new WriteCharNode_(root);
         }
 
     }
-    @GeneratedBy(methodName = "writeChar(VirtualFrame, double)", value = AssignmentNode.class)
-    private static final class WriteChar1Node_ extends BaseNode_ {
+    @GeneratedBy(methodName = "writeDouble(VirtualFrame, double)", value = AssignmentNode.class)
+    private static final class WriteDoubleNode_ extends BaseNode_ {
 
-        WriteChar1Node_(AssignmentNodeGen root) {
+        WriteDoubleNode_(AssignmentNodeGen root) {
             super(root, 4);
         }
 
@@ -406,21 +406,21 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             if (valueNodeValue instanceof Double) {
                 double valueNodeValue_ = (double) valueNodeValue;
                 if ((root.isDoubleKind(frameValue))) {
-                    return root.writeChar(frameValue, valueNodeValue_);
+                    return root.writeDouble(frameValue, valueNodeValue_);
                 }
             }
             return getNext().execute_(frameValue, valueNodeValue);
         }
 
         static BaseNode_ create(AssignmentNodeGen root) {
-            return new WriteChar1Node_(root);
+            return new WriteDoubleNode_(root);
         }
 
     }
-    @GeneratedBy(methodName = "writeChar(VirtualFrame, EnumValue)", value = AssignmentNode.class)
-    private static final class WriteChar2Node_ extends BaseNode_ {
+    @GeneratedBy(methodName = "writeEnum(VirtualFrame, EnumValue)", value = AssignmentNode.class)
+    private static final class WriteEnumNode_ extends BaseNode_ {
 
-        WriteChar2Node_(AssignmentNodeGen root) {
+        WriteEnumNode_(AssignmentNodeGen root) {
             super(root, 5);
         }
 
@@ -429,14 +429,14 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             if (valueNodeValue instanceof EnumValue) {
                 EnumValue valueNodeValue_ = (EnumValue) valueNodeValue;
                 if ((root.isEnum(frameValue))) {
-                    return root.writeChar(frameValue, valueNodeValue_);
+                    return root.writeEnum(frameValue, valueNodeValue_);
                 }
             }
             return getNext().execute_(frameValue, valueNodeValue);
         }
 
         static BaseNode_ create(AssignmentNodeGen root) {
-            return new WriteChar2Node_(root);
+            return new WriteEnumNode_(root);
         }
 
     }

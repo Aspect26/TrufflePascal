@@ -6,10 +6,12 @@ import java.util.List;
 
 public class EnumTypeDescriptor extends TypeDescriptor {
 
-    private List<String> identifiers;
+    private final List<String> identifiers;
+    private final String defaultValue;
 
     public EnumTypeDescriptor(List<String> identifiers) {
         this.identifiers = identifiers;
+        this.defaultValue = identifiers.get(0);
     }
 
     @Override
@@ -19,7 +21,12 @@ public class EnumTypeDescriptor extends TypeDescriptor {
 
     @Override
     public boolean isVariable() {
-        return false;
+        return true;
+    }
+
+    @Override
+    public String getDefaultValue() {
+        return this.defaultValue;
     }
 
 }

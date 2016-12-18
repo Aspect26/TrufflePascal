@@ -51,6 +51,8 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutineRegistry;
 
@@ -83,6 +85,16 @@ public class NodeFactory {
 		}
 	}
 
+    void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
+        for (String identifier : identifiers) {
+            try {
+                lexicalScope.registerLocalVariable(identifier, typeDescriptor);
+            } catch (LexicalException e) {
+                parser.SemErr(e.getMessage());
+            }
+        }
+    }
+
     OrdinalDescriptor createSimpleOrdinalDescriptor(final int lowerBound, final int upperBound) {
         try {
             return lexicalScope.createRangeDescriptor(lowerBound, upperBound);
@@ -99,6 +111,15 @@ public class NodeFactory {
         } catch (LexicalException e){
             parser.SemErr(e.getMessage());
             return lexicalScope.createImplicitRangeDescriptor();
+        }
+    }
+
+    TypeDescriptor registerEnum(List<String> enumIdentifiers) {
+        try {
+            return lexicalScope.registerEnum(enumIdentifiers);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+            return UnknownDescriptor.SINGLETON;
         }
     }
 
@@ -208,14 +229,6 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
             this.lexicalScope.registerStringConstant(identifier, value);
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-        }
-    }
-
-    void registerEnumType(String identifier, List<String> identifiers){
-        try {
-            lexicalScope.registerEnumType(identifier, identifiers);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }

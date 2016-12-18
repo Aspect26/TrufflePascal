@@ -75,22 +75,9 @@ TypeDefinition
 identifier										(. Token identifier = t; .)
 "="
 (
-	Enum<identifier>
+	identifier                                  (. /* TODO: in next commit */ .)
 )
 ";"
-.
-
-
-
-Enum<Token identifier>
-=
-"("												(. List<String> identifiers = new ArrayList<String>(); .)
-	identifier									(. identifiers.add(t.val.toLowerCase()); .)
-	{ 
-		","
-		identifier 								(. identifiers.add(t.val.toLowerCase()); .)
-	}
-")"												(. factory.registerEnumType(identifier.val.toLowerCase(), identifiers); .)
 .
 
 
@@ -167,6 +154,8 @@ identifier                                      (. identifiers.add(t.val.toLower
 (
 	identifier                                  (. factory.registerVariables(identifiers, t); .)
 |
+    EnumDefinition<out TypeDescriptor type>     (. factory.registerVariables(identifiers, type); .)
+|
 	ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
 	{
 		IF(continuesArray())
@@ -193,6 +182,18 @@ Ordinal<out ordinalDescriptor>					(. ordinalDimensions.add(ordinalDescriptor); 
 "]"
 .
 
+
+EnumDefinition<out TypeDescriptor typeDescriptor>
+=                                               (. typeDescriptor = null; .)
+                                                (. List<String> enumIdentifiers = new ArrayList<>(); .)
+"("
+    identifier                                  (. enumIdentifiers.add(t.val.toLowerCase()); .)
+    {
+        ","
+        identifier                              (. enumIdentifiers.add(t.val.toLowerCase()); .)
+    }
+")"                                             (. typeDescriptor = factory.registerEnum(enumIdentifiers); .)
+.
 
 
 Ordinal<out OrdinalDescriptor ordinal>

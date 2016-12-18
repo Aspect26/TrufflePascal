@@ -44,21 +44,21 @@ public abstract class AssignmentNode extends ExpressionNode {
 	}
 
 	@Specialization(guards = "isDoubleKind(frame)")
-	protected double writeChar(VirtualFrame frame, double value) {
+	protected double writeDouble(VirtualFrame frame, double value) {
 		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
 		slotsFrame.setDouble(getSlot(), value);
 		return value;
 	}
 	
 	@Specialization(guards = "isEnum(frame)")
-	protected Object writeChar(VirtualFrame frame, EnumValue value) {
+	protected Object writeEnum(VirtualFrame frame, EnumValue value) {
 		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
 		try { 
-			if (((EnumValue)slotsFrame.getObject(getSlot())).getEnumType() != value.getEnumType()) {
+			if (((EnumValue)slotsFrame.getObject(getSlot())).getTypeDescriptor() != value.getTypeDescriptor()) {
 				throw new PascalRuntimeException("Wrong enum types assignment.");
 			}
 		} catch (FrameSlotTypeException e) {
-			
+			// TODO: this
 		}
 		slotsFrame.setObject(getSlot(), value);
 		return value;

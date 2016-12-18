@@ -100,12 +100,16 @@ class LexicalScope {
         this.localIdentifiers.addVariable(typeName, identifier);
     }
 
+    void registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        this.localIdentifiers.addVariable(typeDescriptor, identifier);
+    }
+
     void registerLocalArrayVariable(String identifier, List<OrdinalDescriptor> ordinalDimensions, String returnTypeName) throws LexicalException {
         this.localIdentifiers.addArrayVariable(identifier, ordinalDimensions, returnTypeName);
     }
 
-    void registerEnumType(String identifier, List<String> identifiers) throws LexicalException {
-        this.localIdentifiers.addEnumType(identifier, identifiers);
+    TypeDescriptor registerEnum(List<String> identifiers) throws LexicalException {
+        return this.localIdentifiers.createEnum(identifiers);
     }
 
     void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {

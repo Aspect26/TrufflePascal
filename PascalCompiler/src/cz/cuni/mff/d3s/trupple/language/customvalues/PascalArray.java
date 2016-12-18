@@ -10,13 +10,13 @@ public class PascalArray implements ICustomValue {
 	}
 	
 	public Object getValueAt(Object index) {
-        // TODO: throw custom esception at array index out of range
+        // TODO: throw custom exception at array index out of range
 		int realIndex = ordinalSource.getRealIndex(index);
 		return data[realIndex];
 	}
 	
 	public void setValueAt(Object index, Object value) {
-		// TODO: throw custom esception at array index out of range
+		// TODO: throw custom exception at array index out of range
         this.data[ordinalSource.getRealIndex(index)] = value;
 	}
 	

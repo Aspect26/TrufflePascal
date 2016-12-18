@@ -107,6 +107,10 @@ public class IdentifiersTable {
         }
     }
 
+    public void addVariable(TypeDescriptor typeDescriptor, String identifier) throws LexicalException {
+        this.registerNewIdentifier(identifier, typeDescriptor);
+    }
+
     public void addArrayVariable(String identifier, List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {
         TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
         TypeDescriptor typeDescriptor = new ArrayDescriptor(ordinalDimensions, returnTypeDescriptor);
@@ -148,13 +152,17 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, (valueDescriptor).negatedCopy());
     }
 
-    public void addEnumType(String name, List<String> identifiers) throws LexicalException {
-        if(this.typeDescriptors.containsKey(name))
-            throw new LexicalException("The type is already defined: " + name + ".");
+    public TypeDescriptor createEnum(List<String> identifiers) throws LexicalException {
+        EnumTypeDescriptor enumTypeDescriptor = new EnumTypeDescriptor(identifiers);
 
-        TypeDescriptor typeDescriptor = new EnumTypeDescriptor(identifiers);
-        this.registerNewIdentifier(name, typeDescriptor);
-        // TODO wtf -> pridat aj identifiers do tabulky ako enum values
+        for (String identifier : identifiers) {
+            if (this.typeDescriptors.containsKey(identifier)) {
+                throw new DuplicitIdentifierException(identifier);
+            }
+            this.registerNewIdentifier(identifier, new EnumValueDescriptor(enumTypeDescriptor, identifier));
+        }
+
+        return enumTypeDescriptor;
     }
 
     public void addProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {

@@ -6,6 +6,8 @@ public abstract class TypeDescriptor {
 
     public abstract FrameSlotKind getSlotKind();
 
+    /** Needed in assignment and reading single identifier **/
+    // TODO: this should be called isValue maybe
     public abstract boolean isVariable();
 
     public Object getDefaultValue() {

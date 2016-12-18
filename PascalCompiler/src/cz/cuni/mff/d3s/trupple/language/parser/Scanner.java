@@ -286,13 +286,13 @@ public class Scanner {
 		start.set(44, 16); 
 		start.set(59, 17); 
 		start.set(61, 18); 
-		start.set(40, 19); 
-		start.set(41, 20); 
-		start.set(43, 21); 
-		start.set(45, 22); 
+		start.set(43, 19); 
+		start.set(45, 20); 
 		start.set(58, 33); 
-		start.set(91, 23); 
-		start.set(93, 24); 
+		start.set(91, 21); 
+		start.set(93, 22); 
+		start.set(40, 23); 
+		start.set(41, 24); 
 		start.set(46, 34); 
 		start.set(102, 35); 
 		start.set(62, 36); 
@@ -302,11 +302,11 @@ public class Scanner {
 		start.set(Buffer.EOF, -1);
 		literals.put("uses", new Integer(5));
 		literals.put("type", new Integer(8));
-		literals.put("const", new Integer(12));
-		literals.put("var", new Integer(15));
-		literals.put("of", new Integer(17));
-		literals.put("packed", new Integer(18));
-		literals.put("array", new Integer(19));
+		literals.put("const", new Integer(10));
+		literals.put("var", new Integer(13));
+		literals.put("of", new Integer(15));
+		literals.put("packed", new Integer(16));
+		literals.put("array", new Integer(17));
 		literals.put("procedure", new Integer(23));
 		literals.put("function", new Integer(25));
 		literals.put("begin", new Integer(27));
@@ -539,13 +539,13 @@ public class Scanner {
 				case 18:
 					{t.kind = 9; break loop;}
 				case 19:
-					{t.kind = 10; break loop;}
-				case 20:
 					{t.kind = 11; break loop;}
+				case 20:
+					{t.kind = 12; break loop;}
 				case 21:
-					{t.kind = 13; break loop;}
+					{t.kind = 18; break loop;}
 				case 22:
-					{t.kind = 14; break loop;}
+					{t.kind = 19; break loop;}
 				case 23:
 					{t.kind = 20; break loop;}
 				case 24:
@@ -567,9 +567,9 @@ public class Scanner {
 				case 32:
 					{t.kind = 53; break loop;}
 				case 33:
-					recEnd = pos; recKind = 16;
+					recEnd = pos; recKind = 14;
 					if (ch == '=') {AddCh(); state = 27; break;}
-					else {t.kind = 16; break loop;}
+					else {t.kind = 14; break loop;}
 				case 34:
 					recEnd = pos; recKind = 26;
 					if (ch == '.') {AddCh(); state = 25; break;}

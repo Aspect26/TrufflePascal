@@ -4,6 +4,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
 
 @NodeInfo(shortName = "=")
@@ -21,4 +22,7 @@ public abstract class EqualsNode extends BinaryNode {
 	protected boolean equals(long left, long right) {
 		return left == right;
 	}
+
+	@Specialization
+	protected boolean equals(EnumValue left, EnumValue right) { return left.getValue() == right.getValue(); }
 }
