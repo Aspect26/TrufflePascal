@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
@@ -88,7 +87,7 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         try {
-            return this.lexicalScope.getTypeDescriptor(identifier);
+            return this.lexicalScope.getTypeTypeDescriptor(identifier);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
             return UnknownDescriptor.SINGLETON;

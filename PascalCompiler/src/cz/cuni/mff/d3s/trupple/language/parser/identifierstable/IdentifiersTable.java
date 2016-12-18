@@ -65,7 +65,7 @@ public class IdentifiersTable {
         return this.frameDescriptor;
     }
 
-    public TypeDescriptor getTypeDescriptor(String identifier) {
+    public TypeDescriptor getTypeTypeDescriptor(String identifier) {
         return this.typeDescriptors.get(identifier);
     }
 
@@ -79,6 +79,10 @@ public class IdentifiersTable {
 
     public boolean isVariable(String identifier) {
         return this.identifiersMap.containsKey(identifier) && this.identifiersMap.get(identifier).isVariable();
+    }
+
+    public boolean isConstant(String identifier) {
+        return this.identifiersMap.get(identifier) instanceof ConstantDescriptor;
     }
 
     public boolean isSubroutine(String identifier) {
@@ -200,7 +204,7 @@ public class IdentifiersTable {
     }
 
     private ConstantDescriptor getConstant(String identifier) throws LexicalException {
-        TypeDescriptor descriptor = this.getTypeDescriptor(identifier);
+        TypeDescriptor descriptor = this.getTypeTypeDescriptor(identifier);
         if (descriptor == null) {
             throw new UnknownIdentifierException(identifier);
         } else if (! (descriptor instanceof ConstantDescriptor)) {

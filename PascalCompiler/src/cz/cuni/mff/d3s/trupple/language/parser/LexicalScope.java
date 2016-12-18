@@ -2,16 +2,12 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
-import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
-import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import org.junit.runners.model.Statement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,8 +72,8 @@ class LexicalScope {
         return this.localIdentifiers.getFrameSlot(this.name);
     }
 
-    TypeDescriptor getTypeDescriptor(String identifier) throws LexicalException {
-        return this.localIdentifiers.getTypeDescriptor(identifier);
+    TypeDescriptor getTypeTypeDescriptor(String identifier) throws LexicalException {
+        return this.localIdentifiers.getTypeTypeDescriptor(identifier);
     }
 
     void registerNewType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
@@ -89,7 +85,7 @@ class LexicalScope {
     }
 
     boolean isConstant(String identifier) {
-        return this.localIdentifiers.getTypeDescriptor(identifier) instanceof ConstantDescriptor;
+        return this.localIdentifiers.isConstant(identifier);
     }
 
     boolean isParameterlessSubroutine(String identifier) {
@@ -167,20 +163,6 @@ class LexicalScope {
             throw new LexicalException("Lower upper bound than lower bound.");
         }
         return new OrdinalDescriptor.RangeDescriptor(lowerBound, upperBound - lowerBound + 1);
-    }
-
-    // TODO: make enums, integer, long, arrays,... ordinal
-    OrdinalDescriptor createRangeDescriptorFromTypename(String typeName) throws LexicalException {
-        TypeDescriptor typeDescriptor = this.localIdentifiers.getTypeDescriptor(typeName);
-        if (typeDescriptor == null) {
-            throw new UnknownTypeException(typeName);
-        }
-        else if (!(typeDescriptor instanceof OrdinalDescriptor)) {
-            throw new LexicalException("The type is not ordinal: " + typeName + ".");
-        }
-        else {
-            return (OrdinalDescriptor)typeDescriptor;
-        }
     }
 
     OrdinalDescriptor createImplicitRangeDescriptor() {
