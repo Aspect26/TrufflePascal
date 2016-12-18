@@ -1,0 +1,23 @@
+UNIT math;
+
+INTERFACE
+
+    function add(a,b:integer): integer;
+    function sub(a,b:integer): integer;
+
+    type definitionSet = (int, real, complex);
+
+IMPLEMENTATION
+
+    function add(a,b:integer): integer;
+    begin
+        add := a + b;
+    end;
+
+    function sub(a,b:integer): integer;
+    begin
+        sub := add(a, -b);
+    end;
+
+
+END.

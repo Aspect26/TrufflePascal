@@ -7,6 +7,7 @@ import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
@@ -149,14 +150,14 @@ class LexicalScope {
         if (upperBound < lowerBound) {
             throw new LexicalException("Lower upper bound than lower bound.");
         }
-        return new OrdinalDescriptor.RangeDescriptor(lowerBound, upperBound);
+        return new OrdinalDescriptor.RangeDescriptor(lowerBound, upperBound - lowerBound + 1);
     }
 
     // TODO: make enums, integer, long, arrays,... ordinal
     OrdinalDescriptor createRangeDescriptorFromTypename(String typeName) throws LexicalException {
         TypeDescriptor typeDescriptor = this.localIdentifiers.getTypeDescriptor(typeName);
         if (typeDescriptor == null) {
-            throw new LexicalException("Unknown type: " + typeName + ".");
+            throw new UnknownTypeException(typeName);
         }
         else if (!(typeDescriptor instanceof OrdinalDescriptor)) {
             throw new LexicalException("The type is not ordinal: " + typeName + ".");
@@ -170,49 +171,9 @@ class LexicalScope {
         return new OrdinalDescriptor.RangeDescriptor(0, 1);
     }
 
-    List<StatementNode> createInitializationNodes() {
-        List<StatementNode> initializationNodes = new ArrayList<>();
-
-        for (Map.Entry<String, TypeDescriptor> entry : this.localIdentifiers.getAll().entrySet()) {
-            String identifier = entry.getKey();
-            TypeDescriptor typeDescriptor = entry.getValue();
-
-            StatementNode initializationNode = createInitializationNode(identifier, typeDescriptor);
-            if (initializationNode != null)
-                initializationNodes.add(initializationNode);
-            // TODO: inform variable not initialized
-        }
-
-        return initializationNodes;
-    }
-
-    private StatementNode createInitializationNode(String identifier, TypeDescriptor typeDescriptor) {
-        FrameSlot frameSlot = this.localIdentifiers.getFrameSlot(identifier);
-        FrameSlotKind slotKind = typeDescriptor.getSlotKind();
-
-        // TODO: separate this into multiple methods
-        if (typeDescriptor instanceof PrimitiveDescriptor) {
-            switch (slotKind) {
-                case Boolean: return InitializationNodeFactory.create(frameSlot, false);
-                case Long: return InitializationNodeFactory.create(frameSlot, 0);
-                case Double: return InitializationNodeFactory.create(frameSlot, 0.0d);
-                case Byte: return InitializationNodeFactory.create(frameSlot, '0');
-            }
-        } else if (typeDescriptor instanceof ConstantDescriptor) {
-            // TODO: add boolean constant
-            if (typeDescriptor instanceof LongConstantDescriptor)
-                return InitializationNodeFactory.create(frameSlot, ((LongConstantDescriptor)typeDescriptor).getValue());
-            else if (typeDescriptor instanceof RealConstantDescriptor)
-                return InitializationNodeFactory.create(frameSlot, ((RealConstantDescriptor)typeDescriptor).getValue());
-            else if (typeDescriptor instanceof CharConstantDescriptor)
-                return InitializationNodeFactory.create(frameSlot, ((CharConstantDescriptor)typeDescriptor).getValue());
-            else if (typeDescriptor instanceof StringConstantDescriptor)
-                return InitializationNodeFactory.create(frameSlot, ((StringConstantDescriptor)typeDescriptor).getValue());
-            else if (typeDescriptor instanceof BooleanConstantDescriptor)
-                return InitializationNodeFactory.create(frameSlot, ((BooleanConstantDescriptor)typeDescriptor).getValue());
-        }
-
-        return null;
+    List<StatementNode> createInitializationNodes() throws LexicalException {
+        InitializationNodeGenerator initNodeGenerator = new InitializationNodeGenerator(this.localIdentifiers);
+        return initNodeGenerator.generate();
     }
 
     void increaseLoopDepth() {

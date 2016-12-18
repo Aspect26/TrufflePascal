@@ -22,17 +22,20 @@ public class ArrayIndexAssignmentNode extends ExpressionNode {
 	@Override
 	public Object executeGeneric(VirtualFrame frame) {
 		try {
-			PascalArray array = (PascalArray)frame.getObject(frameSlot);
 			Object[] indexes = getIndexes(frame);
+			PascalArray array = getMostInnerArray(frame, indexes);
+            Object lastIndex = indexes[indexes.length - 1];
+
 			Object value =  valueNode.executeGeneric(frame);
-			array.setValueAt(indexes, value);
+			array.setValueAt(lastIndex, value);
 			return value;
 		} catch (FrameSlotTypeException e) {
 			System.err.println("Wrong access to array at runtime.");
 			return null;
 		}
 	}
-	
+
+	// TODO: remove this duplicit code (ReadArrayIndexNode), and also add getLastIndex()...
 	private Object[] getIndexes(VirtualFrame frame) {
 		Object[] indexes = new Object[this.indexingNodes.length];
 		for(int i = 0; i < indexes.length; i++) {
@@ -41,4 +44,14 @@ public class ArrayIndexAssignmentNode extends ExpressionNode {
 		
 		return indexes;
 	}
+
+    private PascalArray getMostInnerArray(VirtualFrame frame, Object[] indexes) throws FrameSlotTypeException {
+        PascalArray array = (PascalArray)frame.getObject(frameSlot);
+
+        for (int i = 0; i < indexes.length - 1; ++i) {
+            array = (PascalArray)array.getValueAt(indexes[i]);
+        }
+
+        return array;
+    }
 }

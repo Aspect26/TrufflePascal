@@ -60,7 +60,7 @@ public class ArrayTest extends JUnitTest {
 	}
 	
 	@Test
-	public void assignmentTest(){
+	public void assignmentEnumTest(){
 		String code =
 				"type e = (red,green,blue);"+
 				"var a:array[e] of integer;"+
@@ -74,7 +74,20 @@ public class ArrayTest extends JUnitTest {
 		
 		test(code, "58");
 	}
-	
+
+	@Test
+	public void verySimpleMultidimensionalTest() {
+		String s="var multi: array[1..5,3..6,8..15] of integer;\n"+
+				"\n"+
+				"begin\n"+
+				" multi[1,6,10] := 14122017;\n"+
+				" write(multi[1,6,10]);\n"+
+				"end.";
+		String result = "14122017";
+
+		test(s, result);
+	}
+
 	@Test
 	public void simpleMultidimensionalTest(){
 		String s="var multi: array[1..5,char,boolean,8..15] of integer;\n"+

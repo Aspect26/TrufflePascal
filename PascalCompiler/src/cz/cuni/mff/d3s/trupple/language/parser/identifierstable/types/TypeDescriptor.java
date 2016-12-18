@@ -7,5 +7,9 @@ public abstract class TypeDescriptor {
     public abstract FrameSlotKind getSlotKind();
 
     public abstract boolean isVariable();
+
+    public Object getDefaultValue() {
+        return null;
+    }
 }
 

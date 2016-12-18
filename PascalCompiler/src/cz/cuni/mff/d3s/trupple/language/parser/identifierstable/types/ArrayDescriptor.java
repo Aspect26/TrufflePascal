@@ -7,11 +7,11 @@ import java.util.List;
 
 public class ArrayDescriptor extends TypeDescriptor {
 
-    private final List<OrdinalDescriptor> ordinalDimenstions;
+    private final List<OrdinalDescriptor> ordinalDimensions;
     private final TypeDescriptor returnTypeDescriptor;
 
     public ArrayDescriptor(List<OrdinalDescriptor> dimensions, TypeDescriptor returnTypeDescriptor) {
-        this.ordinalDimenstions = dimensions;
+        this.ordinalDimensions = dimensions;
         this.returnTypeDescriptor = returnTypeDescriptor;
     }
 
@@ -23,5 +23,13 @@ public class ArrayDescriptor extends TypeDescriptor {
     @Override
     public boolean isVariable() {
         return true;
+    }
+
+    public List<OrdinalDescriptor> getDimensionDescriptors() {
+        return this.ordinalDimensions;
+    }
+
+    public TypeDescriptor getReturnTypeDescriptor() {
+        return this.returnTypeDescriptor;
     }
 }

@@ -66,7 +66,7 @@ public class IdentifiersTable {
     }
 
     public TypeDescriptor getTypeDescriptor(String identifier) {
-        return this.identifiersMap.get(identifier);
+        return this.typeDescriptors.get(identifier);
     }
 
     public Map<String, TypeDescriptor> getAll() {
