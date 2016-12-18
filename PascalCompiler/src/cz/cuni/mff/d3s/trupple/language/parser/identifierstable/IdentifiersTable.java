@@ -110,28 +110,19 @@ public class IdentifiersTable {
         }
     }
 
-    public void addVariable(String typeName, String identifier) throws LexicalException {
+    public FrameSlot addVariable(String typeName, String identifier) throws LexicalException {
         TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
-        this.registerNewIdentifier(identifier, typeDescriptor);
+        FrameSlot frameSlot = this.registerNewIdentifier(identifier, typeDescriptor);
 
         if (typeDescriptor == UnknownDescriptor.SINGLETON) {
             throw new UnknownTypeException(typeName);
         }
+
+        return frameSlot;
     }
 
-    public void addVariable(TypeDescriptor typeDescriptor, String identifier) throws LexicalException {
-        this.registerNewIdentifier(identifier, typeDescriptor);
-    }
-
-    public void addArrayVariable(String identifier, List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {
-        TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
-        TypeDescriptor typeDescriptor = new ArrayDescriptor(ordinalDimensions, returnTypeDescriptor);
-
-        this.registerNewIdentifier(identifier, typeDescriptor);
-
-        if (returnTypeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new UnknownTypeException(returnType);
-        }
+    public FrameSlot addVariable(TypeDescriptor typeDescriptor, String identifier) throws LexicalException {
+        return this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
     public void addLongConstant(String identifier, long value) throws LexicalException {
@@ -214,12 +205,12 @@ public class IdentifiersTable {
         }
     }
 
-    private void registerNewIdentifier(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+    private FrameSlot registerNewIdentifier(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         if (this.identifiersMap.containsKey(identifier)){
             throw new DuplicitIdentifierException(identifier);
         } else {
             this.identifiersMap.put(identifier, typeDescriptor);
-            this.frameDescriptor.addFrameSlot(identifier, typeDescriptor.getSlotKind());
+            return this.frameDescriptor.addFrameSlot(identifier, typeDescriptor.getSlotKind());
         }
     }
 }

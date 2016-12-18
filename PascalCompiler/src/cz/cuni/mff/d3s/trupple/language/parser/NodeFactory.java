@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
@@ -33,6 +34,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.FunctionBodyNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.FunctionBodyNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.ProcedureBodyNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.function.ReadSubroutineArgumentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.CharLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.DoubleLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
@@ -45,10 +47,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.ArrayIndexAssignmentNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadArrayIndexNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
@@ -553,13 +552,20 @@ public class NodeFactory {
         }
         subroutineNodes.add(bodyNode);
 
-        return new BlockNode(subroutineNodes.toArray(new StatementNode[lexicalScope.scopeNodes.size()]));
+        return new BlockNode(subroutineNodes.toArray(new StatementNode[subroutineNodes.size()]));
     }
 
     private void addParameterIdentifiersToLexicalScope(List<FormalParameter> parameters) {
         try {
+            int count = 0;
             for (FormalParameter parameter : parameters) {
-                this.lexicalScope.registerLocalVariable(parameter.identifier, parameter.type);
+                FrameSlotKind slotKind = this.lexicalScope.getTypeTypeDescriptor(parameter.type).getSlotKind();
+                FrameSlot frameSlot = this.lexicalScope.registerLocalVariable(parameter.identifier, parameter.type);
+
+                final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(count++, slotKind);
+                final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);
+
+                this.lexicalScope.addScopeArgument(assignment);
             }
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());

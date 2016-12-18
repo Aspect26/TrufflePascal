@@ -22,10 +22,9 @@ class LexicalScope {
     private final IdentifiersTable localIdentifiers;
     private int loopDepth;
     private final PascalContext context;
+    private final List<StatementNode> readArgumentNodes = new ArrayList<>();
 
     private final Map<String, ICustomType> customTypes;
-
-    List<StatementNode> scopeNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name, String returnType) {
         this.name = name;
@@ -100,16 +99,16 @@ class LexicalScope {
         return this.localIdentifiers.containsIdentifier(identifier);
     }
 
-    void registerLocalVariable(String identifier, String typeName) throws LexicalException {
-        this.localIdentifiers.addVariable(typeName, identifier);
+    FrameSlot registerLocalVariable(String identifier, String typeName) throws LexicalException {
+        return this.localIdentifiers.addVariable(typeName, identifier);
     }
 
-    void registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        this.localIdentifiers.addVariable(typeDescriptor, identifier);
+    FrameSlot registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        return this.localIdentifiers.addVariable(typeDescriptor, identifier);
     }
 
-    void registerLocalArrayVariable(String identifier, List<OrdinalDescriptor> ordinalDimensions, String returnTypeName) throws LexicalException {
-        this.localIdentifiers.addArrayVariable(identifier, ordinalDimensions, returnTypeName);
+    void addScopeArgument(StatementNode initializationNode) {
+        this.readArgumentNodes.add(initializationNode);
     }
 
     TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, String returnTypeName) throws LexicalException {
@@ -171,7 +170,11 @@ class LexicalScope {
 
     List<StatementNode> createInitializationNodes() throws LexicalException {
         InitializationNodeGenerator initNodeGenerator = new InitializationNodeGenerator(this.localIdentifiers);
-        return initNodeGenerator.generate();
+
+        List<StatementNode> initializationNodes = initNodeGenerator.generate();
+        initializationNodes.addAll(this.readArgumentNodes);
+
+        return initializationNodes;
     }
 
     void increaseLoopDepth() {
@@ -190,17 +193,8 @@ class LexicalScope {
         return loopDepth > 0;
     }
 
-
-    // THE FRAME DESCRIPTOR WILL BE CREATED AFTER THE PARSING IS FINISHED
-    // INITIALIZATION NODES:
-    //  PRIMITIVES:
-    //   new ...
-    //  ARRAY:
-    //   PascalArray array = createMultidimensionalArray(ordinalDimensions, returnTypeName);
-    //   this.addInitializationNode(InitializationNodeFactory.create(newSlot, array));
-    //  CONSTANTS:
-    //   from their values in descriptors
-    // ----------------------------
+    //
+    // THIS SHOULD BE REMOVED
 
     Map<String, ICustomType> getAllCustomTypes() {
         return this.customTypes;

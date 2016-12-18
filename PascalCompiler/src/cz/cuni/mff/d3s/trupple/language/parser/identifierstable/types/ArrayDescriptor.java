@@ -1,7 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customtypes.IOrdinalType;
 
 import java.util.List;
 
