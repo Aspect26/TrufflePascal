@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 
+import com.sun.org.apache.xpath.internal.operations.Or;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
@@ -73,17 +74,26 @@ public class NodeFactory {
 		this.lexicalScope = new LexicalScope(null, "main");
 	}
 
-	void registerVariables(List<String> identifiers, Token variableType) {
-		String typeName = variableType.val.toLowerCase();
+	void registerNewType(Token identifierToken, TypeDescriptor typeDescriptor) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
 
-		for (String identifier : identifiers) {
-			try {
-				lexicalScope.registerLocalVariable(identifier, typeName);
-			} catch (LexicalException e) {
-				parser.SemErr(e.getMessage());
-			}
-		}
-	}
+        try {
+            this.lexicalScope.registerNewType(identifier, typeDescriptor);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    TypeDescriptor getTypeDescriptor(Token identifierToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+
+        try {
+            return this.lexicalScope.getTypeDescriptor(identifier);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+            return UnknownDescriptor.SINGLETON;
+        }
+    }
 
     void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
         for (String identifier : identifiers) {
@@ -92,6 +102,15 @@ public class NodeFactory {
             } catch (LexicalException e) {
                 parser.SemErr(e.getMessage());
             }
+        }
+    }
+
+    TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
+        try {
+            return lexicalScope.createArrayType(ordinalDimensions, returnTypeToken.val.toLowerCase());
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+            return UnknownDescriptor.SINGLETON;
         }
     }
 
@@ -104,34 +123,24 @@ public class NodeFactory {
         }
     }
 
-    OrdinalDescriptor createSimpleOrdinalDescriptorFromTypename(Token typeNameToken) {
-        String identifier = this.getIdentifierFromToken(typeNameToken);
-        try {
-            return lexicalScope.createRangeDescriptorFromTypename(identifier);
-        } catch (LexicalException e){
-            parser.SemErr(e.getMessage());
-            return lexicalScope.createImplicitRangeDescriptor();
+    OrdinalDescriptor castTypeToOrdinalType(TypeDescriptor typeDescriptor) {
+        if (typeDescriptor instanceof OrdinalDescriptor) {
+            return (OrdinalDescriptor) typeDescriptor;
+        } else {
+            // TODO: this should be in IdentifiersTable somewhere, which will throw an NotOridinalType exception
+            parser.SemErr("Not an ordinal type");
+            return null;
         }
     }
 
     TypeDescriptor registerEnum(List<String> enumIdentifiers) {
         try {
-            return lexicalScope.registerEnum(enumIdentifiers);
+            return lexicalScope.createEnumType(enumIdentifiers);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
             return UnknownDescriptor.SINGLETON;
         }
     }
-
-	void registerArrayVariable(List<String> identifiers, List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
-		for(String identifier : identifiers) {
-            try {
-                lexicalScope.registerLocalArrayVariable(identifier, ordinalDimensions, returnTypeToken.val.toLowerCase());
-            } catch (LexicalException e) {
-                parser.SemErr(e.getMessage());
-            }
-		}
-	}
 
     void registerIntegerConstant(Token identifierToken, Token valueToken) {
         try {

@@ -67,7 +67,7 @@ public abstract class AssignmentNode extends ExpressionNode {
 	@Specialization(guards = "isPascalArray(frame)")
 	protected Object assignArray(VirtualFrame frame, PascalArray array) {
 		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
-		PascalArray arrayCopy = array.createCopy();
+		PascalArray arrayCopy = array.createDeepCopy();
 		slotsFrame.setObject(getSlot(), arrayCopy);
 		return arrayCopy;
 	}

@@ -1,5 +1,9 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.EnumTypeDescriptor;
+
+import java.util.List;
+
 public abstract class PascalOrdinal {
     public abstract int getRealIndex(Object index);
     public abstract int getSize();
@@ -22,6 +26,25 @@ public abstract class PascalOrdinal {
         @Override
         public int getSize() {
             return this.size;
+        }
+    }
+
+    public static class EnumPascalOrdinal extends PascalOrdinal {
+
+        private final List<String> identifiers;
+
+        public EnumPascalOrdinal(EnumTypeDescriptor enumTypeDescriptor) {
+            this.identifiers = enumTypeDescriptor.getIdentifiers();
+        }
+
+        @Override
+        public int getSize() {
+            return this.identifiers.size();
+        }
+
+        @Override
+        public int getRealIndex(Object index) {
+            return this.identifiers.indexOf(((EnumValue)index).getValue());
         }
     }
 

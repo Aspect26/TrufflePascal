@@ -74,12 +74,82 @@ TypeDefinition
 "type"
 identifier										(. Token identifier = t; .)
 "="
-(
-	identifier                                  (. /* TODO: in next commit */ .)
-)
+Type<out TypeDescriptor typeDescriptor>         (. factory.registerNewType(identifier, typeDescriptor); .)
 ";"
 .
 
+
+Type<out TypeDescriptor typeDescriptor>
+=                                               (. typeDescriptor = null; .)
+(
+	identifier                                  (.  typeDescriptor = factory.getTypeDescriptor(t); .)
+|
+    EnumDefinition<out typeDescriptor>
+|
+	ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
+	{
+		IF(continuesArray())
+		"of"
+		ArrayDefinition<. out List<OrdinalDescriptor> additionalDimensions .>
+												(. ordinalDimensions.addAll(additionalDimensions); .)
+	}
+	"of"
+	identifier									(. typeDescriptor = factory.createArray(ordinalDimensions, t); .)
+)
+.
+
+
+ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
+=
+[ "packed" ]
+"array"											(. ordinalDimensions = new ArrayList<>(); .)
+"["												(. OrdinalDescriptor ordinalDescriptor = null; .)
+Ordinal<out ordinalDescriptor>					(. ordinalDimensions.add(ordinalDescriptor); .)
+{
+	","
+	Ordinal<out ordinalDescriptor>				(. ordinalDimensions.add(ordinalDescriptor); .)
+}
+"]"
+.
+
+
+EnumDefinition<out TypeDescriptor typeDescriptor>
+=                                               (. List<String> enumIdentifiers = new ArrayList<>(); .)
+"("
+    identifier                                  (. enumIdentifiers.add(t.val.toLowerCase()); .)
+    {
+        ","
+        identifier                              (. enumIdentifiers.add(t.val.toLowerCase()); .)
+    }
+")"                                             (. typeDescriptor = factory.registerEnum(enumIdentifiers); .)
+.
+
+
+Ordinal<out OrdinalDescriptor ordinal>
+=												(. ordinal = null; .)
+(												(. int lowerBound, upperBound; .)
+	SignedIntegerLiteral<out lowerBound>
+	".."
+	SignedIntegerLiteral<out upperBound>
+												(. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
+|
+	Type<out TypeDescriptor typeDescriptor>     (. ordinal = factory.castTypeToOrdinalType(typeDescriptor); .)
+)
+.
+
+
+SignedIntegerLiteral<out int value>
+=                                               (. value = 0; .)
+(
+    "+"
+    SignedIntegerLiteral<out value>
+|
+    "-"
+    SignedIntegerLiteral<out value>             (. value = -value; .)
+|
+    integerLiteral                              (. value = Integer.parseInt(t.val); .)
+)
+.
 
 
 ConstantDefinition
@@ -151,77 +221,9 @@ identifier                                      (. identifiers.add(t.val.toLower
     identifier                                  (. identifiers.add(t.val.toLowerCase()); .)
 }
 ":"
-(
-	identifier                                  (. factory.registerVariables(identifiers, t); .)
-|
-    EnumDefinition<out TypeDescriptor type>     (. factory.registerVariables(identifiers, type); .)
-|
-	ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
-	{
-		IF(continuesArray())
-		"of"
-		ArrayDefinition<. out List<OrdinalDescriptor> additionalDimensions .>
-												(. ordinalDimensions.addAll(additionalDimensions); .)
-	}
-	"of"
-	identifier									(. factory.registerArrayVariable(identifiers, ordinalDimensions, t); .)
-)
+Type<out TypeDescriptor typeDescriptor>         (. factory.registerVariables(identifiers, typeDescriptor); .)
 .
 
-
-ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
-=
-[ "packed" ]
-"array"											(. ordinalDimensions = new ArrayList<>(); .)
-"["												(. OrdinalDescriptor ordinalDescriptor = null; .)
-Ordinal<out ordinalDescriptor>					(. ordinalDimensions.add(ordinalDescriptor); .)
-{
-	","
-	Ordinal<out ordinalDescriptor>				(. ordinalDimensions.add(ordinalDescriptor); .)
-}
-"]"
-.
-
-
-EnumDefinition<out TypeDescriptor typeDescriptor>
-=                                               (. typeDescriptor = null; .)
-                                                (. List<String> enumIdentifiers = new ArrayList<>(); .)
-"("
-    identifier                                  (. enumIdentifiers.add(t.val.toLowerCase()); .)
-    {
-        ","
-        identifier                              (. enumIdentifiers.add(t.val.toLowerCase()); .)
-    }
-")"                                             (. typeDescriptor = factory.registerEnum(enumIdentifiers); .)
-.
-
-
-Ordinal<out OrdinalDescriptor ordinal>
-=												(. ordinal = null; .)
-(												(. int lowerBound, upperBound; .)
-	SignedIntegerLiteral<out lowerBound>
-	".."
-	SignedIntegerLiteral<out upperBound>
-												(. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
-|
-	identifier									(. Token identifier = t; .)
-												(. ordinal = factory.createSimpleOrdinalDescriptorFromTypename(identifier); .)
-)
-.
-
-
-SignedIntegerLiteral<out int value>
-=                                               (. value = 0; .)
-(
-    "+"
-    SignedIntegerLiteral<out value>
-|
-    "-"
-    SignedIntegerLiteral<out value>             (. value = -value; .)
-|
-    integerLiteral                              (. value = Integer.parseInt(t.val); .)
-)
-.
 
 
 Subroutine

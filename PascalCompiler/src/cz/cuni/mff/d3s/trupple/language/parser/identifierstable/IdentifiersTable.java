@@ -98,6 +98,14 @@ public class IdentifiersTable {
         }
     }
 
+    public void addType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        if (this.identifiersMap.containsKey(identifier)) {
+            throw new DuplicitIdentifierException(identifier);
+        } else {
+            this.typeDescriptors.put(identifier, typeDescriptor);
+        }
+    }
+
     public void addVariable(String typeName, String identifier) throws LexicalException {
         TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
         this.registerNewIdentifier(identifier, typeDescriptor);
@@ -163,6 +171,17 @@ public class IdentifiersTable {
         }
 
         return enumTypeDescriptor;
+    }
+
+    public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {
+        TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
+        TypeDescriptor typeDescriptor = new ArrayDescriptor(ordinalDimensions, returnTypeDescriptor);
+
+        if (returnTypeDescriptor == UnknownDescriptor.SINGLETON) {
+            throw new UnknownTypeException(returnType);
+        }
+
+        return typeDescriptor;
     }
 
     public void addProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {

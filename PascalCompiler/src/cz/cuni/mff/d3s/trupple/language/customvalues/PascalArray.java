@@ -25,9 +25,17 @@ public class PascalArray implements ICustomValue {
 		return data;
 	}
 	
-	public PascalArray createCopy() {
+	public PascalArray createDeepCopy() {
 		Object[] dataCopy = new Object[this.data.length];
-		System.arraycopy(this.data, 0, dataCopy, 0, this.data.length);
+
+        if (this.data[0] instanceof PascalArray) {
+            for (int i = 0; i < dataCopy.length; ++i) {
+                dataCopy[i] = ((PascalArray)this.data[i]).createDeepCopy();
+            }
+        } else {
+            System.arraycopy(this.data, 0, dataCopy, 0, this.data.length);
+        }
+
 		return new PascalArray(this.ordinalSource, dataCopy);
 	}
 }

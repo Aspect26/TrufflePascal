@@ -53,7 +53,7 @@ class InitializationNodeGenerator {
         } else if (typeDescriptor instanceof EnumValueDescriptor) {
             // variables of enum types are EnumValue objects at runtime but also the identifiers that create
             //   the enum type are EnumValue objects at run time
-            return createEnumValue(frameSlot, ((EnumValueDescriptor)typeDescriptor).getEnumTypeDescriptor());
+            return createEnumValue(frameSlot, ((EnumValueDescriptor)typeDescriptor).getEnumTypeDescriptor(), identifier);
         }
 
         return null;
@@ -88,6 +88,10 @@ class InitializationNodeGenerator {
         return InitializationNodeFactory.create(frameSlot, new EnumValue(enumTypeDescriptor, enumTypeDescriptor.getDefaultValue()));
     }
 
+    private StatementNode createEnumValue(FrameSlot frameSlot, EnumTypeDescriptor enumTypeDescriptor, String value) {
+        return InitializationNodeFactory.create(frameSlot, new EnumValue(enumTypeDescriptor, value));
+    }
+
     private StatementNode createArrayValue(FrameSlot frameSlot, ArrayDescriptor arrayDescriptor) throws LexicalException {
         List<OrdinalDescriptor> dimensions = arrayDescriptor.getDimensionDescriptors();
 
@@ -99,7 +103,7 @@ class InitializationNodeGenerator {
             ordinal = this.createOrdinal(dimensions.get(i));
             Object[] arrayOfArray = new Object[ordinal.getSize()];
             for (int j = 0; j < arrayOfArray.length; ++j) {
-                arrayOfArray[j] = currentArray.createCopy();
+                arrayOfArray[j] = currentArray.createDeepCopy();
             }
             currentArray = new PascalArray(ordinal, arrayOfArray);
         }
@@ -114,6 +118,8 @@ class InitializationNodeGenerator {
             return PascalOrdinal.booleanPascalOrdinal;
         } else if (descriptor instanceof PrimitiveDescriptor.CharDescriptor) {
             return PascalOrdinal.charPascalOrdinal;
+        } else if (descriptor instanceof  EnumTypeDescriptor) {
+            return new PascalOrdinal.EnumPascalOrdinal((EnumTypeDescriptor) descriptor);
         } else {
             throw new LexicalException("Not an ordinal type");
         }

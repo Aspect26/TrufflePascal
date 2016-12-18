@@ -49,8 +49,7 @@ public class ArrayTest extends JUnitTest {
 	@Test
 	public void simpleEnumAccess(){
 		String code = 
-				"type e = (r,g,b);" +
-				"var a:array[e] of boolean;" + 
+				"var a:array[(r,g,b)] of boolean;" +
 				"begin" + 
 				" write(a[r]);" +
 				" write(a[b]); " +
@@ -62,8 +61,7 @@ public class ArrayTest extends JUnitTest {
 	@Test
 	public void assignmentEnumTest(){
 		String code =
-				"type e = (red,green,blue);"+
-				"var a:array[e] of integer;"+
+				"var a:array[(red,green,blue)] of integer;"+
 
 				"begin"+
 				" a[blue] := 5;"+

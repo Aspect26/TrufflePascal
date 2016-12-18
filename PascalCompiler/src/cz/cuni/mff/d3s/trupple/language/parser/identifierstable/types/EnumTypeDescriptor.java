@@ -4,7 +4,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 
 import java.util.List;
 
-public class EnumTypeDescriptor extends TypeDescriptor {
+public class EnumTypeDescriptor extends OrdinalDescriptor {
 
     private final List<String> identifiers;
     private final String defaultValue;
@@ -29,4 +29,17 @@ public class EnumTypeDescriptor extends TypeDescriptor {
         return this.defaultValue;
     }
 
+    @Override
+    public int getSize() {
+        return this.identifiers.size();
+    }
+
+    @Override
+    public int getFirstIndex() {
+        return 0;
+    }
+
+    public List<String> getIdentifiers() {
+        return this.identifiers;
+    }
 }

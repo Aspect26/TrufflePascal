@@ -76,6 +76,14 @@ class LexicalScope {
         return this.localIdentifiers.getFrameSlot(this.name);
     }
 
+    TypeDescriptor getTypeDescriptor(String identifier) throws LexicalException {
+        return this.localIdentifiers.getTypeDescriptor(identifier);
+    }
+
+    void registerNewType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        this.localIdentifiers.addType(identifier, typeDescriptor);
+    }
+
     boolean isVariable(String identifier) {
         return this.localIdentifiers.isVariable(identifier);
     }
@@ -108,7 +116,11 @@ class LexicalScope {
         this.localIdentifiers.addArrayVariable(identifier, ordinalDimensions, returnTypeName);
     }
 
-    TypeDescriptor registerEnum(List<String> identifiers) throws LexicalException {
+    TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, String returnTypeName) throws LexicalException {
+        return this.localIdentifiers.createArray(ordinalDimensions, returnTypeName);
+    }
+
+    TypeDescriptor createEnumType(List<String> identifiers) throws LexicalException {
         return this.localIdentifiers.createEnum(identifiers);
     }
 
