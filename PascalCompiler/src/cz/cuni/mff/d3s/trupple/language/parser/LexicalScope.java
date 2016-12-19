@@ -33,14 +33,6 @@ class LexicalScope {
 
         this.localIdentifiers = new IdentifiersTable();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
-
-        if (returnType != null) {
-            try {
-                this.registerLocalVariable(name, returnType);
-            } catch (LexicalException e) {
-                // TODO: what to do here?
-            }
-        }
     }
 
     LexicalScope(LexicalScope outer, String name) {
@@ -101,6 +93,10 @@ class LexicalScope {
 
     FrameSlot registerLocalVariable(String identifier, String typeName) throws LexicalException {
         return this.localIdentifiers.addVariable(typeName, identifier);
+    }
+
+    void registerReturnType(List<FormalParameter> formalParameters, String typeName) throws LexicalException {
+        this.localIdentifiers.addReturnVariable(this.getName(), formalParameters, typeName);
     }
 
     FrameSlot registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {

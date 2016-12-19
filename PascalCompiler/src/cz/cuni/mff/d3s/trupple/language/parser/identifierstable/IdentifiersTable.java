@@ -125,6 +125,16 @@ public class IdentifiersTable {
         return this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
+    public void addReturnVariable(String identifier, List<FormalParameter> formalParameters, String typeName) throws LexicalException {
+        TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
+        if (typeDescriptor == null) {
+            throw new UnknownTypeException(typeName);
+        }
+
+        TypeDescriptor returnDescriptor = new FunctionReturnDescriptor(formalParameters, typeDescriptor);
+        this.registerNewIdentifier(identifier, returnDescriptor);
+    }
+
     public void addLongConstant(String identifier, long value) throws LexicalException {
         this.registerNewIdentifier(identifier, new LongConstantDescriptor(value));
     }

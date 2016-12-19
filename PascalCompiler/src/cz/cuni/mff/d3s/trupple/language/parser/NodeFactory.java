@@ -258,6 +258,7 @@ public class NodeFactory {
         try {
             lexicalScope.registerFunctionInterface(identifier, formalParameters, returnType);
             lexicalScope = new LexicalScope(lexicalScope, identifier, returnType);
+            lexicalScope.registerReturnType(formalParameters, returnType);
             addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
