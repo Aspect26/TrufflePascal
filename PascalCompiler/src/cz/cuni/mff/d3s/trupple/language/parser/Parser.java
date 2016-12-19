@@ -376,11 +376,11 @@ public class Parser{
 			formalParameters = FormalParameterList();
 		}
 		Expect(7);
-		factory.startProcedure(identifierToken, formalParameters); 
 		if (la.kind == 24) {
 			Get();
-			factory.finishProcedure(); 
+			factory.forwardProcedure(identifierToken, formalParameters); 
 		} else if (StartOf(5)) {
+			factory.startProcedure(identifierToken, formalParameters); 
 			while (StartOf(2)) {
 				Declaration();
 			}
@@ -401,11 +401,11 @@ public class Parser{
 		Expect(1);
 		Token returnTypeToken = t; 
 		Expect(7);
-		factory.startFunction(identifierToken, formalParameters, returnTypeToken); 
 		if (la.kind == 24) {
 			Get();
-			factory.finishFunction(); 
+			factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); 
 		} else if (StartOf(5)) {
+			factory.startFunction(identifierToken, formalParameters, returnTypeToken); 
 			while (StartOf(2)) {
 				Declaration();
 			}
@@ -1089,7 +1089,7 @@ class Errors {
 			case 21: s = "\"var\" expected"; break;
 			case 22: s = "\":\" expected"; break;
 			case 23: s = "\"procedure\" expected"; break;
-			case 24: s = "\"forward;\" expected"; break;
+			case 24: s = "\"forward\" expected"; break;
 			case 25: s = "\"function\" expected"; break;
 			case 26: s = "\".\" expected"; break;
 			case 27: s = "\"begin\" expected"; break;

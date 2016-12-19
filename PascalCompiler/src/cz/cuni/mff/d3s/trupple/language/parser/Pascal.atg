@@ -242,10 +242,11 @@ Procedure
 identifier                                      (. Token identifierToken = t; .)
                                                 (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ]
-";"                                             (. factory.startProcedure(identifierToken, formalParameters); .)
+";"
 (
-    "forward;"                                  (. factory.finishProcedure(); .)
+    "forward"                                  (. factory.forwardProcedure(identifierToken, formalParameters); .)
 |
+                                                (. factory.startProcedure(identifierToken, formalParameters); .)
     { Declaration }
     Block<out StatementNode bodyNode>           (. factory.finishProcedure(bodyNode); .)
 )
@@ -260,10 +261,11 @@ identifier                                      (. Token identifierToken = t; .)
 [ FormalParameterList<out formalParameters> ]
 ":"
 identifier                                      (. Token returnTypeToken = t; .)
-";"                                             (. factory.startFunction(identifierToken, formalParameters, returnTypeToken); .)
+";"
 (
-    "forward;"                                  (. factory.finishFunction(); .)
+    "forward"                                  (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
 |
+                                                (. factory.startFunction(identifierToken, formalParameters, returnTypeToken); .)
     { Declaration }
     Block<out StatementNode bodyNode>           (. factory.finishFunction(bodyNode); .)
 )

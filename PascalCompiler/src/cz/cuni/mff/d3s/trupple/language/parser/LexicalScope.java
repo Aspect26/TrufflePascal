@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
@@ -26,17 +27,12 @@ class LexicalScope {
 
     private final Map<String, ICustomType> customTypes;
 
-    LexicalScope(LexicalScope outer, String name, String returnType) {
+    LexicalScope(LexicalScope outer, String name) {
         this.name = name;
         this.outer = outer;
         this.customTypes = new HashMap<>();
-
         this.localIdentifiers = new IdentifiersTable();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
-    }
-
-    LexicalScope(LexicalScope outer, String name) {
-        this(outer, name, null);
     }
 
     String getName() {
@@ -115,13 +111,35 @@ class LexicalScope {
         return this.localIdentifiers.createEnum(identifiers);
     }
 
-    void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+    void forwardProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
         this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
         this.context.registerSubroutineName(identifier, true);
     }
 
-    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
+    void forwardFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
         this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
+        this.context.registerSubroutineName(identifier, true);
+    }
+
+    void startProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+        try {
+            this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
+        } catch (DuplicitIdentifierException e) {
+            if (this.context.isImplemented(identifier)) {
+                throw e;
+            }
+        }
+        this.context.registerSubroutineName(identifier, true);
+    }
+
+    void startFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
+        try {
+            this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
+        } catch (DuplicitIdentifierException e) {
+            if (this.context.isImplemented(identifier)) {
+                throw e;
+            }
+        }
         this.context.registerSubroutineName(identifier, true);
     }
 

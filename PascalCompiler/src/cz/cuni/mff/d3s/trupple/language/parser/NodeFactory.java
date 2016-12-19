@@ -241,10 +241,29 @@ public class NodeFactory {
         }
     }
 
+    void forwardProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        try {
+            lexicalScope.forwardProcedureInterface(identifier, formalParameters);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    void forwardFunction(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        String returnType = this.getIdentifierFromToken(returnTypeToken);
+        try {
+            lexicalScope.forwardFunctionInterface(identifier, formalParameters, returnType);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
 	void startProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
-            lexicalScope.registerProcedureInterface(identifier, formalParameters);
+            lexicalScope.startProcedureInterface(identifier, formalParameters);
             lexicalScope = new LexicalScope(lexicalScope, identifier);
             addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
@@ -256,8 +275,8 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
         String returnType = this.getIdentifierFromToken(returnTypeToken);
         try {
-            lexicalScope.registerFunctionInterface(identifier, formalParameters, returnType);
-            lexicalScope = new LexicalScope(lexicalScope, identifier, returnType);
+            lexicalScope.startFunctionInterface(identifier, formalParameters, returnType);
+            lexicalScope = new LexicalScope(lexicalScope, identifier);
             lexicalScope.registerReturnType(formalParameters, returnType);
             addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {

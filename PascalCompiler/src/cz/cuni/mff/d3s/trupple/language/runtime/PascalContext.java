@@ -81,9 +81,12 @@ public final class PascalContext extends ExecutionContext {
 	public PascalSubroutineRegistry getPrivateFunctionRegistry() {
 		return privateFunctionRegistry;
 	}
-	
-	public boolean containsFunction(String identifier){
-		return globalFunctionRegistry.lookup(identifier) != null ||
-				privateFunctionRegistry.lookup(identifier) != null;
+
+	public boolean isImplemented(String identifier) {
+        PascalFunction global = globalFunctionRegistry.lookup(identifier);
+        if (global != null)
+            return global.isImplemented();
+        else
+            return privateFunctionRegistry.lookup(identifier).isImplemented();
 	}
 }
