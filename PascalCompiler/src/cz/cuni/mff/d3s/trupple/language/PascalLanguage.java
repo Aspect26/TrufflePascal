@@ -16,39 +16,6 @@ import com.oracle.truffle.api.source.Source;
 import cz.cuni.mff.d3s.trupple.language.parser.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
-/*
- * CHANGELOG:
- * v0.85
- * big internal update - created custom lexical tables and type descriptors instead of using Truffle's FrameDescriptor
- * support Type statement
- * support '' in string
- *
- * v0.8
- * support readln
- * support global variables
- * support multidimensional arrays
- * support nested subroutines
- * support constants (except for custom types)
- * support random + randomize
- * support subroutine forwarding
- * support assigning array to array
- * enums are now stored as objects in frame descriptors
- * break now throws ControlFlowException (instead of PascalRuntimeException) so Graal doesn't deoptimize the code
- * unit tests now use assertEquals instead of assertTrue
- * 
- * v0.7
- * support arrays
- * support enums
- * added JUnit tests
- * support not statement
- * else vetva v case
- * private/public methods in units
- * support parameterless subroutine calls without parenthesses
- * make for loop execute limiting expression only once
- * added args4j library
- * -I option syntax changed to gcc-like
- */
-
 @TruffleLanguage.Registration(name = "Pascal", version = "0.8", mimeType = "text/x-pascal")
 public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 
