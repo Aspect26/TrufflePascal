@@ -430,12 +430,12 @@ public class NodeFactory {
 
         LexicalScope ls = this.lexicalScope;
         while (ls != null) {
-            if (lexicalScope.containsLocalIdentifier(variableIdentifier)) {
-                if (!lexicalScope.isVariable(variableIdentifier)) {
+            if (ls.containsLocalIdentifier(variableIdentifier)) {
+                if (!ls.isVariable(variableIdentifier)) {
                     parser.SemErr("Assignment target is not a variable");
                     return null;
                 } else {
-                    FrameSlot frameSlot = lexicalScope.getLocalSlot(variableIdentifier);
+                    FrameSlot frameSlot = ls.getLocalSlot(variableIdentifier);
                     return AssignmentNodeGen.create(valueNode, frameSlot);
                 }
             } else {
