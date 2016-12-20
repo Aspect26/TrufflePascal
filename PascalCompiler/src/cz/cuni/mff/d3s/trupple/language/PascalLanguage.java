@@ -18,7 +18,10 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 /*
  * CHANGELOG:
- * v0.9
+ * v0.85
+ * big internal update - created custom lexical tables and type descriptors instead of using Truffle's FrameDescriptor
+ * support Type statement
+ * support '' in string
  *
  * v0.8
  * support readln
