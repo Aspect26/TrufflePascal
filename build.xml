@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Trupple v0.7" default="info">
+<project name="Trupple v0.85" default="info">
 
     <property name="src.dir" value="PascalCompiler/src/"/>
     <property name="srcgen.dir" value="PascalCompiler/src_gen"/>
@@ -21,8 +21,9 @@
             <exclude name="**/tests/**"/>
             
             <classpath>
-                <pathelement path="${lib.dir}/truffle.jar"/>
-                <pathelement path="${lib.dir}/args4j-2.33.jar"/>
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
             </classpath>
         </javac>
     </target>
@@ -31,9 +32,8 @@
         <delete dir="${build.dir}"/>
     </target>
 
-    <target name="make" depends="build" description="Create executable jar file">
-        <jar destfile="Trupple.jar"
-             basedir="${build.dir}">
+    <target name="make" depends="build" description="Creates executable jar file">
+        <jar destfile="${build.dir}/Trupple.jar">
 
             <zipgroupfileset dir="${lib.dir}">
 			    <include name="**/*.jar" />
@@ -50,27 +50,23 @@
         <mkdir dir="${build.dir}"/>
         <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.8" target="1.8">
             <classpath>
-                <pathelement path="${lib.dir}/truffle.jar"/>
-                <pathelement path="${lib.dir}/args4j-2.33.jar"/>
-                <pathelement path="${lib.dir}/junit-4.11.jar" />
-                <pathelement path="${lib.dir}/hamcrest-all-1.3.jar" />
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
             </classpath>
         </javac>
     </target>
 
-    <target name="unit-tests" depends="build-with-tests">
+    <target name="tests" depends="build-with-tests">
         <mkdir dir="${reports.dir}" />
 
         <junit printsummary="yes">
             <formatter type="xml"/>
 
             <classpath>
-                <pathelement path="${lib.dir}/junit-4.11.jar" />
-                <pathelement path="${lib.dir}/truffle.jar"/>
-                <pathelement path="${lib.dir}/args4j-2.33.jar"/>
-                <pathelement path="${lib.dir}/hamcrest-all-1.3.jar" />
-                <pathelement path="${build.dir}"/>
-                <pathelement path="/" />
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar"/>
+                </fileset>
             </classpath>
 
             <batchtest todir="${reports.dir}">
