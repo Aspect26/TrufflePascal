@@ -3,7 +3,7 @@
 <project name="Trupple v0.85" default="info">
 
     <property name="src.dir" value="src"/>
-    <property name="srcgen.dir" value="src_gen"/>
+    <property name="srcgen.dir" value="src-gen"/>
     <property name="tests.dir" value="src-test" />
     <property name="lib.dir" value="lib" />
     <property name="build.dir" value="build" />
