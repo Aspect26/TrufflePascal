@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.tests;
+package cz.cuni.mff.d3s.trupple;
 
 import org.junit.Test;
 

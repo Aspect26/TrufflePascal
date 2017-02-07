@@ -2,9 +2,10 @@
 
 <project name="Trupple v0.85" default="info">
 
-    <property name="src.dir" value="PascalCompiler/src/"/>
-    <property name="srcgen.dir" value="PascalCompiler/src_gen"/>
-    <property name="lib.dir" value="PascalCompiler/lib" />
+    <property name="src.dir" value="src"/>
+    <property name="srcgen.dir" value="src_gen"/>
+    <property name="tests.dir" value="src-test" />
+    <property name="lib.dir" value="lib" />
     <property name="build.dir" value="build" />
     <property name="reports.dir" value="${build.dir}/junit-report" />
     
@@ -18,8 +19,6 @@
     <target name="build" description="Compiles all Trupple sources">
         <mkdir dir="${build.dir}"/>
         <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.8" target="1.8">
-            <exclude name="**/tests/**"/>
-            
             <classpath>
                 <fileset dir="${lib.dir}">
                     <include name="**/*.jar"/>
@@ -48,7 +47,9 @@
 
     <target name="build-with-tests" description="Compiles all Trupple sources including test cases">
         <mkdir dir="${build.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${build.dir}" source="1.8" target="1.8">
+        <javac destdir="${build.dir}" source="1.8" target="1.8">
+            <src path="${src.dir}" />
+            <src path="${tests.dir}" />
             <classpath>
                 <fileset dir="${lib.dir}">
                     <include name="**/*.jar"/>
@@ -67,13 +68,14 @@
                 <fileset dir="${lib.dir}">
                     <include name="**/*.jar"/>
                 </fileset>
+                <pathelement location="${build.dir}"/>
             </classpath>
 
             <batchtest todir="${reports.dir}">
                 <fileset dir="${build.dir}" >
-                    <include name="**/tests/*.class" />
-                    <exclude name="**/TestAll.class" />
-                    <exclude name="**/JUnitTest.class" />
+                    <include name="**/*Test.class" />
+                    <exclude name="**/cz.cuni.mff.d3s.trupple.TestAll.class" />
+                    <exclude name="**/cz.cuni.mff.d3s.trupple.JUnitTest.class" />
                 </fileset>
             </batchtest>
         </junit>
