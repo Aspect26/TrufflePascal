@@ -30,8 +30,10 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 
-Pascal = 
-(                                               (. factory.startPascal(); .)
+Pascal
+=
+(
+    Program
 	[ ImportsSection ]
 	{ Declaration }
 	MainFunction
@@ -39,6 +41,15 @@ Pascal =
 	Unit
 )
 .
+
+
+Program
+=
+    "program"
+    identifier                                      (. factory.startPascal(t); .)
+    ";"
+.
+
 
 
 ImportsSection

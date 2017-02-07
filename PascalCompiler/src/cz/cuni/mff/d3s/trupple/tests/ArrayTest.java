@@ -6,7 +6,8 @@ public class ArrayTest extends JUnitTest {
 	
 	@Test
 	public void verySimple(){
-		String code = "var a:array[0..5] of integer;" + 
+		String code = "program main; \n"+
+                "var a:array[0..5] of integer;" +
 				"begin " + 
 				" write(a[3]); " + 
 				"end.";
@@ -16,7 +17,8 @@ public class ArrayTest extends JUnitTest {
 	
 	@Test
 	public void simple(){
-		String code = "var a:array[8..20] of integer;" + 
+		String code = "program main; \n"+
+                "var a:array[8..20] of integer;" +
 				"begin" + 
 				" write(a[16]);\n" + 
 				"end.";
@@ -26,7 +28,8 @@ public class ArrayTest extends JUnitTest {
 	
 	@Test
 	public void simpleBoolean(){
-		String code = "var a:array[boolean] of integer;" + 
+		String code = "program main; \n"+
+                "var a:array[boolean] of integer;" +
 				"begin" + 
 				" write(a[true]);" +
 				" write(a[false]); " +
@@ -37,7 +40,8 @@ public class ArrayTest extends JUnitTest {
 	
 	@Test
 	public void simpleReturnBoolean(){
-		String code = "var a:array[boolean] of boolean;" + 
+		String code = "program main; \n"+
+                "var a:array[boolean] of boolean;" +
 				"begin" + 
 				" write(a[true]);" +
 				" write(a[false]); " +
@@ -48,7 +52,8 @@ public class ArrayTest extends JUnitTest {
 	
 	@Test
 	public void simpleEnumAccess(){
-		String code = 
+		String code =
+                "program main; \n"+
 				"var a:array[(r,g,b)] of boolean;" +
 				"begin" + 
 				" write(a[r]);" +
@@ -61,6 +66,7 @@ public class ArrayTest extends JUnitTest {
 	@Test
 	public void assignmentEnumTest(){
 		String code =
+                "program main; \n"+
 				"var a:array[(red,green,blue)] of integer;"+
 
 				"begin"+
@@ -75,7 +81,8 @@ public class ArrayTest extends JUnitTest {
 
 	@Test
 	public void verySimpleMultidimensionalTest() {
-		String s="var multi: array[1..5,3..6,8..15] of integer;\n"+
+		String s="program main; \n"+
+                "var multi: array[1..5,3..6,8..15] of integer;\n"+
 				"\n"+
 				"begin\n"+
 				" multi[1,6,10] := 14122017;\n"+
@@ -88,7 +95,8 @@ public class ArrayTest extends JUnitTest {
 
 	@Test
 	public void simpleMultidimensionalTest(){
-		String s="var multi: array[1..5,char,boolean,8..15] of integer;\n"+
+		String s="program main; \n"+
+                "var multi: array[1..5,char,boolean,8..15] of integer;\n"+
 				"\n"+
 				"begin\n"+
 				" multi[1,\'3\',true,8] := 326545;\n"+
@@ -101,7 +109,8 @@ public class ArrayTest extends JUnitTest {
 	
 	@Test
 	public void lessSimpleMultidimensionalTest(){
-		String s="var arr: array[1..3,10..15,0..6] of integer;\n"+
+		String s="program main; \n" +
+				"var arr: array[1..3,10..15,0..6] of integer;\n"+
 				"var i,j,k:integer;\n"+
 				"\n"+
 				"begin\n"+
@@ -122,7 +131,8 @@ public class ArrayTest extends JUnitTest {
 	
 	@Test
 	public void differentMultidimensionalArrayDefinitionsTest(){
-		String s="var arr1:array [Boolean] of array [1..10] of array [1..3] of real;\n"+
+		String s="program main; \n" +
+                "var arr1:array [Boolean] of array [1..10] of array [1..3] of real;\n"+
 				" arr2:array [Boolean] of array [1..10, 1..3] of real;\n"+
 				" arr3:array [Boolean, 1..10, 1..3] of real;\n"+
 				" arr4:array [Boolean, 1..10] of array [1..3] of real;\n"+

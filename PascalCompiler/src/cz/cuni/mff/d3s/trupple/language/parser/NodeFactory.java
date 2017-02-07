@@ -67,9 +67,9 @@ public class NodeFactory {
 		this.parser = parser;
 	}
 
-	void startPascal() {
+	void startPascal(Token identifierToken) {
 		assert this.lexicalScope == null;
-		this.lexicalScope = new LexicalScope(null, "main");
+		this.lexicalScope = new LexicalScope(null, this.getIdentifierFromToken(identifierToken));
 	}
 
 	void registerNewType(Token identifierToken, TypeDescriptor typeDescriptor) {

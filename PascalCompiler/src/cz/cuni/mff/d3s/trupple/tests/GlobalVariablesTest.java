@@ -6,7 +6,8 @@ public class GlobalVariablesTest extends JUnitTest {
 	
 	@Test
 	public void simple() {
-		String code="var b:boolean;\n"+
+		String code="program main;\n"+
+			"var b:boolean;\n"+
 			"\n"+
 			"procedure p;\n"+
 			" begin \n"+
@@ -23,7 +24,8 @@ public class GlobalVariablesTest extends JUnitTest {
 	
 	@Test
 	public void changeGlobalVariableInProcedure() {
-		String code="var i:integer;\n"+
+		String code="program main; \n"+
+				"var i:integer;\n"+
 				"\n"+
 				"procedure change;\n"+
 				" begin\n"+
@@ -42,7 +44,8 @@ public class GlobalVariablesTest extends JUnitTest {
 	
 	@Test
 	public void localHidesGlobal() {
-		String code="var i:integer;\n"+
+		String code="program main; \n"+
+				"var i:integer;\n"+
 				"\n"+
 				"procedure dontchange;\n"+
 				" var i:integer;\n"+
@@ -62,7 +65,8 @@ public class GlobalVariablesTest extends JUnitTest {
 	
 	@Test
 	public void nestedFunctions() {
-		String code="procedure A;\n"+
+		String code="program main; \n"+
+				"procedure A;\n"+
 				" var i:integer;\n"+
 				"\n"+
 				" procedure B;\n"+
@@ -86,7 +90,8 @@ public class GlobalVariablesTest extends JUnitTest {
 	
 	@Test 
 	public void nestedWithLocalHidesGlobal() {
-		String code="var i:integer;\n"+
+		String code="program main; \n"+
+				"var i:integer;\n"+
 				"\n"+
 				"procedure A;\n"+
 				" var i:integer;\n"+

@@ -6,7 +6,8 @@ public class CaseTest extends JUnitTest {
 
 	@Test
 	public void simpleTest() {
-		String code = "begin\n" + 
+		String code = "program main; \n"+
+				"begin\n" +
 				" case 3 of\n" + 
 				"  1:begin write('Star Wars'); end;	\n" + 
 				"  2:write('The Lord of the Rings'); \n" + 
@@ -21,7 +22,8 @@ public class CaseTest extends JUnitTest {
 	
 	@Test
 	public void simpleTestNoSemicolon() {
-		String code = "begin\n" + 
+		String code = "program main; \n"+
+				"begin\n" +
 				" case 3 of\n" + 
 				"  1:begin write('Star Wars'); end;	\n" + 
 				"  2:write('The Lord of the Rings'); \n" + 
@@ -36,7 +38,8 @@ public class CaseTest extends JUnitTest {
 	
 	@Test
 	public void defaultTest() {
-		String code = "begin\n" + 
+		String code = "program main; \n"+
+				"begin\n" +
 				" case 8 of\n" + 
 				"  1:begin write('Star Wars'); end;	\n" + 
 				"  2:write('The Lord of the Rings'); \n" + 
@@ -52,7 +55,8 @@ public class CaseTest extends JUnitTest {
 	
 	@Test
 	public void defaultTestNoSemicolon() {
-		String code = "begin\n" + 
+		String code = "program main; \n"+
+				"begin\n" +
 				" case 8 of\n" + 
 				"  1:begin write('Star Wars'); end;	\n" + 
 				"  2:write('The Lord of the Rings'); \n" + 

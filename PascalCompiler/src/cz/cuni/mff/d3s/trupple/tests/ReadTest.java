@@ -6,7 +6,7 @@ public class ReadTest extends JUnitTest{
 
 	@Test
 	public void simpleParameterless() {
-		String code = "begin readln; write('asfd'); end.";
+		String code = "program main; begin readln; write('asfd'); end.";
 		String input = "ads\r\n";
 		String output = "asfd";
 		this.testWithInput(code, input, output);
@@ -14,7 +14,7 @@ public class ReadTest extends JUnitTest{
 	
 	@Test
 	public void simpleParameterless2() {
-		String code = "begin readln(); write('asfd'); end.";
+		String code = "program main; begin readln(); write('asfd'); end.";
 		String input = "ads\r\n";
 		String output = "asfd";
 		this.testWithInput(code, input, output);
@@ -22,7 +22,7 @@ public class ReadTest extends JUnitTest{
 	
 	@Test
 	public void simpleReadInteger() {
-		String code="var i:integer;\n"+
+		String code="program main; var i:integer;\n"+
 				"\n"+
 				"begin\n"+
 				" readln(i);\n"+
@@ -35,7 +35,7 @@ public class ReadTest extends JUnitTest{
 	
 	@Test
 	public void simpleMultipleRead() {
-		String code="var i:integer;\n"+
+		String code="program main; var i:integer;\n"+
 				" b:boolean;\n"+
 				"\n"+
 				"begin\n"+
@@ -49,7 +49,7 @@ public class ReadTest extends JUnitTest{
 	
 	@Test
 	public void simpleCalculationBasedOnInput() {
-		String code="Var \n"+
+		String code="program main; Var \n"+
 				" Num1, Num2, Sum : Integer;\n"+
 				"\n"+
 				"Begin {no semicolon}\n"+

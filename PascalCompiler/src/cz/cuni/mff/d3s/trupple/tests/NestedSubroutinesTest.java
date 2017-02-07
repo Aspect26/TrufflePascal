@@ -6,7 +6,8 @@ public class NestedSubroutinesTest extends JUnitTest {
 
 	@Test
 	public void simpleTest() {
-		String code="procedure a;\n"+
+		String code="program main;\n"+
+				"procedure a;\n"+
 				" var ab:boolean;\n"+
 				"\n"+
 				" procedure b;\n"+
@@ -30,7 +31,8 @@ public class NestedSubroutinesTest extends JUnitTest {
 	
 	@Test
 	public void usingGlobalVariableTest() {
-		String code="var b:boolean;\n"+
+		String code="program main;\n"+
+				"var b:boolean;\n"+
 				"\n"+
 				"procedure a;\n"+
 				" procedure c;\n"+
@@ -56,7 +58,8 @@ public class NestedSubroutinesTest extends JUnitTest {
 	
 	@Test
 	public void simpleNestedFunctionsTest() {
-		String s="function a:integer;\n"+
+		String s="program main; \n"+
+				"function a:integer;\n"+
 				"\n"+
 				" function b:integer;\n"+
 				"\n"+

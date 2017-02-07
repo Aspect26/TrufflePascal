@@ -6,7 +6,8 @@ public class ConstantsTest extends JUnitTest {
 
 	@Test
 	public void simple() {
-		String code="const i=42;\n"+
+		String code="program main; \n"+
+				"const i=42;\n"+
 				"const d=12.5;\n"+
 				"const c=\'a\';\n"+
 				"const b=TrUe;\n"+

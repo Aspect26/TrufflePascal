@@ -32,7 +32,8 @@ public class UnitTest extends JUnitTest {
 
     @Test
     public void simpleTest() {
-        String source = "uses math;\n"+
+        String source = "program main; \n"+
+                "uses math;\n"+
                 "\n"+
                 "begin\n"+
                 " write(add(3,5));\n"+

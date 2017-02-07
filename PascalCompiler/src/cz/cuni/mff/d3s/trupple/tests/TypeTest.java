@@ -6,7 +6,8 @@ public class TypeTest extends JUnitTest {
 
     @Test
     public void simpleTestEnum() {
-        String code="type color=(r,g,b);\n"+
+        String code="program main; \n"+
+                "type color=(r,g,b);\n"+
                 "var c1:color;\n"+
                 "\n"+
                 "begin\n"+
@@ -21,7 +22,8 @@ public class TypeTest extends JUnitTest {
 
     @Test
     public void simpleTestArray() {
-        String code="type a=array[1..5] of integer;\n"+
+        String code="program main; \n"+
+                "type a=array[1..5] of integer;\n"+
                 "var a1:a;\n"+
                 "\n"+
                 "begin\n"+
@@ -36,7 +38,8 @@ public class TypeTest extends JUnitTest {
 
     @Test
     public void simpleTypeToTypeAssignment() {
-        String code="type Color=(r,g,b);\n"+
+        String code="program main; \n"+
+                "type Color=(r,g,b);\n"+
                 "type Color1=Color;\n"+
                 "\n"+
                 "var c:Color;\n"+

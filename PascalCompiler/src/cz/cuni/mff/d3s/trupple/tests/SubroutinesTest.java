@@ -6,7 +6,8 @@ public class SubroutinesTest extends JUnitTest {
 
 	@Test
 	public void simpleProcedureTest(){
-		String code = "procedure Hello;\n" + 
+		String code = "program main; \n"+
+				"procedure Hello;\n" +
 				"begin\n" + 
 				" write('Hello World');\n" + 
 				"end;\n" + 
@@ -20,7 +21,8 @@ public class SubroutinesTest extends JUnitTest {
 	
 	@Test
 	public void simpleFunctionTest(){
-		String code ="function simple:integer;\n" + 
+		String code ="program main; \n"+
+				"function simple:integer;\n" +
 				"begin\n" + 
 				" simple:=720;\n" + 
 				"end;\n" + 
@@ -34,7 +36,8 @@ public class SubroutinesTest extends JUnitTest {
 	
 	@Test
 	public void simpleArgumentsTest() {
-		String code="procedure w(a:integer);\n"+
+		String code="program main; \n"+
+				"procedure w(a:integer);\n"+
 				"begin\n"+
 				" a:=a+1;\n"+
 				" write(a);\n"+
@@ -52,7 +55,8 @@ public class SubroutinesTest extends JUnitTest {
 	
 	@Test
 	public void factorialTest(){
-		String code = "function factorial(n:integer):integer;\n" + 
+		String code = "program main; \n"+
+				"function factorial(n:integer):integer;\n" +
 				"begin\n" + 
 				" if n<2 then factorial:=1\n" + 
 				" else factorial:=n*factorial(n-1);\n" + 
@@ -67,7 +71,8 @@ public class SubroutinesTest extends JUnitTest {
 	
 	@Test
 	public void procedureCallNoParentheses() {
-		String code = "procedure p;\n" + 
+		String code = "program main; \n"+
+				"procedure p;\n" +
 				"begin\n" + 
 				"write('Metallica!');" + 
 				"end;\n" + 
@@ -81,7 +86,8 @@ public class SubroutinesTest extends JUnitTest {
 	
 	@Test
 	public void functionCallNoParentheses() {
-		String code = "function f:integer;\n" + 
+		String code = "program main; \n"+
+				"function f:integer;\n" +
 				"begin\n" + 
 				"f:=26270;" + 
 				"end;\n" + 
@@ -95,7 +101,8 @@ public class SubroutinesTest extends JUnitTest {
 	
 	@Test
 	public void forwardTest() {
-		String code="procedure b; forward;\n"+
+		String code="program main; \n"+
+				"procedure b; forward;\n"+
 				"\n"+
 				"procedure a;\n"+
 				" begin\n"+

@@ -6,7 +6,7 @@ public class EnumTest extends JUnitTest {
 
 	@Test
 	public void simpleEnum() {
-		String code = 
+		String code = "program main;"+
 				"var c:(red,green,blue);"+
 				"begin "+
 				"c:=red;"+
@@ -19,7 +19,7 @@ public class EnumTest extends JUnitTest {
 	
 	@Test
 	public void assignEnum() {
-		String code = 
+		String code = "program main;"+
 				"var b,c:(red,green,blue);"+
 				"begin "+
 				"c:=red;"+
@@ -33,7 +33,8 @@ public class EnumTest extends JUnitTest {
 
 	@Test
 	public void ifEnumTest() {
-		String code="var c1, c2:(red,green,blue,alpha);\n"+
+		String code="program main; \n"+
+				"var c1, c2:(red,green,blue,alpha);\n"+
 				"\n"+
 				"begin\n"+
 				" c1 := red;\n"+
@@ -49,7 +50,8 @@ public class EnumTest extends JUnitTest {
 
 	@Test
 	public void switchEnum() {
-        String code="var b:(red,green,blue);\n"+
+        String code="program main; \n"+
+				"var b:(red,green,blue);\n"+
                 "\n"+
                 "begin\n"+
                 " b:=green;\n"+

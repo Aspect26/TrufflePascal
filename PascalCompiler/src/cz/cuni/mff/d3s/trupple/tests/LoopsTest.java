@@ -5,7 +5,8 @@ import org.junit.Test;
 public class LoopsTest extends JUnitTest{
 	@Test
 	public void forToTest() {
-		String code = "var i,j:integer;\n" + 
+		String code = "program main; \n"+
+				"var i,j:integer;\n" +
 				"\n" + 
 				"begin\n" + 
 				" j:=0;\n" + 
@@ -22,7 +23,8 @@ public class LoopsTest extends JUnitTest{
 	
 	@Test
 	public void forDowntoTest() {
-		String code = "var i,j:integer;\n" + 
+		String code = "program main; \n"+
+				"var i,j:integer;\n" +
 				"\n" + 
 				"begin\n" + 
 				" j:=0;\n" + 
@@ -39,7 +41,8 @@ public class LoopsTest extends JUnitTest{
 	
 	@Test
 	public void whileTest(){
-		String code ="var j:integer;\n" + 
+		String code ="program main; \n"+
+				"var j:integer;\n" +
 				"\n" + 
 				"begin\n" + 
 				" j:=0;\n" + 
@@ -60,7 +63,8 @@ public class LoopsTest extends JUnitTest{
 	
 	@Test
 	public void repeatTest(){
-		String code ="var j:integer;\n" + 
+		String code ="program main; \n"+
+				"var j:integer;\n" +
 				"\n" + 
 				"begin\n" + 
 				" j:=0;\n" + 
@@ -81,7 +85,8 @@ public class LoopsTest extends JUnitTest{
 	
 	@Test
 	public void whileBreakTest(){
-		String code = "var j:integer;\n" + 
+		String code = "program main; \n"+
+				"var j:integer;\n" +
 				"\n" + 
 				"begin\n" + 
 				" j:=0;\n" + 
