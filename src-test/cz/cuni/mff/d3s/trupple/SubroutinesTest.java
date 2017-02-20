@@ -37,13 +37,13 @@ public class SubroutinesTest extends JUnitTest {
 	@Test
 	public void simpleArgumentsTest() {
 		String code="program main; \n"+
+				"var b:integer;\n"+
 				"procedure w(a:integer);\n"+
 				"begin\n"+
 				" a:=a+1;\n"+
 				" write(a);\n"+
 				"end;\n"+
 				"\n"+
-				"var b:integer;\n"+
 				"begin\n"+
 				" b:=5;\n"+
 				" w(b);\n"+
