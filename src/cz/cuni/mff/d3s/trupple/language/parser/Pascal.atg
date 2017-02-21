@@ -274,7 +274,7 @@ identifier                                      (. Token identifierToken = t; .)
 identifier                                      (. Token returnTypeToken = t; .)
 ";"
 (
-    "forward"                                  (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
+    "forward"                                   (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
 |
                                                 (. factory.startFunction(identifierToken, formalParameters, returnTypeToken); .)
     { Declaration }
@@ -299,9 +299,9 @@ FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParame
 
 FormalParameter<. out List<FormalParameter> formalParameter .>
 =												(. List<String> identifiers = new ArrayList<>(); .)
-												(. boolean isOutput = false; .)
+												(. boolean isReference = false; .)
 [ 
-	"var"										(. isOutput = true; .)
+	"var"										(. isReference = true; .)
 ]
 identifier										(. identifiers.add(t.val.toLowerCase()); .)
 {
@@ -309,7 +309,7 @@ identifier										(. identifiers.add(t.val.toLowerCase()); .)
 	identifier									(. identifiers.add(t.val.toLowerCase()); .)
 }
 ":"
-identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isOutput); .)
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isReference); .)
 .
 
 

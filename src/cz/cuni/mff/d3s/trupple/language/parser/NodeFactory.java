@@ -121,6 +121,7 @@ public class NodeFactory {
         }
     }
 
+    // TODO: HNED AKO TU SADNEM, PREMENIT PODMIENKU IS INSTANCE OF NA FUNKCIU TYPEDESCRIPTORU (boolean isOrdinal())
     OrdinalDescriptor castTypeToOrdinalType(TypeDescriptor typeDescriptor) {
         if (typeDescriptor instanceof OrdinalDescriptor) {
             return (OrdinalDescriptor) typeDescriptor;
@@ -295,14 +296,6 @@ public class NodeFactory {
         }
 
         return paramList;
-    }
-
-    void finishProcedure() {
-        finishSubroutine();
-    }
-
-    void finishFunction() {
-        finishSubroutine();
     }
 
     void finishProcedure(StatementNode bodyNode) {
@@ -580,7 +573,10 @@ public class NodeFactory {
             int count = 0;
             for (FormalParameter parameter : parameters) {
                 FrameSlotKind slotKind = this.lexicalScope.getTypeTypeDescriptor(parameter.type).getSlotKind();
-                FrameSlot frameSlot = this.lexicalScope.registerLocalVariable(parameter.identifier, parameter.type);
+                FrameSlot frameSlot = (parameter.isOutput)?
+                        this.lexicalScope.registerReferenceVariable(parameter.identifier, parameter.type)
+                        :
+                        this.lexicalScope.registerLocalVariable(parameter.identifier, parameter.type);
 
                 final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(count++, slotKind);
                 final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);

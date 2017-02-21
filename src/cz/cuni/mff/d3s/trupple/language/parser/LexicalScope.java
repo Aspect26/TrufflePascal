@@ -88,7 +88,11 @@ class LexicalScope {
     }
 
     FrameSlot registerLocalVariable(String identifier, String typeName) throws LexicalException {
-        return this.localIdentifiers.addVariable(typeName, identifier);
+        return this.localIdentifiers.addVariable(identifier, typeName);
+    }
+
+    FrameSlot registerReferenceVariable(String identifier, String typeName) throws LexicalException {
+        return this.localIdentifiers.addReference(identifier, typeName);
     }
 
     void registerReturnType(List<FormalParameter> formalParameters, String typeName) throws LexicalException {

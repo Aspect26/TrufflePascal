@@ -110,8 +110,20 @@ public class IdentifiersTable {
         }
     }
 
-    public FrameSlot addVariable(String typeName, String identifier) throws LexicalException {
+    public FrameSlot addVariable(String identifier, String typeName) throws LexicalException {
         TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
+        FrameSlot frameSlot = this.registerNewIdentifier(identifier, typeDescriptor);
+
+        if (typeDescriptor == UnknownDescriptor.SINGLETON) {
+            throw new UnknownTypeException(typeName);
+        }
+
+        return frameSlot;
+    }
+
+    public FrameSlot addReference(String identifier, String typeName) throws LexicalException {
+        TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
+        ReferenceDescriptor referenceDescriptor =
         FrameSlot frameSlot = this.registerNewIdentifier(identifier, typeDescriptor);
 
         if (typeDescriptor == UnknownDescriptor.SINGLETON) {
