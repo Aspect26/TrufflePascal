@@ -27,4 +27,8 @@ public abstract class SubroutineDescriptor extends TypeDescriptor {
         return false;
     }
 
+    public boolean isReferenceParameter(int parameterIndex) {
+        return this.formalParameters.get(parameterIndex).isReference;
+    }
+
 }

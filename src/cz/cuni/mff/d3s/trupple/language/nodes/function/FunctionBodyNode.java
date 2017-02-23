@@ -15,7 +15,6 @@ public abstract class FunctionBodyNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
 
-	/** The body. */
 	@Child
 	private StatementNode bodyNode;
 

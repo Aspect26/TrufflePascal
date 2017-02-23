@@ -452,10 +452,10 @@ public class Parser{
 	List<FormalParameter>  FormalParameter() {
 		List<FormalParameter>  formalParameter;
 		List<String> identifiers = new ArrayList<>(); 
-		boolean isOutput = false; 
+		boolean isReference = false; 
 		if (la.kind == 22) {
 			Get();
-			isOutput = true; 
+			isReference = true; 
 		}
 		Expect(1);
 		identifiers.add(t.val.toLowerCase()); 
@@ -466,7 +466,7 @@ public class Parser{
 		}
 		Expect(23);
 		Expect(1);
-		formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isOutput); 
+		formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isReference); 
 		return formalParameter;
 	}
 
@@ -886,15 +886,8 @@ public class Parser{
 		Expect(16);
 		ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); 
 		List<ExpressionNode> parameters = new ArrayList<>(); 
-		ExpressionNode parameter; 
 		if (StartOf(12)) {
-			parameter = Expression();
-			parameters.add(parameter); 
-			while (la.kind == 8) {
-				Get();
-				parameter = Expression();
-				parameters.add(parameter); 
-			}
+			parameters = ActualParameters(identifierToken);
 		}
 		Expect(17);
 		expression = factory.createCall(functionNode, parameters); 
@@ -924,6 +917,32 @@ public class Parser{
 			identifierName, indexingNodes, value); 
 		} else SynErr(88);
 		return expression;
+	}
+
+	List<ExpressionNode>  ActualParameters(Token subroutineToken ) {
+		List<ExpressionNode>  parameters;
+		parameters = new ArrayList<>(); 
+		int currentParameter = 0; 
+		ExpressionNode parameter = ActualParameter(currentParameter, subroutineToken);
+		parameters.add(parameter); 
+		while (la.kind == 8) {
+			Get();
+			parameter = ActualParameter(++currentParameter, subroutineToken);
+			parameters.add(parameter); 
+		}
+		return parameters;
+	}
+
+	ExpressionNode  ActualParameter(int currentParameterIndex, Token subroutineToken) {
+		ExpressionNode  parameter;
+		parameter = null; 
+		if (factory.shouldBeReference(subroutineToken, currentParameterIndex)) {
+			Expect(1);
+			parameter = factory.createReferenceNode(t); 
+		} else if (StartOf(12)) {
+			parameter = Expression();
+		} else SynErr(89);
+		return parameter;
 	}
 
 	void InterfaceSection() {
@@ -1160,6 +1179,7 @@ class Errors {
 			case 86: s = "invalid Random"; break;
 			case 87: s = "invalid MemberExpression"; break;
 			case 88: s = "invalid ArrayAccessing"; break;
+			case 89: s = "invalid ActualParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

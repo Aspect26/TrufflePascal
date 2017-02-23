@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
@@ -55,6 +56,10 @@ class LexicalScope {
         return this.localIdentifiers.getFrameSlot(identifier);
     }
 
+    FrameSlotKind getSlotKind(String identifier) {
+        return this.localIdentifiers.getFrameSlotKind(identifier);
+    }
+
     FrameSlot getReturnSlot() {
         return this.localIdentifiers.getFrameSlot(this.name);
     }
@@ -73,6 +78,16 @@ class LexicalScope {
 
     boolean isConstant(String identifier) {
         return this.localIdentifiers.isConstant(identifier);
+    }
+
+    boolean isReferenceParameter(String identifier, int parameterIndex) throws LexicalException {
+        TypeDescriptor subroutineDescriptor = this.localIdentifiers.getAll().get(identifier);
+        if (!(subroutineDescriptor instanceof SubroutineDescriptor)) {
+            throw new LexicalException("Not a subroutine: " + identifier);
+        }
+
+        SubroutineDescriptor descriptor = (SubroutineDescriptor)subroutineDescriptor;
+        return descriptor.isReferenceParameter(parameterIndex);
     }
 
     boolean isParameterlessSubroutine(String identifier) {

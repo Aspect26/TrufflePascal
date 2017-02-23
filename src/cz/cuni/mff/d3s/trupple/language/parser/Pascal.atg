@@ -632,21 +632,40 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
 .
 
 
-
 SubroutineCall<out ExpressionNode expression, Token identifierToken>
 =
-"("						                        (. ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); .)
-
+"("                                             (. ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); .)
                                                 (. List<ExpressionNode> parameters = new ArrayList<>(); .)
-                                                (. ExpressionNode parameter; .)
-	[
-		Expression<out parameter>               (. parameters.add(parameter); .)
-		{
-			","
-			Expression<out parameter>           (. parameters.add(parameter); .)
-		}
-	]
+    [
+        ActualParameters<out parameters, identifierToken>
+    ]
 ")"                                             (. expression = factory.createCall(functionNode, parameters); .)
+.
+
+
+ActualParameters<. out List<ExpressionNode> parameters, Token subroutineToken .>
+=
+                                                (. parameters = new ArrayList<>(); .)
+                                                (. int currentParameter = 0; .)
+ActualParameter<out ExpressionNode parameter, currentParameter, subroutineToken>
+                                                (. parameters.add(parameter); .)
+{
+    ","
+    ActualParameter<out parameter, ++currentParameter, subroutineToken>
+                                                (. parameters.add(parameter); .)
+}
+.
+
+
+ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token subroutineToken>
+=
+                                                (. parameter = null; .)
+(
+    IF(factory.shouldBeReference(subroutineToken, currentParameterIndex))
+    identifier                                  (. parameter = factory.createReferenceNode(t); .)
+|
+    Expression<out parameter>
+)
 .
 
 
