@@ -111,7 +111,7 @@ public class ArrayTest extends JUnitTest {
 	public void lessSimpleMultidimensionalTest(){
 		String s="program main; \n" +
 				"var arr: array[1..3,10..15,0..6] of integer;\n"+
-				"var i,j,k:integer;\n"+
+				"    i,j,k:integer;\n"+
 				"\n"+
 				"begin\n"+
 				" for i:=1 to 3 do\n"+

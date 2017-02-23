@@ -35,7 +35,7 @@ Pascal
 (
     Program
 	[ ImportsSection ]
-	{ Declaration }
+	Declarations
 	MainFunction
 |
 	Unit
@@ -65,29 +65,33 @@ identifier										(. factory.importUnit(t); .)
 
 
 
-Declaration
+Declarations
 =
-( 
-	VariableDefinitions 
-|
-	ConstantDefinition
-|
-	TypeDefinition
-|
-	Subroutine
-)
+[ ConstantDefinitions ]
+[ TypeDefinitions ]
+[ VariableDeclarations ]
+{ Subroutine }
 .
 
+
+
+TypeDefinitions
+=
+"type"
+TypeDefinition ";"
+{
+    TypeDefinition ";"
+}
+.
 
 
 TypeDefinition
 =
-"type"
 identifier										(. Token identifier = t; .)
 "="
 Type<out TypeDescriptor typeDescriptor>         (. factory.registerNewType(identifier, typeDescriptor); .)
-";"
 .
+
 
 
 Type<out TypeDescriptor typeDescriptor>
@@ -163,9 +167,18 @@ SignedIntegerLiteral<out int value>
 .
 
 
-ConstantDefinition
+ConstantDefinitions
 =
 "const"
+ConstantDefinition ";"
+{
+    ConstantDefinition ";"
+}
+.
+
+
+ConstantDefinition
+=
 identifier										(. Token identifier = t; .)
 "="
 (
@@ -177,7 +190,6 @@ identifier										(. Token identifier = t; .)
 |
 	IdentifierConstant<identifier>
 )
-";"
 .
 
 
@@ -214,17 +226,17 @@ IdentifierConstant<Token identifier>
 
 
 
-VariableDefinitions
+VariableDeclarations
 =
 "var"
-VariableLineDefinition ";"
+VariableLineDeclaration ";"
 {
-    VariableLineDefinition ";"
+    VariableLineDeclaration ";"
 }
 .
 
 
-VariableLineDefinition
+VariableLineDeclaration
 =                                               (. List<String> identifiers = new ArrayList<>(); .)
 identifier                                      (. identifiers.add(t.val.toLowerCase()); .)
 {
@@ -258,7 +270,7 @@ identifier                                      (. Token identifierToken = t; .)
     "forward"                                  (. factory.forwardProcedure(identifierToken, formalParameters); .)
 |
                                                 (. factory.startProcedure(identifierToken, formalParameters); .)
-    { Declaration }
+    Declarations
     Block<out StatementNode bodyNode>           (. factory.finishProcedure(bodyNode); .)
 )
 .
@@ -277,7 +289,7 @@ identifier                                      (. Token returnTypeToken = t; .)
     "forward"                                  (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
 |
                                                 (. factory.startFunction(identifierToken, formalParameters, returnTypeToken); .)
-    { Declaration }
+    Declarations
     Block<out StatementNode bodyNode>           (. factory.finishFunction(bodyNode); .)
 )
 .
@@ -688,15 +700,13 @@ ImplementationSection
 
 InterfaceSection
 =
+[ TypeDefinitions ]
+[ VariableDeclarations ]
 {
 	(
 		ProcedureHeading
 	|
 		FunctionHeading
-	|
-		VariableDefinitions
-	|
-		TypeDefinition
 	)
 }
 .
@@ -735,7 +745,7 @@ ImplementationSection
 	(
 		Subroutine
 	|
-		VariableDefinitions
+		VariableDeclarations
 	|
 		TypeDefinition
 	)
