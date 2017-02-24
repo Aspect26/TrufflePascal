@@ -586,7 +586,7 @@ public class NodeFactory {
             for (FormalParameter parameter : parameters) {
                 if (parameter.isReference) {
                     FrameSlot frameSlot = this.lexicalScope.registerReferenceVariable(parameter.identifier, parameter.type);
-                    final ReferenceInitializationNode initializationNode = new ReferenceInitializationNode(frameSlot, count);
+                    final ReferenceInitializationNode initializationNode = new ReferenceInitializationNode(frameSlot, count++);
 
                     this.lexicalScope.addScopeArgument(initializationNode);
                 } else {

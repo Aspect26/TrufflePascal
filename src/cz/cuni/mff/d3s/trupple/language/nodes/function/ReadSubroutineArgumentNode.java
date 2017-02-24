@@ -51,6 +51,16 @@ public abstract class ReadSubroutineArgumentNode extends ExpressionNode {
 		throw new RuntimeException("Wrong number of parmeters passed.");
 	}
 
+	@Specialization(guards = "isDoubleKind()")
+	protected double readDouble(VirtualFrame frame) {
+		Object[] args = frame.getArguments();
+		if (index < args.length) {
+			return (double) args[index];
+		}
+
+		throw new RuntimeException("Wrong number of parmeters passed.");
+	}
+
 	@Specialization
 	protected Object readObject(VirtualFrame frame) {
 		Object[] args = frame.getArguments();
@@ -72,5 +82,9 @@ public abstract class ReadSubroutineArgumentNode extends ExpressionNode {
 	protected boolean isCharKind() {
 		return getSlotKind() == FrameSlotKind.Byte;
 	}
+
+    protected boolean isDoubleKind() {
+        return getSlotKind() == FrameSlotKind.Double;
+    }
 
 }
