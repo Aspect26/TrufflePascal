@@ -130,6 +130,10 @@ class LexicalScope {
         return this.localIdentifiers.createEnum(identifiers);
     }
 
+    TypeDescriptor createSetType(OrdinalDescriptor baseType) {
+        return this.localIdentifiers.createSetType(baseType);
+    }
+
     void forwardProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
         this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
         this.context.registerSubroutineName(identifier, true);

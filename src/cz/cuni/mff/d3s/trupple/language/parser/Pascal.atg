@@ -110,6 +110,9 @@ Type<out TypeDescriptor typeDescriptor>
 	}
 	"of"
 	identifier									(. typeDescriptor = factory.createArray(ordinalDimensions, t); .)
+|
+    "set" "of"
+    Ordinal<out OrdinalDescriptor ordinal>      (. typeDescriptor = factory.createSetType(ordinal); .)
 )
 .
 

@@ -110,6 +110,10 @@ public class NodeFactory {
         }
     }
 
+    TypeDescriptor createSetType(OrdinalDescriptor baseType) {
+        return lexicalScope.createSetType(baseType);
+    }
+
     OrdinalDescriptor createSimpleOrdinalDescriptor(final int lowerBound, final int upperBound) {
         try {
             return lexicalScope.createRangeDescriptor(lowerBound, upperBound);

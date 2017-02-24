@@ -206,6 +206,10 @@ public class IdentifiersTable {
         return typeDescriptor;
     }
 
+    public TypeDescriptor createSetType(OrdinalDescriptor base) {
+        return new SetDescriptor(base);
+    }
+
     public void addProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
         TypeDescriptor typeDescriptor = new ProcedureDescriptor(formalParameters);
         this.registerNewIdentifier(identifier, typeDescriptor);
