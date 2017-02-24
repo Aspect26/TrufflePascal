@@ -40,10 +40,10 @@ public class TypeTest extends JUnitTest {
     public void simpleTypeToTypeAssignment() {
         String code="program main; \n"+
                 "type Color=(r,g,b);\n"+
-                "type Color1=Color;\n"+
+                "     Color1=Color;\n"+
                 "\n"+
                 "var c:Color;\n"+
-                "var c1:Color1;\n"+
+                "    c1:Color1;\n"+
                 "\n"+
                 "begin\n"+
                 " c:=g;\n"+
