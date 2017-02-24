@@ -25,16 +25,14 @@ import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.CaseNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.ForNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.IfNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.RepeatNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.FunctionBodyNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.FunctionBodyNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.ProcedureBodyNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.ReadSubroutineArgumentNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.CharLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.DoubleLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
@@ -122,12 +120,11 @@ public class NodeFactory {
     }
 
     OrdinalDescriptor castTypeToOrdinalType(TypeDescriptor typeDescriptor) {
-        if (typeDescriptor instanceof OrdinalDescriptor) {
-            return (OrdinalDescriptor) typeDescriptor;
-        } else {
-            // TODO: this should be in IdentifiersTable somewhere, which will throw an NotOridinalType exception
-            parser.SemErr("Not an ordinal type");
-            return null;
+	    try {
+	        return typeDescriptor.getOrdinal();
+        } catch (LexicalException e) {
+	        parser.SemErr(e.getMessage());
+	        return null;
         }
     }
 
@@ -297,14 +294,6 @@ public class NodeFactory {
         return paramList;
     }
 
-    void finishProcedure() {
-        finishSubroutine();
-    }
-
-    void finishFunction() {
-        finishSubroutine();
-    }
-
     void finishProcedure(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
@@ -472,6 +461,16 @@ public class NodeFactory {
         return null;
     }
 
+    boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
+	    String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
+	    try {
+            return this.lexicalScope.isReferenceParameter(subroutineIdentifier, parameterIndex);
+        } catch(LexicalException e) {
+	        parser.SemErr(e.getMessage());
+	        return false;
+        }
+    }
+
     ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
         return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
     }
@@ -495,6 +494,12 @@ public class NodeFactory {
 
         parser.SemErr("Undefined subroutine: " + identifier);
         return null;
+    }
+
+    ExpressionNode createReferenceNode(Token variableToken) {
+	    String variableIdentifier = this.getIdentifierFromToken(variableToken);
+	    FrameSlot slot = this.lexicalScope.getLocalSlot(variableIdentifier);
+        return new ReadReferencePassNode(slot);
     }
 
     ExpressionNode createReadArrayValue(Token identifierToken, List<ExpressionNode> indexingNodes) {
@@ -579,13 +584,19 @@ public class NodeFactory {
         try {
             int count = 0;
             for (FormalParameter parameter : parameters) {
-                FrameSlotKind slotKind = this.lexicalScope.getTypeTypeDescriptor(parameter.type).getSlotKind();
-                FrameSlot frameSlot = this.lexicalScope.registerLocalVariable(parameter.identifier, parameter.type);
+                if (parameter.isReference) {
+                    FrameSlot frameSlot = this.lexicalScope.registerReferenceVariable(parameter.identifier, parameter.type);
+                    final ReferenceInitializationNode initializationNode = new ReferenceInitializationNode(frameSlot, count);
 
-                final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(count++, slotKind);
-                final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);
+                    this.lexicalScope.addScopeArgument(initializationNode);
+                } else {
+                    FrameSlot frameSlot = this.lexicalScope.registerLocalVariable(parameter.identifier, parameter.type);
+                    FrameSlotKind slotKind = this.lexicalScope.getSlotKind(parameter.identifier);
+                    final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(count++, slotKind);
+                    final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);
 
-                this.lexicalScope.addScopeArgument(assignment);
+                    this.lexicalScope.addScopeArgument(assignment);
+                }
             }
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());

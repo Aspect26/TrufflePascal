@@ -5,6 +5,7 @@ import com.oracle.truffle.api.dsl.GeneratedBy;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
@@ -124,6 +125,22 @@ public final class PascalTypesGen extends PascalTypes {
     public static PascalArray expectPascalArray(Object value) throws UnexpectedResultException {
         if (value instanceof PascalArray) {
             return (PascalArray) value;
+        }
+        throw new UnexpectedResultException(value);
+    }
+
+    public static boolean isReference(Object value) {
+        return value instanceof Reference;
+    }
+
+    public static Reference asReference(Object value) {
+        assert value instanceof Reference : "PascalTypesGen.asReference: Reference expected";
+        return (Reference) value;
+    }
+
+    public static Reference expectReference(Object value) throws UnexpectedResultException {
+        if (value instanceof Reference) {
+            return (Reference) value;
         }
         throw new UnexpectedResultException(value);
     }

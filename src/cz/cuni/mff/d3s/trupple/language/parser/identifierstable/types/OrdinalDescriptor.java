@@ -25,6 +25,11 @@ public abstract class OrdinalDescriptor extends TypeDescriptor {
     }
 
     @Override
+    public OrdinalDescriptor getOrdinal() {
+        return this;
+    }
+
+    @Override
     public FrameSlotKind getSlotKind() {
         return FrameSlotKind.Object;
     }

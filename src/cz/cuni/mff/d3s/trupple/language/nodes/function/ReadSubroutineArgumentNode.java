@@ -7,6 +7,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
+import java.util.Objects;
+
 @NodeField(name = "slotKind", type = FrameSlotKind.class)
 public abstract class ReadSubroutineArgumentNode extends ExpressionNode {
 
@@ -15,7 +17,7 @@ public abstract class ReadSubroutineArgumentNode extends ExpressionNode {
 	private final int index;
 
 	public ReadSubroutineArgumentNode(int index) {
-		// NOTE this is because the first argument is the virtual frame from caller method
+		// NOTE the index is increased because the first argument is the virtual frame from caller method
 		this.index = index + 1;
 	}
 
@@ -44,6 +46,16 @@ public abstract class ReadSubroutineArgumentNode extends ExpressionNode {
 		Object[] args = frame.getArguments();
 		if (index < args.length) {
 			return (char) args[index];
+		}
+
+		throw new RuntimeException("Wrong number of parmeters passed.");
+	}
+
+	@Specialization
+	protected Object readObject(VirtualFrame frame) {
+		Object[] args = frame.getArguments();
+		if (index < args.length) {
+			return args[index];
 		}
 
 		throw new RuntimeException("Wrong number of parmeters passed.");

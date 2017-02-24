@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
@@ -51,14 +52,18 @@ public class IdentifiersTable {
     }
 
     private void addBuiltinFunctions() {
-        identifiersMap.put("write", new ProcedureDescriptor(null));
-        identifiersMap.put("writeln", new ProcedureDescriptor(null));
-        identifiersMap.put("read", new ProcedureDescriptor(null));
-        identifiersMap.put("readln", new ProcedureDescriptor(null));
+        identifiersMap.put("write", new BuiltinProcedureDescriptor.Write());
+        identifiersMap.put("writeln", new BuiltinProcedureDescriptor.Writeln());
+        identifiersMap.put("read", new BuiltinProcedureDescriptor.Read());
+        identifiersMap.put("readln", new BuiltinProcedureDescriptor.Readln());
     }
 
     public FrameSlot getFrameSlot(String identifier) {
         return this.frameDescriptor.findFrameSlot(identifier);
+    }
+
+    public FrameSlotKind getFrameSlotKind(String identifier) {
+        return this.identifiersMap.get(identifier).getSlotKind();
     }
 
     public FrameDescriptor getFrameDescriptor() {
@@ -110,9 +115,21 @@ public class IdentifiersTable {
         }
     }
 
-    public FrameSlot addVariable(String typeName, String identifier) throws LexicalException {
+    public FrameSlot addVariable(String identifier, String typeName) throws LexicalException {
         TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
         FrameSlot frameSlot = this.registerNewIdentifier(identifier, typeDescriptor);
+
+        if (typeDescriptor == UnknownDescriptor.SINGLETON) {
+            throw new UnknownTypeException(typeName);
+        }
+
+        return frameSlot;
+    }
+
+    public FrameSlot addReference(String identifier, String typeName) throws LexicalException {
+        TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
+        ReferenceDescriptor referenceDescriptor = new ReferenceDescriptor(typeDescriptor);
+        FrameSlot frameSlot = this.registerNewIdentifier(identifier, referenceDescriptor);
 
         if (typeDescriptor == UnknownDescriptor.SINGLETON) {
             throw new UnknownTypeException(typeName);

@@ -286,7 +286,7 @@ identifier                                      (. Token identifierToken = t; .)
 identifier                                      (. Token returnTypeToken = t; .)
 ";"
 (
-    "forward"                                  (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
+    "forward"                                   (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
 |
                                                 (. factory.startFunction(identifierToken, formalParameters, returnTypeToken); .)
     Declarations
@@ -311,9 +311,9 @@ FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParame
 
 FormalParameter<. out List<FormalParameter> formalParameter .>
 =												(. List<String> identifiers = new ArrayList<>(); .)
-												(. boolean isOutput = false; .)
+												(. boolean isReference = false; .)
 [ 
-	"var"										(. isOutput = true; .)
+	"var"										(. isReference = true; .)
 ]
 identifier										(. identifiers.add(t.val.toLowerCase()); .)
 {
@@ -321,7 +321,7 @@ identifier										(. identifiers.add(t.val.toLowerCase()); .)
 	identifier									(. identifiers.add(t.val.toLowerCase()); .)
 }
 ":"
-identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isOutput); .)
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isReference); .)
 .
 
 
@@ -644,21 +644,40 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
 .
 
 
-
 SubroutineCall<out ExpressionNode expression, Token identifierToken>
 =
-"("						                        (. ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); .)
-
+"("                                             (. ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); .)
                                                 (. List<ExpressionNode> parameters = new ArrayList<>(); .)
-                                                (. ExpressionNode parameter; .)
-	[
-		Expression<out parameter>               (. parameters.add(parameter); .)
-		{
-			","
-			Expression<out parameter>           (. parameters.add(parameter); .)
-		}
-	]
+    [
+        ActualParameters<out parameters, identifierToken>
+    ]
 ")"                                             (. expression = factory.createCall(functionNode, parameters); .)
+.
+
+
+ActualParameters<. out List<ExpressionNode> parameters, Token subroutineToken .>
+=
+                                                (. parameters = new ArrayList<>(); .)
+                                                (. int currentParameter = 0; .)
+ActualParameter<out ExpressionNode parameter, currentParameter, subroutineToken>
+                                                (. parameters.add(parameter); .)
+{
+    ","
+    ActualParameter<out parameter, ++currentParameter, subroutineToken>
+                                                (. parameters.add(parameter); .)
+}
+.
+
+
+ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token subroutineToken>
+=
+                                                (. parameter = null; .)
+(
+    IF(factory.shouldBeReference(subroutineToken, currentParameterIndex))
+    identifier                                  (. parameter = factory.createReferenceNode(t); .)
+|
+    Expression<out parameter>
+)
 .
 
 

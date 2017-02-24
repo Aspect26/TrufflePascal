@@ -130,7 +130,7 @@ public final class ReadSubroutineArgumentNodeGen extends ReadSubroutineArgumentN
             if ((root.isCharKind())) {
                 return ReadCharNode_.create(root);
             }
-            return null;
+            return ReadObjectNode_.create(root);
         }
 
     }
@@ -229,6 +229,23 @@ public final class ReadSubroutineArgumentNodeGen extends ReadSubroutineArgumentN
 
         static BaseNode_ create(ReadSubroutineArgumentNodeGen root) {
             return new ReadCharNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "readObject(VirtualFrame)", value = ReadSubroutineArgumentNode.class)
+    private static final class ReadObjectNode_ extends BaseNode_ {
+
+        ReadObjectNode_(ReadSubroutineArgumentNodeGen root) {
+            super(root, 4);
+        }
+
+        @Override
+        public Object execute(VirtualFrame frameValue) {
+            return root.readObject(frameValue);
+        }
+
+        static BaseNode_ create(ReadSubroutineArgumentNodeGen root) {
+            return new ReadObjectNode_(root);
         }
 
     }
