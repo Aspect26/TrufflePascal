@@ -130,6 +130,9 @@ public final class ReadSubroutineArgumentNodeGen extends ReadSubroutineArgumentN
             if ((root.isCharKind())) {
                 return ReadCharNode_.create(root);
             }
+            if ((root.isDoubleKind())) {
+                return ReadDoubleNode_.create(root);
+            }
             return ReadObjectNode_.create(root);
         }
 
@@ -232,11 +235,29 @@ public final class ReadSubroutineArgumentNodeGen extends ReadSubroutineArgumentN
         }
 
     }
+    @GeneratedBy(methodName = "readDouble(VirtualFrame)", value = ReadSubroutineArgumentNode.class)
+    private static final class ReadDoubleNode_ extends BaseNode_ {
+
+        ReadDoubleNode_(ReadSubroutineArgumentNodeGen root) {
+            super(root, 4);
+        }
+
+        @Override
+        public Object execute(VirtualFrame frameValue) {
+            assert (root.isDoubleKind());
+            return root.readDouble(frameValue);
+        }
+
+        static BaseNode_ create(ReadSubroutineArgumentNodeGen root) {
+            return new ReadDoubleNode_(root);
+        }
+
+    }
     @GeneratedBy(methodName = "readObject(VirtualFrame)", value = ReadSubroutineArgumentNode.class)
     private static final class ReadObjectNode_ extends BaseNode_ {
 
         ReadObjectNode_(ReadSubroutineArgumentNodeGen root) {
-            super(root, 4);
+            super(root, 5);
         }
 
         @Override

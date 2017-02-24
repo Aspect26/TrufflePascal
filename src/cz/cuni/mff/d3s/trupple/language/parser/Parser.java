@@ -431,7 +431,7 @@ public class Parser{
 		while (la.kind == 6) {
 			Get();
 			newParameters = FormalParameter();
-			factory.appendFormalParameter(newParameters, newParameters); 
+			factory.appendFormalParameter(newParameters, formalParameters); 
 		}
 		Expect(17);
 		return formalParameters;

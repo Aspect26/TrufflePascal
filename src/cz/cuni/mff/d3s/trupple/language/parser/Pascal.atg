@@ -290,7 +290,7 @@ FormalParameterList<. out List<FormalParameter> formalParameters .>
 FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParameters, formalParameters); .)
 { 
 	";" 
-	FormalParameter<out newParameters> 			(. factory.appendFormalParameter(newParameters, newParameters); .)
+	FormalParameter<out newParameters> 			(. factory.appendFormalParameter(newParameters, formalParameters); .)
 }
 ")"
 .

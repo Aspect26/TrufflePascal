@@ -22,7 +22,7 @@ public class ReferencePassingTest extends JUnitTest {
     }
 
     @Test
-    public void readReferenceVariableTest() {
+    public void onlyReadReferenceVariableTest() {
         String code="program main;\n"+
                 "var i:integer;\n"+
                 "\n"+
@@ -36,6 +36,73 @@ public class ReferencePassingTest extends JUnitTest {
                 " p(i);\n"+
                 "end.";
         String output="42";
+        this.test(code, output);
+    }
+
+    @Test
+    public void passIntegerReference() {
+        String code="program main;\n"+
+                "\n"+
+                "var i:integer;\n"+
+                "\n"+
+                "procedure p(var j:integer);\n"+
+                "begin\n"+
+                " j := 5318008;\n"+
+                "end;\n"+
+                "\n"+
+                "begin\n"+
+                " i := 2;\n"+
+                " p(i);\n"+
+                " write(i);\n"+
+                "end.";
+        String output="5318008";
+        this.test(code, output);
+    }
+
+    @Test
+    public void passSameVariableAsMultipleReferences() {
+        String code="program main;\n"+
+                "\n"+
+                "var i:integer;\n"+
+                "\n"+
+                "procedure p(var a,b:integer);\n"+
+                "begin\n"+
+                " a := 3;\n"+
+                " b := 5;\n"+
+                " a := 8;\n"+
+                "end;\n"+
+                "\n"+
+                "begin\n"+
+                " i := 2;\n"+
+                " p(i, i);\n"+
+                " write(i);\n"+
+                "end.\n";
+        String output="8";
+        this.test(code, output);
+    }
+
+    @Test
+    public void passReferencesAndNonReferences() {
+        String code="program main;\n"+
+                "\n"+
+                "var i:integer;\n"+
+                " c:char;\n"+
+                "\n"+
+                "procedure p(var ir:integer; cv:char; var cr:char; iv:integer);\n"+
+                "begin\n"+
+                " ir := 42;\n"+
+                " iv := 43;\n"+
+                " cr := \'a\';\n"+
+                " cv := \'b\';\n"+
+                "end;\n"+
+                "\n"+
+                "begin\n"+
+                " i := 2;\n"+
+                " c := \'f\';\n"+
+                " p(i, c, c, i);\n"+
+                " write(i, c);\n"+
+                "end.";
+        String output="42a";
         this.test(code, output);
     }
 }

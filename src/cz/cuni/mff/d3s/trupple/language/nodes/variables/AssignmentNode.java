@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.variables;
 
-import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -12,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeChild("valueNode")
@@ -22,54 +22,78 @@ public abstract class AssignmentNode extends ExpressionNode {
 
 	@Specialization(guards = "isLongKind(frame)")
 	protected long writeLong(VirtualFrame frame, long value) {
-		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
-		slotsFrame.setLong(getSlot(), value);
+        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
+	    Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
+	    if (referenceVariable == null) {
+            slotFrame.setLong(getSlot(), value);
+        } else {
+	        referenceVariable.getFromFrame().setLong(referenceVariable.getFrameSlot(), value);
+        }
 		return value;
 	}
 
 	@Specialization(guards = "isBoolKind(frame)")
 	protected boolean writeBoolean(VirtualFrame frame, boolean value) {
-		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
-		slotsFrame.setBoolean(getSlot(), value);
-		return value;
+        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
+        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
+        if (referenceVariable == null) {
+            slotFrame.setBoolean(getSlot(), value);
+        } else {
+            referenceVariable.getFromFrame().setBoolean(referenceVariable.getFrameSlot(), value);
+        }
+        return value;
 	}
 
 	// NOTE: characters are stored as bytes, since there is no FrameSlotKind for
 	// char
 	@Specialization(guards = "isCharKind(frame)")
 	protected char writeChar(VirtualFrame frame, char value) {
-		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
-		slotsFrame.setByte(getSlot(), (byte) value);
-		return value;
+        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
+        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
+        if (referenceVariable == null) {
+            slotFrame.setByte(getSlot(), (byte)value);
+        } else {
+            referenceVariable.getFromFrame().setByte(referenceVariable.getFrameSlot(), (byte)value);
+        }
+        return value;
 	}
 
 	@Specialization(guards = "isDoubleKind(frame)")
 	protected double writeDouble(VirtualFrame frame, double value) {
-		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
-		slotsFrame.setDouble(getSlot(), value);
-		return value;
+        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
+        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
+        if (referenceVariable == null) {
+            slotFrame.setDouble(getSlot(), value);
+        } else {
+            referenceVariable.getFromFrame().setDouble(referenceVariable.getFrameSlot(), value);
+        }
+        return value;
 	}
 	
 	@Specialization(guards = "isEnum(frame)")
 	protected Object writeEnum(VirtualFrame frame, EnumValue value) {
-		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
-		try { 
-			if (((EnumValue)slotsFrame.getObject(getSlot())).getTypeDescriptor() != value.getTypeDescriptor()) {
-				throw new PascalRuntimeException("Wrong enum types assignment.");
-			}
-		} catch (FrameSlotTypeException e) {
-			// TODO: this
-		}
-		slotsFrame.setObject(getSlot(), value);
-		return value;
+        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
+        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
+        if (referenceVariable == null) {
+            slotFrame.setObject(getSlot(), value);
+        } else {
+            referenceVariable.getFromFrame().setObject(referenceVariable.getFrameSlot(), value);
+        }
+        return value;
 	}
 	
 	@Specialization(guards = "isPascalArray(frame)")
 	protected Object assignArray(VirtualFrame frame, PascalArray array) {
-		VirtualFrame slotsFrame = getFrameContainingSlot(frame, getSlot());
 		PascalArray arrayCopy = array.createDeepCopy();
-		slotsFrame.setObject(getSlot(), arrayCopy);
-		return arrayCopy;
+
+        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
+        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
+        if (referenceVariable == null) {
+            slotFrame.setObject(getSlot(), arrayCopy);
+        } else {
+            referenceVariable.getFromFrame().setObject(referenceVariable.getFrameSlot(), arrayCopy);
+        }
+        return arrayCopy;
 	}
 
 	/**
@@ -118,17 +142,24 @@ public abstract class AssignmentNode extends ExpressionNode {
 	}
 
 	private boolean isKind(VirtualFrame frame, FrameSlotKind kind) {
-		if (getFrameContainingSlot(frame, getSlot()) == null) {
+		frame = getFrameContainingSlot(frame, getSlot());
+		if (frame == null)
 			return false;
-		} else if (getSlot().getKind() == kind) {
-			return true;
-		} else if (getSlot().getKind() == FrameSlotKind.Illegal) {
-			CompilerDirectives.transferToInterpreterAndInvalidate();
-			getSlot().setKind(kind);
-			return true;
-		} else {
-			return false;
+
+		Reference reference = this.tryGetReference(frame, getSlot());
+		if (reference == null) {
+			return getSlot().getKind() == kind;
+		}
+		else {
+			return reference.getFrameSlot().getKind() == kind;
 		}
 	}
 
+	private Reference tryGetReference(VirtualFrame frame, FrameSlot slot) {
+		try {
+			return (Reference)frame.getObject(slot);
+		} catch (FrameSlotTypeException | ClassCastException e) {
+			return null;
+		}
+	}
 }
