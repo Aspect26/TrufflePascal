@@ -20,4 +20,22 @@ public class ReferencePassingTest extends JUnitTest {
         String output="Is this the real life?";
         this.test(code, output);
     }
+
+    @Test
+    public void readReferenceVariableTest() {
+        String code="program main;\n"+
+                "var i:integer;\n"+
+                "\n"+
+                "procedure p(var j:integer);\n"+
+                "begin\n"+
+                " write(i);\n"+
+                "end;\n"+
+                "\n"+
+                "begin\n"+
+                " i:=42;\n"+
+                " p(i);\n"+
+                "end.";
+        String output="42";
+        this.test(code, output);
+    }
 }

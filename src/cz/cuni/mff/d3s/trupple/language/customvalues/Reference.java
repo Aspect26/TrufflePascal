@@ -1,15 +1,16 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
+import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 public class Reference implements ICustomValue {
 
     private final VirtualFrame fromFrame;
-    private final String identifier;
+    private final FrameSlot frameSlot;
 
-    public Reference(VirtualFrame frame, String identifier) {
+    public Reference(VirtualFrame frame, FrameSlot frameSlot) {
         this.fromFrame = frame;
-        this.identifier = identifier;
+        this.frameSlot = frameSlot;
     }
 
     @Override
@@ -21,7 +22,7 @@ public class Reference implements ICustomValue {
         return fromFrame;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public FrameSlot getFrameSlot() {
+        return frameSlot;
     }
 }

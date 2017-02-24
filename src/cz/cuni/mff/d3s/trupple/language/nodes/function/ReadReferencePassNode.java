@@ -1,19 +1,20 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.function;
 
+import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 public class ReadReferencePassNode extends ExpressionNode {
 
-	private final String variableIdentifier;
+	private final FrameSlot variableSlot;
 
-	public ReadReferencePassNode(String variableIdentifier) {
-		this.variableIdentifier = variableIdentifier;
+	public ReadReferencePassNode(FrameSlot variableSlot) {
+		this.variableSlot = variableSlot;
 	}
 
 	@Override
 	public Object executeGeneric(VirtualFrame frame) {
-		return new Reference(frame, this.variableIdentifier);
+		return new Reference(frame, this.variableSlot);
 	}
 }

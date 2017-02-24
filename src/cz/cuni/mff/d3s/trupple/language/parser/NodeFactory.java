@@ -498,7 +498,8 @@ public class NodeFactory {
 
     ExpressionNode createReferenceNode(Token variableToken) {
 	    String variableIdentifier = this.getIdentifierFromToken(variableToken);
-        return new ReadReferencePassNode(variableIdentifier);
+	    FrameSlot slot = this.lexicalScope.getLocalSlot(variableIdentifier);
+        return new ReadReferencePassNode(slot);
     }
 
     ExpressionNode createReadArrayValue(Token identifierToken, List<ExpressionNode> indexingNodes) {
