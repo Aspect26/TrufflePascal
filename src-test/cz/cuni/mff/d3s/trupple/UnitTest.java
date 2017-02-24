@@ -1,9 +1,11 @@
 package cz.cuni.mff.d3s.trupple;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
 
+@Ignore
 public class UnitTest extends JUnitTest {
 
     private String import_math="UNIT math;\n"+

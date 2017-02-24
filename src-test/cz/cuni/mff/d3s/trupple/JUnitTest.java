@@ -11,7 +11,9 @@ import java.util.List;
 import org.junit.Before;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
+import org.junit.Ignore;
 
+@Ignore
 public abstract class JUnitTest {
 
 	protected ByteArrayOutputStream output;
