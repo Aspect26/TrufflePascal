@@ -97,9 +97,7 @@ public class Parser{
 			if (la.kind == 7) {
 				ImportsSection();
 			}
-			while (StartOf(1)) {
-				Declaration();
-			}
+			Declarations();
 			MainFunction();
 		} else if (la.kind == 60) {
 			Unit();
@@ -125,16 +123,19 @@ public class Parser{
 		Expect(6);
 	}
 
-	void Declaration() {
+	void Declarations() {
+		if (la.kind == 21) {
+			ConstantDefinitions();
+		}
+		if (la.kind == 9) {
+			TypeDefinitions();
+		}
 		if (la.kind == 22) {
-			VariableDefinitions();
-		} else if (la.kind == 21) {
-			ConstantDefinition();
-		} else if (la.kind == 9) {
-			TypeDefinition();
-		} else if (la.kind == 24 || la.kind == 26) {
+			VariableDeclarations();
+		}
+		while (la.kind == 24 || la.kind == 26) {
 			Subroutine();
-		} else SynErr(65);
+		}
 	}
 
 	void MainFunction() {
@@ -158,43 +159,34 @@ public class Parser{
 		Expect(27);
 	}
 
-	void VariableDefinitions() {
-		Expect(22);
-		VariableLineDefinition();
+	void ConstantDefinitions() {
+		Expect(21);
+		ConstantDefinition();
 		Expect(6);
 		while (la.kind == 1) {
-			VariableLineDefinition();
+			ConstantDefinition();
 			Expect(6);
 		}
 	}
 
-	void ConstantDefinition() {
-		Expect(21);
-		Expect(1);
-		Token identifier = t; 
-		Expect(10);
-		if (StartOf(2)) {
-			NumericConstant(identifier);
-		} else if (la.kind == 2) {
-			String value = StringLiteral();
-			factory.registerStringOrCharConstant(identifier, value); 
-		} else if (la.kind == 57 || la.kind == 58) {
-			boolean value = LogicLiteral();
-			factory.registerBooleanConstant(identifier, value); 
-		} else if (la.kind == 1 || la.kind == 19 || la.kind == 20) {
-			IdentifierConstant(identifier);
-		} else SynErr(66);
+	void TypeDefinitions() {
+		Expect(9);
+		TypeDefinition();
 		Expect(6);
+		while (la.kind == 1) {
+			TypeDefinition();
+			Expect(6);
+		}
 	}
 
-	void TypeDefinition() {
-		Expect(9);
-		Expect(1);
-		Token identifier = t; 
-		Expect(10);
-		TypeDescriptor typeDescriptor = Type();
-		factory.registerNewType(identifier, typeDescriptor); 
+	void VariableDeclarations() {
+		Expect(22);
+		VariableLineDeclaration();
 		Expect(6);
+		while (la.kind == 1) {
+			VariableLineDeclaration();
+			Expect(6);
+		}
 	}
 
 	void Subroutine() {
@@ -204,7 +196,15 @@ public class Parser{
 		} else if (la.kind == 26) {
 			Function();
 			Expect(6);
-		} else SynErr(67);
+		} else SynErr(65);
+	}
+
+	void TypeDefinition() {
+		Expect(1);
+		Token identifier = t; 
+		Expect(10);
+		TypeDescriptor typeDescriptor = Type();
+		factory.registerNewType(identifier, typeDescriptor); 
 	}
 
 	TypeDescriptor  Type() {
@@ -225,7 +225,7 @@ public class Parser{
 			Expect(11);
 			Expect(1);
 			typeDescriptor = factory.createArray(ordinalDimensions, t); 
-		} else SynErr(68);
+		} else SynErr(66);
 		return typeDescriptor;
 	}
 
@@ -274,10 +274,10 @@ public class Parser{
 			Expect(18);
 			upperBound = SignedIntegerLiteral();
 			ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); 
-		} else if (StartOf(3)) {
+		} else if (StartOf(1)) {
 			TypeDescriptor typeDescriptor = Type();
 			ordinal = factory.castTypeToOrdinalType(typeDescriptor); 
-		} else SynErr(69);
+		} else SynErr(67);
 		return ordinal;
 	}
 
@@ -294,8 +294,25 @@ public class Parser{
 		} else if (la.kind == 3) {
 			Get();
 			value = Integer.parseInt(t.val); 
-		} else SynErr(70);
+		} else SynErr(68);
 		return value;
+	}
+
+	void ConstantDefinition() {
+		Expect(1);
+		Token identifier = t; 
+		Expect(10);
+		if (StartOf(2)) {
+			NumericConstant(identifier);
+		} else if (la.kind == 2) {
+			String value = StringLiteral();
+			factory.registerStringOrCharConstant(identifier, value); 
+		} else if (la.kind == 57 || la.kind == 58) {
+			boolean value = LogicLiteral();
+			factory.registerBooleanConstant(identifier, value); 
+		} else if (la.kind == 1 || la.kind == 19 || la.kind == 20) {
+			IdentifierConstant(identifier);
+		} else SynErr(69);
 	}
 
 	void NumericConstant(Token identifier) {
@@ -312,7 +329,7 @@ public class Parser{
 			} else if (la.kind == 4) {
 				Get();
 				factory.registerSignedRealConstant(identifier, sign, t); 
-			} else SynErr(71);
+			} else SynErr(70);
 		} else if (la.kind == 3 || la.kind == 4) {
 			if (la.kind == 3) {
 				Get();
@@ -321,7 +338,7 @@ public class Parser{
 				Get();
 				factory.registerRealConstant(identifier, t); 
 			}
-		} else SynErr(72);
+		} else SynErr(71);
 	}
 
 	String  StringLiteral() {
@@ -340,7 +357,7 @@ public class Parser{
 		} else if (la.kind == 58) {
 			Get();
 			result = false; 
-		} else SynErr(73);
+		} else SynErr(72);
 		return result;
 	}
 
@@ -357,10 +374,10 @@ public class Parser{
 		} else if (la.kind == 1) {
 			Get();
 			factory.registerConstantFromIdentifier(identifier, t); 
-		} else SynErr(74);
+		} else SynErr(73);
 	}
 
-	void VariableLineDefinition() {
+	void VariableLineDeclaration() {
 		List<String> identifiers = new ArrayList<>(); 
 		Expect(1);
 		identifiers.add(t.val.toLowerCase()); 
@@ -386,14 +403,12 @@ public class Parser{
 		if (la.kind == 25) {
 			Get();
 			factory.forwardProcedure(identifierToken, formalParameters); 
-		} else if (StartOf(4)) {
+		} else if (StartOf(3)) {
 			factory.startProcedure(identifierToken, formalParameters); 
-			while (StartOf(1)) {
-				Declaration();
-			}
+			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishProcedure(bodyNode); 
-		} else SynErr(75);
+		} else SynErr(74);
 	}
 
 	void Function() {
@@ -411,14 +426,12 @@ public class Parser{
 		if (la.kind == 25) {
 			Get();
 			factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); 
-		} else if (StartOf(4)) {
+		} else if (StartOf(3)) {
 			factory.startFunction(identifierToken, formalParameters, returnTypeToken); 
-			while (StartOf(1)) {
-				Declaration();
-			}
+			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishFunction(bodyNode); 
-		} else SynErr(76);
+		} else SynErr(75);
 	}
 
 	List<FormalParameter>  FormalParameterList() {
@@ -441,7 +454,7 @@ public class Parser{
 		StatementNode  blockNode;
 		Expect(28);
 		List<StatementNode> bodyNodes = new ArrayList<>(); 
-		if (StartOf(5)) {
+		if (StartOf(4)) {
 			StatementSequence(bodyNodes);
 		}
 		Expect(29);
@@ -530,7 +543,7 @@ public class Parser{
 			statement = factory.createRandomizeNode(); 
 			break;
 		}
-		default: SynErr(77); break;
+		default: SynErr(76); break;
 		}
 		return statement;
 	}
@@ -577,7 +590,7 @@ public class Parser{
 		} else if (la.kind == 38) {
 			Get();
 			ascending = false; 
-		} else SynErr(78);
+		} else SynErr(77);
 		ExpressionNode finalValue = Expression();
 		Expect(39);
 		StatementNode loopBody = Statement();
@@ -627,7 +640,7 @@ public class Parser{
 		StatementNode  statement;
 		Expect(32);
 		statement = null; 
-		if (StartOf(6)) {
+		if (StartOf(5)) {
 			statement = factory.createReadLine(); 
 		} else if (la.kind == 16) {
 			Get();
@@ -645,8 +658,8 @@ public class Parser{
 				}
 				Expect(17);
 				statement = factory.createReadLine(identifiers); 
-			} else SynErr(79);
-		} else SynErr(80);
+			} else SynErr(78);
+		} else SynErr(79);
 		return statement;
 	}
 
@@ -699,16 +712,16 @@ public class Parser{
 			Token op = t; 
 			ExpressionNode right = SignedLogicFactor();
 			expression = factory.createUnaryExpression(op, right); 
-		} else if (StartOf(7)) {
+		} else if (StartOf(6)) {
 			expression = LogicFactor();
-		} else SynErr(81);
+		} else SynErr(80);
 		return expression;
 	}
 
 	ExpressionNode  LogicFactor() {
 		ExpressionNode  expression;
 		expression = Arithmetic();
-		if (StartOf(8)) {
+		if (StartOf(7)) {
 			switch (la.kind) {
 			case 48: {
 				Get();
@@ -761,7 +774,7 @@ public class Parser{
 	ExpressionNode  Term() {
 		ExpressionNode  expression;
 		expression = SignedFactor();
-		while (StartOf(9)) {
+		while (StartOf(8)) {
 			if (la.kind == 53) {
 				Get();
 			} else if (la.kind == 54) {
@@ -790,9 +803,9 @@ public class Parser{
 			Token unOp = t; 
 			expression = SignedFactor();
 			expression = factory.createUnaryExpression(unOp, expression); 
-		} else if (StartOf(10)) {
+		} else if (StartOf(9)) {
 			expression = Factor();
-		} else SynErr(82);
+		} else SynErr(81);
 		return expression;
 	}
 
@@ -808,9 +821,9 @@ public class Parser{
 			Get();
 			if (la.kind == 14 || la.kind == 16 || la.kind == 36) {
 				expression = MemberExpression(t);
-			} else if (StartOf(11)) {
+			} else if (StartOf(10)) {
 				expression = factory.createExpressionFromSingleIdentifier(t); 
-			} else SynErr(83);
+			} else SynErr(82);
 			break;
 		}
 		case 16: {
@@ -841,7 +854,7 @@ public class Parser{
 			expression = factory.createLogicLiteral(val); 
 			break;
 		}
-		default: SynErr(84); break;
+		default: SynErr(83); break;
 		}
 		return expression;
 	}
@@ -850,7 +863,7 @@ public class Parser{
 		ExpressionNode  expression;
 		Expect(59);
 		expression = null; 
-		if (StartOf(11)) {
+		if (StartOf(10)) {
 			expression = factory.createRandomNode(); 
 		} else if (la.kind == 16) {
 			Get();
@@ -861,8 +874,8 @@ public class Parser{
 				Get();
 				expression = factory.createRandomNode(t); 
 				Expect(17);
-			} else SynErr(85);
-		} else SynErr(86);
+			} else SynErr(84);
+		} else SynErr(85);
 		return expression;
 	}
 
@@ -877,7 +890,7 @@ public class Parser{
 			expression = factory.createAssignment(identifierName, value); 
 		} else if (la.kind == 14) {
 			expression = ArrayAccessing(identifierName);
-		} else SynErr(87);
+		} else SynErr(86);
 		return expression;
 	}
 
@@ -886,7 +899,7 @@ public class Parser{
 		Expect(16);
 		ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); 
 		List<ExpressionNode> parameters = new ArrayList<>(); 
-		if (StartOf(12)) {
+		if (StartOf(11)) {
 			parameters = ActualParameters(identifierToken);
 		}
 		Expect(17);
@@ -908,14 +921,14 @@ public class Parser{
 			indexingNodes.add(indexingNode); 
 		}
 		Expect(15);
-		if (StartOf(11)) {
+		if (StartOf(10)) {
 			expression = factory.createReadArrayValue(identifierName, indexingNodes); 
 		} else if (la.kind == 36) {
 			Get();
 			ExpressionNode value = Expression();
 			expression = factory.createArrayIndexAssignment( 
 			identifierName, indexingNodes, value); 
-		} else SynErr(88);
+		} else SynErr(87);
 		return expression;
 	}
 
@@ -939,32 +952,34 @@ public class Parser{
 		if (factory.shouldBeReference(subroutineToken, currentParameterIndex)) {
 			Expect(1);
 			parameter = factory.createReferenceNode(t); 
-		} else if (StartOf(12)) {
+		} else if (StartOf(11)) {
 			parameter = Expression();
-		} else SynErr(89);
+		} else SynErr(88);
 		return parameter;
 	}
 
 	void InterfaceSection() {
-		while (StartOf(13)) {
+		if (la.kind == 9) {
+			TypeDefinitions();
+		}
+		if (la.kind == 22) {
+			VariableDeclarations();
+		}
+		while (la.kind == 24 || la.kind == 26) {
 			if (la.kind == 24) {
 				ProcedureHeading();
-			} else if (la.kind == 26) {
-				FunctionHeading();
-			} else if (la.kind == 22) {
-				VariableDefinitions();
 			} else {
-				TypeDefinition();
+				FunctionHeading();
 			}
 		}
 	}
 
 	void ImplementationSection() {
-		while (StartOf(13)) {
+		while (StartOf(12)) {
 			if (la.kind == 24 || la.kind == 26) {
 				Subroutine();
 			} else if (la.kind == 22) {
-				VariableDefinitions();
+				VariableDeclarations();
 			} else {
 				TypeDefinition();
 			}
@@ -997,6 +1012,7 @@ public class Parser{
 		factory.addFunctionInterface(name, formalParameters, returnValue); 
 		Expect(6);
 	}
+
 
 
 	public void Parse(Source source) {
@@ -1174,10 +1190,9 @@ class Errors {
 			case 83: s = "invalid Factor"; break;
 			case 84: s = "invalid Random"; break;
 			case 85: s = "invalid Random"; break;
-			case 86: s = "invalid Random"; break;
-			case 87: s = "invalid MemberExpression"; break;
-			case 88: s = "invalid ArrayAccessing"; break;
-			case 89: s = "invalid ActualParameter"; break;
+			case 86: s = "invalid MemberExpression"; break;
+			case 87: s = "invalid ArrayAccessing"; break;
+			case 88: s = "invalid ActualParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
