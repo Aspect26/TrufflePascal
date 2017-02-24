@@ -4,6 +4,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalOrdinal;
+import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
@@ -54,6 +55,8 @@ class InitializationNodeGenerator {
             // variables of enum types are EnumValue objects at runtime but also the identifiers that create
             //   the enum type are EnumValue objects at run time
             return createEnumValue(frameSlot, ((EnumValueDescriptor)typeDescriptor).getEnumTypeDescriptor(), identifier);
+        } else if (typeDescriptor instanceof SetDescriptor) {
+            return createSetValue(frameSlot, (SetDescriptor)typeDescriptor);
         }
 
         return null;
@@ -109,6 +112,11 @@ class InitializationNodeGenerator {
         }
 
         return InitializationNodeFactory.create(frameSlot, currentArray);
+    }
+
+    private StatementNode createSetValue(FrameSlot frameSlot, SetDescriptor descriptor) throws LexicalException {
+        PascalOrdinal ordinal = createOrdinal(descriptor.getBaseTypeDescriptor());
+        return InitializationNodeFactory.create(frameSlot, new SetTypeValue(ordinal));
     }
 
     private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) throws LexicalException {
