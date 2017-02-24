@@ -8,9 +8,9 @@ public class ConstantsTest extends JUnitTest {
 	public void simple() {
 		String code="program main; \n"+
 				"const i=42;\n"+
-				"const d=12.5;\n"+
-				"const c=\'a\';\n"+
-				"const b=TrUe;\n"+
+				"      d=12.5;\n"+
+				"      c=\'a\';\n"+
+				"      b=TrUe;\n"+
 				"\n"+
 				"begin\n"+
 				" write(i,d,b,c);\n"+

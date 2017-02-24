@@ -999,7 +999,6 @@ public class Parser{
 	}
 
 
-
 	public void Parse(Source source) {
 		this.scanner = new Scanner(source.getInputStream());
 		la = new Token();
@@ -1012,9 +1011,8 @@ public class Parser{
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _T,_x,_T,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x, _T,_x,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
@@ -1024,7 +1022,7 @@ public class Parser{
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_T,_T, _x,_x,_x,_T, _x,_T,_x,_T, _T,_x,_x,_T, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _x,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x}
+		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x}
 
 	};
 	
@@ -1155,26 +1153,26 @@ class Errors {
 			case 62: s = "\"implementation\" expected"; break;
 			case 63: s = "??? expected"; break;
 			case 64: s = "invalid Pascal"; break;
-			case 65: s = "invalid Declaration"; break;
-			case 66: s = "invalid ConstantDefinition"; break;
-			case 67: s = "invalid Subroutine"; break;
-			case 68: s = "invalid Type"; break;
-			case 69: s = "invalid Ordinal"; break;
-			case 70: s = "invalid SignedIntegerLiteral"; break;
+			case 65: s = "invalid Subroutine"; break;
+			case 66: s = "invalid Type"; break;
+			case 67: s = "invalid Ordinal"; break;
+			case 68: s = "invalid SignedIntegerLiteral"; break;
+			case 69: s = "invalid ConstantDefinition"; break;
+			case 70: s = "invalid NumericConstant"; break;
 			case 71: s = "invalid NumericConstant"; break;
-			case 72: s = "invalid NumericConstant"; break;
-			case 73: s = "invalid LogicLiteral"; break;
-			case 74: s = "invalid IdentifierConstant"; break;
-			case 75: s = "invalid Procedure"; break;
-			case 76: s = "invalid Function"; break;
-			case 77: s = "invalid Statement"; break;
-			case 78: s = "invalid ForLoop"; break;
+			case 72: s = "invalid LogicLiteral"; break;
+			case 73: s = "invalid IdentifierConstant"; break;
+			case 74: s = "invalid Procedure"; break;
+			case 75: s = "invalid Function"; break;
+			case 76: s = "invalid Statement"; break;
+			case 77: s = "invalid ForLoop"; break;
+			case 78: s = "invalid ReadStatement"; break;
 			case 79: s = "invalid ReadStatement"; break;
-			case 80: s = "invalid ReadStatement"; break;
-			case 81: s = "invalid SignedLogicFactor"; break;
-			case 82: s = "invalid SignedFactor"; break;
+			case 80: s = "invalid SignedLogicFactor"; break;
+			case 81: s = "invalid SignedFactor"; break;
+			case 82: s = "invalid Factor"; break;
 			case 83: s = "invalid Factor"; break;
-			case 84: s = "invalid Factor"; break;
+			case 84: s = "invalid Random"; break;
 			case 85: s = "invalid Random"; break;
 			case 86: s = "invalid Random"; break;
 			case 87: s = "invalid MemberExpression"; break;
