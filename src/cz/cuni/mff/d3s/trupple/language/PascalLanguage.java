@@ -13,7 +13,7 @@ import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.Source;
 
-import cz.cuni.mff.d3s.trupple.language.parser.Parser;
+import cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.8", mimeType = "text/x-pascal")

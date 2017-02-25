@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		SubroutinesTest.class, LogicOperatorsTest.class, EnumTest.class, LogicNegationTest.class, 
 		ArrayTest.class, NestedSubroutinesTest.class, GlobalVariablesTest.class, ReadTest.class,
 		ConstantsTest.class, StringTest.class, UnitTest.class, TypeTest.class, ReferencePassingTest.class,
-		SetOperationsTest.class})
+		SetTypeTest.class, SetOperationsTest.class})
 public class TestAll {
 
 }
