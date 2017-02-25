@@ -15,6 +15,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(AssignmentNode.class)
@@ -166,6 +167,12 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
                 if ((root.isPascalArray((VirtualFrame) frameValue))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return AssignArrayNode_.create(root);
+                }
+            }
+            if (valueNodeValue instanceof SetTypeValue) {
+                if ((root.isSet((VirtualFrame) frameValue))) {
+                    CompilerDirectives.transferToInterpreterAndInvalidate();
+                    return AssignSetNode_.create(root);
                 }
             }
             return null;
@@ -460,6 +467,29 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
 
         static BaseNode_ create(AssignmentNodeGen root) {
             return new AssignArrayNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "assignSet(VirtualFrame, SetTypeValue)", value = AssignmentNode.class)
+    private static final class AssignSetNode_ extends BaseNode_ {
+
+        AssignSetNode_(AssignmentNodeGen root) {
+            super(root, 7);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof SetTypeValue) {
+                SetTypeValue valueNodeValue_ = (SetTypeValue) valueNodeValue;
+                if ((root.isSet(frameValue))) {
+                    return root.assignSet(frameValue, valueNodeValue_);
+                }
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignSetNode_(root);
         }
 
     }

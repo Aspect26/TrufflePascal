@@ -110,6 +110,9 @@ Type<out TypeDescriptor typeDescriptor>
 	}
 	"of"
 	identifier									(. typeDescriptor = factory.createArray(ordinalDimensions, t); .)
+|
+    "set" "of"
+    Ordinal<out OrdinalDescriptor ordinal>      (. typeDescriptor = factory.createSetType(ordinal); .)
 )
 .
 
@@ -527,7 +530,8 @@ LogicFactor<out ExpressionNode expression>
 =
 Arithmetic<out expression>
 [
-    (">" | ">=" | "<" | "<=" | "=" | "<>")      (. Token op = t; .)
+    (">" | ">=" | "<" | "<=" | "=" | "<>" | "in")
+                                                (. Token op = t; .)
     Arithmetic<out ExpressionNode right>        (. expression = factory.createBinaryExpression(op, expression, right); .)
 ]
 .
@@ -590,6 +594,8 @@ Factor<out ExpressionNode expression>
 |
 												(. boolean val; .)
     LogicLiteral<out val>						(. expression = factory.createLogicLiteral(val); .)
+|
+    SetConstructor<out expression>
 )
 .
 
@@ -629,6 +635,22 @@ Random<out ExpressionNode expression>
 .
 
 
+SetConstructor<out ExpressionNode expression>
+=                                               (. expression = null; .)
+"["
+    (
+                                                (. expression = factory.createSetConstructorNode(new ArrayList<>()); .)
+    |
+                                                (. List<ExpressionNode> valueNodes = new ArrayList<ExpressionNode>(); .)
+        Expression<out ExpressionNode valueNode>(. valueNodes.add(valueNode); .)
+        {
+            ","
+            Expression<out valueNode>           (. valueNodes.add(valueNode); .)
+        }
+                                                (. expression = factory.createSetConstructorNode(valueNodes); .)
+    )
+"]"
+.
 
 
 MemberExpression<out ExpressionNode expression, Token identifierName>

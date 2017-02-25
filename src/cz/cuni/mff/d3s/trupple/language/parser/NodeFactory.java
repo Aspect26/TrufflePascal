@@ -33,18 +33,8 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.IfNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.RepeatNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.CharLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.DoubleLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.LogicLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.LongLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.StringLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.AndNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.EqualsNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
@@ -108,6 +98,10 @@ public class NodeFactory {
             parser.SemErr(e.getMessage());
             return UnknownDescriptor.SINGLETON;
         }
+    }
+
+    TypeDescriptor createSetType(OrdinalDescriptor baseType) {
+        return lexicalScope.createSetType(baseType);
     }
 
     OrdinalDescriptor createSimpleOrdinalDescriptor(final int lowerBound, final int upperBound) {
@@ -393,6 +387,8 @@ public class NodeFactory {
                 return EqualsNodeGen.create(leftNode, rightNode);
             case "<>":
                 return NotNodeGen.create(EqualsNodeGen.create(leftNode, rightNode));
+            case "in":
+                return InNodeGen.create(leftNode, rightNode);
 
             default:
                 parser.SemErr("Unknown binary operator: " + operator.val);
@@ -518,6 +514,10 @@ public class NodeFactory {
 
     ExpressionNode createLogicLiteral(boolean value) {
         return new LogicLiteralNode(value);
+    }
+
+    ExpressionNode createSetConstructorNode(List<ExpressionNode> valueNodes) {
+	    return new SetConstructorNode(valueNodes);
     }
 
     ExpressionNode createNumericLiteral(Token literalToken) {

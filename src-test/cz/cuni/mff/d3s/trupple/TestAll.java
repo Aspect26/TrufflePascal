@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ WriteTest.class, ArithmeticTest.class, IfTest.class, CaseTest.class, LoopsTest.class,
 		SubroutinesTest.class, LogicOperatorsTest.class, EnumTest.class, LogicNegationTest.class, 
 		ArrayTest.class, NestedSubroutinesTest.class, GlobalVariablesTest.class, ReadTest.class,
-		ConstantsTest.class, StringTest.class, UnitTest.class, TypeTest.class, ReferencePassingTest.class})
+		ConstantsTest.class, StringTest.class, UnitTest.class, TypeTest.class, ReferencePassingTest.class,
+		SetOperationsTest.class})
 public class TestAll {
 
 }

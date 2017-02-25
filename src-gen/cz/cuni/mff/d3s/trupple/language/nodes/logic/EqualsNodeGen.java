@@ -13,6 +13,7 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(EqualsNode.class)
@@ -117,6 +118,9 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
             }
             if (leftNodeValue instanceof EnumValue && rightNodeValue instanceof EnumValue) {
                 return Equals2Node_.create(root);
+            }
+            if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
+                return Equals3Node_.create(root);
             }
             return null;
         }
@@ -368,6 +372,46 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
 
         static BaseNode_ create(EqualsNodeGen root) {
             return new Equals2Node_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "equals(SetTypeValue, SetTypeValue)", value = EqualsNode.class)
+    private static final class Equals3Node_ extends BaseNode_ {
+
+        Equals3Node_(EqualsNodeGen root) {
+            super(root, 4);
+        }
+
+        @Override
+        public boolean executeBoolean(VirtualFrame frameValue) {
+            SetTypeValue leftNodeValue_;
+            try {
+                leftNodeValue_ = PascalTypesGen.expectSetTypeValue(root.leftNode_.executeGeneric(frameValue));
+            } catch (UnexpectedResultException ex) {
+                Object rightNodeValue = executeRightNode_(frameValue);
+                return getNext().executeBoolean_(frameValue, ex.getResult(), rightNodeValue);
+            }
+            SetTypeValue rightNodeValue_;
+            try {
+                rightNodeValue_ = PascalTypesGen.expectSetTypeValue(root.rightNode_.executeGeneric(frameValue));
+            } catch (UnexpectedResultException ex) {
+                return getNext().executeBoolean_(frameValue, leftNodeValue_, ex.getResult());
+            }
+            return root.equals(leftNodeValue_, rightNodeValue_);
+        }
+
+        @Override
+        public boolean executeBoolean_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
+            if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
+                SetTypeValue leftNodeValue_ = (SetTypeValue) leftNodeValue;
+                SetTypeValue rightNodeValue_ = (SetTypeValue) rightNodeValue;
+                return root.equals(leftNodeValue_, rightNodeValue_);
+            }
+            return getNext().executeBoolean_(frameValue, leftNodeValue, rightNodeValue);
+        }
+
+        static BaseNode_ create(EqualsNodeGen root) {
+            return new Equals3Node_(root);
         }
 
     }
