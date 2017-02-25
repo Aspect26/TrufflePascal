@@ -108,4 +108,62 @@ public class SetOperationsTest extends JUnitTest {
         String output="truefalse";
         this.test(code, output);
     }
+
+    @Test
+    public void differenceTest() {
+        String code="program main;\n"+
+                "\n"+
+                "var s1, s2, s3: set of 1..5;\n"+
+                "begin\n"+
+                " s1 := [1,2,3,4,5];\n"+
+                " s2 := [1,3,5];\n"+
+                " s3 := s1 - s2;\n"+
+                " write(1 in s3);\n"+
+                " write(2 in s3);\n"+
+                " write(3 in s3);\n"+
+                " write(4 in s3);\n"+
+                " write(5 in s3);\n"+
+                "end.";
+        String output="falsetruefalsetruefalse";
+        this.test(code, output);
+    }
+
+    @Test
+    public void intersectionTest() {
+        String code="program main;\n"+
+                "\n"+
+                "var s1, s2, s3: set of 1..8;\n"+
+                "begin\n"+
+                " s1 := [1,2,3,4,5];\n"+
+                " s2 := [1,3,5];\n"+
+                " s3 := s1 * s2;\n"+
+                " write(1 in s3);\n"+
+                " write(2 in s3);\n"+
+                " write(3 in s3);\n"+
+                " write(4 in s3);\n"+
+                " write(5 in s3);\n"+
+                " write(6 in s3);\n"+
+                "end.";
+        String output="truefalsetruefalsetruefalse";
+        this.test(code, output);
+    }
+
+    @Test
+    public void unionTest() {
+        String code="program main;\n"+
+                "\n"+
+                "var s1, s2, s3: set of 1..5;\n"+
+                "begin\n"+
+                " s1 := [1];\n"+
+                " s2 := [3,4];\n"+
+                " s3 := s1 + s2;\n"+
+                " write(1 in s3);\n"+
+                " write(2 in s3);\n"+
+                " write(3 in s3);\n"+
+                " write(4 in s3);\n"+
+                " write(5 in s3);\n"+
+                "end.";
+        String output="truefalsetruetruefalse";
+        this.test(code, output);
+    }
 }

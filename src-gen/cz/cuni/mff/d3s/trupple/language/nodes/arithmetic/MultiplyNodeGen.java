@@ -12,6 +12,7 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
+import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(MultiplyNode.class)
@@ -123,6 +124,9 @@ public final class MultiplyNodeGen extends MultiplyNode implements SpecializedNo
                 if (leftNodeValue instanceof Double) {
                     return Mul3Node_.create(root);
                 }
+            }
+            if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
+                return Mul4Node_.create(root);
             }
             return null;
         }
@@ -380,6 +384,28 @@ public final class MultiplyNodeGen extends MultiplyNode implements SpecializedNo
 
         static BaseNode_ create(MultiplyNodeGen root) {
             return new Mul3Node_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "mul(SetTypeValue, SetTypeValue)", value = MultiplyNode.class)
+    private static final class Mul4Node_ extends BaseNode_ {
+
+        Mul4Node_(MultiplyNodeGen root) {
+            super(root, 5);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
+            if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
+                SetTypeValue leftNodeValue_ = (SetTypeValue) leftNodeValue;
+                SetTypeValue rightNodeValue_ = (SetTypeValue) rightNodeValue;
+                return root.mul(leftNodeValue_, rightNodeValue_);
+            }
+            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
+        }
+
+        static BaseNode_ create(MultiplyNodeGen root) {
+            return new Mul4Node_(root);
         }
 
     }

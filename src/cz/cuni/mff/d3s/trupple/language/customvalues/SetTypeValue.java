@@ -45,4 +45,25 @@ public class SetTypeValue implements ICustomValue {
     public boolean contains(Object o) {
         return this.data.contains(o);
     }
+
+    public static SetTypeValue union(SetTypeValue left, SetTypeValue right) {
+        SetTypeValue result = left.createDeepCopy();
+        result.getData().addAll(right.getData());
+
+        return result;
+    }
+
+    public static SetTypeValue difference(SetTypeValue left, SetTypeValue right) {
+        SetTypeValue result = left.createDeepCopy();
+        result.getData().removeAll(right.getData());
+
+        return result;
+    }
+
+    public static SetTypeValue intersect(SetTypeValue left, SetTypeValue right) {
+        SetTypeValue result = left.createDeepCopy();
+        result.getData().retainAll(right.getData());
+
+        return result;
+    }
 }
