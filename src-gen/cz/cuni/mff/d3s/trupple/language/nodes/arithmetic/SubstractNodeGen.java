@@ -12,6 +12,7 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
+import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(SubstractNode.class)
@@ -123,6 +124,9 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
                 if (leftNodeValue instanceof Double) {
                     return Sub3Node_.create(root);
                 }
+            }
+            if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
+                return Sub4Node_.create(root);
             }
             return null;
         }
@@ -380,6 +384,28 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
 
         static BaseNode_ create(SubstractNodeGen root) {
             return new Sub3Node_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "sub(SetTypeValue, SetTypeValue)", value = SubstractNode.class)
+    private static final class Sub4Node_ extends BaseNode_ {
+
+        Sub4Node_(SubstractNodeGen root) {
+            super(root, 5);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
+            if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
+                SetTypeValue leftNodeValue_ = (SetTypeValue) leftNodeValue;
+                SetTypeValue rightNodeValue_ = (SetTypeValue) rightNodeValue;
+                return root.sub(leftNodeValue_, rightNodeValue_);
+            }
+            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
+        }
+
+        static BaseNode_ create(SubstractNodeGen root) {
+            return new Sub4Node_(root);
         }
 
     }

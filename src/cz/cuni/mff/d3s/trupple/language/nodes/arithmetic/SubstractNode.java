@@ -4,6 +4,7 @@ import com.oracle.truffle.api.ExactMath;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
 
 @NodeInfo(shortName = "-")
@@ -27,5 +28,10 @@ public abstract class SubstractNode extends BinaryNode {
 	@Specialization
 	protected double sub(double left, double right) {
 		return left - right;
+	}
+
+	@Specialization
+	protected SetTypeValue sub(SetTypeValue left, SetTypeValue right) {
+		return SetTypeValue.difference(left, right);
 	}
 }
