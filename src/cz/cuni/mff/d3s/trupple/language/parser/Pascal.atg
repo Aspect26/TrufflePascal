@@ -530,7 +530,8 @@ LogicFactor<out ExpressionNode expression>
 =
 Arithmetic<out expression>
 [
-    (">" | ">=" | "<" | "<=" | "=" | "<>")      (. Token op = t; .)
+    (">" | ">=" | "<" | "<=" | "=" | "<>" | "in")
+                                                (. Token op = t; .)
     Arithmetic<out ExpressionNode right>        (. expression = factory.createBinaryExpression(op, expression, right); .)
 ]
 .

@@ -34,12 +34,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.RepeatNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.AndNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.EqualsNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.logic.OrNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
@@ -392,6 +387,8 @@ public class NodeFactory {
                 return EqualsNodeGen.create(leftNode, rightNode);
             case "<>":
                 return NotNodeGen.create(EqualsNodeGen.create(leftNode, rightNode));
+            case "in":
+                return InNodeGen.create(leftNode, rightNode);
 
             default:
                 parser.SemErr("Unknown binary operator: " + operator.val);

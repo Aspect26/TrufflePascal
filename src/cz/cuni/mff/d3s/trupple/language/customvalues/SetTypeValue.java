@@ -20,6 +20,10 @@ public class SetTypeValue implements ICustomValue {
         return this;
     }
 
+    public Set<Object> getData() {
+        return this.data;
+    }
+
     public SetTypeValue createDeepCopy() {
         Set<Object> dataCopy = new HashSet<>();
         for (Object item : data) {
@@ -27,5 +31,18 @@ public class SetTypeValue implements ICustomValue {
         }
 
         return new SetTypeValue(dataCopy);
+    }
+
+    public boolean equals(SetTypeValue comp) {
+        Set<Object> compData = comp.getData();
+        return this.data.containsAll(compData) && compData.containsAll(this.data);
+    }
+
+    public int getSize() {
+        return this.data.size();
+    }
+
+    public boolean contains(Object o) {
+        return this.data.contains(o);
     }
 }
