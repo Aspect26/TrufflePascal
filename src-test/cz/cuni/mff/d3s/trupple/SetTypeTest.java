@@ -5,7 +5,7 @@ import org.junit.Test;
 public class SetTypeTest extends JUnitTest {
 
     @Test
-    public void setTypeVariableDeclarations() {
+    public void setTypeVariableDeclarationsTest() {
         String code="program main;\n"+
                 "\n"+
                 "var s1: set of char;\n"+
@@ -20,7 +20,7 @@ public class SetTypeTest extends JUnitTest {
     }
 
     @Test
-    public void setTypeDefinitions() {
+    public void setTypeDefinitionsTest() {
         String code="program main;\n"+
                 "\n"+
                 "type\n"+
@@ -35,6 +35,36 @@ public class SetTypeTest extends JUnitTest {
                 " write(\'Unicorn invasion of dundee!\');\n"+
                 "end.";
         String output="Unicorn invasion of dundee!";
+        this.test(code, output);
+    }
+
+    @Test
+    public void setConstructorAndAssignmentTest() {
+        String code="program main;\n"+
+                "\n"+
+                "var s1: set of 1..10;\n"+
+                "\n"+
+                "begin\n"+
+                " s1 := [3,5,9,2];\n"+
+                " write(\'Hail to hoots!\');\n"+
+                "end.";
+        String output="Hail to hoots!";
+        this.test(code, output);
+    }
+
+    @Test
+    public void setVariablesAsssignment() {
+        String code="program main;\n"+
+                "\n"+
+                "var s1: set of 1..10;\n"+
+                " s2: set of 1..10;\n"+
+                "\n"+
+                "begin\n"+
+                " s1 := [3,5,9,2];\n"+
+                " s2 := s1;\n"+
+                " write(\'The mighty legend of Crail.\');\n"+
+                "end.";
+        String output="The mighty legend of Crail.";
         this.test(code, output);
     }
 }

@@ -33,12 +33,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.IfNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.RepeatNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.CharLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.DoubleLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.LogicLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.LongLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.StringLiteralNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.AndNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.EqualsNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanNodeGen;
@@ -522,6 +517,10 @@ public class NodeFactory {
 
     ExpressionNode createLogicLiteral(boolean value) {
         return new LogicLiteralNode(value);
+    }
+
+    ExpressionNode createSetConstructorNode(List<ExpressionNode> valueNodes) {
+	    return new SetConstructorNode(valueNodes);
     }
 
     ExpressionNode createNumericLiteral(Token literalToken) {

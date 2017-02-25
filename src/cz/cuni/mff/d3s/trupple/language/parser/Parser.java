@@ -506,7 +506,7 @@ public class Parser{
 			statement = factory.createNopStatement(); 
 			break;
 		}
-		case 1: case 2: case 3: case 4: case 17: case 20: case 21: case 48: case 58: case 59: case 60: {
+		case 1: case 2: case 3: case 4: case 15: case 17: case 20: case 21: case 48: case 58: case 59: case 60: {
 			statement = Expression();
 			break;
 		}
@@ -859,6 +859,10 @@ public class Parser{
 			expression = factory.createLogicLiteral(val); 
 			break;
 		}
+		case 15: {
+			expression = SetConstructor();
+			break;
+		}
 		default: SynErr(84); break;
 		}
 		return expression;
@@ -899,6 +903,27 @@ public class Parser{
 		return expression;
 	}
 
+	ExpressionNode  SetConstructor() {
+		ExpressionNode  expression;
+		expression = null; 
+		Expect(15);
+		if (la.kind == 16) {
+			expression = factory.createSetConstructorNode(new ArrayList<>()); 
+		} else if (StartOf(11)) {
+			List<ExpressionNode> valueNodes = new ArrayList<ExpressionNode>(); 
+			ExpressionNode valueNode = Expression();
+			valueNodes.add(valueNode); 
+			while (la.kind == 8) {
+				Get();
+				valueNode = Expression();
+				valueNodes.add(valueNode); 
+			}
+			expression = factory.createSetConstructorNode(valueNodes); 
+		} else SynErr(88);
+		Expect(16);
+		return expression;
+	}
+
 	ExpressionNode  SubroutineCall(Token identifierToken) {
 		ExpressionNode  expression;
 		Expect(17);
@@ -933,7 +958,7 @@ public class Parser{
 			ExpressionNode value = Expression();
 			expression = factory.createArrayIndexAssignment( 
 			identifierName, indexingNodes, value); 
-		} else SynErr(88);
+		} else SynErr(89);
 		return expression;
 	}
 
@@ -959,7 +984,7 @@ public class Parser{
 			parameter = factory.createReferenceNode(t); 
 		} else if (StartOf(11)) {
 			parameter = Expression();
-		} else SynErr(89);
+		} else SynErr(90);
 		return parameter;
 	}
 
@@ -1035,14 +1060,14 @@ public class Parser{
 		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_x, _T,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x},
+		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_x, _T,_x,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_T,_T, _x,_x,_x,_x, _T,_x,_T,_x, _T,_T,_x,_x, _T,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x},
 		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
 
 	};
@@ -1197,8 +1222,9 @@ class Errors {
 			case 85: s = "invalid Random"; break;
 			case 86: s = "invalid Random"; break;
 			case 87: s = "invalid MemberExpression"; break;
-			case 88: s = "invalid ArrayAccessing"; break;
-			case 89: s = "invalid ActualParameter"; break;
+			case 88: s = "invalid SetConstructor"; break;
+			case 89: s = "invalid ArrayAccessing"; break;
+			case 90: s = "invalid ActualParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

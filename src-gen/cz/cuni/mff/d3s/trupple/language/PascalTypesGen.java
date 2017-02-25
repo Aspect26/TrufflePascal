@@ -6,6 +6,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
@@ -141,6 +142,22 @@ public final class PascalTypesGen extends PascalTypes {
     public static Reference expectReference(Object value) throws UnexpectedResultException {
         if (value instanceof Reference) {
             return (Reference) value;
+        }
+        throw new UnexpectedResultException(value);
+    }
+
+    public static boolean isSetTypeValue(Object value) {
+        return value instanceof SetTypeValue;
+    }
+
+    public static SetTypeValue asSetTypeValue(Object value) {
+        assert value instanceof SetTypeValue : "PascalTypesGen.asSetTypeValue: SetTypeValue expected";
+        return (SetTypeValue) value;
+    }
+
+    public static SetTypeValue expectSetTypeValue(Object value) throws UnexpectedResultException {
+        if (value instanceof SetTypeValue) {
+            return (SetTypeValue) value;
         }
         throw new UnexpectedResultException(value);
     }

@@ -593,6 +593,8 @@ Factor<out ExpressionNode expression>
 |
 												(. boolean val; .)
     LogicLiteral<out val>						(. expression = factory.createLogicLiteral(val); .)
+|
+    SetConstructor<out expression>
 )
 .
 
@@ -632,6 +634,22 @@ Random<out ExpressionNode expression>
 .
 
 
+SetConstructor<out ExpressionNode expression>
+=                                               (. expression = null; .)
+"["
+    (
+                                                (. expression = factory.createSetConstructorNode(new ArrayList<>()); .)
+    |
+                                                (. List<ExpressionNode> valueNodes = new ArrayList<ExpressionNode>(); .)
+        Expression<out ExpressionNode valueNode>(. valueNodes.add(valueNode); .)
+        {
+            ","
+            Expression<out valueNode>           (. valueNodes.add(valueNode); .)
+        }
+                                                (. expression = factory.createSetConstructorNode(valueNodes); .)
+    )
+"]"
+.
 
 
 MemberExpression<out ExpressionNode expression, Token identifierName>

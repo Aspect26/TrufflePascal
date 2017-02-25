@@ -12,6 +12,7 @@ import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeChild("valueNode")
@@ -96,9 +97,37 @@ public abstract class AssignmentNode extends ExpressionNode {
         return arrayCopy;
 	}
 
+    @Specialization(guards = "isSet(frame)")
+    protected Object assignSet(VirtualFrame frame, SetTypeValue set) {
+        SetTypeValue setCopy = set.createDeepCopy();
+
+        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
+        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
+        if (referenceVariable == null) {
+            slotFrame.setObject(getSlot(), setCopy);
+        } else {
+            referenceVariable.getFromFrame().setObject(referenceVariable.getFrameSlot(), setCopy);
+        }
+        return setCopy;
+    }
+
 	/**
 	 * guard functions
 	 */
+	// TODO: refactor these 3 functions below -> too much duplicits
+    protected boolean isSet(VirtualFrame frame) {
+        frame = this.getFrameContainingSlot(frame, getSlot());
+        if(frame == null) {
+            return false;
+        }
+        try {
+            Object obj = frame.getObject(getSlot());
+            return obj instanceof SetTypeValue;
+        } catch (FrameSlotTypeException e) {
+            return false;
+        }
+    }
+
 	protected boolean isPascalArray(VirtualFrame frame) {
 		frame = this.getFrameContainingSlot(frame, getSlot());
 		if(frame == null) {

@@ -115,8 +115,7 @@ class InitializationNodeGenerator {
     }
 
     private StatementNode createSetValue(FrameSlot frameSlot, SetDescriptor descriptor) throws LexicalException {
-        PascalOrdinal ordinal = createOrdinal(descriptor.getBaseTypeDescriptor());
-        return InitializationNodeFactory.create(frameSlot, new SetTypeValue(ordinal));
+        return InitializationNodeFactory.create(frameSlot, new SetTypeValue());
     }
 
     private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) throws LexicalException {
