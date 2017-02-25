@@ -348,6 +348,29 @@ public class NodeFactory {
         return new CaseNode(data.caseExpression, indexes, statements, data.elseNode);
     }
 
+    StatementNode createParameterlessSubroutineCall(Token identifierToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+
+        LexicalScope ls = this.lexicalScope;
+        while (ls != null) {
+            if (ls.containsLocalIdentifier(identifier)){
+                if (ls.isParameterlessSubroutine(identifier)) {
+                    PascalContext context = ls.getContext();
+                    ExpressionNode literal = new FunctionLiteralNode(context, identifier);
+                    return this.createCall(literal, new ArrayList<>());
+                } else {
+                    parser.SemErr(identifier + " is not a parameterless subroutine.");
+                    return null;
+                }
+            } else {
+                ls = ls.getOuterScope();
+            }
+        }
+
+        parser.SemErr("Unknown identifier: " + identifier);
+        return null;
+    }
+
     StatementNode createNopStatement() {
         return new NopNode();
     }

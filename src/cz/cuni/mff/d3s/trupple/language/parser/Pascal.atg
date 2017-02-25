@@ -361,8 +361,6 @@ Statement<out StatementNode statement>
 (
                                                 (. statement = factory.createNopStatement(); .)
 |
-    Expression<out statement> 
-|
     IfStatement<out statement>
 |
 	ForLoop<out statement>
@@ -377,12 +375,39 @@ Statement<out StatementNode statement>
 |
     Block<out statement>
 |
+    IdentifierBeginningStatement<out statement>
+|
 	ReadStatement<out statement>	
 |
 	"randomize"									(. statement = factory.createRandomizeNode(); .)		
 )
 .
 
+
+
+IdentifierBeginningStatement<out StatementNode statement>
+=                                               (. statement = null; .)
+identifier                                      (. Token identifierToken = t; .)
+(
+                                                (. statement = factory.createParameterlessSubroutineCall(identifierToken); .)
+|
+    SubroutineCall<out statement, identifierToken>
+|
+    AssignmentAfterIdentifierPart<out statement, identifierToken>
+)
+.
+
+
+
+AssignmentAfterIdentifierPart<out StatementNode statement, Token identifierToken>
+=
+                                                (. List<ExpressionNode> indexNodes = null; .)
+    [
+        ArrayIndex<out indexNodes>
+    ]
+    ":="
+    Expression<out ExpressionNode value>        (. statement = (indexNodes == null)? factory.createAssignment(identifierToken, value) : factory.createArrayIndexAssignment(identifierToken, indexNodes, value); .)
+.
 
 
 
@@ -658,10 +683,7 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
 (                                               
 	SubroutineCall<out expression, identifierName>
 |
-    ":="
-    Expression<out ExpressionNode value>        (. expression = factory.createAssignment(identifierName, value); .)
-|
-	ArrayAccessing<out expression, identifierName>
+	ArrayIndex<. out List<ExpressionNode> indexNodes .>  (. expression = factory.createReadArrayValue(identifierName, indexNodes); .)
 )
 .
 
@@ -703,24 +725,18 @@ ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token s
 .
 
 
-ArrayAccessing<out ExpressionNode expression, Token identifierName>
-=												(. expression = null; .)
-												(. List<ExpressionNode> indexingNodes = new ArrayList<>(); .)
+
+ArrayIndex<. out List<ExpressionNode> indexNodes .>
+=
+												(. indexNodes = new ArrayList<>(); .)
 												(. ExpressionNode indexingNode = null; .)
 "["
-	Expression<out indexingNode>	            (. indexingNodes.add(indexingNode); .)
+	Expression<out indexingNode>	            (. indexNodes.add(indexingNode); .)
 	{
 		","
-		Expression<out indexingNode>	        (. indexingNodes.add(indexingNode); .)
+		Expression<out indexingNode>	        (. indexNodes.add(indexingNode); .)
 	}
 "]"
-(
-												(. expression = factory.createReadArrayValue(identifierName, indexingNodes); .)
-|
-	":="
-	Expression<out ExpressionNode value>		(. expression = factory.createArrayIndexAssignment( .)
-												(.		identifierName, indexingNodes, value); .)
-)
 .
 
 
