@@ -30,12 +30,21 @@ public class IdentifiersTable {
     private FrameDescriptor frameDescriptor;
 
     public IdentifiersTable() {
+        this.initialize();
+        addBuiltinTypes();
+        addBuiltinFunctions();
+    }
+
+    public IdentifiersTable(IdentifiersTable parentTable) {
+        this.initialize();
+        addBuiltinFunctions();
+        addParentTypes(parentTable.getAllTypes());
+    }
+
+    private void initialize() {
         this.identifiersMap = new HashMap<>();
         this.typeDescriptors = new HashMap<>();
         this.frameDescriptor = new FrameDescriptor();
-
-        addBuiltinTypes();
-        addBuiltinFunctions();
     }
 
     private void addBuiltinTypes() {
@@ -58,6 +67,10 @@ public class IdentifiersTable {
         identifiersMap.put("readln", new BuiltinProcedureDescriptor.Readln());
     }
 
+    private void addParentTypes(Map<String, TypeDescriptor> parentTypes) {
+        this.typeDescriptors.putAll(parentTypes);
+    }
+
     public FrameSlot getFrameSlot(String identifier) {
         return this.frameDescriptor.findFrameSlot(identifier);
     }
@@ -76,6 +89,10 @@ public class IdentifiersTable {
 
     public Map<String, TypeDescriptor> getAll() {
         return this.identifiersMap;
+    }
+
+    Map<String, TypeDescriptor> getAllTypes() {
+        return this.typeDescriptors;
     }
 
     public boolean containsIdentifier(String identifier) {
