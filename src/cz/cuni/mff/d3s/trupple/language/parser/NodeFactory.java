@@ -26,7 +26,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.CaseNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.ForNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.IfNode;
@@ -40,9 +40,6 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.CaseStatementData;
-import cz.cuni.mff.d3s.trupple.language.parser.Token;
-import cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutineRegistry;
 
@@ -329,7 +326,7 @@ public class NodeFactory {
         if (!lexicalScope.isInLoop()) {
             parser.SemErr("Break outside a loop: ");
         }
-        return new BreakNode();
+        return new BreakNodeTP();
     }
 
     public void finishLoop() {

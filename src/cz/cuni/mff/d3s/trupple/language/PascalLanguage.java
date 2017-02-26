@@ -98,9 +98,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	 * *************************************************************************
 	 * START FROM CODES
 	 */
-	public static void startFromCodes(String sourceCode, List<String> imports, String codeDescription) {
-		Parser parser = new Parser();
-
+	public static void startFromCodes(String sourceCode, List<String> imports, IParser parser) {
 		int i = 0;
 		for (String imp : imports) {
 			parser.Parse(Source.fromText(imp, "import" + (i++)));
@@ -110,13 +108,13 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 			}
 		}
 
-		parser.Parse(Source.fromText(sourceCode, codeDescription));
+		parser.Parse(Source.fromText(sourceCode, "unnamed_code"));
 		if (parser.hadErrors()) {
 			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
 			return;
 		}
 
-		Truffle.getRuntime().createCallTarget(parser.mainNode).call();
+		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call();
 	}
 
 	public Node createFindContextNode1() {

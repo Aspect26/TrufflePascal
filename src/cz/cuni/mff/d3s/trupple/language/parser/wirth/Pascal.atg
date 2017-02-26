@@ -373,8 +373,6 @@ Statement<out StatementNode statement>
 |
 	CaseStatement<out statement>
 |
-	"break"										(. statement = factory.createBreak(); .)
-|
     Block<out statement>
 |
 	ReadStatement<out statement>	

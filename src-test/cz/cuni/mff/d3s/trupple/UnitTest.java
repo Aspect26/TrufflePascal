@@ -43,6 +43,6 @@ public class UnitTest extends JUnitTest {
                 "end.\n";
         String output = "8-2";
 
-        this.test(source, Arrays.asList(this.import_math), "math_import_test", output);
+        this.test(source, Arrays.asList(this.import_math), output);
     }
 }

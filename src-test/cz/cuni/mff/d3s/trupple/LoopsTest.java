@@ -84,7 +84,7 @@ public class LoopsTest extends JUnitTest{
 	}
 	
 	@Test
-	public void whileBreakTest(){
+	public void whileBreakTestTP(){
 		String code = "program main; \n"+
 				"var j:integer;\n" +
 				"\n" + 
@@ -100,6 +100,6 @@ public class LoopsTest extends JUnitTest{
 				" write(j);\n" + 
 				"end.";
 		
-		test(code, "18");
+		test(code, "18", true);
 	}
 }
