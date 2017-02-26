@@ -1,11 +1,8 @@
 package cz.cuni.mff.d3s.trupple;
 
-import org.junit.Ignore;
 import org.junit.Test;
+import java.util.Collections;
 
-import java.util.Arrays;
-
-@Ignore
 public class UnitTest extends JUnitTest {
 
     private String import_math="UNIT math;\n"+
@@ -43,6 +40,6 @@ public class UnitTest extends JUnitTest {
                 "end.\n";
         String output = "8-2";
 
-        this.test(source, Arrays.asList(this.import_math), output);
+        this.test(source, Collections.singletonList(this.import_math), output, true);
     }
 }

@@ -145,14 +145,8 @@ public class Parser implements IParser {
 	}
 
 	void Unit() {
-		Expect(62);
-		Expect(1);
-		factory.startUnit(t); 
-		Expect(6);
-		Expect(63);
+		UnitHeader();
 		InterfaceSection();
-		Expect(64);
-		factory.leaveUnitInterfaceSection(); 
 		ImplementationSection();
 		Expect(30);
 		factory.endUnit(); 
@@ -1007,7 +1001,15 @@ public class Parser implements IParser {
 		return parameter;
 	}
 
+	void UnitHeader() {
+		Expect(62);
+		Expect(1);
+		factory.startUnit(t); 
+		Expect(6);
+	}
+
 	void InterfaceSection() {
+		Expect(63);
 		if (la.kind == 9) {
 			TypeDefinitions();
 		}
@@ -1024,6 +1026,7 @@ public class Parser implements IParser {
 	}
 
 	void ImplementationSection() {
+		Expect(64);
 		while (StartOf(12)) {
 			if (la.kind == 25 || la.kind == 27) {
 				Subroutine();

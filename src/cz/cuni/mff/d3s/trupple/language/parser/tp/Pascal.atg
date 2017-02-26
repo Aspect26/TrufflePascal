@@ -743,20 +743,25 @@ ArrayIndex<. out List<ExpressionNode> indexNodes .>
 
 Unit
 =
-"unit"
-identifier										(. factory.startUnit(t); .)
-";"
-"interface"
+UnitHeader
 InterfaceSection
-"implementation"								(. factory.leaveUnitInterfaceSection(); .)
 ImplementationSection
 "end"											(. factory.endUnit(); .)
 "."
 .
 
 
+UnitHeader
+=
+"unit"
+identifier										(. factory.startUnit(t); .)
+";"
+.
+
+
 InterfaceSection
 =
+"interface"
 [ TypeDefinitions ]
 [ VariableDeclarations ]
 {
@@ -775,7 +780,7 @@ ProcedureHeading
 "procedure"
 identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ] 		
+[ FormalParameterList<out formalParameters> ]
 												(. factory.addProcedureInterface(name, formalParameters); .)
 ";"
 .
@@ -787,7 +792,7 @@ FunctionHeading
 "function"
 identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ] 
+[ FormalParameterList<out formalParameters> ]
 ":"
 identifier										(. String returnValue = t.val; .)
 												(. factory.addFunctionInterface(name, formalParameters, returnValue); .)
@@ -798,6 +803,7 @@ identifier										(. String returnValue = t.val; .)
 
 ImplementationSection
 =
+"implementation"
 {
 	(
 		Subroutine

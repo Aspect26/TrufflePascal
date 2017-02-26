@@ -64,24 +64,28 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	 * *************************************************************************
 	 * ******* START FROM FILE PATHS
 	 */
-	public static void start(String sourcePath, List<String> imports, IParser parser) throws IOException {
-		for (String dir : imports) {
-			try{
-				Files.walk(Paths.get(dir)).forEach(filePath -> {
-					if(filePath.toString().endsWith(".pas")){
-						try{
-							parser.Parse(Source.fromFileName(filePath.toString()));
-							if (parser.hadErrors()) {
-								System.err.println("Errors while parsing import file " + filePath + ".");
-								return;
+	public static void start(String sourcePath, List<String> imports, boolean useTPExtension) throws IOException {
+		IParser parser = (useTPExtension)? new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser() : new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser();
+
+		if (useTPExtension) {
+			for (String dir : imports) {
+				try {
+					Files.walk(Paths.get(dir)).forEach(filePath -> {
+						if (filePath.toString().endsWith(".pas")) {
+							try {
+								parser.Parse(Source.fromFileName(filePath.toString()));
+								if (parser.hadErrors()) {
+									System.err.println("Errors while parsing import file " + filePath + ".");
+									return;
+								}
+							} catch (IOException e) {
+
 							}
-						} catch (IOException e){
-						
 						}
-					}
-				});
-			} catch(NoSuchFileException e){
-				System.err.println("No such file or directory " + e.getFile());
+					});
+				} catch (NoSuchFileException e) {
+					System.err.println("No such file or directory " + e.getFile());
+				}
 			}
 		}
 		
@@ -98,15 +102,19 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	 * *************************************************************************
 	 * START FROM CODES
 	 */
-	public static void startFromCodes(String sourceCode, List<String> imports, IParser parser) {
-		int i = 0;
-		for (String imp : imports) {
-			parser.Parse(Source.fromText(imp, "import" + (i++)));
-			if (parser.hadErrors()) {
-				System.err.println("Errors while parsing import file " + imp + ".");
-				return;
-			}
-		}
+	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension) {
+        IParser parser = (useTPExtension)? new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser() : new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser();
+
+        if (useTPExtension) {
+            int i = 0;
+            for (String imp : imports) {
+                parser.Parse(Source.fromText(imp, "import" + (i++)));
+                if (parser.hadErrors()) {
+                    System.err.println("Errors while parsing import file " + imp + ".");
+                    return;
+                }
+            }
+        }
 
 		parser.Parse(Source.fromText(sourceCode, "unnamed_code"));
 		if (parser.hadErrors()) {

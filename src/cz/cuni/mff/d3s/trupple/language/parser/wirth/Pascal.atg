@@ -32,14 +32,10 @@ PRODUCTIONS
 
 Pascal
 =
-(
-    Program
-	[ ImportsSection ]
-	Declarations
-	MainFunction
-|
-	Unit
-)
+Program
+[ ImportsSection ]
+Declarations
+MainFunction
 .
 
 
@@ -737,74 +733,5 @@ ArrayIndex<. out List<ExpressionNode> indexNodes .>
 "]"
 .
 
-
-
-Unit
-=
-"unit"
-identifier										(. factory.startUnit(t); .)
-";"
-"interface"
-InterfaceSection
-"implementation"								(. factory.leaveUnitInterfaceSection(); .)
-ImplementationSection
-"end"											(. factory.endUnit(); .)
-"."
-.
-
-
-InterfaceSection
-=
-[ TypeDefinitions ]
-[ VariableDeclarations ]
-{
-	(
-		ProcedureHeading
-	|
-		FunctionHeading
-	)
-}
-.
-
-
-
-ProcedureHeading
-=
-"procedure"
-identifier										(. Token name = t; .)
-												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ] 		
-												(. factory.addProcedureInterface(name, formalParameters); .)
-";"
-.
-
-
-
-FunctionHeading
-=
-"function"
-identifier										(. Token name = t; .)
-												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ] 
-":"
-identifier										(. String returnValue = t.val; .)
-												(. factory.addFunctionInterface(name, formalParameters, returnValue); .)
-";"
-.
-
-
-
-ImplementationSection
-=
-{
-	(
-		Subroutine
-	|
-		VariableDeclarations
-	|
-		TypeDefinition
-	)
-}
-.
 
 END Pascal.

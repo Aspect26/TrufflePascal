@@ -52,9 +52,7 @@ public abstract class JUnitTest {
 
 	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension) {
 		setUpStreams();
-		// TODO: solve this duplicity with task 27
-        IParser parser = (useTPExtension)? new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser() : new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser();
-		PascalLanguage.startFromCodes(sourceCode, imports, parser);
+		PascalLanguage.startFromCodes(sourceCode, imports, useTPExtension);
 		assertEquals(expectedOutput, output.toString() + error.toString());
 	}
 }

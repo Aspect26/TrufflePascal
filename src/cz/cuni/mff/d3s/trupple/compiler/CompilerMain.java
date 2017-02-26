@@ -26,6 +26,7 @@ public class CompilerMain {
 		@Option(name="-I", handler=ImportsOptionHandler.class, usage="specifies directories, where unit .tpa files are located")
 	    public List<String> imports = new ArrayList<>();
 
+		// TODO: crete custom handler for this
 		@Option(name="-std", usage="sets the stanadrd to be used")
         public String standard = STANDARD_WIRTH;
 		
@@ -65,16 +66,9 @@ public class CompilerMain {
 			return;
 		}
 
-        IParser pascalParser;
-		switch (settings.standard) {
-            case Settings.STANDARD_WIRTH:
-                pascalParser = new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser(); break;
-            case Settings.STANDARD_TP:
-                pascalParser = new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser(); break;
-            default:
-                System.err.println("Wrong standard speification (" + settings.standard + "), please use one of 'wirth' or 'turbo'.");
-                return;
-        }
+		if (!settings.standard .equals(Settings.STANDARD_TP) && !settings.standard.equals(Settings.STANDARD_WIRTH)) {
+			System.err.println("Unknown stanard specified: " + settings.standard + ". Please use '" + Settings.STANDARD_TP + "' or '" + Settings.STANDARD_WIRTH + "'");
+		}
 
 		// start interpreter
 		if (settings.verbose) {
@@ -83,7 +77,7 @@ public class CompilerMain {
 			System.out.println("----------------------------------");
 		}
 
-		PascalLanguage.start(settings.sourcePath, settings.imports, pascalParser);
+		PascalLanguage.start(settings.sourcePath, settings.imports, settings.standard.equals(Settings.STANDARD_TP));
 
 		if (settings.verbose) {
 			System.out.println("----------------------------------");
