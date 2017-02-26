@@ -361,26 +361,51 @@ Statement<out StatementNode statement>
 (
                                                 (. statement = factory.createNopStatement(); .)
 |
-    Expression<out statement> 
-|
     IfStatement<out statement>
 |
 	ForLoop<out statement>
 |
 	WhileLoop<out statement>
 |
-	RepeatLoop<out statement> 
+	RepeatLoop<out statement>
 |
 	CaseStatement<out statement>
 |
     Block<out statement>
 |
-	ReadStatement<out statement>	
+    IdentifierBeginningStatement<out statement>
 |
-	"randomize"									(. statement = factory.createRandomizeNode(); .)		
+	ReadStatement<out statement>
+|
+	"randomize"									(. statement = factory.createRandomizeNode(); .)
 )
 .
 
+
+
+IdentifierBeginningStatement<out StatementNode statement>
+=                                               (. statement = null; .)
+identifier                                      (. Token identifierToken = t; .)
+(
+                                                (. statement = factory.createParameterlessSubroutineCall(identifierToken); .)
+|
+    SubroutineCall<out statement, identifierToken>
+|
+    AssignmentAfterIdentifierPart<out statement, identifierToken>
+)
+.
+
+
+
+AssignmentAfterIdentifierPart<out StatementNode statement, Token identifierToken>
+=
+                                                (. List<ExpressionNode> indexNodes = null; .)
+    [
+        ArrayIndex<out indexNodes>
+    ]
+    ":="
+    Expression<out ExpressionNode value>        (. statement = (indexNodes == null)? factory.createAssignment(identifierToken, value) : factory.createArrayIndexAssignment(identifierToken, indexNodes, value); .)
+.
 
 
 
@@ -444,7 +469,7 @@ ForLoop<out StatementNode statement>
 "for"											(. boolean ascending = true; .)
 identifier										(. Token variableToken = t; .)
 ":="
-Expression<out ExpressionNode startValue>	
+Expression<out ExpressionNode startValue>
 (
 	"to"										(. ascending = true; .)
 	|
@@ -454,13 +479,13 @@ Expression<out ExpressionNode finalValue>
 "do"
 Statement<out StatementNode loopBody>			(. statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
                                                 (. factory.finishLoop(); .)
-.	
+.
 
 
 RepeatLoop<out StatementNode statement>
 =												(. factory.startLoop(); .)
 "repeat"										(. List<StatementNode> bodyNodes = new ArrayList<>(); .)
-StatementSequence<bodyNodes>					
+StatementSequence<bodyNodes>
 "until"
 Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes)); .)
                                                 (. factory.finishLoop(); .)
@@ -479,14 +504,14 @@ Statement<out StatementNode loopBody>			(. statement = factory.createWhileLoop(c
 
 IfStatement<out StatementNode statement>
 =
-"if"                                            
+"if"
     Expression<out ExpressionNode condition>
 
-"then"                                          
+"then"
     Statement<out StatementNode thenStatement>
                                                 (. StatementNode elseStatement = null; .)
 [
-"else"                                          
+"else"
     Statement<out elseStatement>
 ]                                               (. statement = factory.createIfStatement(condition, thenStatement, elseStatement); .)
 .
@@ -561,7 +586,7 @@ SignedFactor<out ExpressionNode expression>
     ( "+" | "-" )                               (. Token unOp = t; .)
     SignedFactor<out expression>                (.  expression = factory.createUnaryExpression(unOp, expression); .)
 |
-    Factor<out expression>                                        
+    Factor<out expression>
 )
 .
 
@@ -580,7 +605,7 @@ Factor<out ExpressionNode expression>
     )
 |
     "("
-    Expression<out expression>                  
+    Expression<out expression>
     ")"
 |
                                                 (. String value = ""; .)
@@ -653,13 +678,10 @@ SetConstructor<out ExpressionNode expression>
 
 MemberExpression<out ExpressionNode expression, Token identifierName>
 =							                    (. expression = null; .)
-(                                               
+(
 	SubroutineCall<out expression, identifierName>
 |
-    ":="
-    Expression<out ExpressionNode value>        (. expression = factory.createAssignment(identifierName, value); .)
-|
-	ArrayAccessing<out expression, identifierName>
+	ArrayIndex<. out List<ExpressionNode> indexNodes .>  (. expression = factory.createReadArrayValue(identifierName, indexNodes); .)
 )
 .
 
@@ -701,24 +723,18 @@ ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token s
 .
 
 
-ArrayAccessing<out ExpressionNode expression, Token identifierName>
-=												(. expression = null; .)
-												(. List<ExpressionNode> indexingNodes = new ArrayList<>(); .)
+
+ArrayIndex<. out List<ExpressionNode> indexNodes .>
+=
+												(. indexNodes = new ArrayList<>(); .)
 												(. ExpressionNode indexingNode = null; .)
 "["
-	Expression<out indexingNode>	            (. indexingNodes.add(indexingNode); .)
+	Expression<out indexingNode>	            (. indexNodes.add(indexingNode); .)
 	{
 		","
-		Expression<out indexingNode>	        (. indexingNodes.add(indexingNode); .)
+		Expression<out indexingNode>	        (. indexNodes.add(indexingNode); .)
 	}
 "]"
-(
-												(. expression = factory.createReadArrayValue(identifierName, indexingNodes); .)
-|
-	":="
-	Expression<out ExpressionNode value>		(. expression = factory.createArrayIndexAssignment( .)
-												(.		identifierName, indexingNodes, value); .)
-)
 .
 
 

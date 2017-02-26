@@ -304,10 +304,10 @@ public class Scanner {
 		literals.put("begin", new Integer(29));
 		literals.put("end", new Integer(30));
 		literals.put("randomize", new Integer(31));
-		literals.put("readln", new Integer(32));
-		literals.put("case", new Integer(33));
-		literals.put("else", new Integer(34));
-		literals.put("for", new Integer(35));
+		literals.put("readln", new Integer(33));
+		literals.put("case", new Integer(34));
+		literals.put("else", new Integer(35));
+		literals.put("for", new Integer(36));
 		literals.put("to", new Integer(37));
 		literals.put("downto", new Integer(38));
 		literals.put("do", new Integer(39));
@@ -545,7 +545,7 @@ public class Scanner {
 				case 25:
 					{t.kind = 21; break loop;}
 				case 26:
-					{t.kind = 36; break loop;}
+					{t.kind = 32; break loop;}
 				case 27:
 					{t.kind = 49; break loop;}
 				case 28:
