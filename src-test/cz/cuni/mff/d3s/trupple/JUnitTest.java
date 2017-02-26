@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.mff.d3s.trupple.language.parser.IParser;
 import org.junit.Before;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
@@ -38,16 +39,22 @@ public abstract class JUnitTest {
 	}
 
 	protected void test(String sourceCode, String expectedOutput) {
-		test(sourceCode, "UnnamedTest", expectedOutput);
+		test(sourceCode, expectedOutput, false);
 	}
 
-	protected void test(String sourceCode, String codeDescription, String expectedOutput) {
-		test(sourceCode, new ArrayList<>(), codeDescription, expectedOutput);
+	protected void test(String sourceCode, String expectedOutput, boolean useTPExtension) {
+		test(sourceCode, new ArrayList<>(), expectedOutput, useTPExtension);
 	}
 
-	protected void test(String sourceCode, List<String> imports, String codeDescription, String expectedOutput) {
+    protected void test(String sourceCode, List<String> imports, String expectedOutput) {
+	    test(sourceCode, imports, expectedOutput, false);
+    }
+
+	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension) {
 		setUpStreams();
-		PascalLanguage.startFromCodes(sourceCode, imports, codeDescription);
+		// TODO: solve this duplicity with task 27
+        IParser parser = (useTPExtension)? new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser() : new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser();
+		PascalLanguage.startFromCodes(sourceCode, imports, parser);
 		assertEquals(expectedOutput, output.toString() + error.toString());
 	}
 }

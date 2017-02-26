@@ -26,7 +26,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.CaseNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.ForNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.IfNode;
@@ -45,22 +45,22 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutineRegistry;
 
 public class NodeFactory {
 
-	private Parser parser;
+	private IParser parser;
 	private LexicalScope lexicalScope;
 
 	private Map<String, Unit> units = new HashMap<>();
 	private Unit currentUnit = null;
 
-	public NodeFactory(Parser parser) {
+	public NodeFactory(IParser parser) {
 		this.parser = parser;
 	}
 
-	void startPascal(Token identifierToken) {
+	public void startPascal(Token identifierToken) {
 		assert this.lexicalScope == null;
 		this.lexicalScope = new LexicalScope(null, this.getIdentifierFromToken(identifierToken));
 	}
 
-	void registerNewType(Token identifierToken, TypeDescriptor typeDescriptor) {
+    public void registerNewType(Token identifierToken, TypeDescriptor typeDescriptor) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         try {
@@ -70,7 +70,7 @@ public class NodeFactory {
         }
     }
 
-    TypeDescriptor getTypeDescriptor(Token identifierToken) {
+    public TypeDescriptor getTypeDescriptor(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         try {
@@ -81,7 +81,7 @@ public class NodeFactory {
         }
     }
 
-    void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
+    public void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
         for (String identifier : identifiers) {
             try {
                 lexicalScope.registerLocalVariable(identifier, typeDescriptor);
@@ -91,7 +91,7 @@ public class NodeFactory {
         }
     }
 
-    TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
+    public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
         try {
             return lexicalScope.createArrayType(ordinalDimensions, returnTypeToken.val.toLowerCase());
         } catch (LexicalException e) {
@@ -100,11 +100,11 @@ public class NodeFactory {
         }
     }
 
-    TypeDescriptor createSetType(OrdinalDescriptor baseType) {
+    public TypeDescriptor createSetType(OrdinalDescriptor baseType) {
         return lexicalScope.createSetType(baseType);
     }
 
-    OrdinalDescriptor createSimpleOrdinalDescriptor(final int lowerBound, final int upperBound) {
+    public OrdinalDescriptor createSimpleOrdinalDescriptor(final int lowerBound, final int upperBound) {
         try {
             return lexicalScope.createRangeDescriptor(lowerBound, upperBound);
         } catch (LexicalException e){
@@ -113,7 +113,7 @@ public class NodeFactory {
         }
     }
 
-    OrdinalDescriptor castTypeToOrdinalType(TypeDescriptor typeDescriptor) {
+    public OrdinalDescriptor castTypeToOrdinalType(TypeDescriptor typeDescriptor) {
 	    try {
 	        return typeDescriptor.getOrdinal();
         } catch (LexicalException e) {
@@ -122,7 +122,7 @@ public class NodeFactory {
         }
     }
 
-    TypeDescriptor registerEnum(List<String> enumIdentifiers) {
+    public TypeDescriptor registerEnum(List<String> enumIdentifiers) {
         try {
             return lexicalScope.createEnumType(enumIdentifiers);
         } catch (LexicalException e) {
@@ -131,7 +131,7 @@ public class NodeFactory {
         }
     }
 
-    void registerIntegerConstant(Token identifierToken, Token valueToken) {
+    public void registerIntegerConstant(Token identifierToken, Token valueToken) {
         try {
             long value = this.createLongFromToken(valueToken);
             String identifier = this.getIdentifierFromToken(identifierToken);
@@ -141,7 +141,7 @@ public class NodeFactory {
         }
     }
 
-    void registerSignedIntegerConstant(Token identifierToken, Token sign, Token valueToken) {
+    public void registerSignedIntegerConstant(Token identifierToken, Token sign, Token valueToken) {
         try {
             long value = this.createLongFromToken(valueToken);
             value = (sign.val.equals("-"))? -value : value;
@@ -152,7 +152,7 @@ public class NodeFactory {
         }
     }
 
-    void registerRealConstant(Token identifierToken, Token valueToken) {
+    public void registerRealConstant(Token identifierToken, Token valueToken) {
         try {
             double value = Double.parseDouble(valueToken.val);
             String identifier = this.getIdentifierFromToken(identifierToken);
@@ -162,7 +162,7 @@ public class NodeFactory {
         }
     }
 
-    void registerConstantFromIdentifier(Token identifierToken, Token valueIdentifierToken) {
+    public void registerConstantFromIdentifier(Token identifierToken, Token valueIdentifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         String identifierValue = this.getIdentifierFromToken(valueIdentifierToken);
         try {
@@ -172,7 +172,7 @@ public class NodeFactory {
         }
     }
 
-    void registerSignedConstantFromIdentifier(Token identifierToken, Token sign, Token valueIdentifierToken) {
+    public void registerSignedConstantFromIdentifier(Token identifierToken, Token sign, Token valueIdentifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         String identifierValue = this.getIdentifierFromToken(valueIdentifierToken);
         try {
@@ -186,7 +186,7 @@ public class NodeFactory {
         }
     }
 
-    void registerSignedRealConstant(Token identifierToken, Token sign, Token valueToken) {
+    public void registerSignedRealConstant(Token identifierToken, Token sign, Token valueToken) {
         try {
             double value = Double.parseDouble(valueToken.val);
             value = (sign.val.equals("-"))? -value : value;
@@ -197,7 +197,7 @@ public class NodeFactory {
         }
     }
 
-    void registerBooleanConstant(Token identifierToken, boolean value) {
+    public void registerBooleanConstant(Token identifierToken, boolean value) {
         try {
             String identifier = this.getIdentifierFromToken(identifierToken);
             this.lexicalScope.registerBooleanConstant(identifier, value);
@@ -206,7 +206,7 @@ public class NodeFactory {
         }
     }
 
-    void registerStringOrCharConstant(Token identifierToken, String value) {
+    public void registerStringOrCharConstant(Token identifierToken, String value) {
         if(value.length() == 1) {
             registerCharConstant(identifierToken, value.charAt(0));
         } else {
@@ -232,7 +232,7 @@ public class NodeFactory {
         }
     }
 
-    void forwardProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
+    public void forwardProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
             lexicalScope.forwardProcedureInterface(identifier, formalParameters);
@@ -241,7 +241,7 @@ public class NodeFactory {
         }
     }
 
-    void forwardFunction(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
+    public void forwardFunction(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         String returnType = this.getIdentifierFromToken(returnTypeToken);
         try {
@@ -251,7 +251,7 @@ public class NodeFactory {
         }
     }
 
-	void startProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
+    public void startProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
             lexicalScope.startProcedureInterface(identifier, formalParameters);
@@ -262,7 +262,7 @@ public class NodeFactory {
         }
 	}
 
-	void startFunction(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
+    public void startFunction(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         String returnType = this.getIdentifierFromToken(returnTypeToken);
         try {
@@ -275,11 +275,11 @@ public class NodeFactory {
         }
     }
 
-    void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params) {
+    public void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params) {
         params.addAll(parameter);
     }
 
-    List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName, boolean isOutput) {
+    public List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName, boolean isOutput) {
         List<FormalParameter> paramList = new ArrayList<>();
         for (String identifier : identifiers) {
             paramList.add(new FormalParameter(identifier, typeName, isOutput));
@@ -288,23 +288,23 @@ public class NodeFactory {
         return paramList;
     }
 
-    void finishProcedure(StatementNode bodyNode) {
+    public void finishProcedure(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
         finishSubroutine(procedureBodyNode);
     }
 
-    void finishFunction(StatementNode bodyNode) {
+    public void finishFunction(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(subroutineNode, lexicalScope.getReturnSlot());
         finishSubroutine(functionBodyNode);
     }
 
-    void startLoop() {
+    public void startLoop() {
         lexicalScope.increaseLoopDepth();
     }
 
-    StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
+    public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
         String iteratingIdentifier = this.getIdentifierFromToken(variableToken);
         FrameSlot iteratingSlot = lexicalScope.getLocalSlot(iteratingIdentifier);
         if (iteratingSlot == null) {
@@ -313,23 +313,23 @@ public class NodeFactory {
         return new ForNode(ascending, iteratingSlot, startValue, finalValue, loopBody);
     }
 
-    StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
+    public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
         return new RepeatNode(condition, loopBody);
     }
 
-    StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody) {
+    public StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody) {
         return new WhileNode(condition, loopBody);
     }
 
-    StatementNode createBreak() {
+    public StatementNode createBreak() {
         // TODO: check if TurboPascal standard is set
         if (!lexicalScope.isInLoop()) {
             parser.SemErr("Break outside a loop: ");
         }
-        return new BreakNode();
+        return new BreakNodeTP();
     }
 
-	void finishLoop() {
+    public void finishLoop() {
         try {
             lexicalScope.decreaseLoopDepth();
         } catch (LexicalException e) {
@@ -337,22 +337,22 @@ public class NodeFactory {
         }
     }
 
-    StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
+    public StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
         return new IfNode(condition, thenNode, elseNode);
     }
 
-    CaseNode createCaseStatement(CaseStatementData data) {
+    public CaseNode createCaseStatement(CaseStatementData data) {
         ExpressionNode[] indexes = data.indexNodes.toArray(new ExpressionNode[data.indexNodes.size()]);
         StatementNode[] statements = data.statementNodes.toArray(new StatementNode[data.statementNodes.size()]);
 
         return new CaseNode(data.caseExpression, indexes, statements, data.elseNode);
     }
 
-    StatementNode createNopStatement() {
+    public StatementNode createNopStatement() {
         return new NopNode();
     }
 
-    ExpressionNode createBinaryExpression(Token operator, ExpressionNode leftNode, ExpressionNode rightNode) {
+    public ExpressionNode createBinaryExpression(Token operator, ExpressionNode leftNode, ExpressionNode rightNode) {
         switch (operator.val.toLowerCase()) {
 
             // arithmetic
@@ -396,7 +396,7 @@ public class NodeFactory {
         }
     }
 
-    ExpressionNode createUnaryExpression(Token operator, ExpressionNode son) {
+    public ExpressionNode createUnaryExpression(Token operator, ExpressionNode son) {
         switch (operator.val) {
             case "+":
                 return son;
@@ -410,7 +410,7 @@ public class NodeFactory {
         }
     }
 
-    ExpressionNode createAssignment(Token identifierToken, ExpressionNode valueNode) {
+    public ExpressionNode createAssignment(Token identifierToken, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
 
         LexicalScope ls = this.lexicalScope;
@@ -432,7 +432,7 @@ public class NodeFactory {
         return null;
     }
 
-    ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
+    public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         LexicalScope ls = this.lexicalScope;
@@ -457,7 +457,7 @@ public class NodeFactory {
         return null;
     }
 
-    boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
+    public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
 	    String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
 	    try {
             return this.lexicalScope.isReferenceParameter(subroutineIdentifier, parameterIndex);
@@ -467,11 +467,11 @@ public class NodeFactory {
         }
     }
 
-    ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
+    public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
         return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
     }
 
-    ExpressionNode createFunctionLiteralNode(Token identifierToken) {
+    public ExpressionNode createFunctionLiteralNode(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         LexicalScope ls = this.lexicalScope;
@@ -492,35 +492,35 @@ public class NodeFactory {
         return null;
     }
 
-    ExpressionNode createReferenceNode(Token variableToken) {
+    public ExpressionNode createReferenceNode(Token variableToken) {
 	    String variableIdentifier = this.getIdentifierFromToken(variableToken);
 	    FrameSlot slot = this.lexicalScope.getLocalSlot(variableIdentifier);
         return new ReadReferencePassNode(slot);
     }
 
-    ExpressionNode createReadArrayValue(Token identifierToken, List<ExpressionNode> indexingNodes) {
+    public ExpressionNode createReadArrayValue(Token identifierToken, List<ExpressionNode> indexingNodes) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]),
                 lexicalScope.getLocalSlot(identifier));
     }
 
-    ExpressionNode createArrayIndexAssignment(Token identifierToken, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
+    public ExpressionNode createArrayIndexAssignment(Token identifierToken, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         return new ArrayIndexAssignmentNode(lexicalScope.getLocalSlot(identifier),
                 indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
     }
 
-    ExpressionNode createLogicLiteral(boolean value) {
+    public ExpressionNode createLogicLiteral(boolean value) {
         return new LogicLiteralNode(value);
     }
 
-    ExpressionNode createSetConstructorNode(List<ExpressionNode> valueNodes) {
+    public ExpressionNode createSetConstructorNode(List<ExpressionNode> valueNodes) {
 	    return new SetConstructorNode(valueNodes);
     }
 
-    ExpressionNode createNumericLiteral(Token literalToken) {
+    public ExpressionNode createNumericLiteral(Token literalToken) {
         try {
             return new LongLiteralNode(createLongFromToken(literalToken));
         } catch (LexicalException e) {
@@ -529,26 +529,26 @@ public class NodeFactory {
         }
     }
 
-    ExpressionNode createFloatLiteral(Token token) {
+    public ExpressionNode createFloatLiteral(Token token) {
         double value = Float.parseFloat(token.val);
         return new DoubleLiteralNode(value);
     }
 
-    ExpressionNode createCharOrStringLiteral(String literal) {
+    public ExpressionNode createCharOrStringLiteral(String literal) {
         return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
     }
 
-    StatementNode createBlockNode(List<StatementNode> bodyNodes) {
+    public StatementNode createBlockNode(List<StatementNode> bodyNodes) {
         return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
     }
 
     // TODO: this main node can be in lexical scope instead of a parser
-    PascalRootNode finishMainFunction(StatementNode blockNode) {
+    public PascalRootNode finishMainFunction(StatementNode blockNode) {
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
         return new PascalRootNode(lexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
     }
 
-    String createStringFromToken(Token t) {
+    public String createStringFromToken(Token t) {
         String literal = t.val;
         literal = literal.substring(1, literal.length() - 1);
         literal = literal.replaceAll("''", "'");
@@ -670,7 +670,7 @@ public class NodeFactory {
 		}
 	}
 
-    boolean containsIdentifier(String identifier) {
+    public boolean containsIdentifier(String identifier) {
         return this.lexicalScope.containsLocalIdentifier(identifier);
     }
 

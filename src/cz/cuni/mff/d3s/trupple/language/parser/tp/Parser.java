@@ -1,16 +1,16 @@
 
-package cz.cuni.mff.d3s.trupple.language.parser;
+package cz.cuni.mff.d3s.trupple.language.parser.tp;
 
+import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
+import cz.cuni.mff.d3s.trupple.language.parser.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
-
 import com.oracle.truffle.api.source.Source;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parser{
+public class Parser implements IParser {
 	public static final int _EOF = 0;
 	public static final int _identifier = 1;
 	public static final int _stringLiteral = 2;
@@ -1076,8 +1076,12 @@ public class Parser{
 
 	};
 	
-    public boolean noErrors(){
-    	return errors.count == 0;
+    public boolean hadErrors(){
+    	return errors.count > 0;
+    }
+
+    public RootNode getRootNode() {
+        return this.mainNode;
     }
     
     public boolean caseEnds(){
@@ -1111,13 +1115,6 @@ public class Parser{
     	return false;
     }
 } // end Parser
-
-class CaseStatementData {
-    public ExpressionNode caseExpression;
-    public final List<ExpressionNode> indexNodes = new ArrayList<ExpressionNode>();
-    public final List<StatementNode> statementNodes = new ArrayList<StatementNode>();
-    public StatementNode elseNode;
-}
 
 class Errors {
 	public int count = 0;                                    // number of errors detected
