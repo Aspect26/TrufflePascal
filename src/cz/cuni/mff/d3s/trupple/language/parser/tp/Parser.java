@@ -1,13 +1,12 @@
 
 package cz.cuni.mff.d3s.trupple.language.parser.tp;
 
+import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.parser.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
-
 import com.oracle.truffle.api.source.Source;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1077,8 +1076,12 @@ public class Parser implements IParser {
 
 	};
 	
-    public boolean noErrors(){
-    	return errors.count == 0;
+    public boolean hadErrors(){
+    	return errors.count > 0;
+    }
+
+    public RootNode getRootNode() {
+        return this.mainNode;
     }
     
     public boolean caseEnds(){

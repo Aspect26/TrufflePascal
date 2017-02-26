@@ -13,6 +13,7 @@ import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.Source;
 
+import cz.cuni.mff.d3s.trupple.language.parser.IParser;
 import cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -63,16 +64,14 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	 * *************************************************************************
 	 * ******* START FROM FILE PATHS
 	 */
-	public static void start(String sourcePath, List<String> imports) throws IOException {
-		Parser parser = new Parser();
-
+	public static void start(String sourcePath, List<String> imports, IParser parser) throws IOException {
 		for (String dir : imports) {
 			try{
 				Files.walk(Paths.get(dir)).forEach(filePath -> {
 					if(filePath.toString().endsWith(".pas")){
 						try{
 							parser.Parse(Source.fromFileName(filePath.toString()));
-							if (!parser.noErrors()) {
+							if (parser.hadErrors()) {
 								System.err.println("Errors while parsing import file " + filePath + ".");
 								return;
 							}
@@ -87,12 +86,12 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		}
 		
 		parser.Parse(Source.fromFileName(sourcePath));
-		if (!parser.noErrors()) {
+		if (parser.hadErrors()) {
 			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
 			return;
 		}
 
-		Truffle.getRuntime().createCallTarget(parser.mainNode).call();
+		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call();
 	}
 
 	/*
@@ -105,14 +104,14 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		int i = 0;
 		for (String imp : imports) {
 			parser.Parse(Source.fromText(imp, "import" + (i++)));
-			if (!parser.noErrors()) {
+			if (parser.hadErrors()) {
 				System.err.println("Errors while parsing import file " + imp + ".");
 				return;
 			}
 		}
 
 		parser.Parse(Source.fromText(sourceCode, codeDescription));
-		if (!parser.noErrors()) {
+		if (parser.hadErrors()) {
 			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
 			return;
 		}
