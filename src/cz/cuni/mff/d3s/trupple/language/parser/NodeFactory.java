@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.oracle.truffle.api.frame.FrameSlot;
-
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
@@ -43,22 +42,52 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 public class NodeFactory {
 
+    /**
+     * The parser to be used for parsing. There can be two: parser for wirths' standard or turbo pascal standard.
+     */
 	private IParser parser;
+
+    /**
+     * Current lexical scope. Holds information about registered identifiers and what type are they assigned to.
+     */
 	private LexicalScope lexicalScope;
-	private Map<String, LexicalScope> units = new HashMap<>();
+
+    /**
+     * Map if included units. This contains every unit found in a directory specified by -I parameter of the compiler.
+     * This doesn't mean that all of these units must be used in the program. On the other hand, each of the units that
+     * are used in the program by the uses statement must be contained in this map.
+     */
+	private List<String> includedUnits = new ArrayList<>();
+
+    /**
+     * A list of actually used units by the uses statement.
+     */
+	private List<String> usedUnits = new ArrayList<>();
+
+    /**
+     * Specifies a prefix to be added to all identifiers.
+     * Identifiers imported from a unit shall have prefix containing name of that unit and a character that cannot occur
+     * in any identifier's name.
+     */
+	private String identifiersPrefix = "";
 
 	public NodeFactory(IParser parser) {
 		this.parser = parser;
+		this.lexicalScope = new LexicalScope(null, "_main");
 	}
 
 	public void startPascal(Token identifierToken) {
-		this.lexicalScope = new LexicalScope(null, this.getIdentifierFromToken(identifierToken));
+		this.lexicalScope.setName(this.getIdentifierFromToken(identifierToken));
 	}
 
     public void registerUnit(Token unitIdentifierToken) {
         String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);
-        parser.SemErr("Not implemented.");
-        // TODO: implement this
+        if (!this.includedUnits.contains(unitIdentifier)) {
+            parser.SemErr("Unknown unit: " + unitIdentifier + ". Did you forget to include it?");
+            return;
+        }
+
+        this.usedUnits.add(unitIdentifier);
     }
 
     public void registerNewType(Token identifierToken, TypeDescriptor typeDescriptor) {
@@ -593,12 +622,13 @@ public class NodeFactory {
         }
     }
 
-	private String getIdentifierFromToken(Token identifier) {
-        return identifier.val.toLowerCase();
+	private String getIdentifierFromToken(Token identifierToken) {
+	    String identifier = identifierToken.val.toLowerCase();
+        return this.identifiersPrefix + identifier;
     }
 
     private StatementNode createSubroutineNode(StatementNode bodyNode) {
-        // TODO: syntax tree by vyzeral lepsie keby z initialization nodes je BlockNode
+        // TODO: the syntax tree would look nicer if the initialization nodes were in a separate block node
         List<StatementNode> subroutineNodes = new ArrayList<>();
         try {
             subroutineNodes = lexicalScope.createInitializationNodes();
@@ -652,13 +682,13 @@ public class NodeFactory {
     public void startUnit(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
-        if (units.containsKey(identifier)) {
+        if (includedUnits.contains(identifier)) {
             parser.SemErr("Unit with name " + identifier + " is already defined.");
             return;
         }
 
-        this.lexicalScope = new LexicalScope(null, identifier);
-        this.units.put(identifier, this.lexicalScope);
+        this.identifiersPrefix = identifier + ".";
+        this.includedUnits.add(identifier);
     }
 
     public void addUnitProcedureInterface(Token identifierToken, List<FormalParameter> formalParameters) {
@@ -713,7 +743,7 @@ public class NodeFactory {
     }
 
     public void endUnit() {
-        this.lexicalScope = null;
+	    this.identifiersPrefix = "";
     }
 
     // *************************************************************

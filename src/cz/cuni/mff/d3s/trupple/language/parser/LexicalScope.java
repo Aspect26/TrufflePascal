@@ -15,11 +15,13 @@ import java.util.List;
 class LexicalScope {
 
 
-    private final String name;
+    private String name;
     private final LexicalScope outer;
     private final IdentifiersTable localIdentifiers;
     private int loopDepth;
     private final PascalContext context;
+
+    // TODO: wtf is this?
     private final List<StatementNode> readArgumentNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name) {
@@ -63,6 +65,10 @@ class LexicalScope {
 
     TypeDescriptor getTypeTypeDescriptor(String identifier) throws LexicalException {
         return this.localIdentifiers.getTypeTypeDescriptor(identifier);
+    }
+
+    public void setName(String identifier) {
+        this.name = identifier;
     }
 
     void registerNewType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {

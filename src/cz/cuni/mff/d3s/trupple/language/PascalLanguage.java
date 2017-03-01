@@ -79,7 +79,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 									return;
 								}
 							} catch (IOException e) {
-
+								System.err.println("Error reading unit file: " + filePath);
 							}
 						}
 					});

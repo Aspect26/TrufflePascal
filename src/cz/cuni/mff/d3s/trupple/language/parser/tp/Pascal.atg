@@ -816,7 +816,7 @@ ImplementationSection
 	(
 		UnitSubroutineImplementation
 	|
-		VariableLineDeclaration
+		VariableDeclarations
 	|
 		TypeDefinitions
 	)
