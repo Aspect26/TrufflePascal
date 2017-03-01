@@ -8,7 +8,6 @@ import java.util.Map;
 import com.oracle.truffle.api.frame.FrameSlot;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
@@ -41,24 +40,26 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDes
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutineRegistry;
 
 public class NodeFactory {
 
 	private IParser parser;
 	private LexicalScope lexicalScope;
-
-	private Map<String, Unit> units = new HashMap<>();
-	private Unit currentUnit = null;
+	private Map<String, LexicalScope> units = new HashMap<>();
 
 	public NodeFactory(IParser parser) {
 		this.parser = parser;
 	}
 
 	public void startPascal(Token identifierToken) {
-		assert this.lexicalScope == null;
 		this.lexicalScope = new LexicalScope(null, this.getIdentifierFromToken(identifierToken));
 	}
+
+    public void registerUnit(Token unitIdentifierToken) {
+        String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);
+        parser.SemErr("Not implemented.");
+        // TODO: implement this
+    }
 
     public void registerNewType(Token identifierToken, TypeDescriptor typeDescriptor) {
         String identifier = this.getIdentifierFromToken(identifierToken);
@@ -235,7 +236,7 @@ public class NodeFactory {
     public void forwardProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
-            lexicalScope.forwardProcedureInterface(identifier, formalParameters);
+            lexicalScope.registerProcedureInterface(identifier, formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
@@ -245,31 +246,31 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
         String returnType = this.getIdentifierFromToken(returnTypeToken);
         try {
-            lexicalScope.forwardFunctionInterface(identifier, formalParameters, returnType);
+            lexicalScope.registerFunctionInterface(identifier, formalParameters, returnType);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
     }
 
-    public void startProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
+    public void startProcedureImplementation(Token identifierToken, List<FormalParameter> formalParameters) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
-            lexicalScope.startProcedureInterface(identifier, formalParameters);
+            lexicalScope.tryRegisterProcedureInterface(identifier, formalParameters);
             lexicalScope = new LexicalScope(lexicalScope, identifier);
-            addParameterIdentifiersToLexicalScope(formalParameters);
+            this.addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
 	}
 
-    public void startFunction(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
+    public void startFunctionImplementation(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         String returnType = this.getIdentifierFromToken(returnTypeToken);
         try {
-            lexicalScope.startFunctionInterface(identifier, formalParameters, returnType);
+            lexicalScope.tryRegisterFunctionInterface(identifier, formalParameters, returnType);
             lexicalScope = new LexicalScope(lexicalScope, identifier);
             lexicalScope.registerReturnType(formalParameters, returnType);
-            addParameterIdentifiersToLexicalScope(formalParameters);
+            this.addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
@@ -288,13 +289,13 @@ public class NodeFactory {
         return paramList;
     }
 
-    public void finishProcedure(StatementNode bodyNode) {
+    public void finishProcedureImplementation(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
         finishSubroutine(procedureBodyNode);
     }
 
-    public void finishFunction(StatementNode bodyNode) {
+    public void finishFunctionImplementation(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(subroutineNode, lexicalScope.getReturnSlot());
         finishSubroutine(functionBodyNode);
@@ -322,7 +323,6 @@ public class NodeFactory {
     }
 
     public StatementNode createBreak() {
-        // TODO: check if TurboPascal standard is set
         if (!lexicalScope.isInLoop()) {
             parser.SemErr("Break outside a loop: ");
         }
@@ -483,7 +483,14 @@ public class NodeFactory {
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
 	    String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
 	    try {
-            return this.lexicalScope.isReferenceParameter(subroutineIdentifier, parameterIndex);
+	        LexicalScope ls = this.lexicalScope;
+	        while(ls != null) {
+	            if (ls.containsLocalIdentifier(subroutineIdentifier)) {
+                    return ls.isReferenceParameter(subroutineIdentifier, parameterIndex);
+                }
+                ls = ls.getOuterScope();
+            }
+            return false;
         } catch(LexicalException e) {
 	        parser.SemErr(e.getMessage());
 	        return false;
@@ -626,10 +633,6 @@ public class NodeFactory {
         }
     }
 
-    private void finishSubroutine() {
-        lexicalScope = lexicalScope.getOuterScope();
-    }
-
     private void finishSubroutine(ExpressionNode subroutineBodyNode) {
         final PascalRootNode rootNode = new PascalRootNode(lexicalScope.getFrameDescriptor(), subroutineBodyNode);
 
@@ -638,106 +641,110 @@ public class NodeFactory {
         lexicalScope.getContext().setSubroutineRootNode(subroutineIdentifier, rootNode);
     }
 
-	// ------------------------------------------------------
-
-	public StatementNode createRandomizeNode() {
-		return new RandomizeBuiltinNode(lexicalScope.getContext());
-	}
-
-	public ExpressionNode createRandomNode() {
-		return new RandomBuiltinNode(lexicalScope.getContext());
-	}
-
-	public ExpressionNode createRandomNode(Token numericLiteral) {
-		return new RandomBuiltinNode(lexicalScope.getContext(), Long.parseLong(numericLiteral.val));
-	}
-
-	public StatementNode createReadLine() {
-		return new ReadlnBuiltinNode(lexicalScope.getContext());
-	}
-
-	public StatementNode createReadLine(List<String> identifiers){
-		FrameSlot[] slots = new FrameSlot[identifiers.size()];
-		for(int i = 0; i < slots.length; i++) {
-			String currentIdentifier = identifiers.get(i);
-			slots[i] = lexicalScope.getLocalSlot(currentIdentifier);
-			if(slots[i] == null) {
-				parser.SemErr("UnknownDescriptor identifier: " + currentIdentifier + ".");
-			}
-		}
-
-		ReadlnBuiltinNode readln = new ReadlnBuiltinNode(lexicalScope.getContext(), slots);
-		return readln;
-	}
-
-	public void importUnit(Token unitToken) {
-		String importingUnit = unitToken.val.toLowerCase();
-
-		if (!units.containsKey(importingUnit)) {
-			parser.SemErr("UnknownDescriptor unit. Did you forget to import it to compiler? - " + importingUnit);
-			return;
-		}
-
-		Unit unit = units.get(importingUnit);
-
-		// functions
-		PascalSubroutineRegistry fRegistry = unit.getContext().getGlobalFunctionRegistry();
-		lexicalScope.getContext().getGlobalFunctionRegistry().addAll(fRegistry);
-
-		// custom types
-		for(String typeIdentifier : unit.getLexicalScope().getAllCustomTypes().keySet()){
-			ICustomType custom = unit.getLexicalScope().getAllCustomTypes().get(typeIdentifier);
-			if(custom.isGlobal()){
-				lexicalScope.registerCustomType(typeIdentifier, custom);
-			}
-		}
-	}
-
     public boolean containsIdentifier(String identifier) {
         return this.lexicalScope.containsLocalIdentifier(identifier);
     }
 
-	/*****************************************************************************
-	 * UNIT SECTION
-	 *****************************************************************************/
 
-	public void startUnit(Token t) {
-		String unitName = t.val.toLowerCase();
+    // ***************************************************
+    // UNIT PART
+    // ***************************************************
+    public void startUnit(Token identifierToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
 
-		if (units.containsValue(t.val.toLowerCase())) {
-			parser.SemErr("Unit with name " + unitName + " is already defined.");
-			return;
-		}
+        if (units.containsKey(identifier)) {
+            parser.SemErr("Unit with name " + identifier + " is already defined.");
+            return;
+        }
 
-		currentUnit = new Unit(unitName);
-		this.units.put(unitName, currentUnit);
-        this.lexicalScope = currentUnit.getLexicalScope();
-	}
+        this.lexicalScope = new LexicalScope(null, identifier);
+        this.units.put(identifier, this.lexicalScope);
+    }
 
-	public void endUnit() {
-		currentUnit = null;
+    public void addUnitProcedureInterface(Token identifierToken, List<FormalParameter> formalParameters) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        try {
+            lexicalScope.registerProcedureInterface(identifier, formalParameters);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    public void addUnitFunctionInterface(Token identifierToken, List<FormalParameter> formalParameters, String returnTypeName) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+	    try {
+            lexicalScope.registerFunctionInterface(identifier, formalParameters, returnTypeName);
+        } catch (LexicalException e) {
+	        parser.SemErr(e.getMessage());
+        }
+    }
+
+    public void startUnitProcedureImplementation(Token identifierToken, List<FormalParameter> formalParameters) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+        try {
+            if (lexicalScope.containsLocalIdentifier(identifier) && !lexicalScope.isSubroutine(identifier)) {
+                parser.SemErr("Cannot implement. Not a procedure: " + identifier);
+            } else if (!lexicalScope.containsLocalIdentifier(identifier)) {
+                lexicalScope.registerProcedureInterface(identifier, formalParameters, false);
+            }
+            lexicalScope = new LexicalScope(lexicalScope, identifier);
+            this.addParameterIdentifiersToLexicalScope(formalParameters);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    public void startUnitFunctionImplementation(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+        String returnTypeName = this.getIdentifierFromToken(returnTypeToken);
+
+        try {
+            if (lexicalScope.containsLocalIdentifier(identifier) && !lexicalScope.isSubroutine(identifier)) {
+                parser.SemErr("Cannot implement. Not a function: " + identifier);
+            } else if (!lexicalScope.containsLocalIdentifier(identifier)) {
+                lexicalScope.registerFunctionInterface(identifier, formalParameters, returnTypeName, false);
+            }
+            lexicalScope = new LexicalScope(lexicalScope, identifier);
+            lexicalScope.registerReturnType(formalParameters, returnTypeName);
+            this.addParameterIdentifiersToLexicalScope(formalParameters);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
+    public void endUnit() {
         this.lexicalScope = null;
-	}
+    }
 
-	public void addProcedureInterface(Token name, List<FormalParameter> formalParameters) {
-		if(currentUnit == null) {
-			lexicalScope.getContext().getGlobalFunctionRegistry().registerSubroutineName(name.val.toLowerCase());
-            this.lexicalScope = this.lexicalScope.getOuterScope();
-		} else if (!currentUnit.addProcedureInterface(name.val.toLowerCase(), formalParameters)) {
-			parser.SemErr("Subroutine with this name is already defined: " + name);
-		}
-	}
+    // *************************************************************
+    // Not refactored section
+    // *************************************************************
+    public StatementNode createRandomizeNode() {
+        return new RandomizeBuiltinNode(lexicalScope.getContext());
+    }
 
-	public void addFunctionInterface(Token name, List<FormalParameter> formalParameters, String returnType) {
-		if(currentUnit == null) {
-			lexicalScope.getContext().getGlobalFunctionRegistry().registerSubroutineName(name.val.toLowerCase());
-		} else if (!currentUnit.addFunctionInterface(name.val.toLowerCase(), formalParameters, returnType)) {
-			parser.SemErr("Subroutine with this name is already defined: " + name);
-		}
-	}
+    public ExpressionNode createRandomNode() {
+        return new RandomBuiltinNode(lexicalScope.getContext());
+    }
 
-	public void leaveUnitInterfaceSection(){
-		assert currentUnit != null;
-		currentUnit.leaveInterfaceSection();
-	}
+    public ExpressionNode createRandomNode(Token numericLiteral) {
+        return new RandomBuiltinNode(lexicalScope.getContext(), Long.parseLong(numericLiteral.val));
+    }
+
+    public StatementNode createReadLine() {
+        return new ReadlnBuiltinNode(lexicalScope.getContext());
+    }
+
+    public StatementNode createReadLine(List<String> identifiers){
+        FrameSlot[] slots = new FrameSlot[identifiers.size()];
+        for(int i = 0; i < slots.length; i++) {
+            String currentIdentifier = identifiers.get(i);
+            slots[i] = lexicalScope.getLocalSlot(currentIdentifier);
+            if(slots[i] == null) {
+                parser.SemErr("Unknown identifier: " + currentIdentifier + ".");
+            }
+        }
+
+        return new ReadlnBuiltinNode(lexicalScope.getContext(), slots);
+    }
 }

@@ -3,18 +3,14 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class LexicalScope {
 
@@ -26,12 +22,9 @@ class LexicalScope {
     private final PascalContext context;
     private final List<StatementNode> readArgumentNodes = new ArrayList<>();
 
-    private final Map<String, ICustomType> customTypes;
-
     LexicalScope(LexicalScope outer, String name) {
         this.name = name;
         this.outer = outer;
-        this.customTypes = new HashMap<>();
         this.localIdentifiers = (outer==null)? new IdentifiersTable() : new IdentifiersTable(outer.getIdentifiersTable());
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
     }
@@ -138,17 +131,8 @@ class LexicalScope {
         return this.localIdentifiers.createSetType(baseType);
     }
 
-    void forwardProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
-        this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
-        this.context.registerSubroutineName(identifier, true);
-    }
-
-    void forwardFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
-        this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
-        this.context.registerSubroutineName(identifier, true);
-    }
-
-    void startProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+    // NOTE: the procedure could have been forwarded
+    void tryRegisterProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
         try {
             this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
         } catch (DuplicitIdentifierException e) {
@@ -159,7 +143,8 @@ class LexicalScope {
         this.context.registerSubroutineName(identifier, true);
     }
 
-    void startFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
+    // NOTE: the function could have been forwarded
+    void tryRegisterFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
         try {
             this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
         } catch (DuplicitIdentifierException e) {
@@ -168,6 +153,24 @@ class LexicalScope {
             }
         }
         this.context.registerSubroutineName(identifier, true);
+    }
+
+    void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+        this.registerProcedureInterface(identifier, formalParameters, true);
+    }
+
+    void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters, boolean isPublic) throws LexicalException {
+        this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
+        this.context.registerSubroutineName(identifier, isPublic);
+    }
+
+    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnTypeName) throws LexicalException {
+        this.registerFunctionInterface(identifier, formalParameters, returnTypeName, true);
+    }
+
+    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnTypeName, boolean isPublic) throws LexicalException {
+        this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnTypeName);
+        this.context.registerSubroutineName(identifier, isPublic);
     }
 
     void registerLongConstant(String identifier, long value) throws LexicalException {
@@ -232,16 +235,5 @@ class LexicalScope {
 
     boolean isInLoop() {
         return loopDepth > 0;
-    }
-
-    //
-    // THIS SHOULD BE REMOVED
-
-    Map<String, ICustomType> getAllCustomTypes() {
-        return this.customTypes;
-    }
-
-    void registerCustomType(String name, ICustomType customType) {
-        this.customTypes.put(name, customType);
     }
 }

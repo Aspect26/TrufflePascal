@@ -114,11 +114,11 @@ public class Parser implements IParser {
 	void ImportsSection() {
 		Expect(7);
 		Expect(1);
-		factory.importUnit(t); 
+		factory.registerUnit(t); 
 		while (la.kind == 8) {
 			Get();
 			Expect(1);
-			factory.importUnit(t); 
+			factory.registerUnit(t); 
 		}
 		Expect(6);
 	}
@@ -148,9 +148,7 @@ public class Parser implements IParser {
 		UnitHeader();
 		InterfaceSection();
 		ImplementationSection();
-		Expect(30);
-		factory.endUnit(); 
-		Expect(28);
+		UnitFooter();
 	}
 
 	void ConstantDefinitions() {
@@ -403,10 +401,10 @@ public class Parser implements IParser {
 			Get();
 			factory.forwardProcedure(identifierToken, formalParameters); 
 		} else if (StartOf(3)) {
-			factory.startProcedure(identifierToken, formalParameters); 
+			factory.startProcedureImplementation(identifierToken, formalParameters); 
 			Declarations();
 			StatementNode bodyNode = Block();
-			factory.finishProcedure(bodyNode); 
+			factory.finishProcedureImplementation(bodyNode); 
 		} else SynErr(76);
 	}
 
@@ -426,10 +424,10 @@ public class Parser implements IParser {
 			Get();
 			factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); 
 		} else if (StartOf(3)) {
-			factory.startFunction(identifierToken, formalParameters, returnTypeToken); 
+			factory.startFunctionImplementation(identifierToken, formalParameters, returnTypeToken); 
 			Declarations();
 			StatementNode bodyNode = Block();
-			factory.finishFunction(bodyNode); 
+			factory.finishFunctionImplementation(bodyNode); 
 		} else SynErr(77);
 	}
 
@@ -1010,17 +1008,15 @@ public class Parser implements IParser {
 
 	void InterfaceSection() {
 		Expect(63);
-		if (la.kind == 9) {
-			TypeDefinitions();
-		}
-		if (la.kind == 23) {
-			VariableDeclarations();
-		}
-		while (la.kind == 25 || la.kind == 27) {
+		while (StartOf(12)) {
 			if (la.kind == 25) {
 				ProcedureHeading();
-			} else {
+			} else if (la.kind == 27) {
 				FunctionHeading();
+			} else if (la.kind == 9) {
+				TypeDefinitions();
+			} else {
+				VariableLineDeclaration();
 			}
 		}
 	}
@@ -1029,13 +1025,19 @@ public class Parser implements IParser {
 		Expect(64);
 		while (StartOf(12)) {
 			if (la.kind == 25 || la.kind == 27) {
-				Subroutine();
-			} else if (la.kind == 23) {
-				VariableDeclarations();
+				UnitSubroutineImplementation();
+			} else if (la.kind == 1) {
+				VariableLineDeclaration();
 			} else {
-				TypeDefinition();
+				TypeDefinitions();
 			}
 		}
+	}
+
+	void UnitFooter() {
+		Expect(30);
+		factory.endUnit(); 
+		Expect(28);
 	}
 
 	void ProcedureHeading() {
@@ -1046,7 +1048,7 @@ public class Parser implements IParser {
 		if (la.kind == 17) {
 			formalParameters = FormalParameterList();
 		}
-		factory.addProcedureInterface(name, formalParameters); 
+		factory.addUnitProcedureInterface(name, formalParameters); 
 		Expect(6);
 	}
 
@@ -1061,8 +1063,51 @@ public class Parser implements IParser {
 		Expect(24);
 		Expect(1);
 		String returnValue = t.val; 
-		factory.addFunctionInterface(name, formalParameters, returnValue); 
+		factory.addUnitFunctionInterface(name, formalParameters, returnValue); 
 		Expect(6);
+	}
+
+	void UnitSubroutineImplementation() {
+		if (la.kind == 25) {
+			UnitProcedureImplementation();
+			Expect(6);
+		} else if (la.kind == 27) {
+			UnitFunctionImplementation();
+			Expect(6);
+		} else SynErr(92);
+	}
+
+	void UnitProcedureImplementation() {
+		Expect(25);
+		Expect(1);
+		Token identifierToken = t; 
+		List<FormalParameter> formalParameters = new ArrayList<>(); 
+		if (la.kind == 17) {
+			formalParameters = FormalParameterList();
+		}
+		Expect(6);
+		factory.startUnitProcedureImplementation(identifierToken, formalParameters); 
+		Declarations();
+		StatementNode bodyNode = Block();
+		factory.finishProcedureImplementation(bodyNode); 
+	}
+
+	void UnitFunctionImplementation() {
+		Expect(27);
+		Expect(1);
+		Token identifierToken = t; 
+		List<FormalParameter> formalParameters = new ArrayList<>(); 
+		if (la.kind == 17) {
+			formalParameters = FormalParameterList();
+		}
+		Expect(24);
+		Expect(1);
+		Token returnTypeToken = t; 
+		Expect(6);
+		factory.startUnitFunctionImplementation(identifierToken, formalParameters, returnTypeToken); 
+		Declarations();
+		StatementNode bodyNode = Block();
+		factory.finishFunctionImplementation(bodyNode); 
 	}
 
 
@@ -1090,7 +1135,7 @@ public class Parser implements IParser {
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_T,_T, _x,_x,_x,_x, _T,_x,_T,_x, _T,_T,_x,_x, _T,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
+		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
 
 	};
 	
@@ -1245,6 +1290,7 @@ class Errors {
 			case 89: s = "invalid MemberExpression"; break;
 			case 90: s = "invalid SetConstructor"; break;
 			case 91: s = "invalid ActualParameter"; break;
+			case 92: s = "invalid UnitSubroutineImplementation"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
