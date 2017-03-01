@@ -776,7 +776,7 @@ InterfaceSection
 	|
 	    TypeDefinitions
 	|
-	    VariableLineDeclaration
+	    VariableDeclarations
 	)
 }
 .

@@ -158,10 +158,7 @@ public class NodeFactory {
 
     public TypeDescriptor getTypeDescriptor(Token identifierToken) {
         String identifier = this.getTypeNameFromToken(identifierToken);
-
-        return this.doLookup(identifier, (LexicalScope foundInLexicalScope, String foundIdentifier) ->
-            foundInLexicalScope.getTypeDescriptor(foundIdentifier)
-        , new UnknownTypeException(identifier), UnknownDescriptor.SINGLETON);
+        return this.doLookup(identifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(identifier), UnknownDescriptor.SINGLETON);
     }
 
     public void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
@@ -517,24 +514,16 @@ public class NodeFactory {
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
-        LexicalScope ls = this.lexicalScope;
-        while (ls != null) {
-            if (ls.containsLocalIdentifier(identifier)){
-                if (ls.isVariable(identifier) || ls.isConstant(identifier)) {
-                    return ReadVariableNodeGen.create(ls.getLocalSlot(identifier));
-                } else if (ls.isParameterlessSubroutine(identifier)) {
-                    return this.createSubroutineCall(identifierToken, Collections.emptyList());
-                } else {
-                    parser.SemErr(identifier + " is not an expression");
-                    return null;
-                }
+        return this.doLookup(identifier, (LexicalScope foundInLexicalScope, String foundIdentifier) -> {
+            if (foundInLexicalScope.isVariable(foundIdentifier) || foundInLexicalScope.isConstant(foundIdentifier)) {
+                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier));
+            } else if (foundInLexicalScope.isParameterlessSubroutine(foundIdentifier)) {
+                return this.createInvokeNode(foundInLexicalScope, foundIdentifier, Collections.emptyList());
             } else {
-                ls = ls.getOuterScope();
+                parser.SemErr(foundIdentifier + " is not an expression");
+                return null;
             }
-        }
-
-        parser.SemErr("Unknown identifier: " + identifier);
-        return null;
+        }, new UnknownIdentifierException(identifier));
     }
 
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
@@ -558,13 +547,17 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
         return this.doLookup(identifier, (LexicalScope foundInScope, String foundIdentifier) -> {
             if (foundInScope.isSubroutine(foundIdentifier)) {
-                PascalContext context = foundInScope.getContext();
-                ExpressionNode literal = new FunctionLiteralNode(context, foundIdentifier);
-                return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), literal);
+                return this.createInvokeNode(foundInScope, foundIdentifier, params);
             } else {
                 throw new LexicalException(foundIdentifier + " is not a subroutine.");
             }
         }, new UnknownIdentifierException(identifier));
+    }
+
+    private ExpressionNode createInvokeNode(LexicalScope inScope, String identifier, List<ExpressionNode> params) {
+        PascalContext context = inScope.getContext();
+        ExpressionNode literal = new FunctionLiteralNode(context, identifier);
+        return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), literal);
     }
 
     public ExpressionNode createReferenceNode(Token variableToken) {
