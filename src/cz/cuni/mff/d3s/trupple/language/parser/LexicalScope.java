@@ -27,7 +27,7 @@ class LexicalScope {
     LexicalScope(LexicalScope outer, String name) {
         this.name = name;
         this.outer = outer;
-        this.localIdentifiers = (outer==null)? new IdentifiersTable() : new IdentifiersTable(outer.getIdentifiersTable());
+        this.localIdentifiers = new IdentifiersTable();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
     }
 
@@ -59,12 +59,8 @@ class LexicalScope {
         return this.localIdentifiers.getFrameSlot(this.name);
     }
 
-    private IdentifiersTable getIdentifiersTable() {
-        return this.localIdentifiers;
-    }
-
-    TypeDescriptor getTypeTypeDescriptor(String identifier) throws LexicalException {
-        return this.localIdentifiers.getTypeTypeDescriptor(identifier);
+    TypeDescriptor getTypeDescriptor(String identifier) {
+        return this.localIdentifiers.getTypeDescriptor(identifier);
     }
 
     public void setName(String identifier) {

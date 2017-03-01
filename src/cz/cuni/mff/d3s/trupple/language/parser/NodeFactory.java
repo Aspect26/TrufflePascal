@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.oracle.truffle.api.frame.FrameSlot;
@@ -34,10 +35,12 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import org.hamcrest.generator.qdox.model.Type;
 
 public class NodeFactory {
 
@@ -103,11 +106,47 @@ public class NodeFactory {
         String identifier = this.getTypeNameFromToken(identifierToken);
 
         try {
-            return this.lexicalScope.getTypeTypeDescriptor(identifier);
+            TypeDescriptor type = this.getTypescriptorFromMainProgram(identifier);
+            if (type == null) {
+                type = this.getTypeDescriptorFromUnits(identifier);
+            }
+            if (type == null) {
+                throw new UnknownTypeException(identifier);
+            }
+            return type;
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
             return UnknownDescriptor.SINGLETON;
         }
+    }
+
+    private TypeDescriptor getTypescriptorFromMainProgram(String identifier) {
+	    LexicalScope ls = this.lexicalScope;
+	    TypeDescriptor type;
+	    while (ls != null) {
+	        type = ls.getTypeDescriptor(identifier);
+            if (type != null) {
+                return type;
+            }
+            ls = ls.getOuterScope();
+        }
+
+        return null;
+    }
+
+    private TypeDescriptor getTypeDescriptorFromUnits(String identifier) {
+        LexicalScope mainProgramLexicalScope = this.getRootLexicalScope(this.lexicalScope);
+
+        for (int i = this.usedUnits.size() - 1; i > -1; --i) {
+            String currentUnitName = this.usedUnits.get(i);
+            String lookupIdentifier = currentUnitName + "." + identifier;
+            TypeDescriptor type = mainProgramLexicalScope.getTypeDescriptor(lookupIdentifier);
+            if (type != null) {
+                return type;
+            }
+        }
+
+        return null;
     }
 
     public void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
@@ -469,9 +508,7 @@ public class NodeFactory {
                 if (ls.isVariable(identifier) || ls.isConstant(identifier)) {
                     return ReadVariableNodeGen.create(ls.getLocalSlot(identifier));
                 } else if (ls.isParameterlessSubroutine(identifier)) {
-                    PascalContext context = ls.getContext();
-                    ExpressionNode literal = new FunctionLiteralNode(context, identifier);
-                    return this.createCall(literal, new ArrayList<>());
+                    return this.createSubroutineCall(identifierToken, Collections.emptyList());
                 } else {
                     parser.SemErr(identifier + " is not an expression");
                     return null;
@@ -500,10 +537,6 @@ public class NodeFactory {
 	        parser.SemErr(e.getMessage());
 	        return false;
         }
-    }
-
-    private ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
-        return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
     }
 
     public ExpressionNode createSubroutineCall(Token identifierToken, List<ExpressionNode> params) {
@@ -561,6 +594,9 @@ public class NodeFactory {
         }
     }
 
+    private ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
+        return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
+    }
 
     public ExpressionNode createReferenceNode(Token variableToken) {
 	    String variableIdentifier = this.getIdentifierFromToken(variableToken);
