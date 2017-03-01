@@ -55,10 +55,10 @@ Program
 ImportsSection
 =
 "uses"
-identifier										(. factory.importUnit(t); .)
+identifier										(. factory.registerUnit(t); .)
 {
 	","
-	identifier									(. factory.importUnit(t); .)
+	identifier									(. factory.registerUnit(t); .)
 }
 ";"
 .
@@ -134,10 +134,10 @@ Ordinal<out ordinalDescriptor>					(. ordinalDimensions.add(ordinalDescriptor); 
 EnumDefinition<out TypeDescriptor typeDescriptor>
 =                                               (. List<String> enumIdentifiers = new ArrayList<>(); .)
 "("
-    identifier                                  (. enumIdentifiers.add(t.val.toLowerCase()); .)
+    identifier                                  (. enumIdentifiers.add(factory.getIdentifierFromToken(t)); .)
     {
         ","
-        identifier                              (. enumIdentifiers.add(t.val.toLowerCase()); .)
+        identifier                              (. enumIdentifiers.add(factory.getIdentifierFromToken(t)); .)
     }
 ")"                                             (. typeDescriptor = factory.registerEnum(enumIdentifiers); .)
 .
@@ -241,10 +241,10 @@ VariableLineDeclaration ";"
 
 VariableLineDeclaration
 =                                               (. List<String> identifiers = new ArrayList<>(); .)
-identifier                                      (. identifiers.add(t.val.toLowerCase()); .)
+identifier                                      (. identifiers.add(factory.getIdentifierFromToken(t)); .)
 {
     ","
-    identifier                                  (. identifiers.add(t.val.toLowerCase()); .)
+    identifier                                  (. identifiers.add(factory.getIdentifierFromToken(t)); .)
 }
 ":"
 Type<out TypeDescriptor typeDescriptor>         (. factory.registerVariables(identifiers, typeDescriptor); .)
@@ -270,11 +270,11 @@ identifier                                      (. Token identifierToken = t; .)
 [ FormalParameterList<out formalParameters> ]
 ";"
 (
-    "forward"                                  (. factory.forwardProcedure(identifierToken, formalParameters); .)
+    "forward"                                   (. factory.forwardProcedure(identifierToken, formalParameters); .)
 |
-                                                (. factory.startProcedure(identifierToken, formalParameters); .)
+                                                (. factory.startProcedureImplementation(identifierToken, formalParameters); .)
     Declarations
-    Block<out StatementNode bodyNode>           (. factory.finishProcedure(bodyNode); .)
+    Block<out StatementNode bodyNode>           (. factory.finishProcedureImplementation(bodyNode); .)
 )
 .
 
@@ -291,9 +291,9 @@ identifier                                      (. Token returnTypeToken = t; .)
 (
     "forward"                                   (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
 |
-                                                (. factory.startFunction(identifierToken, formalParameters, returnTypeToken); .)
+                                                (. factory.startFunctionImplementation(identifierToken, formalParameters, returnTypeToken); .)
     Declarations
-    Block<out StatementNode bodyNode>           (. factory.finishFunction(bodyNode); .)
+    Block<out StatementNode bodyNode>           (. factory.finishFunctionImplementation(bodyNode); .)
 )
 .
 
@@ -318,13 +318,13 @@ FormalParameter<. out List<FormalParameter> formalParameter .>
 [ 
 	"var"										(. isReference = true; .)
 ]
-identifier										(. identifiers.add(t.val.toLowerCase()); .)
+identifier										(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 {
 	","
-	identifier									(. identifiers.add(t.val.toLowerCase()); .)
+	identifier									(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 }
 ":"
-identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isReference); .)
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), isReference); .)
 .
 
 
@@ -389,7 +389,7 @@ IdentifierBeginningStatement<out StatementNode statement>
 =                                               (. statement = null; .)
 identifier                                      (. Token identifierToken = t; .)
 (
-                                                (. statement = factory.createParameterlessSubroutineCall(identifierToken); .)
+                                                (. statement = factory.createSubroutineCall(identifierToken, new ArrayList<ExpressionNode>()); .)
 |
     SubroutineCall<out statement, identifierToken>
 |
@@ -421,10 +421,10 @@ ReadStatement<out StatementNode statement>
 	(
 		")"										(. statement = factory.createReadLine(); .)
 	|
-		identifier								(. identifiers.add(t.val.toLowerCase()); .)
+		identifier								(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 		{
 			","
-			identifier							(. identifiers.add(t.val.toLowerCase()); .)
+			identifier							(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 		}
 	")"											(. statement = factory.createReadLine(identifiers); .)
 	)
@@ -690,12 +690,12 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
 
 SubroutineCall<out ExpressionNode expression, Token identifierToken>
 =
-"("                                             (. ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); .)
+"("
                                                 (. List<ExpressionNode> parameters = new ArrayList<>(); .)
     [
         ActualParameters<out parameters, identifierToken>
     ]
-")"                                             (. expression = factory.createCall(functionNode, parameters); .)
+")"                                             (. expression = factory.createSubroutineCall(identifierToken, parameters); .)
 .
 
 
@@ -743,13 +743,23 @@ ArrayIndex<. out List<ExpressionNode> indexNodes .>
 
 Unit
 =
+UnitHeader
+InterfaceSection                                (. factory.finishUnitInterfaceSection(); .)
+ImplementationSection
+UnitFooter
+.
+
+
+UnitHeader
+=
 "unit"
 identifier										(. factory.startUnit(t); .)
 ";"
-"interface"
-InterfaceSection
-"implementation"								(. factory.leaveUnitInterfaceSection(); .)
-ImplementationSection
+.
+
+
+UnitFooter
+=
 "end"											(. factory.endUnit(); .)
 "."
 .
@@ -757,13 +767,16 @@ ImplementationSection
 
 InterfaceSection
 =
-[ TypeDefinitions ]
-[ VariableDeclarations ]
+"interface"
 {
 	(
 		ProcedureHeading
 	|
 		FunctionHeading
+	|
+	    TypeDefinitions
+	|
+	    VariableDeclarations
 	)
 }
 .
@@ -775,8 +788,8 @@ ProcedureHeading
 "procedure"
 identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ] 		
-												(. factory.addProcedureInterface(name, formalParameters); .)
+[ FormalParameterList<out formalParameters> ]
+												(. factory.addUnitProcedureInterface(name, formalParameters); .)
 ";"
 .
 
@@ -787,10 +800,10 @@ FunctionHeading
 "function"
 identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ] 
+[ FormalParameterList<out formalParameters> ]
 ":"
-identifier										(. String returnValue = t.val; .)
-												(. factory.addFunctionInterface(name, formalParameters, returnValue); .)
+identifier										(. String returnTypeName = factory.getTypeNameFromToken(t); .)
+												(. factory.addUnitFunctionInterface(name, formalParameters, returnTypeName); .)
 ";"
 .
 
@@ -798,15 +811,54 @@ identifier										(. String returnValue = t.val; .)
 
 ImplementationSection
 =
+"implementation"
 {
 	(
-		Subroutine
+		UnitSubroutineImplementation
 	|
 		VariableDeclarations
 	|
-		TypeDefinition
+		TypeDefinitions
 	)
 }
+.
+
+
+UnitSubroutineImplementation
+=
+(
+    UnitProcedureImplementation ";"
+|
+    UnitFunctionImplementation ";"
+)
+.
+
+
+UnitProcedureImplementation
+=
+"procedure"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+";"
+                                                (. factory.startUnitProcedureImplementation(identifierToken, formalParameters); .)
+Declarations
+Block<out StatementNode bodyNode>               (. factory.finishProcedureImplementation(bodyNode); .)
+.
+
+
+UnitFunctionImplementation
+=
+"function"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+":"
+identifier                                      (. Token returnTypeToken = t; .)
+";"
+                                                (. factory.startUnitFunctionImplementation(identifierToken, formalParameters, returnTypeToken); .)
+Declarations
+Block<out StatementNode bodyNode>               (. factory.finishFunctionImplementation(bodyNode); .)
 .
 
 END Pascal.

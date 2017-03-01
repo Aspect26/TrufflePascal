@@ -35,12 +35,6 @@ public class IdentifiersTable {
         addBuiltinFunctions();
     }
 
-    public IdentifiersTable(IdentifiersTable parentTable) {
-        this.initialize();
-        addBuiltinFunctions();
-        addParentTypes(parentTable.getAllTypes());
-    }
-
     private void initialize() {
         this.identifiersMap = new HashMap<>();
         this.typeDescriptors = new HashMap<>();
@@ -58,6 +52,10 @@ public class IdentifiersTable {
         typeDescriptors.put("double", PrimitiveDescriptor.floatDescriptor());
         typeDescriptors.put("boolean", PrimitiveDescriptor.booleanDescriptor());
         typeDescriptors.put("char", PrimitiveDescriptor.charDescriptor());
+
+        for (Map.Entry<String, TypeDescriptor> typeEntry : typeDescriptors.entrySet()) {
+            identifiersMap.put(typeEntry.getKey(), new TypeTypeDescriptor(typeEntry.getValue()));
+        }
     }
 
     private void addBuiltinFunctions() {
@@ -65,10 +63,6 @@ public class IdentifiersTable {
         identifiersMap.put("writeln", new BuiltinProcedureDescriptor.Writeln());
         identifiersMap.put("read", new BuiltinProcedureDescriptor.Read());
         identifiersMap.put("readln", new BuiltinProcedureDescriptor.Readln());
-    }
-
-    private void addParentTypes(Map<String, TypeDescriptor> parentTypes) {
-        this.typeDescriptors.putAll(parentTypes);
     }
 
     public FrameSlot getFrameSlot(String identifier) {
@@ -83,16 +77,16 @@ public class IdentifiersTable {
         return this.frameDescriptor;
     }
 
-    public TypeDescriptor getTypeTypeDescriptor(String identifier) {
+    public TypeDescriptor getTypeDescriptor(String identifier)  {
         return this.typeDescriptors.get(identifier);
+    }
+
+    public TypeDescriptor getTypeTypeDescriptor(String typeIdentifier) {
+        return this.typeDescriptors.get(typeIdentifier);
     }
 
     public Map<String, TypeDescriptor> getAll() {
         return this.identifiersMap;
-    }
-
-    Map<String, TypeDescriptor> getAllTypes() {
-        return this.typeDescriptors;
     }
 
     public boolean containsIdentifier(String identifier) {
@@ -117,11 +111,7 @@ public class IdentifiersTable {
         }
 
         TypeDescriptor descriptor = this.identifiersMap.get(identifier);
-        if (!(descriptor instanceof SubroutineDescriptor)){
-            return false;
-        } else {
-            return !((SubroutineDescriptor) descriptor).hasParameters();
-        }
+        return descriptor instanceof SubroutineDescriptor && !((SubroutineDescriptor) descriptor).hasParameters();
     }
 
     public void addType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
@@ -129,33 +119,15 @@ public class IdentifiersTable {
             throw new DuplicitIdentifierException(identifier);
         } else {
             this.typeDescriptors.put(identifier, typeDescriptor);
+            this.identifiersMap.put(identifier, new TypeTypeDescriptor(typeDescriptor));
         }
     }
 
-    public FrameSlot addVariable(String identifier, String typeName) throws LexicalException {
-        TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
-        FrameSlot frameSlot = this.registerNewIdentifier(identifier, typeDescriptor);
-
-        if (typeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new UnknownTypeException(typeName);
-        }
-
-        return frameSlot;
+    public FrameSlot addReference(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        return this.registerNewIdentifier(identifier, new ReferenceDescriptor(typeDescriptor));
     }
 
-    public FrameSlot addReference(String identifier, String typeName) throws LexicalException {
-        TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
-        ReferenceDescriptor referenceDescriptor = new ReferenceDescriptor(typeDescriptor);
-        FrameSlot frameSlot = this.registerNewIdentifier(identifier, referenceDescriptor);
-
-        if (typeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new UnknownTypeException(typeName);
-        }
-
-        return frameSlot;
-    }
-
-    public FrameSlot addVariable(TypeDescriptor typeDescriptor, String identifier) throws LexicalException {
+    public FrameSlot addVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         return this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
@@ -243,7 +215,7 @@ public class IdentifiersTable {
     }
 
     private ConstantDescriptor getConstant(String identifier) throws LexicalException {
-        TypeDescriptor descriptor = this.getTypeTypeDescriptor(identifier);
+        TypeDescriptor descriptor = this.getTypeDescriptor(identifier);
         if (descriptor == null) {
             throw new UnknownIdentifierException(identifier);
         } else if (! (descriptor instanceof ConstantDescriptor)) {

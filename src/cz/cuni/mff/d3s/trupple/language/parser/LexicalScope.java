@@ -3,7 +3,6 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customtypes.ICustomType;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
@@ -11,28 +10,26 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class LexicalScope {
 
 
-    private final String name;
+    private String name;
     private final LexicalScope outer;
     private final IdentifiersTable localIdentifiers;
     private int loopDepth;
     private final PascalContext context;
-    private final List<StatementNode> readArgumentNodes = new ArrayList<>();
+    private final Set<String> publicIdentifiers;
 
-    private final Map<String, ICustomType> customTypes;
+    // TODO: wtf is this?
+    private final List<StatementNode> readArgumentNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name) {
         this.name = name;
         this.outer = outer;
-        this.customTypes = new HashMap<>();
-        this.localIdentifiers = (outer==null)? new IdentifiersTable() : new IdentifiersTable(outer.getIdentifiersTable());
+        this.publicIdentifiers = new HashSet<>();
+        this.localIdentifiers = new IdentifiersTable();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
     }
 
@@ -64,12 +61,16 @@ class LexicalScope {
         return this.localIdentifiers.getFrameSlot(this.name);
     }
 
-    private IdentifiersTable getIdentifiersTable() {
-        return this.localIdentifiers;
+    TypeDescriptor getTypeDescriptor(String identifier) {
+        return this.localIdentifiers.getTypeDescriptor(identifier);
     }
 
-    TypeDescriptor getTypeTypeDescriptor(String identifier) throws LexicalException {
-        return this.localIdentifiers.getTypeTypeDescriptor(identifier);
+    TypeDescriptor getTypeTypeDescriptor(String typeIdentifier) {
+        return this.localIdentifiers.getTypeTypeDescriptor(typeIdentifier);
+    }
+
+    public void setName(String identifier) {
+        this.name = identifier;
     }
 
     void registerNewType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
@@ -102,16 +103,16 @@ class LexicalScope {
         return this.localIdentifiers.isSubroutine(identifier);
     }
 
+    boolean isIdentifierPublic(String identifier) {
+        return this.publicIdentifiers.contains(identifier);
+    }
+
     boolean containsLocalIdentifier(String identifier) {
         return this.localIdentifiers.containsIdentifier(identifier);
     }
 
-    FrameSlot registerLocalVariable(String identifier, String typeName) throws LexicalException {
-        return this.localIdentifiers.addVariable(identifier, typeName);
-    }
-
-    FrameSlot registerReferenceVariable(String identifier, String typeName) throws LexicalException {
-        return this.localIdentifiers.addReference(identifier, typeName);
+    FrameSlot registerReferenceVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        return this.localIdentifiers.addReference(identifier, typeDescriptor);
     }
 
     void registerReturnType(List<FormalParameter> formalParameters, String typeName) throws LexicalException {
@@ -119,7 +120,7 @@ class LexicalScope {
     }
 
     FrameSlot registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        return this.localIdentifiers.addVariable(typeDescriptor, identifier);
+        return this.localIdentifiers.addVariable(identifier, typeDescriptor);
     }
 
     void addScopeArgument(StatementNode initializationNode) {
@@ -138,17 +139,8 @@ class LexicalScope {
         return this.localIdentifiers.createSetType(baseType);
     }
 
-    void forwardProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
-        this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
-        this.context.registerSubroutineName(identifier, true);
-    }
-
-    void forwardFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
-        this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
-        this.context.registerSubroutineName(identifier, true);
-    }
-
-    void startProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+    // NOTE: the procedure could have been forwarded
+    void tryRegisterProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
         try {
             this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
         } catch (DuplicitIdentifierException e) {
@@ -159,7 +151,8 @@ class LexicalScope {
         this.context.registerSubroutineName(identifier, true);
     }
 
-    void startFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
+    // NOTE: the function could have been forwarded
+    void tryRegisterFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
         try {
             this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
         } catch (DuplicitIdentifierException e) {
@@ -168,6 +161,24 @@ class LexicalScope {
             }
         }
         this.context.registerSubroutineName(identifier, true);
+    }
+
+    void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+        this.registerProcedureInterface(identifier, formalParameters, true);
+    }
+
+    void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters, boolean isPublic) throws LexicalException {
+        this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
+        this.context.registerSubroutineName(identifier, isPublic);
+    }
+
+    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnTypeName) throws LexicalException {
+        this.registerFunctionInterface(identifier, formalParameters, returnTypeName, true);
+    }
+
+    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnTypeName, boolean isPublic) throws LexicalException {
+        this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnTypeName);
+        this.context.registerSubroutineName(identifier, isPublic);
     }
 
     void registerLongConstant(String identifier, long value) throws LexicalException {
@@ -218,6 +229,16 @@ class LexicalScope {
         return initializationNodes;
     }
 
+    void markAllIdentifiersFromUnitPublic(String unitName) {
+        Map<String, TypeDescriptor> allIdentifiers = this.localIdentifiers.getAll();
+        for (Map.Entry<String, TypeDescriptor> entry : allIdentifiers.entrySet()) {
+            String currentIdentifier = entry.getKey();
+            if (currentIdentifier.startsWith(unitName + ".")) {
+                this.publicIdentifiers.add(currentIdentifier);
+            }
+        }
+    }
+
     void increaseLoopDepth() {
         ++loopDepth;
     }
@@ -232,16 +253,5 @@ class LexicalScope {
 
     boolean isInLoop() {
         return loopDepth > 0;
-    }
-
-    //
-    // THIS SHOULD BE REMOVED
-
-    Map<String, ICustomType> getAllCustomTypes() {
-        return this.customTypes;
-    }
-
-    void registerCustomType(String name, ICustomType customType) {
-        this.customTypes.put(name, customType);
     }
 }
