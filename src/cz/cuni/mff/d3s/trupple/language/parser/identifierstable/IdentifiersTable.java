@@ -52,6 +52,10 @@ public class IdentifiersTable {
         typeDescriptors.put("double", PrimitiveDescriptor.floatDescriptor());
         typeDescriptors.put("boolean", PrimitiveDescriptor.booleanDescriptor());
         typeDescriptors.put("char", PrimitiveDescriptor.charDescriptor());
+
+        for (Map.Entry<String, TypeDescriptor> typeEntry : typeDescriptors.entrySet()) {
+            identifiersMap.put(typeEntry.getKey(), new TypeTypeDescriptor(typeEntry.getValue()));
+        }
     }
 
     private void addBuiltinFunctions() {
@@ -111,6 +115,8 @@ public class IdentifiersTable {
             throw new DuplicitIdentifierException(identifier);
         } else {
             this.typeDescriptors.put(identifier, typeDescriptor);
+            // TODO: here should be TypeTypeDescriptor
+            this.identifiersMap.put(identifier, new TypeTypeDescriptor(typeDescriptor));
         }
     }
 

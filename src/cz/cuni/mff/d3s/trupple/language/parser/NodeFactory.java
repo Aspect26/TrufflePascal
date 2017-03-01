@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import com.sun.istack.internal.NotNull;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
@@ -40,9 +41,14 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDes
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import org.hamcrest.generator.qdox.model.Type;
 
 public class NodeFactory {
+
+    private interface GlobalObjectLookup<T> {
+
+        T onFound(LexicalScope foundInScope, String foundIdentifier) throws LexicalException;
+
+    }
 
     /**
      * The parser to be used for parsing. There can be two: parser for wirths' standard or turbo pascal standard.
@@ -102,51 +108,60 @@ public class NodeFactory {
         }
     }
 
-    public TypeDescriptor getTypeDescriptor(Token identifierToken) {
-        String identifier = this.getTypeNameFromToken(identifierToken);
-
+    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException, T notFoundReturnValue) {
         try {
-            TypeDescriptor type = this.getTypescriptorFromMainProgram(identifier);
-            if (type == null) {
-                type = this.getTypeDescriptorFromUnits(identifier);
+            T result = lookupToParentScope(identifier, lookupFunction);
+            if (result == null) {
+                result = lookupInUnits(identifier, lookupFunction);
             }
-            if (type == null) {
-                throw new UnknownTypeException(identifier);
+            if (result == null) {
+                throw notFoundException;
             }
-            return type;
+            return result;
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
-            return UnknownDescriptor.SINGLETON;
+            return notFoundReturnValue;
         }
     }
 
-    private TypeDescriptor getTypescriptorFromMainProgram(String identifier) {
-	    LexicalScope ls = this.lexicalScope;
-	    TypeDescriptor type;
-	    while (ls != null) {
-	        type = ls.getTypeDescriptor(identifier);
-            if (type != null) {
-                return type;
+    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException) {
+	    return this.doLookup(identifier, lookupFunction, notFoundException, null);
+    }
+
+    private <T> T lookupToParentScope(String identifier, GlobalObjectLookup<T> lookupFunction) throws LexicalException {
+        LexicalScope currentLexicalScope = this.lexicalScope;
+        while (currentLexicalScope != null) {
+            if (currentLexicalScope.containsLocalIdentifier(identifier)){
+                return lookupFunction.onFound(currentLexicalScope, identifier);
+            } else {
+                currentLexicalScope = currentLexicalScope.getOuterScope();
             }
-            ls = ls.getOuterScope();
         }
 
         return null;
     }
 
-    private TypeDescriptor getTypeDescriptorFromUnits(String identifier) {
+    private <T> T lookupInUnits(String identifier, GlobalObjectLookup<T> lookupFunction) throws LexicalException {
         LexicalScope mainProgramLexicalScope = this.getRootLexicalScope(this.lexicalScope);
 
         for (int i = this.usedUnits.size() - 1; i > -1; --i) {
             String currentUnitName = this.usedUnits.get(i);
             String lookupIdentifier = currentUnitName + "." + identifier;
-            TypeDescriptor type = mainProgramLexicalScope.getTypeDescriptor(lookupIdentifier);
-            if (type != null) {
-                return type;
+
+            if (mainProgramLexicalScope.containsLocalIdentifier(lookupIdentifier)){
+                return lookupFunction.onFound(mainProgramLexicalScope, lookupIdentifier);
             }
         }
 
         return null;
+    }
+
+    public TypeDescriptor getTypeDescriptor(Token identifierToken) {
+        String identifier = this.getTypeNameFromToken(identifierToken);
+
+        return this.doLookup(identifier, (LexicalScope foundInLexicalScope, String foundIdentifier) ->
+            foundInLexicalScope.getTypeDescriptor(foundIdentifier)
+        , new UnknownTypeException(identifier), UnknownDescriptor.SINGLETON);
     }
 
     public void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
@@ -541,61 +556,15 @@ public class NodeFactory {
 
     public ExpressionNode createSubroutineCall(Token identifierToken, List<ExpressionNode> params) {
         String identifier = this.getIdentifierFromToken(identifierToken);
-
-        try {
-            ExpressionNode resultNode = this.createSubroutineCallInMainProgram(identifier, params);
-            if (resultNode == null) {
-                resultNode = this.createSubroutineCallFromUnits(identifier, params);
-            }
-            if (resultNode == null) {
-                throw new UnknownIdentifierException(identifier);
-            }
-            return resultNode;
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-            return null;
-        }
-    }
-
-    private ExpressionNode createSubroutineCallInMainProgram(String identifier, List<ExpressionNode> params) throws LexicalException {
-        LexicalScope ls = this.lexicalScope;
-        while (ls != null) {
-            if (ls.containsLocalIdentifier(identifier)){
-                return createSubroutineCallInLexicalScope(ls, identifier, params);
+        return this.doLookup(identifier, (LexicalScope foundInScope, String foundIdentifier) -> {
+            if (foundInScope.isSubroutine(foundIdentifier)) {
+                PascalContext context = foundInScope.getContext();
+                ExpressionNode literal = new FunctionLiteralNode(context, foundIdentifier);
+                return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), literal);
             } else {
-                ls = ls.getOuterScope();
+                throw new LexicalException(foundIdentifier + " is not a subroutine.");
             }
-        }
-
-        return null;
-    }
-
-    private ExpressionNode createSubroutineCallFromUnits(String identifier, List<ExpressionNode> params) throws LexicalException {
-        LexicalScope mainProgramLexicalScope = this.getRootLexicalScope(this.lexicalScope);
-
-        for (int i = this.usedUnits.size() - 1; i > -1; --i) {
-            String currentUnitName = this.usedUnits.get(i);
-            String lookupIdentifier = currentUnitName + "." + identifier;
-            if (mainProgramLexicalScope.containsLocalIdentifier(lookupIdentifier)){
-                return createSubroutineCallInLexicalScope(mainProgramLexicalScope, lookupIdentifier, params);
-            }
-        }
-
-        return null;
-    }
-
-    private ExpressionNode createSubroutineCallInLexicalScope(LexicalScope lexicalScope, String identifier, List<ExpressionNode> params) throws LexicalException {
-        if (lexicalScope.isSubroutine(identifier)) {
-            PascalContext context = lexicalScope.getContext();
-            ExpressionNode literal = new FunctionLiteralNode(context, identifier);
-            return this.createCall(literal, params);
-        } else {
-            throw new LexicalException(identifier + " is not a subroutine.");
-        }
-    }
-
-    private ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
-        return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
+        }, new UnknownIdentifierException(identifier));
     }
 
     public ExpressionNode createReferenceNode(Token variableToken) {
