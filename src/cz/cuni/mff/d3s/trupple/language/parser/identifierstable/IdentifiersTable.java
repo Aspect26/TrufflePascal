@@ -81,6 +81,10 @@ public class IdentifiersTable {
         return this.typeDescriptors.get(identifier);
     }
 
+    public TypeDescriptor getTypeTypeDescriptor(String typeIdentifier) {
+        return this.typeDescriptors.get(typeIdentifier);
+    }
+
     public Map<String, TypeDescriptor> getAll() {
         return this.identifiersMap;
     }
@@ -115,35 +119,15 @@ public class IdentifiersTable {
             throw new DuplicitIdentifierException(identifier);
         } else {
             this.typeDescriptors.put(identifier, typeDescriptor);
-            // TODO: here should be TypeTypeDescriptor
             this.identifiersMap.put(identifier, new TypeTypeDescriptor(typeDescriptor));
         }
     }
 
-    public FrameSlot addVariable(String identifier, String typeName) throws LexicalException {
-        TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
-        FrameSlot frameSlot = this.registerNewIdentifier(identifier, typeDescriptor);
-
-        if (typeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new UnknownTypeException(typeName);
-        }
-
-        return frameSlot;
+    public FrameSlot addReference(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        return this.registerNewIdentifier(identifier, new ReferenceDescriptor(typeDescriptor));
     }
 
-    public FrameSlot addReference(String identifier, String typeName) throws LexicalException {
-        TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
-        ReferenceDescriptor referenceDescriptor = new ReferenceDescriptor(typeDescriptor);
-        FrameSlot frameSlot = this.registerNewIdentifier(identifier, referenceDescriptor);
-
-        if (typeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new UnknownTypeException(typeName);
-        }
-
-        return frameSlot;
-    }
-
-    public FrameSlot addVariable(TypeDescriptor typeDescriptor, String identifier) throws LexicalException {
+    public FrameSlot addVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         return this.registerNewIdentifier(identifier, typeDescriptor);
     }
 

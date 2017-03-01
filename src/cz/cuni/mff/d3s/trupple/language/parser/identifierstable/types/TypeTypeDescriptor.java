@@ -10,6 +10,10 @@ public class TypeTypeDescriptor extends TypeDescriptor {
         this.typeDescriptor = typeDescriptor;
     }
 
+    public TypeDescriptor getTypeDescriptor() {
+        return this.typeDescriptor;
+    }
+
     @Override
     public FrameSlotKind getSlotKind() {
         return null;

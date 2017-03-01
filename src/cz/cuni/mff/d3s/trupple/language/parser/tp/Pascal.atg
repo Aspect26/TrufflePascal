@@ -744,7 +744,7 @@ ArrayIndex<. out List<ExpressionNode> indexNodes .>
 Unit
 =
 UnitHeader
-InterfaceSection
+InterfaceSection                                (. factory.finishUnitInterfaceSection(); .)
 ImplementationSection
 UnitFooter
 .

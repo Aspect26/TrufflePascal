@@ -9,8 +9,8 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 class LexicalScope {
 
@@ -20,6 +20,7 @@ class LexicalScope {
     private final IdentifiersTable localIdentifiers;
     private int loopDepth;
     private final PascalContext context;
+    private final Set<String> publicIdentifiers;
 
     // TODO: wtf is this?
     private final List<StatementNode> readArgumentNodes = new ArrayList<>();
@@ -27,6 +28,7 @@ class LexicalScope {
     LexicalScope(LexicalScope outer, String name) {
         this.name = name;
         this.outer = outer;
+        this.publicIdentifiers = new HashSet<>();
         this.localIdentifiers = new IdentifiersTable();
         this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
     }
@@ -63,6 +65,10 @@ class LexicalScope {
         return this.localIdentifiers.getTypeDescriptor(identifier);
     }
 
+    TypeDescriptor getTypeTypeDescriptor(String typeIdentifier) {
+        return this.localIdentifiers.getTypeTypeDescriptor(typeIdentifier);
+    }
+
     public void setName(String identifier) {
         this.name = identifier;
     }
@@ -97,16 +103,16 @@ class LexicalScope {
         return this.localIdentifiers.isSubroutine(identifier);
     }
 
+    boolean isIdentifierPublic(String identifier) {
+        return this.publicIdentifiers.contains(identifier);
+    }
+
     boolean containsLocalIdentifier(String identifier) {
         return this.localIdentifiers.containsIdentifier(identifier);
     }
 
-    FrameSlot registerLocalVariable(String identifier, String typeName) throws LexicalException {
-        return this.localIdentifiers.addVariable(identifier, typeName);
-    }
-
-    FrameSlot registerReferenceVariable(String identifier, String typeName) throws LexicalException {
-        return this.localIdentifiers.addReference(identifier, typeName);
+    FrameSlot registerReferenceVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        return this.localIdentifiers.addReference(identifier, typeDescriptor);
     }
 
     void registerReturnType(List<FormalParameter> formalParameters, String typeName) throws LexicalException {
@@ -114,7 +120,7 @@ class LexicalScope {
     }
 
     FrameSlot registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        return this.localIdentifiers.addVariable(typeDescriptor, identifier);
+        return this.localIdentifiers.addVariable(identifier, typeDescriptor);
     }
 
     void addScopeArgument(StatementNode initializationNode) {
@@ -221,6 +227,16 @@ class LexicalScope {
         initializationNodes.addAll(this.readArgumentNodes);
 
         return initializationNodes;
+    }
+
+    void markAllIdentifiersFromUnitPublic(String unitName) {
+        Map<String, TypeDescriptor> allIdentifiers = this.localIdentifiers.getAll();
+        for (Map.Entry<String, TypeDescriptor> entry : allIdentifiers.entrySet()) {
+            String currentIdentifier = entry.getKey();
+            if (currentIdentifier.startsWith(unitName + ".")) {
+                this.publicIdentifiers.add(currentIdentifier);
+            }
+        }
     }
 
     void increaseLoopDepth() {

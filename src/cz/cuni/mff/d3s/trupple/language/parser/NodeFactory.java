@@ -39,6 +39,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierExcep
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -148,7 +149,7 @@ public class NodeFactory {
             String currentUnitName = this.usedUnits.get(i);
             String lookupIdentifier = currentUnitName + "." + identifier;
 
-            if (mainProgramLexicalScope.containsLocalIdentifier(lookupIdentifier)){
+            if (mainProgramLexicalScope.containsLocalIdentifier(lookupIdentifier) && mainProgramLexicalScope.isIdentifierPublic(lookupIdentifier)) {
                 return lookupFunction.onFound(mainProgramLexicalScope, lookupIdentifier);
             }
         }
@@ -665,13 +666,19 @@ public class NodeFactory {
         try {
             int count = 0;
             for (FormalParameter parameter : parameters) {
+                TypeDescriptor typeDescriptor = this.doLookup(parameter.type, LexicalScope::getTypeTypeDescriptor,
+                        new UnknownTypeException(parameter.identifier));
+
+                if (typeDescriptor == null)
+                    return;
+
                 if (parameter.isReference) {
-                    FrameSlot frameSlot = this.lexicalScope.registerReferenceVariable(parameter.identifier, parameter.type);
+                    FrameSlot frameSlot = this.lexicalScope.registerReferenceVariable(parameter.identifier, typeDescriptor);
                     final ReferenceInitializationNode initializationNode = new ReferenceInitializationNode(frameSlot, count++);
 
                     this.lexicalScope.addScopeArgument(initializationNode);
                 } else {
-                    FrameSlot frameSlot = this.lexicalScope.registerLocalVariable(parameter.identifier, parameter.type);
+                    FrameSlot frameSlot = this.lexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
                     FrameSlotKind slotKind = this.lexicalScope.getSlotKind(parameter.identifier);
                     final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(count++, slotKind);
                     final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);
@@ -728,6 +735,14 @@ public class NodeFactory {
         } catch (LexicalException e) {
 	        parser.SemErr(e.getMessage());
         }
+    }
+
+    public void finishUnitInterfaceSection() {
+	    assert this.identifiersPrefix.endsWith(".");
+
+	    // TODO: oh god... there should be a variable containing current parsing unit instead of this...
+	    String unitName = this.identifiersPrefix.substring(0, this.identifiersPrefix.length() - 1);
+	    this.lexicalScope.markAllIdentifiersFromUnitPublic(unitName);
     }
 
     public void startUnitProcedureImplementation(Token identifierToken, List<FormalParameter> formalParameters) {

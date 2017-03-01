@@ -147,6 +147,7 @@ public class Parser implements IParser {
 	void Unit() {
 		UnitHeader();
 		InterfaceSection();
+		factory.finishUnitInterfaceSection(); 
 		ImplementationSection();
 		UnitFooter();
 	}
