@@ -115,13 +115,14 @@ Ordinal<out ordinalDescriptor>					(. ordinalDimensions.add(ordinalDescriptor); 
 EnumDefinition<out TypeDescriptor typeDescriptor>
 =                                               (. List<String> enumIdentifiers = new ArrayList<>(); .)
 "("
-    identifier                                  (. enumIdentifiers.add(t.val.toLowerCase()); .)
+    identifier                                  (. enumIdentifiers.add(factory.getIdentifierFromToken(t)); .)
     {
         ","
-        identifier                              (. enumIdentifiers.add(t.val.toLowerCase()); .)
+        identifier                              (. enumIdentifiers.add(factory.getIdentifierFromToken(t)); .)
     }
 ")"                                             (. typeDescriptor = factory.registerEnum(enumIdentifiers); .)
 .
+
 
 
 Ordinal<out OrdinalDescriptor ordinal>
@@ -222,10 +223,10 @@ VariableLineDeclaration ";"
 
 VariableLineDeclaration
 =                                               (. List<String> identifiers = new ArrayList<>(); .)
-identifier                                      (. identifiers.add(t.val.toLowerCase()); .)
+identifier                                      (. identifiers.add(factory.getIdentifierFromToken(t)); .)
 {
     ","
-    identifier                                  (. identifiers.add(t.val.toLowerCase()); .)
+    identifier                                  (. identifiers.add(factory.getIdentifierFromToken(t)); .)
 }
 ":"
 Type<out TypeDescriptor typeDescriptor>         (. factory.registerVariables(identifiers, typeDescriptor); .)
@@ -299,13 +300,13 @@ FormalParameter<. out List<FormalParameter> formalParameter .>
 [ 
 	"var"										(. isReference = true; .)
 ]
-identifier										(. identifiers.add(t.val.toLowerCase()); .)
+identifier										(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 {
 	","
-	identifier									(. identifiers.add(t.val.toLowerCase()); .)
+	identifier									(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 }
 ":"
-identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isReference); .)
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), isReference); .)
 .
 
 
@@ -368,7 +369,7 @@ IdentifierBeginningStatement<out StatementNode statement>
 =                                               (. statement = null; .)
 identifier                                      (. Token identifierToken = t; .)
 (
-                                                (. statement = factory.createParameterlessSubroutineCall(identifierToken); .)
+                                                (. statement = factory.createSubroutineCall(identifierToken, new ArrayList<ExpressionNode>()); .)
 |
     SubroutineCall<out statement, identifierToken>
 |
@@ -400,10 +401,10 @@ ReadStatement<out StatementNode statement>
 	(
 		")"										(. statement = factory.createReadLine(); .)
 	|
-		identifier								(. identifiers.add(t.val.toLowerCase()); .)
+		identifier								(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 		{
 			","
-			identifier							(. identifiers.add(t.val.toLowerCase()); .)
+			identifier							(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 		}
 	")"											(. statement = factory.createReadLine(identifiers); .)
 	)
@@ -669,12 +670,12 @@ MemberExpression<out ExpressionNode expression, Token identifierName>
 
 SubroutineCall<out ExpressionNode expression, Token identifierToken>
 =
-"("                                             (. ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); .)
+"("
                                                 (. List<ExpressionNode> parameters = new ArrayList<>(); .)
     [
         ActualParameters<out parameters, identifierToken>
     ]
-")"                                             (. expression = factory.createCall(functionNode, parameters); .)
+")"                                             (. expression = factory.createSubroutineCall(identifierToken, parameters); .)
 .
 
 

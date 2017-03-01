@@ -38,4 +38,9 @@ public final class FunctionLiteralNode extends ExpressionNode {
 		
 		return function;
 	}
+
+	@Override
+	public String toString() {
+		return this.value;
+	}
 }

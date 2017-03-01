@@ -1,9 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
@@ -35,6 +33,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
@@ -101,7 +100,7 @@ public class NodeFactory {
     }
 
     public TypeDescriptor getTypeDescriptor(Token identifierToken) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
+        String identifier = this.getTypeNameFromToken(identifierToken);
 
         try {
             return this.lexicalScope.getTypeTypeDescriptor(identifier);
@@ -377,29 +376,6 @@ public class NodeFactory {
         return new CaseNode(data.caseExpression, indexes, statements, data.elseNode);
     }
 
-    public StatementNode createParameterlessSubroutineCall(Token identifierToken) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-
-        LexicalScope ls = this.lexicalScope;
-        while (ls != null) {
-            if (ls.containsLocalIdentifier(identifier)){
-                if (ls.isParameterlessSubroutine(identifier)) {
-                    PascalContext context = ls.getContext();
-                    ExpressionNode literal = new FunctionLiteralNode(context, identifier);
-                    return this.createCall(literal, new ArrayList<>());
-                } else {
-                    parser.SemErr(identifier + " is not a parameterless subroutine.");
-                    return null;
-                }
-            } else {
-                ls = ls.getOuterScope();
-            }
-        }
-
-        parser.SemErr("Unknown identifier: " + identifier);
-        return null;
-    }
-
     public StatementNode createNopStatement() {
         return new NopNode();
     }
@@ -526,30 +502,65 @@ public class NodeFactory {
         }
     }
 
-    public ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
+    private ExpressionNode createCall(ExpressionNode functionLiteral, List<ExpressionNode> params) {
         return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), functionLiteral);
     }
 
-    public ExpressionNode createFunctionLiteralNode(Token identifierToken) {
+    public ExpressionNode createSubroutineCall(Token identifierToken, List<ExpressionNode> params) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
+        try {
+            ExpressionNode resultNode = this.createSubroutineCallInMainProgram(identifier, params);
+            if (resultNode == null) {
+                resultNode = this.createSubroutineCallFromUnits(identifier, params);
+            }
+            if (resultNode == null) {
+                throw new UnknownIdentifierException(identifier);
+            }
+            return resultNode;
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+            return null;
+        }
+    }
+
+    private ExpressionNode createSubroutineCallInMainProgram(String identifier, List<ExpressionNode> params) throws LexicalException {
         LexicalScope ls = this.lexicalScope;
-        while (ls != null){
-            if (ls.containsLocalIdentifier(identifier)) {
-                if (!ls.isSubroutine(identifier)) {
-                    parser.SemErr(identifier + " is not a subroutine");
-                    return null;
-                } else {
-                    return new FunctionLiteralNode(ls.getContext(), identifier);
-                }
+        while (ls != null) {
+            if (ls.containsLocalIdentifier(identifier)){
+                return createSubroutineCallInLexicalScope(ls, identifier, params);
             } else {
                 ls = ls.getOuterScope();
             }
         }
 
-        parser.SemErr("Undefined subroutine: " + identifier);
         return null;
     }
+
+    private ExpressionNode createSubroutineCallFromUnits(String identifier, List<ExpressionNode> params) throws LexicalException {
+        LexicalScope mainProgramLexicalScope = this.getRootLexicalScope(this.lexicalScope);
+
+        for (int i = this.usedUnits.size() - 1; i > -1; --i) {
+            String currentUnitName = this.usedUnits.get(i);
+            String lookupIdentifier = currentUnitName + "." + identifier;
+            if (mainProgramLexicalScope.containsLocalIdentifier(lookupIdentifier)){
+                return createSubroutineCallInLexicalScope(mainProgramLexicalScope, lookupIdentifier, params);
+            }
+        }
+
+        return null;
+    }
+
+    private ExpressionNode createSubroutineCallInLexicalScope(LexicalScope lexicalScope, String identifier, List<ExpressionNode> params) throws LexicalException {
+        if (lexicalScope.isSubroutine(identifier)) {
+            PascalContext context = lexicalScope.getContext();
+            ExpressionNode literal = new FunctionLiteralNode(context, identifier);
+            return this.createCall(literal, params);
+        } else {
+            throw new LexicalException(identifier + " is not a subroutine.");
+        }
+    }
+
 
     public ExpressionNode createReferenceNode(Token variableToken) {
 	    String variableIdentifier = this.getIdentifierFromToken(variableToken);
@@ -622,9 +633,21 @@ public class NodeFactory {
         }
     }
 
-	private String getIdentifierFromToken(Token identifierToken) {
+	public String getIdentifierFromToken(Token identifierToken) {
 	    String identifier = identifierToken.val.toLowerCase();
         return this.identifiersPrefix + identifier;
+    }
+
+    public String getTypeNameFromToken(Token typeNameToken) {
+        return typeNameToken.val.toLowerCase();
+    }
+
+    private LexicalScope getRootLexicalScope(LexicalScope lexicalScope) {
+	    LexicalScope rootLexicalScope = lexicalScope;
+        while (rootLexicalScope.getOuterScope() != null) {
+            rootLexicalScope = rootLexicalScope.getOuterScope();
+        }
+        return rootLexicalScope;
     }
 
     private StatementNode createSubroutineNode(StatementNode bodyNode) {
@@ -726,7 +749,7 @@ public class NodeFactory {
 
     public void startUnitFunctionImplementation(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
-        String returnTypeName = this.getIdentifierFromToken(returnTypeToken);
+        String returnTypeName = this.getTypeNameFromToken(returnTypeToken);
 
         try {
             if (lexicalScope.containsLocalIdentifier(identifier) && !lexicalScope.isSubroutine(identifier)) {

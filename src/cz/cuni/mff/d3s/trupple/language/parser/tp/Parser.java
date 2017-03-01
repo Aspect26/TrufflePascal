@@ -231,11 +231,11 @@ public class Parser implements IParser {
 		List<String> enumIdentifiers = new ArrayList<>(); 
 		Expect(17);
 		Expect(1);
-		enumIdentifiers.add(t.val.toLowerCase()); 
+		enumIdentifiers.add(factory.getIdentifierFromToken(t)); 
 		while (la.kind == 8) {
 			Get();
 			Expect(1);
-			enumIdentifiers.add(t.val.toLowerCase()); 
+			enumIdentifiers.add(factory.getIdentifierFromToken(t)); 
 		}
 		Expect(18);
 		typeDescriptor = factory.registerEnum(enumIdentifiers); 
@@ -377,11 +377,11 @@ public class Parser implements IParser {
 	void VariableLineDeclaration() {
 		List<String> identifiers = new ArrayList<>(); 
 		Expect(1);
-		identifiers.add(t.val.toLowerCase()); 
+		identifiers.add(factory.getIdentifierFromToken(t)); 
 		while (la.kind == 8) {
 			Get();
 			Expect(1);
-			identifiers.add(t.val.toLowerCase()); 
+			identifiers.add(factory.getIdentifierFromToken(t)); 
 		}
 		Expect(24);
 		TypeDescriptor typeDescriptor = Type();
@@ -468,15 +468,15 @@ public class Parser implements IParser {
 			isReference = true; 
 		}
 		Expect(1);
-		identifiers.add(t.val.toLowerCase()); 
+		identifiers.add(factory.getIdentifierFromToken(t)); 
 		while (la.kind == 8) {
 			Get();
 			Expect(1);
-			identifiers.add(t.val.toLowerCase()); 
+			identifiers.add(factory.getIdentifierFromToken(t)); 
 		}
 		Expect(24);
 		Expect(1);
-		formalParameter = factory.createFormalParametersList(identifiers, t.val.toLowerCase(), isReference); 
+		formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), isReference); 
 		return formalParameter;
 	}
 
@@ -627,7 +627,7 @@ public class Parser implements IParser {
 		Expect(1);
 		Token identifierToken = t; 
 		if (StartOf(5)) {
-			statement = factory.createParameterlessSubroutineCall(identifierToken); 
+			statement = factory.createSubroutineCall(identifierToken, new ArrayList<ExpressionNode>()); 
 		} else if (la.kind == 17) {
 			statement = SubroutineCall(identifierToken);
 		} else if (la.kind == 15 || la.kind == 33) {
@@ -650,11 +650,11 @@ public class Parser implements IParser {
 				statement = factory.createReadLine(); 
 			} else if (la.kind == 1) {
 				Get();
-				identifiers.add(t.val.toLowerCase()); 
+				identifiers.add(factory.getIdentifierFromToken(t)); 
 				while (la.kind == 8) {
 					Get();
 					Expect(1);
-					identifiers.add(t.val.toLowerCase()); 
+					identifiers.add(factory.getIdentifierFromToken(t)); 
 				}
 				Expect(18);
 				statement = factory.createReadLine(identifiers); 
@@ -666,13 +666,12 @@ public class Parser implements IParser {
 	ExpressionNode  SubroutineCall(Token identifierToken) {
 		ExpressionNode  expression;
 		Expect(17);
-		ExpressionNode functionNode = factory.createFunctionLiteralNode(identifierToken); 
 		List<ExpressionNode> parameters = new ArrayList<>(); 
 		if (StartOf(6)) {
 			parameters = ActualParameters(identifierToken);
 		}
 		Expect(18);
-		expression = factory.createCall(functionNode, parameters); 
+		expression = factory.createSubroutineCall(identifierToken, parameters); 
 		return expression;
 	}
 
@@ -1062,8 +1061,8 @@ public class Parser implements IParser {
 		}
 		Expect(24);
 		Expect(1);
-		String returnValue = t.val; 
-		factory.addUnitFunctionInterface(name, formalParameters, returnValue); 
+		String returnTypeName = factory.getTypeNameFromToken(t); 
+		factory.addUnitFunctionInterface(name, formalParameters, returnTypeName); 
 		Expect(6);
 	}
 
