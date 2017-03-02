@@ -3,7 +3,6 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.sun.istack.internal.NotNull;
@@ -39,7 +38,6 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierExcep
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -110,7 +108,9 @@ public class NodeFactory {
     }
 
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException, T notFoundReturnValue) {
-        try {
+	    assert notFoundException != null;
+
+	    try {
             T result = lookupToParentScope(identifier, lookupFunction);
             if (result == null) {
                 result = lookupInUnits(identifier, lookupFunction);
