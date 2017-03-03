@@ -74,6 +74,7 @@ public class PascalSubroutineRegistry {
 		installBuiltinInfiniteArguments(WritelnBuiltinNodeFactory.getInstance());
 		installBuiltinInfiniteArguments(WriteBuiltinNodeFactory.getInstance());
 		installBuiltinInfiniteArguments(ReadBuiltinNodeFactory.getInstance());
+		installBuiltinInfiniteArguments(ReadlnBuiltinNodeFactory.getInstance());
 	}
 
 	@SuppressWarnings("unused")

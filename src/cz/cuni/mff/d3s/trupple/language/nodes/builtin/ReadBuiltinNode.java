@@ -13,7 +13,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 @NodeInfo(shortName = "read")
 public abstract class ReadBuiltinNode extends BuiltinNode {
 
-    private static final String NEW_LINE = System.getProperty("line.separator");
+    protected static final String NEW_LINE = System.getProperty("line.separator");
 
 	@Specialization
     public Object read(Object[] arguments) {
@@ -124,16 +124,4 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
 	    return this.getContext().getInput().next("[^" + NEW_LINE + "]");
     }
 
-    /*
-    private void readNewLine() {
-	    try {
-            int readCode = this.readNextChar();
-            while (!NEW_LINE.equals(Character.toString((char) readCode))) {
-                readCode = this.readNextChar();
-            }
-        } catch (IOException e) {
-	        throw new PascalRuntimeException.CantReadInputException(e);
-        }
-    }
-    */
 }
