@@ -357,8 +357,6 @@ Statement<out StatementNode statement>
 |
     IdentifierBeginningStatement<out statement>
 |
-	ReadStatement<out statement>
-|
 	"randomize"									(. statement = factory.createRandomizeNode(); .)
 )
 .
@@ -387,28 +385,6 @@ AssignmentAfterIdentifierPart<out StatementNode statement, Token identifierToken
     ]
     ":="
     Expression<out ExpressionNode value>        (. statement = (indexNodes == null)? factory.createAssignment(identifierToken, value) : factory.createArrayIndexAssignment(identifierToken, indexNodes, value); .)
-.
-
-
-
-ReadStatement<out StatementNode statement>
-=
-"readln"										(. statement = null; .)
-(
-												(. statement = factory.createReadLine(); .)
-|
-	"("											(. List<String> identifiers = new ArrayList<>(); .)
-	(
-		")"										(. statement = factory.createReadLine(); .)
-	|
-		identifier								(. identifiers.add(factory.getIdentifierFromToken(t)); .)
-		{
-			","
-			identifier							(. identifiers.add(factory.getIdentifierFromToken(t)); .)
-		}
-	")"											(. statement = factory.createReadLine(identifiers); .)
-	)
-)
 .
 
 
