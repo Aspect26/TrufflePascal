@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Random;
+import java.util.Scanner;
 
 import com.oracle.truffle.api.ExecutionContext;
 import com.oracle.truffle.api.TruffleLanguage;
@@ -11,7 +12,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 
 public final class PascalContext extends ExecutionContext {
 	
-	private final BufferedReader input;
+	private final Scanner input;
 	private final PrintStream output;
     private final PascalSubroutineRegistry globalFunctionRegistry;
     private final PascalSubroutineRegistry privateFunctionRegistry;
@@ -23,7 +24,7 @@ public final class PascalContext extends ExecutionContext {
 	}
 
 	private PascalContext(PascalContext outerContext, TruffleLanguage.Env env, BufferedReader input, PrintStream output) {
-		this.input = input;
+		this.input = new Scanner(input);
 		this.output = output;
 		this.outerContext = outerContext;
 		
@@ -66,7 +67,7 @@ public final class PascalContext extends ExecutionContext {
 		return outerContext;
 	}
 
-	public BufferedReader getInput() {
+	public Scanner getInput() {
 		return input;
 	}
 

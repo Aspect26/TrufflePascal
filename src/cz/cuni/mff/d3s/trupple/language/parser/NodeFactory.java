@@ -3,7 +3,6 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.sun.istack.internal.NotNull;
@@ -21,7 +20,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.NegationNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.SubstractNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
@@ -39,7 +37,6 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierExcep
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -110,7 +107,9 @@ public class NodeFactory {
     }
 
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException, T notFoundReturnValue) {
-        try {
+	    assert notFoundException != null;
+
+	    try {
             T result = lookupToParentScope(identifier, lookupFunction);
             if (result == null) {
                 result = lookupInUnits(identifier, lookupFunction);
@@ -795,22 +794,5 @@ public class NodeFactory {
 
     public ExpressionNode createRandomNode(Token numericLiteral) {
         return new RandomBuiltinNode(lexicalScope.getContext(), Long.parseLong(numericLiteral.val));
-    }
-
-    public StatementNode createReadLine() {
-        return new ReadlnBuiltinNode(lexicalScope.getContext());
-    }
-
-    public StatementNode createReadLine(List<String> identifiers){
-        FrameSlot[] slots = new FrameSlot[identifiers.size()];
-        for(int i = 0; i < slots.length; i++) {
-            String currentIdentifier = identifiers.get(i);
-            slots[i] = lexicalScope.getLocalSlot(currentIdentifier);
-            if(slots[i] == null) {
-                parser.SemErr("Unknown identifier: " + currentIdentifier + ".");
-            }
-        }
-
-        return new ReadlnBuiltinNode(lexicalScope.getContext(), slots);
     }
 }

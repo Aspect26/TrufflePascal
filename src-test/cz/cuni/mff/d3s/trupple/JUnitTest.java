@@ -32,10 +32,14 @@ public abstract class JUnitTest {
 	private void setInput(String input) {
 		System.setIn(new ByteArrayInputStream(input.getBytes()));
 	}
-	
+
 	protected void testWithInput(String sourceCode, String input, String expectedOutput) {
+		this.testWithInput(sourceCode, input, expectedOutput, false);
+	}
+
+	protected void testWithInput(String sourceCode, String input, String expectedOutput, boolean useTpExtension) {
 		setInput(input);
-		test(sourceCode, expectedOutput);
+		test(sourceCode, expectedOutput, useTpExtension);
 	}
 
 	protected void test(String sourceCode, String expectedOutput) {

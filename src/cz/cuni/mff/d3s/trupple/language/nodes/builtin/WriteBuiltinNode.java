@@ -3,8 +3,10 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin;
 import java.io.PrintStream;
 
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
+import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
+import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeInfo(shortName = "write")
 public abstract class WriteBuiltinNode extends BuiltinNode {

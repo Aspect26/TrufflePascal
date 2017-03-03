@@ -15,6 +15,20 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 
     public static class Write extends NoReferenceParameter { }
     public static class Writeln extends NoReferenceParameter { }
-    public static class Read extends NoReferenceParameter { }
-    public static class Readln extends NoReferenceParameter { }
+
+    public static class Read extends NoReferenceParameter {
+
+        @Override
+        public boolean isReferenceParameter(int index) {
+            return true;
+        }
+    }
+
+    public static class Readln extends NoReferenceParameter {
+
+        @Override
+        public boolean isReferenceParameter(int index) {
+            return true;
+        }
+    }
 }

@@ -13,9 +13,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WriteBuiltinNodeFactory;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WritelnBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 
@@ -75,6 +73,8 @@ public class PascalSubroutineRegistry {
 
 		installBuiltinInfiniteArguments(WritelnBuiltinNodeFactory.getInstance());
 		installBuiltinInfiniteArguments(WriteBuiltinNodeFactory.getInstance());
+		installBuiltinInfiniteArguments(ReadBuiltinNodeFactory.getInstance());
+		installBuiltinInfiniteArguments(ReadlnBuiltinNodeFactory.getInstance());
 	}
 
 	@SuppressWarnings("unused")
