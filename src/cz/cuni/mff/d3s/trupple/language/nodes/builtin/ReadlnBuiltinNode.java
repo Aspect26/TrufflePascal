@@ -14,13 +14,17 @@ public abstract class ReadlnBuiltinNode extends ReadBuiltinNode {
 
 	@Specialization
     public Object read(Object[] arguments) {
-        Object returnValue = super.read(arguments);
-        this.consumeNewLine();
+	    if (arguments.length == 0) {
+	        return this.consumeNewLine();
+        } else {
+            Object returnValue = super.read(arguments);
+            this.consumeNewLine();
 
-        return returnValue;
+            return returnValue;
+        }
     }
 
-    private void consumeNewLine() {
-        this.getContext().getInput().nextLine();
+    private String consumeNewLine() {
+        return this.getContext().getInput().nextLine();
     }
 }

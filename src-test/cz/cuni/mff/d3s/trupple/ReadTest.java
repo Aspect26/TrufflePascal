@@ -3,29 +3,13 @@ package cz.cuni.mff.d3s.trupple;
 import org.junit.Test;
 
 public class ReadTest extends JUnitTest{
-
-	@Test
-	public void simpleParameterlessTest() {
-		String code = "program main; begin readln; write('asfd'); end.";
-		String input = "ads\r\n";
-		String output = "asfd";
-		this.testWithInput(code, input, output);
-	}
-	
-	@Test
-	public void simpleParameterless2Test() {
-		String code = "program main; begin readln(); write('asfd'); end.";
-		String input = "ads\r\n";
-		String output = "asfd";
-		this.testWithInput(code, input, output);
-	}
 	
 	@Test
 	public void simpleReadIntegerTest() {
 		String code="program main; var i:integer;\n"+
 				"\n"+
 				"begin\n"+
-				" readln(i);\n"+
+				" read(i);\n"+
 				" write(i);\n"+
 				"end.";
 		String input = "15324";
@@ -34,16 +18,48 @@ public class ReadTest extends JUnitTest{
 	}
 	
 	@Test
-	public void simpleMultipleReadTest() {
+	public void correctReadBehaviourTest() {
+	    // NOTE: this is a standard behaviour of TP. Firstly it tries to read first integer after whitespaces without consuming
+        // any whitespace after the read integer. Then it reads the next character in the input which is a whtiespace.
+        // There really is no way to read integer and a char (separated by whitespaces) in one read statement.
 		String code="program main; var i:integer;\n"+
+				" c:char;\n"+
+				"\n"+
+				"begin\n"+
+				" read(i,c);\n"+
+				" write(i,c);\n"+
+				"end.";
+		String input = "    126 c     ";
+		String output = "126 ";
+		this.testWithInput(code, input, output);
+	}
+
+    @Test
+    public void multipleReadOnOneLineTest() {
+        String code="program main; var i,j:integer;\n"+
+                "\n"+
+                "begin\n"+
+                " read(i,j);\n"+
+                " write(i,',',j);\n"+
+                "end.";
+        String input = "    126   58   ";
+        String output = "126,58";
+        this.testWithInput(code, input, output);
+    }
+
+	@Test
+	public void mutipleReadLnOnMultipleLinesTest() {
+		String code="program main; var i,j,k:integer;\n"+
 				" b:boolean;\n"+
 				"\n"+
 				"begin\n"+
-				" readln(i,b);\n"+
-				" write(i,b);\n"+
+				" readln(i,j);\n"+
+				" readln(k);\n"+
+				" write(i,',',j);\n"+
+                " write(',',k);\n"+
 				"end.";
-		String input = "126\r\ntrue\r\n";
-		String output = "126true";
+		String input = String.format("   12    34   58     %n   65 %n");
+		String output = "12,34,65";
 		this.testWithInput(code, input, output);
 	}
 	
@@ -52,14 +68,14 @@ public class ReadTest extends JUnitTest{
 		String code="program main; Var \n"+
 				" Num1, Num2, Sum : Integer;\n"+
 				"\n"+
-				"Begin {no semicolon}\n"+
+				"Begin\n"+
 				"\tReadln(Num1);\n"+
 				"\tReadln(Num2);\n"+
 				"\tSum := Num1 + Num2; {addition} \n"+
 				"\tWrite(Sum);\n"+
 				"\tReadln;\n"+
 				"End. ";
-		String input = "36\r\n18\r\n\r\n";
+		String input = String.format("36%n18%n%n");
 		String output = "54";
 		this.testWithInput(code, input, output);
 	}
@@ -77,7 +93,7 @@ public class ReadTest extends JUnitTest{
 				" writeln(k);\n"+
 				" writeln(l);\n"+
 				"end.";
-		String input = "315\r\n42\n26\r654";
+		String input = String.format("315\r\n42\n26\r654%n");
 		String output = String.format("315%n42%n26%n654%n");
 		this.testWithInput(code, input, output);
 	}
