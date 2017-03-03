@@ -20,8 +20,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.NegationNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.SubstractNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
@@ -797,24 +795,4 @@ public class NodeFactory {
     public ExpressionNode createRandomNode(Token numericLiteral) {
         return new RandomBuiltinNode(lexicalScope.getContext(), Long.parseLong(numericLiteral.val));
     }
-
-    /*
-    public StatementNode createReadLine() {
-        return ReadlnBuiltinNodeFactory.create(new ExpressionNode[0], lexicalScope.getContext());
-    }
-
-    public StatementNode createReadLine(List<String> identifiers){
-        ReadReferencePassNode[] readReferenceNodes = new ReadReferencePassNode[identifiers.size()];
-
-        for(int i = 0; i < slots.length; i++) {
-            String currentIdentifier = identifiers.get(i);
-            slots[i] = lexicalScope.getLocalSlot(currentIdentifier);
-            if(slots[i] == null) {
-                parser.SemErr("Unknown identifier: " + currentIdentifier + ".");
-            }
-        }
-
-        return new ReadlnBuiltinNode(lexicalScope.getContext(), slots);
-    }
-    */
 }

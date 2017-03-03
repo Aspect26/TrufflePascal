@@ -15,18 +15,18 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
-@GeneratedBy(ReadlnBuiltinNode.class)
+@GeneratedBy(ReadBuiltinNode.class)
 @SuppressWarnings({"unchecked", "rawtypes"})
-public final class ReadlnBuiltinNodeFactory implements NodeFactory<ReadlnBuiltinNode> {
+public final class ReadBuiltinNodeFactory implements NodeFactory<ReadBuiltinNode> {
 
-    private static ReadlnBuiltinNodeFactory instance;
+    private static ReadBuiltinNodeFactory instance;
 
-    private ReadlnBuiltinNodeFactory() {
+    private ReadBuiltinNodeFactory() {
     }
 
     @Override
-    public Class<ReadlnBuiltinNode> getNodeClass() {
-        return ReadlnBuiltinNode.class;
+    public Class<ReadBuiltinNode> getNodeClass() {
+        return ReadBuiltinNode.class;
     }
 
     @Override
@@ -40,7 +40,7 @@ public final class ReadlnBuiltinNodeFactory implements NodeFactory<ReadlnBuiltin
     }
 
     @Override
-    public ReadlnBuiltinNode createNode(Object... arguments) {
+    public ReadBuiltinNode createNode(Object... arguments) {
         if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof ExpressionNode[]) && (arguments[1] == null || arguments[1] instanceof PascalContext)) {
             return create((ExpressionNode[]) arguments[0], (PascalContext) arguments[1]);
         } else {
@@ -48,25 +48,25 @@ public final class ReadlnBuiltinNodeFactory implements NodeFactory<ReadlnBuiltin
         }
     }
 
-    public static NodeFactory<ReadlnBuiltinNode> getInstance() {
+    public static NodeFactory<ReadBuiltinNode> getInstance() {
         if (instance == null) {
-            instance = new ReadlnBuiltinNodeFactory();
+            instance = new ReadBuiltinNodeFactory();
         }
         return instance;
     }
 
-    public static ReadlnBuiltinNode create(ExpressionNode[] arguments, PascalContext context) {
-        return new ReadlnBuiltinNodeGen(arguments, context);
+    public static ReadBuiltinNode create(ExpressionNode[] arguments, PascalContext context) {
+        return new ReadBuiltinNodeGen(arguments, context);
     }
 
-    @GeneratedBy(ReadlnBuiltinNode.class)
-    public static final class ReadlnBuiltinNodeGen extends ReadlnBuiltinNode {
+    @GeneratedBy(ReadBuiltinNode.class)
+    public static final class ReadBuiltinNodeGen extends ReadBuiltinNode {
 
         private final PascalContext context;
         @Child private ExpressionNode arguments0_;
         @CompilationFinal private boolean seenUnsupported0;
 
-        private ReadlnBuiltinNodeGen(ExpressionNode[] arguments, PascalContext context) {
+        private ReadBuiltinNodeGen(ExpressionNode[] arguments, PascalContext context) {
             this.context = context;
             this.arguments0_ = arguments != null && 0 < arguments.length ? arguments[0] : null;
         }
