@@ -1,9 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.runtime;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.Truffle;
@@ -21,29 +19,22 @@ public class PascalSubroutineRegistry {
 	private final Map<String, PascalFunction> functions = new HashMap<>();
 	private final PascalContext context;
 
-	public PascalSubroutineRegistry(PascalContext context, boolean installBuiltins) {
+	PascalSubroutineRegistry(PascalContext context, boolean installBuiltins) {
 		this.context = context;
 		if(installBuiltins) {
 			installBuiltins();
 		}
 	}
 
-	public void registerSubroutineName(String identifier) {
-		functions.put(identifier, PascalFunction.createUnimplementedFunctin());
+	void registerSubroutineName(String identifier) {
+		functions.put(identifier, PascalFunction.createUnimplementedFunction());
 	}
-
-	public boolean contains(String identifier) {
-		return this.functions.get(identifier) != null;
-	}
-
-    // --------------------------------------------
 
 	public PascalFunction lookup(String identifier) {
-		PascalFunction result = functions.get(identifier);
-		return result;
+		return functions.get(identifier);
 	}
 
-	public void setFunctionRootNode(String identifier, PascalRootNode rootNode) {
+	void setFunctionRootNode(String identifier, PascalRootNode rootNode) {
         PascalFunction function = functions.get(identifier);
 		assert function != null;
 		
@@ -51,30 +42,9 @@ public class PascalSubroutineRegistry {
         function.setCallTarget(callTarget);
 	}
 
-	public void addAll(PascalSubroutineRegistry registry) {
-		Iterator<Entry<String, PascalFunction>> it = registry.functions.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, PascalFunction> pair = it.next();
-
-			String name = pair.getKey();
-			if (this.functions.containsKey(name))
-				continue;
-
-			this.functions.put(name, pair.getValue());
-		}
-	}
-
-	/**
-	 * Adds all builtin functions to the {@link PascalSubroutineRegistry}. This
-	 * method lists all {@link PascalBuiltinNode builtin implementation classes}
-	 * .
-	 */
-	private void installBuiltins() {
-
-		installBuiltinInfiniteArguments(WritelnBuiltinNodeFactory.getInstance());
-		installBuiltinInfiniteArguments(WriteBuiltinNodeFactory.getInstance());
-		installBuiltinInfiniteArguments(ReadBuiltinNodeFactory.getInstance());
-		installBuiltinInfiniteArguments(ReadlnBuiltinNodeFactory.getInstance());
+	protected void installBuiltins() {
+		installBuiltinWithVariableArgumentsCount(WriteBuiltinNodeFactory.getInstance());
+		installBuiltinWithVariableArgumentsCount(ReadBuiltinNodeFactory.getInstance());
 	}
 
 	@SuppressWarnings("unused")
@@ -86,23 +56,14 @@ public class PascalSubroutineRegistry {
 			argumentNodes[i] = new ReadArgumentNode(i);
 		}
 
-		/*
-		 * Instantiate the builtin node. This node performs the actual
-		 * functionality.
-		 */
 		BuiltinNode builtinBodyNode = factory.createNode(argumentNodes, context);
-
-		/*
-		 * Wrap the builtin in a RootNode. Truffle requires all AST to start
-		 * with a RootNode.
-		 */
 		PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinBodyNode);
 
 		String name = lookupNodeInfo(builtinBodyNode.getClass()).shortName();
 		this.register(name, rootNode);
 	}
 
-	private void installBuiltinInfiniteArguments(NodeFactory<? extends BuiltinNode> factory) {
+	protected void installBuiltinWithVariableArgumentsCount(NodeFactory<? extends BuiltinNode> factory) {
 		ExpressionNode argumentsNode[] = new ExpressionNode[1];
 		argumentsNode[0] = new ReadAllArgumentsNode();
 		BuiltinNode bodyNode = factory.createNode(argumentsNode, context);
@@ -114,13 +75,13 @@ public class PascalSubroutineRegistry {
 	
 	
 	private void register(String identifier, PascalRootNode rootNode){
-		PascalFunction func = new PascalFunction(identifier);
 		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
-		func.setCallTarget(callTarget);
-		functions.put(identifier, func);
+		PascalFunction pascalFunction = new PascalFunction(identifier, callTarget);
+
+		functions.put(identifier, pascalFunction);
 	}
 
-	public static NodeInfo lookupNodeInfo(Class<?> clazz) {
+	private static NodeInfo lookupNodeInfo(Class<?> clazz) {
 		if (clazz == null) {
 			return null;
 		}

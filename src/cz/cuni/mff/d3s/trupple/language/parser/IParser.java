@@ -11,5 +11,7 @@ public interface IParser {
 
     boolean hadErrors();
 
+    boolean isUsingTPExtension();
+
     RootNode getRootNode();
 }

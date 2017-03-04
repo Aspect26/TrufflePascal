@@ -125,6 +125,10 @@ public class Parser implements IParser {
 	private static final boolean[][] set = {
 -->initialization
 	};
+
+	public boolean isUsingTPExtension() {
+	    return true;
+	}
 	
     public boolean hadErrors(){
     	return errors.count > 0;

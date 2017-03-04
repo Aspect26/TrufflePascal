@@ -60,7 +60,7 @@ public class ReadTest extends JUnitTest{
 				"end.";
 		String input = String.format("   12    34   58     %n   65 %n");
 		String output = "12,34,65";
-		this.testWithInput(code, input, output);
+		this.testWithInput(code, input, output, true);
 	}
 	
 	@Test
@@ -77,7 +77,7 @@ public class ReadTest extends JUnitTest{
 				"End. ";
 		String input = String.format("36%n18%n%n");
 		String output = "54";
-		this.testWithInput(code, input, output);
+		this.testWithInput(code, input, output, true);
 	}
 
 	@Test
@@ -95,6 +95,6 @@ public class ReadTest extends JUnitTest{
 				"end.";
 		String input = String.format("315\r\n42\n26\r654%n");
 		String output = String.format("315%n42%n26%n654%n");
-		this.testWithInput(code, input, output);
+		this.testWithInput(code, input, output, true);
 	}
 }

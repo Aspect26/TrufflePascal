@@ -14,40 +14,31 @@ public final class PascalContext extends ExecutionContext {
 	
 	private final Scanner input;
 	private final PrintStream output;
-    private final PascalSubroutineRegistry globalFunctionRegistry;
-    private final PascalSubroutineRegistry privateFunctionRegistry;
+    private final PascalSubroutineRegistry functionRegistry;
 	private final PascalContext outerContext;
 	private Random random;
 	
-	public PascalContext(PascalContext outerContext) {
-		this(outerContext, null, new BufferedReader(new InputStreamReader(System.in)), System.out);
+	public PascalContext(PascalContext outerContext, boolean usingTPExtension) {
+		this(outerContext, null, new BufferedReader(new InputStreamReader(System.in)), System.out, usingTPExtension);
 	}
 
-	private PascalContext(PascalContext outerContext, TruffleLanguage.Env env, BufferedReader input, PrintStream output) {
+	private PascalContext(PascalContext outerContext, TruffleLanguage.Env env, BufferedReader input, PrintStream output, boolean usingTPExtension) {
 		this.input = new Scanner(input);
 		this.output = output;
 		this.outerContext = outerContext;
-		
+
 		this.random = new Random(165132464);
-		this.globalFunctionRegistry = new PascalSubroutineRegistry(this, true);
-		this.privateFunctionRegistry = new PascalSubroutineRegistry(this, false);
+		this.functionRegistry = (usingTPExtension)? new PascalSubroutineRegistryTP(this,true) :
+				new PascalSubroutineRegistry(this, true);
 	}
 	
 	
-    public void registerSubroutineName(String identifier, boolean isPublic) {
-        if (isPublic) {
-            this.globalFunctionRegistry.registerSubroutineName(identifier);
-        } else {
-            this.privateFunctionRegistry.registerSubroutineName(identifier);
-        }
+    public void registerSubroutineName(String identifier) {
+		this.functionRegistry.registerSubroutineName(identifier);
     }
 
 	public void setSubroutineRootNode(String identifier, PascalRootNode rootNode) {
-        if (this.globalFunctionRegistry.contains(identifier)) {
-            this.globalFunctionRegistry.setFunctionRootNode(identifier, rootNode);
-        } else {
-            this.privateFunctionRegistry.setFunctionRootNode(identifier, rootNode);
-        }
+		this.functionRegistry.setFunctionRootNode(identifier, rootNode);
     }
 
 	
@@ -75,19 +66,12 @@ public final class PascalContext extends ExecutionContext {
 		return output;
 	}
 
-	public PascalSubroutineRegistry getGlobalFunctionRegistry() {
-		return globalFunctionRegistry;
-	}
-	
-	public PascalSubroutineRegistry getPrivateFunctionRegistry() {
-		return privateFunctionRegistry;
+	public PascalSubroutineRegistry getFunctionRegistry() {
+		return functionRegistry;
 	}
 
 	public boolean isImplemented(String identifier) {
-        PascalFunction global = globalFunctionRegistry.lookup(identifier);
-        if (global != null)
-            return global.isImplemented();
-        else
-            return privateFunctionRegistry.lookup(identifier).isImplemented();
+        PascalFunction global = functionRegistry.lookup(identifier);
+		return global.isImplemented();
 	}
 }

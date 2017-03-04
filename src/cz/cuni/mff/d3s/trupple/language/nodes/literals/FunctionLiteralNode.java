@@ -22,10 +22,8 @@ public final class FunctionLiteralNode extends ExpressionNode {
 		PascalContext context = this.context;
 		PascalFunction function = null;
 		while(context != null){
-			function = context.getGlobalFunctionRegistry().lookup(value);
-			if(function == null)
-				function = context.getPrivateFunctionRegistry().lookup(value);
-		
+			function = context.getFunctionRegistry().lookup(value);
+
 			if(function == null)
 				context = context.getOuterContext();
 			
@@ -34,7 +32,7 @@ public final class FunctionLiteralNode extends ExpressionNode {
 		}
 		
 		if(function == null)
-			throw new RuntimeException("Function " + function + " does not exist in this context.");
+			throw new RuntimeException("Function " + this.value + " does not exist in this context.");
 		
 		return function;
 	}
