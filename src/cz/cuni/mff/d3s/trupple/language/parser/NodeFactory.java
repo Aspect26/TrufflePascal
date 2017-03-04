@@ -31,6 +31,8 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
@@ -468,6 +470,8 @@ public class NodeFactory {
                 return NotNodeGen.create(EqualsNodeGen.create(leftNode, rightNode));
             case "in":
                 return InNodeGen.create(leftNode, rightNode);
+            case "><":
+                return SymmetricDifferenceNodeGen.create(leftNode, rightNode);
 
             default:
                 parser.SemErr("Unknown binary operator: " + operator.val);

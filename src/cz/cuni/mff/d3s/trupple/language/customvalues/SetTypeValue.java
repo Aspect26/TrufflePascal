@@ -66,4 +66,11 @@ public class SetTypeValue implements ICustomValue {
 
         return result;
     }
+
+    public static SetTypeValue symmetricDifference(SetTypeValue left, SetTypeValue right) {
+        SetTypeValue union = SetTypeValue.union(left, right);
+        SetTypeValue intersection = SetTypeValue.intersect(left, right);
+
+        return SetTypeValue.difference(union, intersection);
+    }
 }
