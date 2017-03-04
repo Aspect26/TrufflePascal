@@ -436,11 +436,6 @@ public class Parser implements IParser {
 	List<FormalParameter>  FormalParameter() {
 		List<FormalParameter>  formalParameter;
 		List<String> identifiers = new ArrayList<>(); 
-		boolean isReference = false; 
-		if (la.kind == 22) {
-			Get();
-			isReference = true; 
-		}
 		Expect(1);
 		identifiers.add(factory.getIdentifierFromToken(t)); 
 		while (la.kind == 14) {
@@ -450,7 +445,7 @@ public class Parser implements IParser {
 		}
 		Expect(23);
 		Expect(1);
-		formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), isReference); 
+		formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), false); 
 		return formalParameter;
 	}
 

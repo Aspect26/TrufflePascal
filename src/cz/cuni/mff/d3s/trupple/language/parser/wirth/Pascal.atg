@@ -296,17 +296,13 @@ FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParame
 
 FormalParameter<. out List<FormalParameter> formalParameter .>
 =												(. List<String> identifiers = new ArrayList<>(); .)
-												(. boolean isReference = false; .)
-[ 
-	"var"										(. isReference = true; .)
-]
 identifier										(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 {
 	","
 	identifier									(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 }
 ":"
-identifier										(. formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), isReference); .)
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), false); .)
 .
 
 
@@ -675,6 +671,7 @@ ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token s
 (
     IF(factory.shouldBeReference(subroutineToken, currentParameterIndex))
     identifier                                  (. parameter = factory.createReferenceNode(t); .)
+    // read is implemented with references
 |
     Expression<out parameter>
 )

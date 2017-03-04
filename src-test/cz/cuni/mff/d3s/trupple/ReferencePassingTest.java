@@ -18,7 +18,7 @@ public class ReferencePassingTest extends JUnitTest {
                 " write('Is this the real life?');\n"+
                 "end.";
         String output="Is this the real life?";
-        this.test(code, output);
+        this.test(code, output, true);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class ReferencePassingTest extends JUnitTest {
                 " p(i);\n"+
                 "end.";
         String output="42";
-        this.test(code, output);
+        this.test(code, output, true);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class ReferencePassingTest extends JUnitTest {
                 " write(i);\n"+
                 "end.";
         String output="5318008";
-        this.test(code, output);
+        this.test(code, output, true);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class ReferencePassingTest extends JUnitTest {
                 " write(i);\n"+
                 "end.\n";
         String output="8";
-        this.test(code, output);
+        this.test(code, output, true);
     }
 
     @Test
@@ -103,6 +103,6 @@ public class ReferencePassingTest extends JUnitTest {
                 " write(i, c);\n"+
                 "end.";
         String output="42a";
-        this.test(code, output);
+        this.test(code, output, true);
     }
 }
