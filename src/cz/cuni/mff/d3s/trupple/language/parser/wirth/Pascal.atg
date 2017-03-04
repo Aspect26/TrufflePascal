@@ -171,8 +171,6 @@ identifier										(. Token identifier = t; .)
 |
 	StringLiteral<out String value> 			(. factory.registerStringOrCharConstant(identifier, value); .)
 |
-    LogicLiteral<out boolean value>             (. factory.registerBooleanConstant(identifier, value); .)
-|
 	IdentifierConstant<identifier>
 )
 .
