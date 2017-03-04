@@ -79,7 +79,7 @@ public class NodeFactory {
 
 	public NodeFactory(IParser parser) {
 		this.parser = parser;
-		this.lexicalScope = new LexicalScope(null, "_main");
+		this.lexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
 	}
 
 	public void startPascal(Token identifierToken) {
@@ -335,7 +335,7 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
             lexicalScope.tryRegisterProcedureInterface(identifier, formalParameters);
-            lexicalScope = new LexicalScope(lexicalScope, identifier);
+            lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
             this.addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
@@ -347,7 +347,7 @@ public class NodeFactory {
         String returnType = this.getIdentifierFromToken(returnTypeToken);
         try {
             lexicalScope.tryRegisterFunctionInterface(identifier, formalParameters, returnType);
-            lexicalScope = new LexicalScope(lexicalScope, identifier);
+            lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
             lexicalScope.registerReturnType(formalParameters, returnType);
             this.addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
@@ -750,9 +750,9 @@ public class NodeFactory {
             if (lexicalScope.containsLocalIdentifier(identifier) && !lexicalScope.isSubroutine(identifier)) {
                 parser.SemErr("Cannot implement. Not a procedure: " + identifier);
             } else if (!lexicalScope.containsLocalIdentifier(identifier)) {
-                lexicalScope.registerProcedureInterface(identifier, formalParameters, false);
+                lexicalScope.registerProcedureInterface(identifier, formalParameters);
             }
-            lexicalScope = new LexicalScope(lexicalScope, identifier);
+            lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
             this.addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
@@ -767,9 +767,9 @@ public class NodeFactory {
             if (lexicalScope.containsLocalIdentifier(identifier) && !lexicalScope.isSubroutine(identifier)) {
                 parser.SemErr("Cannot implement. Not a function: " + identifier);
             } else if (!lexicalScope.containsLocalIdentifier(identifier)) {
-                lexicalScope.registerFunctionInterface(identifier, formalParameters, returnTypeName, false);
+                lexicalScope.registerFunctionInterface(identifier, formalParameters, returnTypeName);
             }
-            lexicalScope = new LexicalScope(lexicalScope, identifier);
+            lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
             lexicalScope.registerReturnType(formalParameters, returnTypeName);
             this.addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {

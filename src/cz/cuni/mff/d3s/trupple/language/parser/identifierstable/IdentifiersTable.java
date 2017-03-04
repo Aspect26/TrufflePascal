@@ -16,13 +16,8 @@ import java.util.Map;
 
 public class IdentifiersTable {
 
-    /* TODO: HIGH PRIORITY oddelit types a variables
-        type color(red,green,blue);
-        identifikatory color,red,green aj blue maju rovnaky type descriptor
-     */
-
     /** Map of all identifiers: e.g.: variable names, function names, types names, ... */
-    private Map<String, TypeDescriptor> identifiersMap;
+    Map<String, TypeDescriptor> identifiersMap;
 
     /** Map of type identifiers: e.g.: integer, boolean, enums, records, ... */
     private Map<String, TypeDescriptor> typeDescriptors;
@@ -58,11 +53,9 @@ public class IdentifiersTable {
         }
     }
 
-    private void addBuiltinFunctions() {
+    protected void addBuiltinFunctions() {
         identifiersMap.put("write", new BuiltinProcedureDescriptor.Write());
-        identifiersMap.put("writeln", new BuiltinProcedureDescriptor.Writeln());
         identifiersMap.put("read", new BuiltinProcedureDescriptor.Read());
-        identifiersMap.put("readln", new BuiltinProcedureDescriptor.Readln());
     }
 
     public FrameSlot getFrameSlot(String identifier) {

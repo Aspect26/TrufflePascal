@@ -7,6 +7,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTableTP;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -25,12 +26,12 @@ class LexicalScope {
     // TODO: wtf is this?
     private final List<StatementNode> readArgumentNodes = new ArrayList<>();
 
-    LexicalScope(LexicalScope outer, String name) {
+    LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
         this.name = name;
         this.outer = outer;
         this.publicIdentifiers = new HashSet<>();
-        this.localIdentifiers = new IdentifiersTable();
-        this.context = (outer != null)? new PascalContext(outer.context) : new PascalContext(null);
+        this.localIdentifiers = (usingTPExtension)? new IdentifiersTableTP() : new IdentifiersTable();
+        this.context = (outer != null)? new PascalContext(outer.context, usingTPExtension) : new PascalContext(null, usingTPExtension);
     }
 
     String getName() {
@@ -148,7 +149,7 @@ class LexicalScope {
                 throw e;
             }
         }
-        this.context.registerSubroutineName(identifier, true);
+        this.context.registerSubroutineName(identifier);
     }
 
     // NOTE: the function could have been forwarded
@@ -160,25 +161,17 @@ class LexicalScope {
                 throw e;
             }
         }
-        this.context.registerSubroutineName(identifier, true);
+        this.context.registerSubroutineName(identifier);
     }
 
     void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
-        this.registerProcedureInterface(identifier, formalParameters, true);
-    }
-
-    void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters, boolean isPublic) throws LexicalException {
         this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
-        this.context.registerSubroutineName(identifier, isPublic);
+        this.context.registerSubroutineName(identifier);
     }
 
     void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnTypeName) throws LexicalException {
-        this.registerFunctionInterface(identifier, formalParameters, returnTypeName, true);
-    }
-
-    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnTypeName, boolean isPublic) throws LexicalException {
         this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnTypeName);
-        this.context.registerSubroutineName(identifier, isPublic);
+        this.context.registerSubroutineName(identifier);
     }
 
     void registerLongConstant(String identifier, long value) throws LexicalException {

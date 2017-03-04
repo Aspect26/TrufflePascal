@@ -4,10 +4,7 @@ import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
-
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-
-import java.util.Objects;
 
 @NodeField(name = "slotKind", type = FrameSlotKind.class)
 public abstract class ReadSubroutineArgumentNode extends ExpressionNode {

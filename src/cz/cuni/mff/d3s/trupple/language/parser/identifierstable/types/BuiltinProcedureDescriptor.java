@@ -6,17 +6,24 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
         super(null);
     }
 
-    private static abstract class NoReferenceParameter extends BuiltinProcedureDescriptor {
+
+    private static abstract class NoReferenceParameterBuiltin extends BuiltinProcedureDescriptor {
 
         public boolean isReferenceParameter(int parameterIndex) {
             return false;
         }
     }
 
-    public static class Write extends NoReferenceParameter { }
-    public static class Writeln extends NoReferenceParameter { }
+    // **********************************************************************
+    // Actual builtin subroutine's descriptors
+    // **********************************************************************
 
-    public static class Read extends NoReferenceParameter {
+    public static class Write extends NoReferenceParameterBuiltin { }
+
+    public static class Writeln extends NoReferenceParameterBuiltin {
+    }
+
+    public static class Read extends BuiltinProcedureDescriptor {
 
         @Override
         public boolean isReferenceParameter(int index) {
@@ -24,11 +31,12 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
         }
     }
 
-    public static class Readln extends NoReferenceParameter {
+    public static class Readln extends BuiltinProcedureDescriptor {
 
         @Override
         public boolean isReferenceParameter(int index) {
             return true;
         }
-    }
+
+        }
 }

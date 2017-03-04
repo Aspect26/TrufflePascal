@@ -9,10 +9,8 @@ import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 public class ReadArgumentNode extends ExpressionNode {
 
 	private final int index;
-	// private final FrameSlotKind kind;
 
-	public ReadArgumentNode(/* FrameSlotKind type, */ int index) {
-		// this.kind = type;
+	public ReadArgumentNode(int index) {
 		this.index = index + 1;
 	}
 
