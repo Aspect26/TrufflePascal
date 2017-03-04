@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.compiler;
+package cz.cuni.mff.d3s.trupple.compiler.settings.handlers;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -14,7 +14,7 @@ public class ImportsOptionHandler extends OptionHandler<String> {
 
     @Override
     public int parseArguments(Parameters params) throws CmdLineException {
-    	String dir = null;
+    	String dir;
     	int index = 0;
     	while(index<params.size()-1){
     		dir = params.getParameter(index++);
