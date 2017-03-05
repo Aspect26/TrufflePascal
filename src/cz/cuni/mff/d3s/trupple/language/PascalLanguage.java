@@ -9,7 +9,6 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.nodes.Node;
-import com.oracle.truffle.api.source.MissingNameException;
 import com.oracle.truffle.api.source.Source;
 
 import cz.cuni.mff.d3s.trupple.language.parser.IParser;
@@ -48,7 +47,6 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	protected Object evalInContext(Source source, Node node, MaterializedFrame mFrame) throws IOException {
 		return null;
 	}
-
 
     @Override
     protected CallTarget parse(Source code, Node context, String... argumentNames) throws IOException {
@@ -156,11 +154,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
     }
 
     private static Source buildSourceFromFile(File file) throws IOException {
-	    try {
-            InputStream is = new FileInputStream(file);
-            return Source.newBuilder(new InputStreamReader(is)).mimeType(PascalLanguage.MIME_TYPE).build();
-        } catch (MissingNameException e) {
-	        return null;
-        }
+        InputStream is = new FileInputStream(file);
+        return Source.newBuilder(new InputStreamReader(is)).name(file.getName()).mimeType(PascalLanguage.MIME_TYPE).build();
     }
 }

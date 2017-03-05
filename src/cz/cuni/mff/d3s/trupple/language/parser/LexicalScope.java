@@ -10,7 +10,6 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTableTP;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-
 import java.util.*;
 
 class LexicalScope {
@@ -134,6 +133,10 @@ class LexicalScope {
 
     TypeDescriptor createEnumType(List<String> identifiers) throws LexicalException {
         return this.localIdentifiers.createEnum(identifiers);
+    }
+
+    FileDescriptor createFileDescriptor(TypeDescriptor contentTypeDescriptor) {
+        return this.localIdentifiers.createFileDescriptor(contentTypeDescriptor);
     }
 
     TypeDescriptor createSetType(OrdinalDescriptor baseType) {
