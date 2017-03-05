@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.EnumTypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
 
 public class EnumValue implements ICustomValue {
 

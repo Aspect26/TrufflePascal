@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable;
 
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.BuiltinProcedureDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.BuiltinProcedureDescriptor;
 
 public class IdentifiersTableTP extends IdentifiersTable {
 

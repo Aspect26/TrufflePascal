@@ -1,14 +1,14 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.CantBeNegatedException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 
-public class CharConstantDescriptor implements OrdinalConstantDescriptor {
+public class BooleanConstantDescriptor implements OrdinalConstantDescriptor {
 
-    private final char value;
+    private final boolean value;
 
-    public CharConstantDescriptor(char value) {
+    public BooleanConstantDescriptor(boolean value) {
         this.value = value;
     }
 
@@ -19,7 +19,7 @@ public class CharConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return '\0';
+        return false;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class CharConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public int getOrdinalValue() {
-        return (int)this.value;
+        return (value)? 1 : 0;
     }
 
 }

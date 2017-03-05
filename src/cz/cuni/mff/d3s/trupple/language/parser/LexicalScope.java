@@ -9,6 +9,12 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTableTP;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.LongConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.SubroutineDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.*;
 

@@ -37,6 +37,8 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 public class NodeFactory {

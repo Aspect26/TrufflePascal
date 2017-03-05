@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine;
 
 import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
 
@@ -10,8 +10,4 @@ public class ProcedureDescriptor extends SubroutineDescriptor {
         super(formalParameters);
     }
 
-    @Override
-    public Object getDefaultValue() {
-        return null;
-    }
 }

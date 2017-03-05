@@ -9,6 +9,15 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.ReferenceDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.ArrayDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumValueDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.SetDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.*;
 
 import java.util.HashMap;
 import java.util.List;
