@@ -16,7 +16,7 @@ public class ConstantsTest extends JUnitTest {
 				" write(i,d,b,c);\n"+
 				"end.";
 		String output = "4212.5truea";
-		this.test(code, output);
+		this.test(code, output, true);
 	}
 
 	// NOTE: not supported in Wirth's standard
