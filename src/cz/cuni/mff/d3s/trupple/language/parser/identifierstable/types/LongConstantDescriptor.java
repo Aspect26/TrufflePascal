@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
-public class LongConstantDescriptor extends ConstantDescriptor{
+public class LongConstantDescriptor extends ConstantDescriptor {
 
     private final long value;
 
@@ -20,7 +20,13 @@ public class LongConstantDescriptor extends ConstantDescriptor{
         return new LongConstantDescriptor(-value);
     }
 
-    public long getValue() {
+    @Override
+    public Object getValue() {
         return this.value;
+    }
+
+    @Override
+    public boolean isSigned() {
+        return true;
     }
 }

@@ -155,13 +155,19 @@ Type<out TypeDescriptor contentType>            (. fileDescriptor = factory.crea
 Ordinal<out OrdinalDescriptor ordinal>
 =												(. ordinal = null; .)
 (												(. int lowerBound, upperBound; .)
-	SignedIntegerLiteral<out lowerBound>
-	".."
-	SignedIntegerLiteral<out upperBound>
-												(. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
+	SubrangeType<out ordinal>
 |
 	Type<out TypeDescriptor typeDescriptor>     (. ordinal = factory.castTypeToOrdinalType(typeDescriptor); .)
 )
+.
+
+
+SubrangeType<out OrdinalDescriptor ordinal>
+=
+SignedIntegerLiteral<out int lowerBound>
+".."
+SignedIntegerLiteral<out int upperBound>
+                                                (. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
 .
 
 
@@ -193,49 +199,46 @@ ConstantDefinition
 =
 identifier										(. Token identifier = t; .)
 "="
-(
-	NumericConstant<identifier>
-|
-	StringLiteral<out String value> 			(. factory.registerStringOrCharConstant(identifier, value); .)
-|
-    LogicLiteral<out boolean value>             (. factory.registerBooleanConstant(identifier, value); .)
-|
-	IdentifierConstant<identifier>
-)
+Constant<out ConstantDescriptor constant>       (. factory.registerConstant(identifier, constant); .)
 .
 
 
-
-NumericConstant<Token identifier>
+Constant<out ConstantDescriptor constant>
 =
+                                                (. constant = null; String sign = ""; .)
+[
+    "+" | "-"                                   (. sign = t.val; .)
+]
 (
-	( "+" | "-" )								(. Token sign = t; .)
-	(
-	    integerLiteral                          (. factory.registerSignedIntegerConstant(identifier, sign, t); .)
-	|
-	    doubleLiteral                           (. factory.registerSignedRealConstant(identifier, sign, t); .)
-	)
+	UnsignedIntegerLiteral<out long value>      (. constant = factory.createLongConstant(sign, value); .)
 |
-	(
-	    integerLiteral                          (. factory.registerIntegerConstant(identifier, t); .)
-	|
-	    doubleLiteral                           (. factory.registerRealConstant(identifier, t); .)
-	)
+    UnsignedDoubleLiteral<out double value>     (. constant = factory.createDoubleConstant(sign, value); .)
+|
+	StringLiteral<out String value> 			(. constant = factory.createCharOrStringConstant(sign, value); .)
+|
+    LogicLiteral<out boolean value>             (. constant = factory.createBooleanConstant(sign, value); .)
+|
+	IdentifierConstant<out Token identifier>    (. constant = factory.createConstantFromIdentifier(sign, identifier); .)
 )
 .
 
 
-
-IdentifierConstant<Token identifier>
+UnsignedIntegerLiteral<out long value>
 =
-(
-    ( "+" | "-" )                               (. Token sign = t; .)
-    identifier                                  (. factory.registerSignedConstantFromIdentifier(identifier, sign, t); .)
-|
-    identifier                                  (. factory.registerConstantFromIdentifier(identifier, t); .)
-)
+integerLiteral                                  (. value = factory.getLongFromToken(t); .)
 .
 
+
+UnsignedDoubleLiteral<out double value>
+=
+doubleLiteral                                   (. value = factory.getDoubleFromToken(t); .)
+.
+
+
+IdentifierConstant<out Token identifierToken>
+=
+identifier                                      (. identifierToken = t; .)
+.
 
 
 VariableDeclarations
@@ -596,14 +599,14 @@ Factor<out ExpressionNode expression>
     ")"
 |
                                                 (. String value = ""; .)
-	StringLiteral<out value>		            (. expression = factory.createCharOrStringLiteral(value); .)
+	StringLiteral<out value>		            (. expression = factory.createCharOrStringLiteralNode(value); .)
 |
-	doubleLiteral								(. expression = factory.createFloatLiteral(t); .)
+	doubleLiteral								(. expression = factory.createFloatLiteralNode(t); .)
 |
-    integerLiteral                              (. expression = factory.createNumericLiteral(t); .)
+    integerLiteral                              (. expression = factory.createNumericLiteralNode(t); .)
 |
 												(. boolean val; .)
-    LogicLiteral<out val>						(. expression = factory.createLogicLiteral(val); .)
+    LogicLiteral<out val>						(. expression = factory.createLogicLiteralNode(val); .)
 |
     SetConstructor<out expression>
 )

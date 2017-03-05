@@ -134,34 +134,8 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, returnDescriptor);
     }
 
-    public void addLongConstant(String identifier, long value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new LongConstantDescriptor(value));
-    }
-
-    public void addRealConstant(String identifier, double value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new RealConstantDescriptor(value));
-    }
-
-    public void addBooleanConstant(String identifier, boolean value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new BooleanConstantDescriptor(value));
-    }
-
-    public void addCharConstant(String identifier, char value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new CharConstantDescriptor(value));
-    }
-
-    public void addStringConstant(String identifier, String value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new StringConstantDescriptor(value));
-    }
-
-    public void addConstantFromConstant(String identifier, String valueIdentifier) throws LexicalException {
-        ConstantDescriptor valueDescriptor = getConstant(valueIdentifier);
-        this.registerNewIdentifier(identifier, (valueDescriptor).shallowCopy());
-    }
-
-    public void addConstantFromNegatedConstant(String identifier, String valueIdentifier) throws LexicalException {
-        ConstantDescriptor valueDescriptor = getConstant(valueIdentifier);
-        this.registerNewIdentifier(identifier, (valueDescriptor).negatedCopy());
+    public void addConstant(String identifier, ConstantDescriptor descriptor) throws LexicalException {
+        this.registerNewIdentifier(identifier, descriptor);
     }
 
     public TypeDescriptor createEnum(List<String> identifiers) throws LexicalException {
@@ -211,7 +185,7 @@ public class IdentifiersTable {
         }
     }
 
-    private ConstantDescriptor getConstant(String identifier) throws LexicalException {
+    public ConstantDescriptor getConstant(String identifier) throws LexicalException {
         TypeDescriptor descriptor = this.getTypeDescriptor(identifier);
         if (descriptor == null) {
             throw new UnknownIdentifierException(identifier);

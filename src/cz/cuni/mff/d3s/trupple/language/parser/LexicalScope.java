@@ -69,6 +69,10 @@ class LexicalScope {
         return this.localIdentifiers.getTypeTypeDescriptor(typeIdentifier);
     }
 
+    ConstantDescriptor getConstant(String identifier) throws LexicalException {
+        return this.localIdentifiers.getConstant(identifier);
+    }
+
     public void setName(String identifier) {
         this.name = identifier;
     }
@@ -177,32 +181,8 @@ class LexicalScope {
         this.context.registerSubroutineName(identifier);
     }
 
-    void registerLongConstant(String identifier, long value) throws LexicalException {
-        this.localIdentifiers.addLongConstant(identifier, value);
-    }
-
-    void registerRealConstant(String identifier, double value) throws LexicalException {
-        this.localIdentifiers.addRealConstant(identifier, value);
-    }
-
-    void registerBooleanConstant(String identifier, boolean value) throws LexicalException {
-        this.localIdentifiers.addBooleanConstant(identifier, value);
-    }
-
-    void registerCharConstant(String identifier, char value) throws LexicalException {
-        this.localIdentifiers.addCharConstant(identifier, value);
-    }
-
-    void registerStringConstant(String identifier, String value) throws LexicalException {
-        this.localIdentifiers.addStringConstant(identifier, value);
-    }
-
-    void registerConstantFromConstant(String identifier, String valueIdentifier) throws LexicalException {
-        this.localIdentifiers.addConstantFromConstant(identifier, valueIdentifier);
-    }
-
-    void registerConstantFromNegatedConstant(String identifier, String valueIdentifier) throws LexicalException {
-        this.localIdentifiers.addConstantFromNegatedConstant(identifier, valueIdentifier);
+    void registerConstant(String identifier, ConstantDescriptor constant) throws LexicalException {
+        this.localIdentifiers.addConstant(identifier, constant);
     }
 
     OrdinalDescriptor createRangeDescriptor(int lowerBound, int upperBound)  throws LexicalException {

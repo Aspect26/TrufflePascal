@@ -32,9 +32,14 @@ PRODUCTIONS
 
 Pascal
 =
-Program
-Declarations
-MainFunction
+(
+    Program
+	[ ImportsSection ]
+	Declarations
+	MainFunction
+|
+	Unit
+)
 .
 
 
@@ -44,6 +49,20 @@ Program
     identifier                                      (. factory.startPascal(t); .)
     ";"
 .
+
+
+
+ImportsSection
+=
+"uses"
+identifier										(. factory.registerUnit(t); .)
+{
+	","
+	identifier									(. factory.registerUnit(t); .)
+}
+";"
+.
+
 
 
 Declarations
@@ -136,19 +155,13 @@ Type<out TypeDescriptor contentType>            (. fileDescriptor = factory.crea
 Ordinal<out OrdinalDescriptor ordinal>
 =												(. ordinal = null; .)
 (												(. int lowerBound, upperBound; .)
-	SubrangeType<out ordinal>
+	SignedIntegerLiteral<out lowerBound>
+	".."
+	SignedIntegerLiteral<out upperBound>
+												(. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
 |
 	Type<out TypeDescriptor typeDescriptor>     (. ordinal = factory.castTypeToOrdinalType(typeDescriptor); .)
 )
-.
-
-
-SubrangeType<out OrdinalDescriptor ordinal>
-=
-SignedIntegerLiteral<out int lowerBound>
-".."
-SignedIntegerLiteral<out int upperBound>
-                                                (. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
 .
 
 
@@ -180,44 +193,49 @@ ConstantDefinition
 =
 identifier										(. Token identifier = t; .)
 "="
-Constant<out ConstantDescriptor constant>       (. factory.registerConstant(identifier, constant); .)
-.
-
-
-Constant<out ConstantDescriptor constant>
-=
-                                                (. constant = null; String sign = ""; .)
-[
-    "+" | "-"                                   (. sign = t.val; .)
-]
 (
-	UnsignedIntegerLiteral<out long value>      (. constant = factory.createLongConstant(sign, value); .)
+	NumericConstant<identifier>
 |
-    UnsignedDoubleLiteral<out double value>     (. constant = factory.createDoubleConstant(sign, value); .)
+	StringLiteral<out String value> 			(. factory.registerStringOrCharConstant(identifier, value); .)
 |
-	StringLiteral<out String value> 			(. constant = factory.createCharOrStringConstant(sign, value); .)
+    LogicLiteral<out boolean value>             (. factory.registerBooleanConstant(identifier, value); .)
 |
-	IdentifierConstant<out Token identifier>    (. constant = factory.createConstantFromIdentifier(sign, identifier); .)
+	IdentifierConstant<identifier>
 )
 .
 
 
-UnsignedIntegerLiteral<out long value>
+
+NumericConstant<Token identifier>
 =
-integerLiteral                                  (. value = factory.getLongFromToken(t); .)
+(
+	( "+" | "-" )								(. Token sign = t; .)
+	(
+	    integerLiteral                          (. factory.registerSignedIntegerConstant(identifier, sign, t); .)
+	|
+	    doubleLiteral                           (. factory.registerSignedRealConstant(identifier, sign, t); .)
+	)
+|
+	(
+	    integerLiteral                          (. factory.registerIntegerConstant(identifier, t); .)
+	|
+	    doubleLiteral                           (. factory.registerRealConstant(identifier, t); .)
+	)
+)
 .
 
 
-UnsignedDoubleLiteral<out double value>
+
+IdentifierConstant<Token identifier>
 =
-doubleLiteral                                   (. value = factory.getDoubleFromToken(t); .)
+(
+    ( "+" | "-" )                               (. Token sign = t; .)
+    identifier                                  (. factory.registerSignedConstantFromIdentifier(identifier, sign, t); .)
+|
+    identifier                                  (. factory.registerConstantFromIdentifier(identifier, t); .)
+)
 .
 
-
-IdentifierConstant<out Token identifierToken>
-=
-identifier                                      (. identifierToken = t; .)
-.
 
 
 VariableDeclarations
@@ -305,13 +323,17 @@ FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParame
 
 FormalParameter<. out List<FormalParameter> formalParameter .>
 =												(. List<String> identifiers = new ArrayList<>(); .)
+												(. boolean isReference = false; .)
+[ 
+	"var"										(. isReference = true; .)
+]
 identifier										(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 {
 	","
 	identifier									(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 }
 ":"
-identifier										(. formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), false); .)
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), isReference); .)
 .
 
 
@@ -354,15 +376,17 @@ Statement<out StatementNode statement>
 |
 	WhileLoop<out statement>
 |
-	RepeatLoop<out statement>
+	RepeatLoop<out statement> 
 |
 	CaseStatement<out statement>
+|
+	"break"										(. statement = factory.createBreak(); .)
 |
     Block<out statement>
 |
     IdentifierBeginningStatement<out statement>
 |
-	"randomize"									(. statement = factory.createRandomizeNode(); .)
+	"randomize"									(. statement = factory.createRandomizeNode(); .)		
 )
 .
 
@@ -432,7 +456,7 @@ ForLoop<out StatementNode statement>
 "for"											(. boolean ascending = true; .)
 identifier										(. Token variableToken = t; .)
 ":="
-Expression<out ExpressionNode startValue>
+Expression<out ExpressionNode startValue>	
 (
 	"to"										(. ascending = true; .)
 	|
@@ -442,13 +466,13 @@ Expression<out ExpressionNode finalValue>
 "do"
 Statement<out StatementNode loopBody>			(. statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
                                                 (. factory.finishLoop(); .)
-.
+.	
 
 
 RepeatLoop<out StatementNode statement>
 =												(. factory.startLoop(); .)
 "repeat"										(. List<StatementNode> bodyNodes = new ArrayList<>(); .)
-StatementSequence<bodyNodes>
+StatementSequence<bodyNodes>					
 "until"
 Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes)); .)
                                                 (. factory.finishLoop(); .)
@@ -467,14 +491,14 @@ Statement<out StatementNode loopBody>			(. statement = factory.createWhileLoop(c
 
 IfStatement<out StatementNode statement>
 =
-"if"
+"if"                                            
     Expression<out ExpressionNode condition>
 
-"then"
+"then"                                          
     Statement<out StatementNode thenStatement>
                                                 (. StatementNode elseStatement = null; .)
 [
-"else"
+"else"                                          
     Statement<out elseStatement>
 ]                                               (. statement = factory.createIfStatement(condition, thenStatement, elseStatement); .)
 .
@@ -516,7 +540,7 @@ LogicFactor<out ExpressionNode expression>
 =
 Arithmetic<out expression>
 [
-    (">" | ">=" | "<" | "<=" | "=" | "<>" | "in")
+    (">" | ">=" | "<" | "<=" | "=" | "<>" | "in" | "><" )
                                                 (. Token op = t; .)
     Arithmetic<out ExpressionNode right>        (. expression = factory.createBinaryExpression(op, expression, right); .)
 ]
@@ -549,7 +573,7 @@ SignedFactor<out ExpressionNode expression>
     ( "+" | "-" )                               (. Token unOp = t; .)
     SignedFactor<out expression>                (.  expression = factory.createUnaryExpression(unOp, expression); .)
 |
-    Factor<out expression>
+    Factor<out expression>                                        
 )
 .
 
@@ -568,18 +592,18 @@ Factor<out ExpressionNode expression>
     )
 |
     "("
-    Expression<out expression>
+    Expression<out expression>                  
     ")"
 |
                                                 (. String value = ""; .)
-	StringLiteral<out value>		            (. expression = factory.createCharOrStringLiteralNode(value); .)
+	StringLiteral<out value>		            (. expression = factory.createCharOrStringLiteral(value); .)
 |
-	doubleLiteral								(. expression = factory.createFloatLiteralNode(t); .)
+	doubleLiteral								(. expression = factory.createFloatLiteral(t); .)
 |
-    integerLiteral                              (. expression = factory.createNumericLiteralNode(t); .)
+    integerLiteral                              (. expression = factory.createNumericLiteral(t); .)
 |
 												(. boolean val; .)
-    LogicLiteral<out val>						(. expression = factory.createLogicLiteralNode(val); .)
+    LogicLiteral<out val>						(. expression = factory.createLogicLiteral(val); .)
 |
     SetConstructor<out expression>
 )
@@ -641,7 +665,7 @@ SetConstructor<out ExpressionNode expression>
 
 MemberExpression<out ExpressionNode expression, Token identifierName>
 =							                    (. expression = null; .)
-(
+(                                               
 	SubroutineCall<out expression, identifierName>
 |
 	ArrayIndex<. out List<ExpressionNode> indexNodes .>  (. expression = factory.createReadArrayValue(identifierName, indexNodes); .)
@@ -680,7 +704,6 @@ ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token s
 (
     IF(factory.shouldBeReference(subroutineToken, currentParameterIndex))
     identifier                                  (. parameter = factory.createReferenceNode(t); .)
-    // read is implemented with references
 |
     Expression<out parameter>
 )
@@ -701,5 +724,126 @@ ArrayIndex<. out List<ExpressionNode> indexNodes .>
 "]"
 .
 
+
+
+Unit
+=
+UnitHeader
+InterfaceSection                                (. factory.finishUnitInterfaceSection(); .)
+ImplementationSection
+UnitFooter
+.
+
+
+UnitHeader
+=
+"unit"
+identifier										(. factory.startUnit(t); .)
+";"
+.
+
+
+UnitFooter
+=
+"end"											(. factory.endUnit(); .)
+"."
+.
+
+
+InterfaceSection
+=
+"interface"
+{
+	(
+		ProcedureHeading
+	|
+		FunctionHeading
+	|
+	    TypeDefinitions
+	|
+	    VariableDeclarations
+	)
+}
+.
+
+
+
+ProcedureHeading
+=
+"procedure"
+identifier										(. Token name = t; .)
+												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+												(. factory.addUnitProcedureInterface(name, formalParameters); .)
+";"
+.
+
+
+
+FunctionHeading
+=
+"function"
+identifier										(. Token name = t; .)
+												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+":"
+identifier										(. String returnTypeName = factory.getTypeNameFromToken(t); .)
+												(. factory.addUnitFunctionInterface(name, formalParameters, returnTypeName); .)
+";"
+.
+
+
+
+ImplementationSection
+=
+"implementation"
+{
+	(
+		UnitSubroutineImplementation
+	|
+		VariableDeclarations
+	|
+		TypeDefinitions
+	)
+}
+.
+
+
+UnitSubroutineImplementation
+=
+(
+    UnitProcedureImplementation ";"
+|
+    UnitFunctionImplementation ";"
+)
+.
+
+
+UnitProcedureImplementation
+=
+"procedure"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+";"
+                                                (. factory.startUnitProcedureImplementation(identifierToken, formalParameters); .)
+Declarations
+Block<out StatementNode bodyNode>               (. factory.finishProcedureImplementation(bodyNode); .)
+.
+
+
+UnitFunctionImplementation
+=
+"function"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+":"
+identifier                                      (. Token returnTypeToken = t; .)
+";"
+                                                (. factory.startUnitFunctionImplementation(identifierToken, formalParameters, returnTypeToken); .)
+Declarations
+Block<out StatementNode bodyNode>               (. factory.finishFunctionImplementation(bodyNode); .)
+.
 
 END Pascal.

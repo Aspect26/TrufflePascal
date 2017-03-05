@@ -15,7 +15,13 @@ public class BooleanConstantDescriptor extends ConstantDescriptor{
         return FrameSlotKind.Long;
     }
 
-    public boolean getValue() {
+    @Override
+    public Object getValue() {
         return this.value;
+    }
+
+    @Override
+    public boolean isSigned() {
+        return false;
     }
 }

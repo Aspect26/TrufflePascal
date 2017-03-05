@@ -15,7 +15,13 @@ public class StringConstantDescriptor extends ConstantDescriptor{
         return FrameSlotKind.Long;
     }
 
-    public String getValue() {
+    @Override
+    public Object getValue() {
         return this.value;
+    }
+
+    @Override
+    public boolean isSigned() {
+        return false;
     }
 }

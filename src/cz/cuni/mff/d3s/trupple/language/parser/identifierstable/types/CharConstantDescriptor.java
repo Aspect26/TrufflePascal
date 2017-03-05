@@ -15,7 +15,13 @@ public class CharConstantDescriptor extends ConstantDescriptor{
         return FrameSlotKind.Long;
     }
 
-    public char getValue() {
+    @Override
+    public Object getValue() {
         return this.value;
+    }
+
+    @Override
+    public boolean isSigned() {
+        return false;
     }
 }

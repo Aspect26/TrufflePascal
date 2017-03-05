@@ -9,6 +9,10 @@ public abstract class ConstantDescriptor extends TypeDescriptor {
         return false;
     }
 
+    public abstract Object getValue();
+
+    public abstract boolean isSigned();
+
     public ConstantDescriptor negatedCopy() throws LexicalException {
         throw new LexicalException("This constant type cannot be negated.");
     }

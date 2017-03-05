@@ -20,7 +20,13 @@ public class RealConstantDescriptor extends ConstantDescriptor{
         return new RealConstantDescriptor(-value);
     }
 
-    public double getValue() {
+    @Override
+    public Object getValue() {
         return this.value;
+    }
+
+    @Override
+    public boolean isSigned() {
+        return true;
     }
 }
