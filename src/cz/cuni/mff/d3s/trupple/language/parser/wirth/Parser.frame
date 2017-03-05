@@ -154,7 +154,7 @@ public class Parser implements IParser {
     	return false;
     }
     
-    public boolean isSingleIdentifier(){
+    public boolean isSingleIdentifier() {
     	Token next = scanner.Peek();
     	if(next.val.equals("]") && factory.containsIdentifier(la.val.toLowerCase()))
     		return true;
@@ -162,12 +162,17 @@ public class Parser implements IParser {
     	return false;
     }
     
-    public boolean continuesArray(){
+    public boolean continuesArray() {
     	Token next = scanner.Peek();
     	if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
     		return true;
 
     	return false;
+    }
+
+    public boolean isSubrange() {
+        Token next = scanner.Peek();
+        return next.val.toLowerCase().equals("..");
     }
 } // end Parser
 

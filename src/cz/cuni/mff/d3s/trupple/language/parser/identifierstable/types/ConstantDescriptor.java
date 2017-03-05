@@ -2,26 +2,11 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
 
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 
-public abstract class ConstantDescriptor extends TypeDescriptor {
+public interface ConstantDescriptor extends TypeDescriptor {
 
-    @Override
-    public boolean isVariable() {
-        return false;
-    }
+    Object getValue();
 
-    public abstract Object getValue();
+    boolean isSigned();
 
-    public abstract boolean isSigned();
-
-    public ConstantDescriptor negatedCopy() throws LexicalException {
-        throw new LexicalException("This constant type cannot be negated.");
-    }
-
-    public ConstantDescriptor shallowCopy() {
-        try {
-            return (ConstantDescriptor)this.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
-        }
-    }
+    ConstantDescriptor negatedCopy() throws LexicalException;
 }

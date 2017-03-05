@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
-public class TypeTypeDescriptor extends TypeDescriptor {
+public class TypeTypeDescriptor implements TypeDescriptor {
 
     private final TypeDescriptor typeDescriptor;
 
@@ -20,7 +20,8 @@ public class TypeTypeDescriptor extends TypeDescriptor {
     }
 
     @Override
-    public boolean isVariable() {
-        return false;
+    public Object getDefaultValue() {
+        return null;
     }
+
 }

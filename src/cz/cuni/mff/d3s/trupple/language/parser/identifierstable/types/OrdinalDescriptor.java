@@ -2,44 +2,43 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
-public abstract class OrdinalDescriptor extends TypeDescriptor {
+public interface OrdinalDescriptor extends TypeDescriptor {
 
-    public static class RangeDescriptor extends OrdinalDescriptor {
+    abstract class OrdinalDescriptorAbstract implements OrdinalDescriptor {
 
-        final private int firstIndex;
-        final private int size;
+        @Override
+        public FrameSlotKind getSlotKind() {
+            return FrameSlotKind.Object;
+        }
 
-        public RangeDescriptor(int firstIndex, int size) {
-            this.firstIndex = firstIndex;
-            this.size = size;
+        @Override
+        public Object getDefaultValue() {
+            return null;
+        }
+
+    }
+
+    class RangeDescriptor extends OrdinalDescriptorAbstract {
+
+        private final OrdinalConstantDescriptor lowerBound;
+        private final OrdinalConstantDescriptor upperBound;
+
+        public RangeDescriptor(OrdinalConstantDescriptor lowerBound, OrdinalConstantDescriptor upperBound) {
+            this.lowerBound = lowerBound;
+            this.upperBound = upperBound;
         }
 
         public int getFirstIndex() {
-            return this.firstIndex;
+            return this.lowerBound.getOrdinalValue();
         }
 
         public int getSize() {
-            return this.size;
+            return this.upperBound.getOrdinalValue() - this.lowerBound.getOrdinalValue() + 1;
         }
 
     }
 
-    @Override
-    public OrdinalDescriptor getOrdinal() {
-        return this;
-    }
+    int getFirstIndex();
 
-    @Override
-    public FrameSlotKind getSlotKind() {
-        return FrameSlotKind.Object;
-    }
-
-    @Override
-    public boolean isVariable() {
-        return false;
-    }
-
-    public abstract int getFirstIndex();
-
-    public abstract int getSize();
+    int getSize();
 }

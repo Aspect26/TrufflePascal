@@ -5,11 +5,11 @@ import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
 
 import java.util.List;
 
-public abstract class SubroutineDescriptor extends TypeDescriptor {
+public abstract class SubroutineDescriptor implements TypeDescriptor {
 
     protected final List<FormalParameter> formalParameters;
 
-    public SubroutineDescriptor(List<FormalParameter> formalParameters) {
+    SubroutineDescriptor(List<FormalParameter> formalParameters) {
         this.formalParameters = formalParameters;
     }
 
@@ -20,11 +20,6 @@ public abstract class SubroutineDescriptor extends TypeDescriptor {
 
     public boolean hasParameters() {
         return this.formalParameters.size() != 0;
-    }
-
-    @Override
-    public boolean isVariable() {
-        return false;
     }
 
     public boolean isReferenceParameter(int parameterIndex) {

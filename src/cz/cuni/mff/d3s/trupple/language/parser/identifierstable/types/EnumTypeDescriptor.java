@@ -4,7 +4,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 
 import java.util.List;
 
-public class EnumTypeDescriptor extends OrdinalDescriptor {
+public class EnumTypeDescriptor implements OrdinalDescriptor {
 
     private final List<String> identifiers;
     private final String defaultValue;
@@ -17,11 +17,6 @@ public class EnumTypeDescriptor extends OrdinalDescriptor {
     @Override
     public FrameSlotKind getSlotKind() {
         return FrameSlotKind.Object;
-    }
-
-    @Override
-    public boolean isVariable() {
-        return true;
     }
 
     @Override

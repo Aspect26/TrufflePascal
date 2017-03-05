@@ -19,14 +19,8 @@ public class FunctionReturnDescriptor extends SubroutineDescriptor {
         return returnTypeDescriptor.getSlotKind();
     }
 
-    // NOTE: so it can be assigned a value
-    @Override
-    public boolean isVariable() {
-        return true;
-    }
-
     @Override
     public Object getDefaultValue() {
-        return returnTypeDescriptor.getDefaultValue();
+        return null;
     }
 }

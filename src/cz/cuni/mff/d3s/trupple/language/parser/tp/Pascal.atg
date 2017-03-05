@@ -154,7 +154,8 @@ Type<out TypeDescriptor contentType>            (. fileDescriptor = factory.crea
 
 Ordinal<out OrdinalDescriptor ordinal>
 =												(. ordinal = null; .)
-(												(. int lowerBound, upperBound; .)
+(
+    IF(isSubrange())
 	SubrangeType<out ordinal>
 |
 	Type<out TypeDescriptor typeDescriptor>     (. ordinal = factory.castTypeToOrdinalType(typeDescriptor); .)
@@ -164,24 +165,9 @@ Ordinal<out OrdinalDescriptor ordinal>
 
 SubrangeType<out OrdinalDescriptor ordinal>
 =
-SignedIntegerLiteral<out int lowerBound>
+Constant<out ConstantDescriptor lowerBound>
 ".."
-SignedIntegerLiteral<out int upperBound>
-                                                (. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
-.
-
-
-SignedIntegerLiteral<out int value>
-=                                               (. value = 0; .)
-(
-    "+"
-    SignedIntegerLiteral<out value>
-|
-    "-"
-    SignedIntegerLiteral<out value>             (. value = -value; .)
-|
-    integerLiteral                              (. value = Integer.parseInt(t.val); .)
-)
+Constant<out ConstantDescriptor upperBound>     (. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
 .
 
 

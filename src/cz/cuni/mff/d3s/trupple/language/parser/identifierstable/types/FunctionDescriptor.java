@@ -12,4 +12,8 @@ public class FunctionDescriptor extends SubroutineDescriptor {
         this.returnType = returnType;
     }
 
+    @Override
+    public Object getDefaultValue() {
+        return null;
+    }
 }

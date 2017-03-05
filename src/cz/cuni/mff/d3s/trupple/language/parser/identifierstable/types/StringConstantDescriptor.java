@@ -1,8 +1,10 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.CantBeNegatedException;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 
-public class StringConstantDescriptor extends ConstantDescriptor{
+public class StringConstantDescriptor implements ConstantDescriptor {
 
     private final String value;
 
@@ -16,6 +18,11 @@ public class StringConstantDescriptor extends ConstantDescriptor{
     }
 
     @Override
+    public Object getDefaultValue() {
+        return null;
+    }
+
+    @Override
     public Object getValue() {
         return this.value;
     }
@@ -23,5 +30,10 @@ public class StringConstantDescriptor extends ConstantDescriptor{
     @Override
     public boolean isSigned() {
         return false;
+    }
+
+    @Override
+    public ConstantDescriptor negatedCopy() throws LexicalException {
+        throw new CantBeNegatedException();
     }
 }

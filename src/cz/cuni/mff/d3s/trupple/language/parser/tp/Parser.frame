@@ -153,6 +153,11 @@ public class Parser implements IParser {
     	
     	return false;
     }
+
+    public boolean isSubrange() {
+        Token next = scanner.Peek();
+        return next.val.toLowerCase().equals("..");
+    }
     
     public boolean isSingleIdentifier(){
     	Token next = scanner.Peek();

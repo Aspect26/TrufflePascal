@@ -86,10 +86,6 @@ public class IdentifiersTable {
         return this.identifiersMap.containsKey(identifier);
     }
 
-    public boolean isVariable(String identifier) {
-        return this.identifiersMap.containsKey(identifier) && this.identifiersMap.get(identifier).isVariable();
-    }
-
     public boolean isConstant(String identifier) {
         return this.identifiersMap.get(identifier) instanceof ConstantDescriptor;
     }

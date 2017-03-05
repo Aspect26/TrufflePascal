@@ -187,20 +187,23 @@ public class NodeFactory {
         return this.lexicalScope.createFileDescriptor(contentTypeDescriptor);
     }
 
-    public OrdinalDescriptor createSimpleOrdinalDescriptor(final int lowerBound, final int upperBound) {
+    public OrdinalDescriptor createSimpleOrdinalDescriptor(final ConstantDescriptor lowerBound, final ConstantDescriptor upperBound) {
         try {
-            return lexicalScope.createRangeDescriptor(lowerBound, upperBound);
+            return lexicalScope.createRangeDescriptor((OrdinalConstantDescriptor)lowerBound, (OrdinalConstantDescriptor)upperBound);
         } catch (LexicalException e){
             parser.SemErr(e.getMessage());
+            return lexicalScope.createImplicitRangeDescriptor();
+        } catch (ClassCastException e) {
+            parser.SemErr("Not an ordinal constant");
             return lexicalScope.createImplicitRangeDescriptor();
         }
     }
 
     public OrdinalDescriptor castTypeToOrdinalType(TypeDescriptor typeDescriptor) {
 	    try {
-	        return typeDescriptor.getOrdinal();
-        } catch (LexicalException e) {
-	        parser.SemErr(e.getMessage());
+	        return (OrdinalDescriptor) typeDescriptor;
+        } catch (ClassCastException e) {
+	        parser.SemErr("Not an ordinal");
 	        return null;
         }
     }
@@ -477,13 +480,9 @@ public class NodeFactory {
         LexicalScope ls = this.lexicalScope;
         while (ls != null) {
             if (ls.containsLocalIdentifier(variableIdentifier)) {
-                if (!ls.isVariable(variableIdentifier)) {
-                    parser.SemErr("Assignment target is not a variable");
-                    return null;
-                } else {
-                    FrameSlot frameSlot = ls.getLocalSlot(variableIdentifier);
-                    return AssignmentNodeGen.create(valueNode, frameSlot);
-                }
+                // TODO: check if it is assignable
+                FrameSlot frameSlot = ls.getLocalSlot(variableIdentifier);
+                return AssignmentNodeGen.create(valueNode, frameSlot);
             } else {
                 ls = ls.getOuterScope();
             }
@@ -497,13 +496,12 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         return this.doLookup(identifier, (LexicalScope foundInLexicalScope, String foundIdentifier) -> {
-            if (foundInLexicalScope.isVariable(foundIdentifier) || foundInLexicalScope.isConstant(foundIdentifier)) {
-                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier));
-            } else if (foundInLexicalScope.isParameterlessSubroutine(foundIdentifier)) {
+            if (foundInLexicalScope.isParameterlessSubroutine(foundIdentifier)) {
                 return this.createInvokeNode(foundInLexicalScope, foundIdentifier, Collections.emptyList());
-            } else {
-                parser.SemErr(foundIdentifier + " is not an expression");
-                return null;
+            }
+            else {
+                // TODO: check if it is a constant or a variable
+                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier));
             }
         }, new UnknownIdentifierException(identifier));
     }

@@ -81,10 +81,6 @@ class LexicalScope {
         this.localIdentifiers.addType(identifier, typeDescriptor);
     }
 
-    boolean isVariable(String identifier) {
-        return this.localIdentifiers.isVariable(identifier);
-    }
-
     boolean isConstant(String identifier) {
         return this.localIdentifiers.isConstant(identifier);
     }
@@ -185,15 +181,23 @@ class LexicalScope {
         this.localIdentifiers.addConstant(identifier, constant);
     }
 
-    OrdinalDescriptor createRangeDescriptor(int lowerBound, int upperBound)  throws LexicalException {
-        if (upperBound < lowerBound) {
-            throw new LexicalException("Lower upper bound than lower bound.");
+    OrdinalDescriptor createRangeDescriptor(OrdinalConstantDescriptor lowerBound, OrdinalConstantDescriptor upperBound)  throws LexicalException {
+        if (!lowerBound.getClass().equals(upperBound.getClass())) {
+            throw new LexicalException("Range type mismatch");
         }
-        return new OrdinalDescriptor.RangeDescriptor(lowerBound, upperBound - lowerBound + 1);
+
+        long lower = lowerBound.getOrdinalValue();
+        long upper = upperBound.getOrdinalValue();
+
+        if (lower > upper) {
+            throw new LexicalException("Lower upper bound than lower bound");
+        }
+
+        return new OrdinalDescriptor.RangeDescriptor(lowerBound, upperBound);
     }
 
     OrdinalDescriptor createImplicitRangeDescriptor() {
-        return new OrdinalDescriptor.RangeDescriptor(0, 1);
+        return new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(1));
     }
 
     List<StatementNode> createInitializationNodes() throws LexicalException {

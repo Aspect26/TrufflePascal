@@ -297,7 +297,7 @@ public class Scanner {
 		literals.put("packed", new Integer(13));
 		literals.put("array", new Integer(14));
 		literals.put("file", new Integer(19));
-		literals.put("const", new Integer(23));
+		literals.put("const", new Integer(21));
 		literals.put("var", new Integer(24));
 		literals.put("procedure", new Integer(26));
 		literals.put("forward", new Integer(27));
@@ -542,9 +542,9 @@ public class Scanner {
 				case 23:
 					{t.kind = 20; break loop;}
 				case 24:
-					{t.kind = 21; break loop;}
-				case 25:
 					{t.kind = 22; break loop;}
+				case 25:
+					{t.kind = 23; break loop;}
 				case 26:
 					{t.kind = 34; break loop;}
 				case 27:

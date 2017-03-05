@@ -106,7 +106,7 @@ public class Parser implements IParser {
 	}
 
 	void Declarations() {
-		if (la.kind == 22) {
+		if (la.kind == 20) {
 			ConstantDefinitions();
 		}
 		if (la.kind == 7) {
@@ -127,7 +127,7 @@ public class Parser implements IParser {
 	}
 
 	void ConstantDefinitions() {
-		Expect(22);
+		Expect(20);
 		ConstantDefinition();
 		Expect(6);
 		while (la.kind == 1) {
@@ -242,8 +242,7 @@ public class Parser implements IParser {
 	OrdinalDescriptor  Ordinal() {
 		OrdinalDescriptor  ordinal;
 		ordinal = null; 
-		if (la.kind == 3 || la.kind == 20 || la.kind == 21) {
-			int lowerBound, upperBound; 
+		if (isSubrange()) {
 			ordinal = SubrangeType();
 		} else if (StartOf(1)) {
 			TypeDescriptor typeDescriptor = Type();
@@ -263,43 +262,18 @@ public class Parser implements IParser {
 
 	OrdinalDescriptor  SubrangeType() {
 		OrdinalDescriptor  ordinal;
-		int lowerBound = SignedIntegerLiteral();
+		ConstantDescriptor lowerBound = Constant();
 		Expect(19);
-		int upperBound = SignedIntegerLiteral();
+		ConstantDescriptor upperBound = Constant();
 		ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); 
 		return ordinal;
-	}
-
-	int  SignedIntegerLiteral() {
-		int  value;
-		value = 0; 
-		if (la.kind == 20) {
-			Get();
-			value = SignedIntegerLiteral();
-		} else if (la.kind == 21) {
-			Get();
-			value = SignedIntegerLiteral();
-			value = -value; 
-		} else if (la.kind == 3) {
-			Get();
-			value = Integer.parseInt(t.val); 
-		} else SynErr(64);
-		return value;
-	}
-
-	void ConstantDefinition() {
-		Expect(1);
-		Token identifier = t; 
-		Expect(8);
-		ConstantDescriptor constant = Constant();
-		factory.registerConstant(identifier, constant); 
 	}
 
 	ConstantDescriptor  Constant() {
 		ConstantDescriptor  constant;
 		constant = null; String sign = ""; 
-		if (la.kind == 20 || la.kind == 21) {
-			if (la.kind == 20) {
+		if (la.kind == 21 || la.kind == 22) {
+			if (la.kind == 21) {
 				Get();
 			} else {
 				Get();
@@ -318,8 +292,16 @@ public class Parser implements IParser {
 		} else if (la.kind == 1) {
 			Token identifier = IdentifierConstant();
 			constant = factory.createConstantFromIdentifier(sign, identifier); 
-		} else SynErr(65);
+		} else SynErr(64);
 		return constant;
+	}
+
+	void ConstantDefinition() {
+		Expect(1);
+		Token identifier = t; 
+		Expect(8);
+		ConstantDescriptor constant = Constant();
+		factory.registerConstant(identifier, constant); 
 	}
 
 	long  UnsignedIntegerLiteral() {
@@ -381,7 +363,7 @@ public class Parser implements IParser {
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishProcedureImplementation(bodyNode); 
-		} else SynErr(66);
+		} else SynErr(65);
 	}
 
 	void Function() {
@@ -404,7 +386,7 @@ public class Parser implements IParser {
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishFunctionImplementation(bodyNode); 
-		} else SynErr(67);
+		} else SynErr(66);
 	}
 
 	List<FormalParameter>  FormalParameterList() {
@@ -502,7 +484,7 @@ public class Parser implements IParser {
 			statement = factory.createRandomizeNode(); 
 			break;
 		}
-		default: SynErr(68); break;
+		default: SynErr(67); break;
 		}
 		return statement;
 	}
@@ -537,7 +519,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 37) {
 			Get();
 			ascending = false; 
-		} else SynErr(69);
+		} else SynErr(68);
 		ExpressionNode finalValue = Expression();
 		Expect(38);
 		StatementNode loopBody = Statement();
@@ -594,7 +576,7 @@ public class Parser implements IParser {
 			statement = SubroutineCall(identifierToken);
 		} else if (la.kind == 13 || la.kind == 32) {
 			statement = AssignmentAfterIdentifierPart(identifierToken);
-		} else SynErr(70);
+		} else SynErr(69);
 		return statement;
 	}
 
@@ -701,7 +683,7 @@ public class Parser implements IParser {
 			expression = factory.createUnaryExpression(op, right); 
 		} else if (StartOf(6)) {
 			expression = LogicFactor();
-		} else SynErr(71);
+		} else SynErr(70);
 		return expression;
 	}
 
@@ -749,8 +731,8 @@ public class Parser implements IParser {
 	ExpressionNode  Arithmetic() {
 		ExpressionNode  expression;
 		expression = Term();
-		while (la.kind == 20 || la.kind == 21) {
-			if (la.kind == 20) {
+		while (la.kind == 21 || la.kind == 22) {
+			if (la.kind == 21) {
 				Get();
 			} else {
 				Get();
@@ -785,8 +767,8 @@ public class Parser implements IParser {
 	ExpressionNode  SignedFactor() {
 		ExpressionNode  expression;
 		expression = null; 
-		if (la.kind == 20 || la.kind == 21) {
-			if (la.kind == 20) {
+		if (la.kind == 21 || la.kind == 22) {
+			if (la.kind == 21) {
 				Get();
 			} else {
 				Get();
@@ -796,7 +778,7 @@ public class Parser implements IParser {
 			expression = factory.createUnaryExpression(unOp, expression); 
 		} else if (StartOf(9)) {
 			expression = Factor();
-		} else SynErr(72);
+		} else SynErr(71);
 		return expression;
 	}
 
@@ -814,7 +796,7 @@ public class Parser implements IParser {
 				expression = MemberExpression(t);
 			} else if (StartOf(10)) {
 				expression = factory.createExpressionFromSingleIdentifier(t); 
-			} else SynErr(73);
+			} else SynErr(72);
 			break;
 		}
 		case 16: {
@@ -849,7 +831,7 @@ public class Parser implements IParser {
 			expression = SetConstructor();
 			break;
 		}
-		default: SynErr(74); break;
+		default: SynErr(73); break;
 		}
 		return expression;
 	}
@@ -869,8 +851,8 @@ public class Parser implements IParser {
 				Get();
 				expression = factory.createRandomNode(t); 
 				Expect(17);
-			} else SynErr(75);
-		} else SynErr(76);
+			} else SynErr(74);
+		} else SynErr(75);
 		return expression;
 	}
 
@@ -882,7 +864,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 13) {
 			List<ExpressionNode> indexNodes  = ArrayIndex();
 			expression = factory.createReadArrayValue(identifierName, indexNodes); 
-		} else SynErr(77);
+		} else SynErr(76);
 		return expression;
 	}
 
@@ -895,7 +877,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 58) {
 			Get();
 			result = false; 
-		} else SynErr(78);
+		} else SynErr(77);
 		return result;
 	}
 
@@ -915,7 +897,7 @@ public class Parser implements IParser {
 				valueNodes.add(valueNode); 
 			}
 			expression = factory.createSetConstructorNode(valueNodes); 
-		} else SynErr(79);
+		} else SynErr(78);
 		Expect(15);
 		return expression;
 	}
@@ -942,7 +924,7 @@ public class Parser implements IParser {
 			parameter = factory.createReferenceNode(t); 
 		} else if (StartOf(5)) {
 			parameter = Expression();
-		} else SynErr(80);
+		} else SynErr(79);
 		return parameter;
 	}
 
@@ -961,15 +943,15 @@ public class Parser implements IParser {
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_T,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_T,_x,_T, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_T,_T, _x,_T,_x,_x, _T,_T,_x,_x, _T,_x,_x,_x, _x,_x,_T,_x, _x,_x,_T,_x, _T,_T,_T,_x, _T,_x,_x,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x}
+		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_T,_T, _x,_T,_x,_x, _x,_T,_T,_x, _T,_x,_x,_x, _x,_x,_T,_x, _x,_x,_T,_x, _T,_T,_T,_x, _T,_x,_x,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _x,_x}
 
 	};
 
@@ -1000,7 +982,7 @@ public class Parser implements IParser {
     	return false;
     }
     
-    public boolean isSingleIdentifier(){
+    public boolean isSingleIdentifier() {
     	Token next = scanner.Peek();
     	if(next.val.equals("]") && factory.containsIdentifier(la.val.toLowerCase()))
     		return true;
@@ -1008,12 +990,17 @@ public class Parser implements IParser {
     	return false;
     }
     
-    public boolean continuesArray(){
+    public boolean continuesArray() {
     	Token next = scanner.Peek();
     	if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
     		return true;
 
     	return false;
+    }
+
+    public boolean isSubrange() {
+        Token next = scanner.Peek();
+        return next.val.toLowerCase().equals("..");
     }
 } // end Parser
 
@@ -1056,9 +1043,9 @@ class Errors {
 			case 17: s = "\")\" expected"; break;
 			case 18: s = "\"file\" expected"; break;
 			case 19: s = "\"..\" expected"; break;
-			case 20: s = "\"+\" expected"; break;
-			case 21: s = "\"-\" expected"; break;
-			case 22: s = "\"const\" expected"; break;
+			case 20: s = "\"const\" expected"; break;
+			case 21: s = "\"+\" expected"; break;
+			case 22: s = "\"-\" expected"; break;
 			case 23: s = "\"var\" expected"; break;
 			case 24: s = "\":\" expected"; break;
 			case 25: s = "\"procedure\" expected"; break;
@@ -1100,23 +1087,22 @@ class Errors {
 			case 61: s = "invalid Subroutine"; break;
 			case 62: s = "invalid Type"; break;
 			case 63: s = "invalid Ordinal"; break;
-			case 64: s = "invalid SignedIntegerLiteral"; break;
-			case 65: s = "invalid Constant"; break;
-			case 66: s = "invalid Procedure"; break;
-			case 67: s = "invalid Function"; break;
-			case 68: s = "invalid Statement"; break;
-			case 69: s = "invalid ForLoop"; break;
-			case 70: s = "invalid IdentifierBeginningStatement"; break;
-			case 71: s = "invalid SignedLogicFactor"; break;
-			case 72: s = "invalid SignedFactor"; break;
+			case 64: s = "invalid Constant"; break;
+			case 65: s = "invalid Procedure"; break;
+			case 66: s = "invalid Function"; break;
+			case 67: s = "invalid Statement"; break;
+			case 68: s = "invalid ForLoop"; break;
+			case 69: s = "invalid IdentifierBeginningStatement"; break;
+			case 70: s = "invalid SignedLogicFactor"; break;
+			case 71: s = "invalid SignedFactor"; break;
+			case 72: s = "invalid Factor"; break;
 			case 73: s = "invalid Factor"; break;
-			case 74: s = "invalid Factor"; break;
+			case 74: s = "invalid Random"; break;
 			case 75: s = "invalid Random"; break;
-			case 76: s = "invalid Random"; break;
-			case 77: s = "invalid MemberExpression"; break;
-			case 78: s = "invalid LogicLiteral"; break;
-			case 79: s = "invalid SetConstructor"; break;
-			case 80: s = "invalid ActualParameter"; break;
+			case 76: s = "invalid MemberExpression"; break;
+			case 77: s = "invalid LogicLiteral"; break;
+			case 78: s = "invalid SetConstructor"; break;
+			case 79: s = "invalid ActualParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
