@@ -1,9 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.oracle.truffle.api.CallTarget;
@@ -11,125 +9,158 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.nodes.Node;
+import com.oracle.truffle.api.source.MissingNameException;
 import com.oracle.truffle.api.source.Source;
 
 import cz.cuni.mff.d3s.trupple.language.parser.IParser;
-import cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.8", mimeType = "text/x-pascal")
+@TruffleLanguage.Registration(name = "Pascal", version = "0.9", mimeType = PascalLanguage.MIME_TYPE)
 public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 
-	public static final PascalLanguage INSTANCE = new PascalLanguage();
-	public static final String builtinKind = "Pascal builtin";
+    public static final PascalLanguage INSTANCE = new PascalLanguage();
+	static final String MIME_TYPE = "text/x-pascal";
 
 	@Override
-	protected PascalContext createContext(com.oracle.truffle.api.TruffleLanguage.Env env) {
-		return null;
+	protected PascalContext createContext(com.oracle.truffle.api.TruffleLanguage.Env environment) {
+        BufferedReader input = new BufferedReader(new InputStreamReader(environment.in()));
+        PrintStream output = new PrintStream(environment.out(), true);
+
+		return new PascalContext(null, environment, input, output, true);
 	}
 
-	@Override
-	protected CallTarget parse(Source code, Node context, String... argumentNames) throws IOException {
-		// final PascalContext _context = new PascalContext();
-		// RootNode rootNode =_context.evalSource(code);
-		// return Truffle.getRuntime().createCallTarget(rootNode);
-		return null;
-	}
-
-	@Override
 	protected Object findExportedSymbol(PascalContext context, String globalName, boolean onlyExplicit) {
-		// TODO Auto-generated method stub
-		return null;
+		return context.getFunctionRegistry().lookup(globalName);
 	}
 
 	@Override
 	protected Object getLanguageGlobal(PascalContext context) {
-		// TODO Auto-generated method stub
-		return null;
+		return context;
 	}
 
 	@Override
 	protected boolean isObjectOfLanguage(Object object) {
-		// TODO Auto-generated method stub
-		return false;
+		return object instanceof PascalFunction;
 	}
 
 	@Override
 	protected Object evalInContext(Source source, Node node, MaterializedFrame mFrame) throws IOException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*
-	 * *************************************************************************
-	 * ******* START FROM FILE PATHS
-	 */
+
+    @Override
+    protected CallTarget parse(Source code, Node context, String... argumentNames) throws IOException {
+        // TODO: implement this
+	    return null;
+    }
+
 	public static void start(String sourcePath, List<String> imports, boolean useTPExtension) throws IOException {
 		IParser parser = (useTPExtension)? new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser() : new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser();
 
-		if (useTPExtension) {
-			for (String dir : imports) {
-				try {
-					Files.walk(Paths.get(dir)).forEach(filePath -> {
-						if (filePath.toString().endsWith(".pas")) {
-							try {
-								parser.Parse(Source.fromFileName(filePath.toString()));
-								if (parser.hadErrors()) {
-									System.err.println("Errors while parsing import file " + filePath + ".");
-									return;
-								}
-							} catch (IOException e) {
-								System.err.println("Error reading unit file: " + filePath);
-							}
-						}
-					});
-				} catch (NoSuchFileException e) {
-					System.err.println("No such file or directory " + e.getFile());
-				}
-			}
+		if (useTPExtension && !imports.isEmpty()) {
+            if (!parseImports(imports, parser)) {
+                return;
+            }
 		}
 		
-		parser.Parse(Source.fromFileName(sourcePath));
-		if (parser.hadErrors()) {
-			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
-			return;
-		}
+		if (!parseSource(buildSourceFromFile(new File(sourcePath)), parser)) {
+		    return;
+        }
 
 		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call();
 	}
 
-	/*
-	 * *************************************************************************
-	 * START FROM CODES
-	 */
 	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension) {
         IParser parser = (useTPExtension)? new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser() : new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser();
 
         if (useTPExtension) {
             int i = 0;
             for (String imp : imports) {
-                parser.Parse(Source.fromText(imp, "import" + (i++)));
-                if (parser.hadErrors()) {
-                    System.err.println("Errors while parsing import file " + imp + ".");
+                if (!parseSource(buildSourceFromText(imp, "import" + (i++)), parser)) {
                     return;
                 }
             }
         }
 
-		parser.Parse(Source.fromText(sourceCode, "unnamed_code"));
-		if (parser.hadErrors()) {
-			System.err.println("Errors while parsing source file, the code cannot be interpreted...");
-			return;
-		}
+        if (!parseSource(buildSourceFromText(sourceCode, "unnamed_code"), parser)) {
+            return;
+        }
 
 		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call();
 	}
 
-	public Node createFindContextNode1() {
-		return createFindContextNode();
-	}
+	private static boolean parseImports(List<String> imports, IParser parser) {
+        for (String dir : imports) {
+            if (!parseImportDirectory(dir, parser)) {
+                return false;
+            }
+        }
 
-	public PascalContext findContext1(Node contextNode) {
-		return findContext(contextNode);
-	}
+        return true;
+    }
+
+    private static boolean parseImportDirectory(String path, IParser parser) {
+	    File[] filesInDirectory = new File(path).listFiles();
+
+	    if (filesInDirectory == null) {
+	        return true;
+        }
+
+	    for (File fileImport : filesInDirectory) {
+	        if (fileImport.isFile() && fileImport.getAbsolutePath().endsWith(".pas")) {
+	            if (!parseImport(fileImport, parser)) {
+	                return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean parseImport(File importFile, IParser parser) {
+        String filePath = importFile.getPath();
+
+        try {
+            parser.Parse(buildSourceFromFile(importFile));
+
+            if (parser.hadErrors()) {
+                System.err.println("Errors while parsing import file " + filePath + ".");
+                return false;
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading unit file: " + filePath);
+        }
+
+        return true;
+    }
+
+    private static boolean parseSource(Source source, IParser parser) {
+	    parser.Parse(source);
+        if (parser.hadErrors()) {
+            System.err.println("Errors while parsing source file, the code cannot be interpreted...");
+            return false;
+        }
+
+        return true;
+    }
+
+    private static Source buildSourceFromText(String source, String name) {
+	    try {
+            InputStream is = new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
+            return Source.newBuilder(new InputStreamReader(is)).name(name).mimeType(PascalLanguage.MIME_TYPE).build();
+        } catch (IOException e) {
+	        return null;
+        }
+    }
+
+    private static Source buildSourceFromFile(File file) throws IOException {
+	    try {
+            InputStream is = new FileInputStream(file);
+            return Source.newBuilder(new InputStreamReader(is)).mimeType(PascalLanguage.MIME_TYPE).build();
+        } catch (MissingNameException e) {
+	        return null;
+        }
+    }
 }

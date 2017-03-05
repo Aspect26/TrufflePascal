@@ -22,7 +22,7 @@ public final class PascalContext extends ExecutionContext {
 		this(outerContext, null, new BufferedReader(new InputStreamReader(System.in)), System.out, usingTPExtension);
 	}
 
-	private PascalContext(PascalContext outerContext, TruffleLanguage.Env env, BufferedReader input, PrintStream output, boolean usingTPExtension) {
+	public PascalContext(PascalContext outerContext, TruffleLanguage.Env env, BufferedReader input, PrintStream output, boolean usingTPExtension) {
 		this.input = new Scanner(input);
 		this.output = output;
 		this.outerContext = outerContext;
