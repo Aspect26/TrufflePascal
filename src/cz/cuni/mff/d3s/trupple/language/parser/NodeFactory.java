@@ -31,7 +31,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
@@ -184,6 +183,10 @@ public class NodeFactory {
 
     public TypeDescriptor createSetType(OrdinalDescriptor baseType) {
         return lexicalScope.createSetType(baseType);
+    }
+
+    public TypeDescriptor createFileType(TypeDescriptor contentTypeDescriptor) {
+        return this.lexicalScope.createFileDescriptor(contentTypeDescriptor);
     }
 
     public OrdinalDescriptor createSimpleOrdinalDescriptor(final int lowerBound, final int upperBound) {

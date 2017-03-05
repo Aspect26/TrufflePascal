@@ -94,6 +94,8 @@ Type<out TypeDescriptor typeDescriptor>
 |
     "set" "of"
     Ordinal<out OrdinalDescriptor ordinal>      (. typeDescriptor = factory.createSetType(ordinal); .)
+|
+    FileType<out typeDescriptor>
 )
 .
 
@@ -123,6 +125,12 @@ EnumDefinition<out TypeDescriptor typeDescriptor>
 ")"                                             (. typeDescriptor = factory.registerEnum(enumIdentifiers); .)
 .
 
+
+FileType<out TypeDescriptor fileDescriptor>
+=
+"file" "of"
+Type<out TypeDescriptor contentType>            (. fileDescriptor = factory.createFileType(contentType); .)
+.
 
 
 Ordinal<out OrdinalDescriptor ordinal>

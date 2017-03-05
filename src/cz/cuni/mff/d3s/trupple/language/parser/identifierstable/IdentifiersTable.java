@@ -177,6 +177,10 @@ public class IdentifiersTable {
         return enumTypeDescriptor;
     }
 
+    public FileDescriptor createFileDescriptor(TypeDescriptor contentTypeDescriptor) {
+        return new FileDescriptor(contentTypeDescriptor);
+    }
+
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {
         TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
         TypeDescriptor typeDescriptor = new ArrayDescriptor(ordinalDimensions, returnTypeDescriptor);
