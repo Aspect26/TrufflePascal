@@ -19,6 +19,31 @@ public abstract class LessThanOrEqualNode extends BinaryNode {
 	}
 
 	@Specialization
+	protected boolean lessThan(double left, long right) {
+		return left <= right;
+	}
+
+	@Specialization
+	protected boolean lessThan(long left, double right) {
+		return left <= right;
+	}
+
+	@Specialization
+	protected boolean lessThan(double left, double right) {
+		return left <= right;
+	}
+
+	@Specialization
+	protected boolean lessThan(char left, char right) {
+		return left <= right;
+	}
+
+	@Specialization
+	protected boolean lessThan(boolean left, boolean right) {
+		return !left && right;
+	}
+
+	@Specialization
 	protected boolean lessThanOrEqual(SetTypeValue left, SetTypeValue right) {
 		return (left.getSize() < right.getSize()) || (left.getSize() == right.getSize());
 	}
