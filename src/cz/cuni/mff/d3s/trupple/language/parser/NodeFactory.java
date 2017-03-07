@@ -36,9 +36,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.UnknownDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 public class NodeFactory {
@@ -189,20 +189,23 @@ public class NodeFactory {
         return this.lexicalScope.createFileDescriptor(contentTypeDescriptor);
     }
 
-    public OrdinalDescriptor createSimpleOrdinalDescriptor(final int lowerBound, final int upperBound) {
+    public OrdinalDescriptor createSimpleOrdinalDescriptor(final ConstantDescriptor lowerBound, final ConstantDescriptor upperBound) {
         try {
-            return lexicalScope.createRangeDescriptor(lowerBound, upperBound);
+            return lexicalScope.createRangeDescriptor((OrdinalConstantDescriptor)lowerBound, (OrdinalConstantDescriptor)upperBound);
         } catch (LexicalException e){
             parser.SemErr(e.getMessage());
+            return lexicalScope.createImplicitRangeDescriptor();
+        } catch (ClassCastException e) {
+            parser.SemErr("Not an ordinal constant");
             return lexicalScope.createImplicitRangeDescriptor();
         }
     }
 
     public OrdinalDescriptor castTypeToOrdinalType(TypeDescriptor typeDescriptor) {
 	    try {
-	        return typeDescriptor.getOrdinal();
-        } catch (LexicalException e) {
-	        parser.SemErr(e.getMessage());
+	        return (OrdinalDescriptor) typeDescriptor;
+        } catch (ClassCastException e) {
+	        parser.SemErr("Not an ordinal");
 	        return null;
         }
     }
@@ -216,102 +219,79 @@ public class NodeFactory {
         }
     }
 
-    public void registerIntegerConstant(Token identifierToken, Token valueToken) {
-        try {
-            long value = this.createLongFromToken(valueToken);
-            String identifier = this.getIdentifierFromToken(identifierToken);
-            this.lexicalScope.registerLongConstant(identifier, value);
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
+    public ConstantDescriptor createLongConstant(String sign, long value) {
+	    switch (sign) {
+            case "":
+	        case "+": return new LongConstantDescriptor(value);
+	        case "-": return new LongConstantDescriptor(-value);
+            default:
+                parser.SemErr("Unknown unary operator: " + sign);
+                return new LongConstantDescriptor(0);
         }
     }
 
-    public void registerSignedIntegerConstant(Token identifierToken, Token sign, Token valueToken) {
-        try {
-            long value = this.createLongFromToken(valueToken);
-            value = (sign.val.equals("-"))? -value : value;
-            String identifier = this.getIdentifierFromToken(identifierToken);
-            this.lexicalScope.registerLongConstant(identifier, value);
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
+    public ConstantDescriptor createDoubleConstant(String sign, double value) {
+        switch (sign) {
+            case "":
+            case "+": return new RealConstantDescriptor(value);
+            case "-": return new RealConstantDescriptor(-value);
+            default:
+                parser.SemErr("Unknown unary operator: " + sign);
+                return new RealConstantDescriptor(0);
         }
     }
 
-    public void registerRealConstant(Token identifierToken, Token valueToken) {
-        try {
-            double value = Double.parseDouble(valueToken.val);
-            String identifier = this.getIdentifierFromToken(identifierToken);
-            this.lexicalScope.registerRealConstant(identifier, value);
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
+    public ConstantDescriptor createCharOrStringConstant(String sign, String value) {
+        if (!sign.isEmpty()) {
+            parser.SemErr("String or char constants cannot have unary operator.");
+            return new StringConstantDescriptor("");
+        }
+        if (value.length() == 1) {
+            return new CharConstantDescriptor(value.charAt(0));
+        } else {
+            return new StringConstantDescriptor(value);
         }
     }
 
-    public void registerConstantFromIdentifier(Token identifierToken, Token valueIdentifierToken) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-        String identifierValue = this.getIdentifierFromToken(valueIdentifierToken);
-        try {
-            this.lexicalScope.registerConstantFromConstant(identifier, identifierValue);
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
+    public ConstantDescriptor createBooleanConstant(String sign, boolean value) {
+        if (!sign.isEmpty()) {
+            parser.SemErr("String or char constants cannot have unary operator.");
+            return new StringConstantDescriptor("");
         }
+        return new BooleanConstantDescriptor(value);
     }
 
-    public void registerSignedConstantFromIdentifier(Token identifierToken, Token sign, Token valueIdentifierToken) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-        String identifierValue = this.getIdentifierFromToken(valueIdentifierToken);
-        try {
-            if (sign.val.equals("-")) {
-                this.lexicalScope.registerConstantFromConstant(identifier, identifierValue);
+    public ConstantDescriptor createConstantFromIdentifier(String sign, Token identifierToken) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+	    try {
+            ConstantDescriptor constant = this.lexicalScope.getConstant(identifier);
+            if (sign.isEmpty()) {
+                return constant;
             } else {
-                this.lexicalScope.registerConstantFromNegatedConstant(identifier, identifierValue);
+                if (constant.isSigned()) {
+                    switch (sign) {
+                        case "":case "+":
+                            return constant;
+                        case "-":
+                            return constant.negatedCopy();
+                        default:
+                            throw new LexicalException("Wrong constant unary operator: " + sign);
+                    }
+                } else {
+                    throw new LexicalException(identifier + " cannot be negated.");
+                }
             }
         } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
+	        parser.SemErr(e.getMessage());
+	        // TODO: return some default constant
+	        return new LongConstantDescriptor(0);
         }
     }
 
-    public void registerSignedRealConstant(Token identifierToken, Token sign, Token valueToken) {
-        try {
-            double value = Double.parseDouble(valueToken.val);
-            value = (sign.val.equals("-"))? -value : value;
-            String identifier = this.getIdentifierFromToken(identifierToken);
-            this.lexicalScope.registerRealConstant(identifier, value);
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-        }
-    }
-
-    public void registerBooleanConstant(Token identifierToken, boolean value) {
-        try {
-            String identifier = this.getIdentifierFromToken(identifierToken);
-            this.lexicalScope.registerBooleanConstant(identifier, value);
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-        }
-    }
-
-    public void registerStringOrCharConstant(Token identifierToken, String value) {
-        if(value.length() == 1) {
-            registerCharConstant(identifierToken, value.charAt(0));
-        } else {
-            registerStringConstant(identifierToken, value);
-        }
-    }
-
-    private void registerCharConstant(Token identifierToken, char value) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-        try {
-            this.lexicalScope.registerCharConstant(identifier, value);
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-        }
-    }
-
-    private void registerStringConstant(Token identifierToken, String value) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-        try {
-            this.lexicalScope.registerStringConstant(identifier, value);
+    public void registerConstant(Token identifierToken, ConstantDescriptor descriptor) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+	    try {
+	        this.lexicalScope.registerConstant(identifier, descriptor);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
@@ -502,13 +482,9 @@ public class NodeFactory {
         LexicalScope ls = this.lexicalScope;
         while (ls != null) {
             if (ls.containsLocalIdentifier(variableIdentifier)) {
-                if (!ls.isVariable(variableIdentifier)) {
-                    parser.SemErr("Assignment target is not a variable");
-                    return null;
-                } else {
-                    FrameSlot frameSlot = ls.getLocalSlot(variableIdentifier);
-                    return AssignmentNodeGen.create(valueNode, frameSlot);
-                }
+                // TODO: check if it is assignable
+                FrameSlot frameSlot = ls.getLocalSlot(variableIdentifier);
+                return AssignmentNodeGen.create(valueNode, frameSlot);
             } else {
                 ls = ls.getOuterScope();
             }
@@ -522,13 +498,12 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         return this.doLookup(identifier, (LexicalScope foundInLexicalScope, String foundIdentifier) -> {
-            if (foundInLexicalScope.isVariable(foundIdentifier) || foundInLexicalScope.isConstant(foundIdentifier)) {
-                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier));
-            } else if (foundInLexicalScope.isParameterlessSubroutine(foundIdentifier)) {
+            if (foundInLexicalScope.isParameterlessSubroutine(foundIdentifier)) {
                 return this.createInvokeNode(foundInLexicalScope, foundIdentifier, Collections.emptyList());
-            } else {
-                parser.SemErr(foundIdentifier + " is not an expression");
-                return null;
+            }
+            else {
+                // TODO: check if it is a constant or a variable
+                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier));
             }
         }, new UnknownIdentifierException(identifier));
     }
@@ -587,7 +562,7 @@ public class NodeFactory {
                 indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
     }
 
-    public ExpressionNode createLogicLiteral(boolean value) {
+    public ExpressionNode createLogicLiteralNode(boolean value) {
         return new LogicLiteralNode(value);
     }
 
@@ -595,21 +570,15 @@ public class NodeFactory {
 	    return new SetConstructorNode(valueNodes);
     }
 
-    public ExpressionNode createNumericLiteral(Token literalToken) {
-        try {
-            return new LongLiteralNode(createLongFromToken(literalToken));
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-            return new LongLiteralNode(0);
-        }
+    public ExpressionNode createNumericLiteralNode(Token literalToken) {
+        return new LongLiteralNode(getLongFromToken(literalToken));
     }
 
-    public ExpressionNode createFloatLiteral(Token token) {
-        double value = Float.parseFloat(token.val);
-        return new DoubleLiteralNode(value);
+    public ExpressionNode createFloatLiteralNode(Token token) {
+        return new DoubleLiteralNode(getDoubleFromToken(token));
     }
 
-    public ExpressionNode createCharOrStringLiteral(String literal) {
+    public ExpressionNode createCharOrStringLiteralNode(String literal) {
         return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
     }
 
@@ -628,19 +597,6 @@ public class NodeFactory {
         literal = literal.substring(1, literal.length() - 1);
         literal = literal.replaceAll("''", "'");
         return literal;
-    }
-
-    private long createLongFromToken(Token token) throws LexicalException {
-        try {
-            return Long.parseLong(token.val);
-        } catch (NumberFormatException e) {
-            throw new LexicalException("Integer literal out of range");
-        }
-    }
-
-	public String getIdentifierFromToken(Token identifierToken) {
-	    String identifier = identifierToken.val.toLowerCase();
-        return this.identifiersPrefix + identifier;
     }
 
     public String getTypeNameFromToken(Token typeNameToken) {
@@ -707,6 +663,24 @@ public class NodeFactory {
 
     public boolean containsIdentifier(String identifier) {
         return this.lexicalScope.containsLocalIdentifier(identifier);
+    }
+
+    public long getLongFromToken(Token token) {
+        try {
+            return Long.parseLong(token.val);
+        } catch (NumberFormatException e) {
+            parser.SemErr("Integer literal out of range");
+            return 0;
+        }
+    }
+
+    public double getDoubleFromToken(Token token) {
+        return Float.parseFloat(token.val);
+    }
+
+    public String getIdentifierFromToken(Token identifierToken) {
+        String identifier = identifierToken.val.toLowerCase();
+        return this.identifiersPrefix + identifier;
     }
 
 

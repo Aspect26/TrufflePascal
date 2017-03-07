@@ -1,8 +1,10 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
-public class SetDescriptor extends TypeDescriptor {
+public class SetDescriptor implements TypeDescriptor {
 
     private final OrdinalDescriptor baseTypeDescriptor;
 
@@ -16,11 +18,12 @@ public class SetDescriptor extends TypeDescriptor {
     }
 
     @Override
-    public boolean isVariable() {
-        return true;
+    public Object getDefaultValue() {
+        return null;
     }
 
     public OrdinalDescriptor getBaseTypeDescriptor() {
         return this.baseTypeDescriptor;
     }
+
 }

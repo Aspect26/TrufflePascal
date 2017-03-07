@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
-public class UnknownDescriptor extends TypeDescriptor {
+public class UnknownDescriptor implements TypeDescriptor {
 
     public static UnknownDescriptor SINGLETON = new UnknownDescriptor();
 
@@ -16,7 +16,8 @@ public class UnknownDescriptor extends TypeDescriptor {
     }
 
     @Override
-    public boolean isVariable() {
-        return false;
+    public Object getDefaultValue() {
+        return null;
     }
+
 }

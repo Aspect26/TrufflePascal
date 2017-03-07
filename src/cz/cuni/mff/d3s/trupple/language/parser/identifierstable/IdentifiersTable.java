@@ -9,6 +9,15 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.ReferenceDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.ArrayDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumValueDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.SetDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -86,10 +95,6 @@ public class IdentifiersTable {
         return this.identifiersMap.containsKey(identifier);
     }
 
-    public boolean isVariable(String identifier) {
-        return this.identifiersMap.containsKey(identifier) && this.identifiersMap.get(identifier).isVariable();
-    }
-
     public boolean isConstant(String identifier) {
         return this.identifiersMap.get(identifier) instanceof ConstantDescriptor;
     }
@@ -134,34 +139,8 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, returnDescriptor);
     }
 
-    public void addLongConstant(String identifier, long value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new LongConstantDescriptor(value));
-    }
-
-    public void addRealConstant(String identifier, double value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new RealConstantDescriptor(value));
-    }
-
-    public void addBooleanConstant(String identifier, boolean value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new BooleanConstantDescriptor(value));
-    }
-
-    public void addCharConstant(String identifier, char value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new CharConstantDescriptor(value));
-    }
-
-    public void addStringConstant(String identifier, String value) throws LexicalException {
-        this.registerNewIdentifier(identifier, new StringConstantDescriptor(value));
-    }
-
-    public void addConstantFromConstant(String identifier, String valueIdentifier) throws LexicalException {
-        ConstantDescriptor valueDescriptor = getConstant(valueIdentifier);
-        this.registerNewIdentifier(identifier, (valueDescriptor).shallowCopy());
-    }
-
-    public void addConstantFromNegatedConstant(String identifier, String valueIdentifier) throws LexicalException {
-        ConstantDescriptor valueDescriptor = getConstant(valueIdentifier);
-        this.registerNewIdentifier(identifier, (valueDescriptor).negatedCopy());
+    public void addConstant(String identifier, ConstantDescriptor descriptor) throws LexicalException {
+        this.registerNewIdentifier(identifier, descriptor);
     }
 
     public TypeDescriptor createEnum(List<String> identifiers) throws LexicalException {
@@ -211,7 +190,7 @@ public class IdentifiersTable {
         }
     }
 
-    private ConstantDescriptor getConstant(String identifier) throws LexicalException {
+    public ConstantDescriptor getConstant(String identifier) throws LexicalException {
         TypeDescriptor descriptor = this.getTypeDescriptor(identifier);
         if (descriptor == null) {
             throw new UnknownIdentifierException(identifier);

@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.EnumTypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
 
 import java.util.List;
 
@@ -19,8 +19,19 @@ public abstract class PascalOrdinal {
 
         @Override
         public int getRealIndex(Object index) {
-            // TODO: the problem here is that index is java.lang.Long
-            return  (int)(long)index - this.offset;
+            int intvalue = 0;
+
+            if (index instanceof Long) {
+                intvalue = ((Long)index).intValue();
+            } else if (index instanceof Character) {
+                intvalue = (int)((Character)index);
+            } else if (index instanceof Boolean) {
+                intvalue = ((Boolean) index)? 1 : 0;
+            } else if (index instanceof EnumValue) {
+                intvalue = ((EnumValue)index).getIntValue();
+            }
+
+            return intvalue - this.offset;
         }
 
         @Override

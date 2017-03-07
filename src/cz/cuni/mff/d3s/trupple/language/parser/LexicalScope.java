@@ -9,6 +9,12 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTableTP;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.LongConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.SubroutineDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.*;
 
@@ -69,20 +75,16 @@ class LexicalScope {
         return this.localIdentifiers.getTypeTypeDescriptor(typeIdentifier);
     }
 
+    ConstantDescriptor getConstant(String identifier) throws LexicalException {
+        return this.localIdentifiers.getConstant(identifier);
+    }
+
     public void setName(String identifier) {
         this.name = identifier;
     }
 
     void registerNewType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         this.localIdentifiers.addType(identifier, typeDescriptor);
-    }
-
-    boolean isVariable(String identifier) {
-        return this.localIdentifiers.isVariable(identifier);
-    }
-
-    boolean isConstant(String identifier) {
-        return this.localIdentifiers.isConstant(identifier);
     }
 
     boolean isReferenceParameter(String identifier, int parameterIndex) throws LexicalException {
@@ -177,43 +179,27 @@ class LexicalScope {
         this.context.registerSubroutineName(identifier);
     }
 
-    void registerLongConstant(String identifier, long value) throws LexicalException {
-        this.localIdentifiers.addLongConstant(identifier, value);
+    void registerConstant(String identifier, ConstantDescriptor constant) throws LexicalException {
+        this.localIdentifiers.addConstant(identifier, constant);
     }
 
-    void registerRealConstant(String identifier, double value) throws LexicalException {
-        this.localIdentifiers.addRealConstant(identifier, value);
-    }
-
-    void registerBooleanConstant(String identifier, boolean value) throws LexicalException {
-        this.localIdentifiers.addBooleanConstant(identifier, value);
-    }
-
-    void registerCharConstant(String identifier, char value) throws LexicalException {
-        this.localIdentifiers.addCharConstant(identifier, value);
-    }
-
-    void registerStringConstant(String identifier, String value) throws LexicalException {
-        this.localIdentifiers.addStringConstant(identifier, value);
-    }
-
-    void registerConstantFromConstant(String identifier, String valueIdentifier) throws LexicalException {
-        this.localIdentifiers.addConstantFromConstant(identifier, valueIdentifier);
-    }
-
-    void registerConstantFromNegatedConstant(String identifier, String valueIdentifier) throws LexicalException {
-        this.localIdentifiers.addConstantFromNegatedConstant(identifier, valueIdentifier);
-    }
-
-    OrdinalDescriptor createRangeDescriptor(int lowerBound, int upperBound)  throws LexicalException {
-        if (upperBound < lowerBound) {
-            throw new LexicalException("Lower upper bound than lower bound.");
+    OrdinalDescriptor createRangeDescriptor(OrdinalConstantDescriptor lowerBound, OrdinalConstantDescriptor upperBound)  throws LexicalException {
+        if (!lowerBound.getClass().equals(upperBound.getClass())) {
+            throw new LexicalException("Range type mismatch");
         }
-        return new OrdinalDescriptor.RangeDescriptor(lowerBound, upperBound - lowerBound + 1);
+
+        long lower = lowerBound.getOrdinalValue();
+        long upper = upperBound.getOrdinalValue();
+
+        if (lower > upper) {
+            throw new LexicalException("Lower upper bound than lower bound");
+        }
+
+        return new OrdinalDescriptor.RangeDescriptor(lowerBound, upperBound);
     }
 
     OrdinalDescriptor createImplicitRangeDescriptor() {
-        return new OrdinalDescriptor.RangeDescriptor(0, 1);
+        return new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(1));
     }
 
     List<StatementNode> createInitializationNodes() throws LexicalException {

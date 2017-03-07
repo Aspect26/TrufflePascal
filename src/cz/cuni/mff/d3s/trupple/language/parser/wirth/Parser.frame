@@ -31,7 +31,8 @@ package cz.cuni.mff.d3s.trupple.language.parser.wirth;
 import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.parser.*;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 import com.oracle.truffle.api.source.Source;
 import java.util.ArrayList;
@@ -153,7 +154,7 @@ public class Parser implements IParser {
     	return false;
     }
     
-    public boolean isSingleIdentifier(){
+    public boolean isSingleIdentifier() {
     	Token next = scanner.Peek();
     	if(next.val.equals("]") && factory.containsIdentifier(la.val.toLowerCase()))
     		return true;
@@ -161,12 +162,17 @@ public class Parser implements IParser {
     	return false;
     }
     
-    public boolean continuesArray(){
+    public boolean continuesArray() {
     	Token next = scanner.Peek();
     	if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
     		return true;
 
     	return false;
+    }
+
+    public boolean isSubrange() {
+        Token next = scanner.Peek();
+        return next.val.toLowerCase().equals("..");
     }
 } // end Parser
 

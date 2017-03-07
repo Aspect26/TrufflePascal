@@ -10,8 +10,13 @@ import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.ArrayDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumValueDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.SetDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

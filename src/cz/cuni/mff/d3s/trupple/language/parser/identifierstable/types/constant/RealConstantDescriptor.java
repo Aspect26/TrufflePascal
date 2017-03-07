@@ -1,8 +1,8 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
-public class RealConstantDescriptor extends ConstantDescriptor{
+public class RealConstantDescriptor implements ConstantDescriptor {
 
     private final double value;
 
@@ -16,11 +16,22 @@ public class RealConstantDescriptor extends ConstantDescriptor{
     }
 
     @Override
+    public Object getDefaultValue() {
+        return 0d;
+    }
+
+    @Override
     public RealConstantDescriptor negatedCopy() {
         return new RealConstantDescriptor(-value);
     }
 
-    public double getValue() {
+    @Override
+    public Object getValue() {
         return this.value;
+    }
+
+    @Override
+    public boolean isSigned() {
+        return true;
     }
 }

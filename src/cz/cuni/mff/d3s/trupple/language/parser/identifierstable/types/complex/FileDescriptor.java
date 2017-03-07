@@ -1,8 +1,9 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
-public class FileDescriptor extends TypeDescriptor {
+public class FileDescriptor implements TypeDescriptor {
 
     private final TypeDescriptor contentTypeDescriptor;
 
@@ -16,7 +17,8 @@ public class FileDescriptor extends TypeDescriptor {
     }
 
     @Override
-    public boolean isVariable() {
-        return false;
+    public Object getDefaultValue() {
+        return null;
     }
+
 }

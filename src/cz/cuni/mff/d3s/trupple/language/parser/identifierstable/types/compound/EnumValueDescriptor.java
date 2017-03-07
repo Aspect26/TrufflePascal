@@ -1,8 +1,9 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
-public class EnumValueDescriptor extends TypeDescriptor {
+public class EnumValueDescriptor implements TypeDescriptor {
 
     private final EnumTypeDescriptor enumTypeDescriptor;
     private final String identifier;
@@ -18,8 +19,13 @@ public class EnumValueDescriptor extends TypeDescriptor {
     }
 
     @Override
-    public boolean isVariable() {
-        return true;
+    public Object getDefaultValue() {
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return this.identifier;
     }
 
     public EnumTypeDescriptor getEnumTypeDescriptor() {

@@ -1,18 +1,15 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 
-public abstract class PrimitiveDescriptor extends OrdinalDescriptor {
+public abstract class PrimitiveDescriptor implements TypeDescriptor {
 
-    public static class LongDescriptor extends PrimitiveDescriptor {
+    public static class LongDescriptor extends PrimitiveDescriptor implements OrdinalDescriptor {
+
         @Override
         public FrameSlotKind getSlotKind() {
             return FrameSlotKind.Long;
-        }
-
-        @Override
-        public boolean isVariable() {
-            return true;
         }
 
         @Override
@@ -29,17 +26,14 @@ public abstract class PrimitiveDescriptor extends OrdinalDescriptor {
         public int getFirstIndex() {
             return Integer.MIN_VALUE;
         }
+
     }
 
     public static class RealDescriptor extends PrimitiveDescriptor {
+
         @Override
         public FrameSlotKind getSlotKind() {
             return FrameSlotKind.Double;
-        }
-
-        @Override
-        public boolean isVariable() {
-            return true;
         }
 
         @Override
@@ -47,32 +41,18 @@ public abstract class PrimitiveDescriptor extends OrdinalDescriptor {
             return 0.0d;
         }
 
-        // TODO: what to do with this?
-        @Override
-        public int getSize() {
-            return 0;
-        }
-
-        @Override
-        public int getFirstIndex() {
-            return 0;
-        }
     }
 
-    public static class CharDescriptor extends PrimitiveDescriptor {
+    public static class CharDescriptor extends PrimitiveDescriptor implements OrdinalDescriptor {
+
         @Override
         public FrameSlotKind getSlotKind() {
             return FrameSlotKind.Byte;
         }
 
         @Override
-        public boolean isVariable() {
-            return true;
-        }
-
-        @Override
         public Object getDefaultValue() {
-            return '0';
+            return '\0';
         }
 
         @Override
@@ -84,17 +64,14 @@ public abstract class PrimitiveDescriptor extends OrdinalDescriptor {
         public int getFirstIndex() {
             return Character.MIN_VALUE;
         }
+
     }
 
-    public static class BooleanDescriptor extends PrimitiveDescriptor {
+    public static class BooleanDescriptor extends PrimitiveDescriptor implements OrdinalDescriptor {
+
         @Override
         public FrameSlotKind getSlotKind() {
             return FrameSlotKind.Boolean;
-        }
-
-        @Override
-        public boolean isVariable() {
-            return true;
         }
 
         @Override
@@ -103,13 +80,13 @@ public abstract class PrimitiveDescriptor extends OrdinalDescriptor {
         }
 
         @Override
-        public int getSize() {
-            return 2;
+        public int getFirstIndex() {
+            return 0;
         }
 
         @Override
-        public int getFirstIndex() {
-            return 0;
+        public int getSize() {
+            return 2;
         }
     }
 

@@ -1,10 +1,11 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 
 import java.util.List;
 
-public class EnumTypeDescriptor extends OrdinalDescriptor {
+public class EnumTypeDescriptor implements OrdinalDescriptor {
 
     private final List<String> identifiers;
     private final String defaultValue;
@@ -17,11 +18,6 @@ public class EnumTypeDescriptor extends OrdinalDescriptor {
     @Override
     public FrameSlotKind getSlotKind() {
         return FrameSlotKind.Object;
-    }
-
-    @Override
-    public boolean isVariable() {
-        return true;
     }
 
     @Override

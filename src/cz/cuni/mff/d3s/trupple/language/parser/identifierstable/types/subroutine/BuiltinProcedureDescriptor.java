@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine;
 
 public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 

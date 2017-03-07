@@ -1,10 +1,12 @@
-package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types;
+package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
 import java.util.List;
 
-public class ArrayDescriptor extends TypeDescriptor {
+public class ArrayDescriptor implements TypeDescriptor {
 
     private final List<OrdinalDescriptor> ordinalDimensions;
     private final TypeDescriptor returnTypeDescriptor;
@@ -20,8 +22,8 @@ public class ArrayDescriptor extends TypeDescriptor {
     }
 
     @Override
-    public boolean isVariable() {
-        return true;
+    public Object getDefaultValue() {
+        return null;
     }
 
     public List<OrdinalDescriptor> getDimensionDescriptors() {
