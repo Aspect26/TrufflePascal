@@ -35,7 +35,7 @@ public class Parser implements IParser {
 	
 
 	public Parser() {
-		this.factory = new NodeFactory(this);
+		this.factory = new NodeFactory(this, false);
 		errors = new Errors();
 	}
 

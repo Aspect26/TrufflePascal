@@ -56,7 +56,7 @@ public class Parser implements IParser {
 	-->declarations
 
 	public Parser() {
-		this.factory = new NodeFactory(this);
+		this.factory = new NodeFactory(this, true);
 		errors = new Errors();
 	}
 

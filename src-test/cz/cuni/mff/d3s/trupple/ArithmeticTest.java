@@ -15,6 +15,11 @@ public class ArithmeticTest extends JUnitTest {
 	}
 
 	@Test
+	public void plusStringTest() {
+		test("program main; begin write('Hammer high,' + ' to the sky!'); end.", "Hammer high, to the sky!", true);
+	}
+
+	@Test
 	public void minusTest() {
 		test("program main; begin write(42-26); end.", "16");
 	}
