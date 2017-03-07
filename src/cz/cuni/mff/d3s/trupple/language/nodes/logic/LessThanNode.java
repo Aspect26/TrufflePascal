@@ -7,7 +7,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
 
-@NodeInfo(shortName = "<=")
+@NodeInfo(shortName = "<")
 public abstract class LessThanNode extends BinaryNode {
 
 	@Override
@@ -16,6 +16,31 @@ public abstract class LessThanNode extends BinaryNode {
 	@Specialization
 	protected boolean lessThan(long left, long right) {
 		return left < right;
+	}
+
+	@Specialization
+	protected boolean lessThan(double left, long right) {
+		return left < right;
+	}
+
+	@Specialization
+	protected boolean lessThan(long left, double right) {
+		return left < right;
+	}
+
+	@Specialization
+	protected boolean lessThan(double left, double right) {
+		return left < right;
+	}
+
+	@Specialization
+	protected boolean lessThan(char left, char right) {
+		return left < right;
+	}
+
+	@Specialization
+	protected boolean lessThan(boolean left, boolean right) {
+		return !left && right;
 	}
 
 	@Specialization

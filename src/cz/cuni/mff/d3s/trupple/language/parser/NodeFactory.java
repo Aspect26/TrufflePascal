@@ -11,13 +11,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.AddNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.DivideIntegerNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.DivideNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.ModuloNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.MultiplyNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.NegationNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.SubstractNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
@@ -78,8 +72,15 @@ public class NodeFactory {
      */
 	private String identifiersPrefix = "";
 
-	public NodeFactory(IParser parser) {
+    /**
+     * Flag that specifies whether the factory shall use TurboPascal specific nodes (when using TP standard) or not.
+     */
+	private final boolean usingTPExtension;
+
+	public NodeFactory(IParser parser, boolean usingTPExtension) {
 		this.parser = parser;
+		this.usingTPExtension = usingTPExtension;
+
 		this.lexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
 	}
 
@@ -421,7 +422,7 @@ public class NodeFactory {
 
             // arithmetic
             case "+":
-                return AddNodeGen.create(leftNode, rightNode);
+                return (usingTPExtension)? AddNodeTPNodeGen.create(leftNode, rightNode) : AddNodeGen.create(leftNode, rightNode);
             case "-":
                 return SubstractNodeGen.create(leftNode, rightNode);
             case "*":
