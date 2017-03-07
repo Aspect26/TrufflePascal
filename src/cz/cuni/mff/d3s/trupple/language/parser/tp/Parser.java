@@ -1247,7 +1247,7 @@ class Errors {
 			case 65: s = "\"implementation\" expected"; break;
 			case 66: s = "??? expected"; break;
 			case 67: s = "invalid Pascal"; break;
-			case 68: s = "invalid subroutine"; break;
+			case 68: s = "invalid Subroutine"; break;
 			case 69: s = "invalid Type"; break;
 			case 70: s = "invalid Ordinal"; break;
 			case 71: s = "invalid Constant"; break;

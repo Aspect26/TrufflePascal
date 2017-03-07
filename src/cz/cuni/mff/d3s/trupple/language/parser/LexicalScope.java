@@ -87,10 +87,6 @@ class LexicalScope {
         this.localIdentifiers.addType(identifier, typeDescriptor);
     }
 
-    boolean isConstant(String identifier) {
-        return this.localIdentifiers.isConstant(identifier);
-    }
-
     boolean isReferenceParameter(String identifier, int parameterIndex) throws LexicalException {
         TypeDescriptor subroutineDescriptor = this.localIdentifiers.getAll().get(identifier);
         if (!(subroutineDescriptor instanceof SubroutineDescriptor)) {

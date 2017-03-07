@@ -20,4 +20,9 @@ public class EnumValue implements ICustomValue {
 	public Object getValue() {
 		return value;
 	}
+
+	int getIntValue() {
+		return this.enumType.getIdentifiers().indexOf(value);
+	}
+
 }

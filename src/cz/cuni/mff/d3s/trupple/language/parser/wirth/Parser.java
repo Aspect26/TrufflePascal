@@ -1084,7 +1084,7 @@ class Errors {
 			case 58: s = "\"false\" expected"; break;
 			case 59: s = "\"random\" expected"; break;
 			case 60: s = "??? expected"; break;
-			case 61: s = "invalid subroutine"; break;
+			case 61: s = "invalid Subroutine"; break;
 			case 62: s = "invalid Type"; break;
 			case 63: s = "invalid Ordinal"; break;
 			case 64: s = "invalid Constant"; break;
