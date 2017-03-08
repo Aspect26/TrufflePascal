@@ -9,6 +9,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeInfo(shortName = "write")
+@NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class WriteBuiltinNode extends BuiltinNode {
 
 	// TODO specializations
