@@ -6,37 +6,51 @@ public class LoopsTest extends JUnitTest{
 	@Test
 	public void forToTest() {
 		String code = "program main; \n"+
-				"var i,j:integer;\n" +
+				"var i:integer;\n" +
 				"\n" + 
 				"begin\n" + 
-				" j:=0;\n" + 
-				" for i:=5 to 10 do\n" + 
+				" for i:=5 to 10 do\n" +
 				" begin\n" + 
-				"  j:=j+1;\n" + 
+				"  write(i);\n" +
 				" end;\n" + 
-				"\n" + 
-				" write(j);\n" + 
+				"\n" +
 				"end.";
 		
-		test(code, "6");
+		test(code, "5678910");
 	}
 	
 	@Test
 	public void forDowntoTest() {
 		String code = "program main; \n"+
-				"var i,j:integer;\n" +
+				"var c:char;\n" +
 				"\n" + 
 				"begin\n" + 
-				" j:=0;\n" + 
-				" for i:=568 downto 527 do\n" + 
+				" for c:='g' downto 'c' do\n" +
 				" begin\n" + 
-				"  j:=j+1;\n" + 
+				"  write(c);\n" +
 				" end;\n" + 
 				"\n" + 
-				" write(j);\n" + 
 				"end.";
 		
-		test(code, "42");
+		test(code, "gfedc");
+	}
+
+	@Test
+	public void forEnumTest() {
+		String code = "program main;\n"+
+				"type day = (null, mon, tue, wed, thu, fri, sat, sun, unusedValue, unusedValue2);\n"+
+				"var goodDays: set of day;\n"+
+				" iterator: day;\n"+
+				"\n"+
+				"begin\n"+
+				" goodDays := [wed, fri, sat, sun];\n"+
+				"\n"+
+				" for iterator := mon to sun do begin\n"+
+				" write(iterator in goodDays, ', ');\n"+
+				" end;\n"+
+				"end.";
+
+		test(code, "false, false, true, false, true, true, true, ");
 	}
 	
 	@Test

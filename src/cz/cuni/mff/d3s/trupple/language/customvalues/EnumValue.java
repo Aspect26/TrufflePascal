@@ -21,8 +21,33 @@ public class EnumValue implements ICustomValue {
 		return value;
 	}
 
+	@Override
+	public boolean equals(Object enumValue) {
+		if (enumValue instanceof EnumValue) {
+			return this.getValue().equals(((EnumValue) enumValue).getValue());
+		} else {
+			return super.equals(enumValue);
+		}
+	}
+
+	@Override
+	public int hashCode() {
+	    return this.getValue().hashCode();
+    }
+
 	int getIntValue() {
 		return this.enumType.getIdentifiers().indexOf(value);
 	}
 
+	public EnumValue getNext() {
+	    return this.enumType.getNext(this.value);
+    }
+
+    public EnumValue getPrevious() {
+	    return this.enumType.getPrevious(this.value);
+    }
+
+    public boolean lesserThan(EnumValue compareTo) {
+		return this.enumType.getIdentifiers().indexOf(this.value) < this.enumType.getIdentifiers().indexOf(compareTo.getValue());
+	}
 }

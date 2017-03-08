@@ -134,43 +134,43 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Long) {
-                if ((root.isLongKind((VirtualFrame) frameValue))) {
+                if ((root.isLongKind((VirtualFrame) frameValue, root.getSlot()))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return WriteLongNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof Boolean) {
-                if ((root.isBoolKind((VirtualFrame) frameValue))) {
+                if ((root.isBoolKind((VirtualFrame) frameValue, root.getSlot()))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return WriteBooleanNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof Character) {
-                if ((root.isCharKind((VirtualFrame) frameValue))) {
+                if ((root.isCharKind((VirtualFrame) frameValue, root.getSlot()))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return WriteCharNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof Double) {
-                if ((root.isDoubleKind((VirtualFrame) frameValue))) {
+                if ((root.isDoubleKind((VirtualFrame) frameValue, root.getSlot()))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return WriteDoubleNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof EnumValue) {
-                if ((root.isEnum((VirtualFrame) frameValue))) {
+                if ((root.isEnum((VirtualFrame) frameValue, root.getSlot()))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return WriteEnumNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof PascalArray) {
-                if ((root.isPascalArray((VirtualFrame) frameValue))) {
+                if ((root.isPascalArray((VirtualFrame) frameValue, root.getSlot()))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return AssignArrayNode_.create(root);
                 }
             }
             if (valueNodeValue instanceof SetTypeValue) {
-                if ((root.isSet((VirtualFrame) frameValue))) {
+                if ((root.isSet((VirtualFrame) frameValue, root.getSlot()))) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     return AssignSetNode_.create(root);
                 }
@@ -287,7 +287,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             } catch (UnexpectedResultException ex) {
                 return PascalTypesGen.expectLong(getNext().execute_(frameValue, ex.getResult()));
             }
-            if ((root.isLongKind(frameValue))) {
+            if ((root.isLongKind(frameValue, root.getSlot()))) {
                 return root.writeLong(frameValue, valueNodeValue_);
             }
             return PascalTypesGen.expectLong(getNext().execute_(frameValue, valueNodeValue_));
@@ -297,7 +297,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Long) {
                 long valueNodeValue_ = (long) valueNodeValue;
-                if ((root.isLongKind(frameValue))) {
+                if ((root.isLongKind(frameValue, root.getSlot()))) {
                     return root.writeLong(frameValue, valueNodeValue_);
                 }
             }
@@ -333,7 +333,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             } catch (UnexpectedResultException ex) {
                 return PascalTypesGen.expectBoolean(getNext().execute_(frameValue, ex.getResult()));
             }
-            if ((root.isBoolKind(frameValue))) {
+            if ((root.isBoolKind(frameValue, root.getSlot()))) {
                 return root.writeBoolean(frameValue, valueNodeValue_);
             }
             return PascalTypesGen.expectBoolean(getNext().execute_(frameValue, valueNodeValue_));
@@ -343,7 +343,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Boolean) {
                 boolean valueNodeValue_ = (boolean) valueNodeValue;
-                if ((root.isBoolKind(frameValue))) {
+                if ((root.isBoolKind(frameValue, root.getSlot()))) {
                     return root.writeBoolean(frameValue, valueNodeValue_);
                 }
             }
@@ -379,7 +379,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             } catch (UnexpectedResultException ex) {
                 return PascalTypesGen.expectCharacter(getNext().execute_(frameValue, ex.getResult()));
             }
-            if ((root.isCharKind(frameValue))) {
+            if ((root.isCharKind(frameValue, root.getSlot()))) {
                 return root.writeChar(frameValue, valueNodeValue_);
             }
             return PascalTypesGen.expectCharacter(getNext().execute_(frameValue, valueNodeValue_));
@@ -389,7 +389,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Character) {
                 char valueNodeValue_ = (char) valueNodeValue;
-                if ((root.isCharKind(frameValue))) {
+                if ((root.isCharKind(frameValue, root.getSlot()))) {
                     return root.writeChar(frameValue, valueNodeValue_);
                 }
             }
@@ -412,7 +412,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Double) {
                 double valueNodeValue_ = (double) valueNodeValue;
-                if ((root.isDoubleKind(frameValue))) {
+                if ((root.isDoubleKind(frameValue, root.getSlot()))) {
                     return root.writeDouble(frameValue, valueNodeValue_);
                 }
             }
@@ -435,7 +435,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof EnumValue) {
                 EnumValue valueNodeValue_ = (EnumValue) valueNodeValue;
-                if ((root.isEnum(frameValue))) {
+                if ((root.isEnum(frameValue, root.getSlot()))) {
                     return root.writeEnum(frameValue, valueNodeValue_);
                 }
             }
@@ -458,7 +458,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof PascalArray) {
                 PascalArray valueNodeValue_ = (PascalArray) valueNodeValue;
-                if ((root.isPascalArray(frameValue))) {
+                if ((root.isPascalArray(frameValue, root.getSlot()))) {
                     return root.assignArray(frameValue, valueNodeValue_);
                 }
             }
@@ -481,7 +481,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof SetTypeValue) {
                 SetTypeValue valueNodeValue_ = (SetTypeValue) valueNodeValue;
-                if ((root.isSet(frameValue))) {
+                if ((root.isSet(frameValue, root.getSlot()))) {
                     return root.assignSet(frameValue, valueNodeValue_);
                 }
             }

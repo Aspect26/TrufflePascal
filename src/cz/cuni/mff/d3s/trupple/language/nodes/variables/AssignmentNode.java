@@ -4,11 +4,8 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
-import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
-import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
@@ -21,7 +18,7 @@ public abstract class AssignmentNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
 
-	@Specialization(guards = "isLongKind(frame)")
+	@Specialization(guards = "isLongKind(frame, getSlot())")
 	protected long writeLong(VirtualFrame frame, long value) {
         VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
 	    Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
@@ -33,7 +30,7 @@ public abstract class AssignmentNode extends ExpressionNode {
 		return value;
 	}
 
-	@Specialization(guards = "isBoolKind(frame)")
+	@Specialization(guards = "isBoolKind(frame, getSlot())")
 	protected boolean writeBoolean(VirtualFrame frame, boolean value) {
         VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
         Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
@@ -47,7 +44,7 @@ public abstract class AssignmentNode extends ExpressionNode {
 
 	// NOTE: characters are stored as bytes, since there is no FrameSlotKind for
 	// char
-	@Specialization(guards = "isCharKind(frame)")
+	@Specialization(guards = "isCharKind(frame, getSlot())")
 	protected char writeChar(VirtualFrame frame, char value) {
         VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
         Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
@@ -59,7 +56,7 @@ public abstract class AssignmentNode extends ExpressionNode {
         return value;
 	}
 
-	@Specialization(guards = "isDoubleKind(frame)")
+	@Specialization(guards = "isDoubleKind(frame, getSlot())")
 	protected double writeDouble(VirtualFrame frame, double value) {
         VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
         Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
@@ -71,7 +68,7 @@ public abstract class AssignmentNode extends ExpressionNode {
         return value;
 	}
 	
-	@Specialization(guards = "isEnum(frame)")
+	@Specialization(guards = "isEnum(frame, getSlot())")
 	protected Object writeEnum(VirtualFrame frame, EnumValue value) {
         VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
         Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
@@ -83,7 +80,7 @@ public abstract class AssignmentNode extends ExpressionNode {
         return value;
 	}
 	
-	@Specialization(guards = "isPascalArray(frame)")
+	@Specialization(guards = "isPascalArray(frame, getSlot())")
 	protected Object assignArray(VirtualFrame frame, PascalArray array) {
 		PascalArray arrayCopy = array.createDeepCopy();
 
@@ -97,7 +94,7 @@ public abstract class AssignmentNode extends ExpressionNode {
         return arrayCopy;
 	}
 
-    @Specialization(guards = "isSet(frame)")
+    @Specialization(guards = "isSet(frame, getSlot())")
     protected Object assignSet(VirtualFrame frame, SetTypeValue set) {
         SetTypeValue setCopy = set.createDeepCopy();
 
@@ -111,84 +108,4 @@ public abstract class AssignmentNode extends ExpressionNode {
         return setCopy;
     }
 
-	/**
-	 * guard functions
-	 */
-	// TODO: refactor these 3 functions below -> too much duplicits
-    protected boolean isSet(VirtualFrame frame) {
-        frame = this.getFrameContainingSlot(frame, getSlot());
-        if(frame == null) {
-            return false;
-        }
-        try {
-            Object obj = frame.getObject(getSlot());
-            return obj instanceof SetTypeValue;
-        } catch (FrameSlotTypeException e) {
-            return false;
-        }
-    }
-
-	protected boolean isPascalArray(VirtualFrame frame) {
-		frame = this.getFrameContainingSlot(frame, getSlot());
-		if(frame == null) {
-			return false;
-		}
-		try {
-			Object obj = frame.getObject(getSlot());
-			return obj instanceof PascalArray;
-		} catch (FrameSlotTypeException e) {
-			return false;
-		}
-	}
-	
-	protected boolean isEnum(VirtualFrame frame) {
-		frame = this.getFrameContainingSlot(frame, getSlot());
-		if(frame == null) {
-			return false;
-		}
-		try {
-			Object obj = frame.getObject(getSlot());
-			return obj instanceof EnumValue;
-		} catch (FrameSlotTypeException e) {
-			return false;
-		}
-	}
-	
-	protected boolean isLongKind(VirtualFrame frame) {
-		return isKind(frame, FrameSlotKind.Long);
-	}
-
-	protected boolean isBoolKind(VirtualFrame frame) {
-		return isKind(frame, FrameSlotKind.Boolean);
-	}
-
-	protected boolean isCharKind(VirtualFrame frame) {
-		return isKind(frame, FrameSlotKind.Byte);
-	}
-
-	protected boolean isDoubleKind(VirtualFrame frame) {
-		return isKind(frame, FrameSlotKind.Double);
-	}
-
-	private boolean isKind(VirtualFrame frame, FrameSlotKind kind) {
-		frame = getFrameContainingSlot(frame, getSlot());
-		if (frame == null)
-			return false;
-
-		Reference reference = this.tryGetReference(frame, getSlot());
-		if (reference == null) {
-			return getSlot().getKind() == kind;
-		}
-		else {
-			return reference.getFrameSlot().getKind() == kind;
-		}
-	}
-
-	private Reference tryGetReference(VirtualFrame frame, FrameSlot slot) {
-		try {
-			return (Reference)frame.getObject(slot);
-		} catch (FrameSlotTypeException | ClassCastException e) {
-			return null;
-		}
-	}
 }

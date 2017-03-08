@@ -12,6 +12,7 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -133,6 +134,9 @@ public final class LessThanOrEqualNodeGen extends LessThanOrEqualNode implements
             }
             if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
                 return LessThanOrEqual1Node_.create(root);
+            }
+            if (leftNodeValue instanceof EnumValue && rightNodeValue instanceof EnumValue) {
+                return LessThan5Node_.create(root);
             }
             return null;
         }
@@ -567,6 +571,46 @@ public final class LessThanOrEqualNodeGen extends LessThanOrEqualNode implements
 
         static BaseNode_ create(LessThanOrEqualNodeGen root) {
             return new LessThanOrEqual1Node_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "lessThan(EnumValue, EnumValue)", value = LessThanOrEqualNode.class)
+    private static final class LessThan5Node_ extends BaseNode_ {
+
+        LessThan5Node_(LessThanOrEqualNodeGen root) {
+            super(root, 8);
+        }
+
+        @Override
+        public boolean executeBoolean(VirtualFrame frameValue) {
+            EnumValue leftNodeValue_;
+            try {
+                leftNodeValue_ = root.leftNode_.executeEnum(frameValue);
+            } catch (UnexpectedResultException ex) {
+                Object rightNodeValue = executeRightNode_(frameValue);
+                return getNext().executeBoolean_(frameValue, ex.getResult(), rightNodeValue);
+            }
+            EnumValue rightNodeValue_;
+            try {
+                rightNodeValue_ = root.rightNode_.executeEnum(frameValue);
+            } catch (UnexpectedResultException ex) {
+                return getNext().executeBoolean_(frameValue, leftNodeValue_, ex.getResult());
+            }
+            return root.lessThan(leftNodeValue_, rightNodeValue_);
+        }
+
+        @Override
+        public boolean executeBoolean_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
+            if (leftNodeValue instanceof EnumValue && rightNodeValue instanceof EnumValue) {
+                EnumValue leftNodeValue_ = (EnumValue) leftNodeValue;
+                EnumValue rightNodeValue_ = (EnumValue) rightNodeValue;
+                return root.lessThan(leftNodeValue_, rightNodeValue_);
+            }
+            return getNext().executeBoolean_(frameValue, leftNodeValue, rightNodeValue);
+        }
+
+        static BaseNode_ create(LessThanOrEqualNodeGen root) {
+            return new LessThan5Node_(root);
         }
 
     }

@@ -4,12 +4,25 @@ import java.io.PrintStream;
 
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.NodeChild;
+import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 @NodeInfo(shortName = "write")
+@NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class WriteBuiltinNode extends BuiltinNode {
+
+    private final PascalContext context;
+
+    public WriteBuiltinNode(PascalContext context) {
+        this.context = context;
+    }
+
+    private PascalContext getContext() {
+        return this.context;
+    }
 
 	// TODO specializations
 

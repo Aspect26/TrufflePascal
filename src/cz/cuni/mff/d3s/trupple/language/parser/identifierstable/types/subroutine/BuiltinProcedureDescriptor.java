@@ -18,9 +18,12 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
     // Actual builtin subroutine's descriptors
     // **********************************************************************
 
-    public static class Write extends NoReferenceParameterBuiltin { }
+    public static class Write extends NoReferenceParameterBuiltin {
+
+    }
 
     public static class Writeln extends NoReferenceParameterBuiltin {
+
     }
 
     public static class Read extends BuiltinProcedureDescriptor {
@@ -38,5 +41,13 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
             return true;
         }
 
-        }
+    }
+
+    public static class Succ extends NoReferenceParameterBuiltin {
+
+    }
+
+    public static class Pred extends NoReferenceParameterBuiltin {
+
+    }
 }

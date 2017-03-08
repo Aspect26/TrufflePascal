@@ -6,57 +6,142 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
-import cz.cuni.mff.d3s.trupple.exceptions.BreakExceptionTP;
+import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
 
 @NodeInfo(shortName = "for", description = "The node implementing a for loop")
 public class ForNode extends StatementNode {
 
+    private interface ControlInterface {
+
+        void increaseControlVariable() throws FrameSlotTypeException;
+
+        void decreaseControlVariable() throws FrameSlotTypeException;
+    }
+
 	private final boolean ascending;
-	private final FrameSlot slot;
-	@Child
-	private ExpressionNode startValue;
+	private final FrameSlot controlSlot;
 	@Child
 	private ExpressionNode finalValue;
 	@Child
 	private AssignmentNode assignment;
 	@Child
 	private StatementNode body;
+	@Child
+    private ExpressionNode hasEndedNode;
 
-	public ForNode(boolean ascending, FrameSlot slot, ExpressionNode startValue, ExpressionNode finalValue,
+	public ForNode(boolean ascending, FrameSlot controlSlot, ExpressionNode startValue, ExpressionNode finalValue,
 			StatementNode body) {
 
 		this.ascending = ascending;
-		this.slot = slot;
-		this.startValue = startValue;
+		this.controlSlot = controlSlot;
 		this.finalValue = finalValue;
-		this.assignment = AssignmentNodeGen.create(startValue, slot);
+		this.assignment = AssignmentNodeGen.create(startValue, controlSlot);
 		this.body = body;
+		this.hasEndedNode = (ascending)? LessThanOrEqualNodeGen.create(ReadVariableNodeGen.create(controlSlot), finalValue) :
+                NotNodeGen.create(LessThanNodeGen.create(ReadVariableNodeGen.create(controlSlot), finalValue));
 	}
 
 	@Override
 	public void executeVoid(VirtualFrame frame) {
-		try {
-			assignment.executeVoid(frame);
-			if (ascending) {
-				final long topLimit = finalValue.executeLong(frame);
-				while (frame.getLong(slot) <= topLimit) {
-					body.executeVoid(frame);
-					frame.setLong(slot, frame.getLong(slot) + 1);
-				}
-			} else {
-				final long bottomLimit = finalValue.executeLong(frame);
-				while (frame.getLong(slot) >= bottomLimit) {
-					body.executeVoid(frame);
-					frame.setLong(slot, frame.getLong(slot) - 1);
-				}
-			}
-		} catch (BreakExceptionTP e) {
-		} catch (UnexpectedResultException | FrameSlotTypeException e) {
-			// TODO HANDLE THIS ERROR
-		}
+	    try {
+            ControlInterface controlInterface = null;
+
+            switch (controlSlot.getKind()) {
+                case Long:
+                    controlInterface = this.createLongControlInterface(frame);
+                    break;
+                case Byte:
+                    controlInterface = this.createCharControlInterface(frame);
+                    break;
+                case Object:
+                    Object controlValue = frame.getObject(controlSlot);
+                    if (controlValue instanceof EnumValue) {
+                        controlInterface = this.createEnumControlInterface(frame);
+                        break;
+                    } else {
+                        throw new PascalRuntimeException("Unsupported control variable type");
+                    }
+            }
+
+            this.execute(frame, controlInterface, ascending);
+        } catch (FrameSlotTypeException | UnexpectedResultException e) {
+	        throw new PascalRuntimeException("Something went wrong.");
+        }
 	}
+
+	private void execute(VirtualFrame frame, ControlInterface control, boolean ascending) throws FrameSlotTypeException, UnexpectedResultException {
+        this.assignment.executeVoid(frame);
+        // TODO: check if it should even start
+        while (this.hasEndedNode.executeBoolean(frame)) {
+            body.executeVoid(frame);
+            if (ascending) {
+                control.increaseControlVariable();
+            } else {
+                control.decreaseControlVariable();
+            }
+        }
+    }
+
+    private ControlInterface createLongControlInterface(VirtualFrame frame) {
+
+	    return new ControlInterface() {
+
+            @Override
+            public void increaseControlVariable() throws FrameSlotTypeException {
+                long controlValue = frame.getLong(controlSlot);
+                frame.setLong(controlSlot, ++controlValue);
+            }
+
+            @Override
+            public void decreaseControlVariable() throws FrameSlotTypeException {
+                long controlValue = frame.getLong(controlSlot);
+                frame.setLong(controlSlot, --controlValue);
+            }
+        };
+    }
+
+    private ControlInterface createCharControlInterface(VirtualFrame frame) {
+
+        return new ControlInterface() {
+
+            @Override
+            public void increaseControlVariable() throws FrameSlotTypeException {
+                char controlValue = (char)frame.getByte(controlSlot);
+                frame.setByte(controlSlot, (byte)++controlValue);
+            }
+
+            @Override
+            public void decreaseControlVariable() throws FrameSlotTypeException {
+                char controlValue = (char)frame.getByte(controlSlot);
+                frame.setByte(controlSlot, (byte)--controlValue);
+            }
+        };
+    }
+
+    private ControlInterface createEnumControlInterface(VirtualFrame frame) {
+
+        return new ControlInterface() {
+
+            @Override
+            public void increaseControlVariable() throws FrameSlotTypeException {
+                EnumValue controlValue = (EnumValue) frame.getObject(controlSlot);
+                frame.setObject(controlSlot, controlValue.getNext());
+            }
+
+            @Override
+            public void decreaseControlVariable() throws FrameSlotTypeException {
+                EnumValue controlValue = (EnumValue) frame.getObject(controlSlot);
+                frame.setObject(controlSlot, controlValue.getNext());
+            }
+        };
+    }
 }

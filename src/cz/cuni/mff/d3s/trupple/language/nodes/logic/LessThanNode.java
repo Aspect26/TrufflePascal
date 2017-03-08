@@ -4,6 +4,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
 
@@ -46,5 +47,10 @@ public abstract class LessThanNode extends BinaryNode {
 	@Specialization
 	protected boolean lessThan(SetTypeValue left, SetTypeValue right) {
 		return left.getSize() < right.getSize();
+	}
+
+	@Specialization
+	protected boolean lessThan(EnumValue left, EnumValue right) {
+		return left.lesserThan(right);
 	}
 }

@@ -21,12 +21,7 @@ public class RandomBuiltinNode extends BuiltinNode {
 	}
 	
 	@Override
-	public PascalContext getContext() {
-		return context;
-	}
-
-	@Override
 	public Object executeGeneric(VirtualFrame frame) {
-		return this.getContext().getRandom(bound);
+		return this.context.getRandom(bound);
 	}
 }

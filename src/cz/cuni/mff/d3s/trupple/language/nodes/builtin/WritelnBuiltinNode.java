@@ -7,9 +7,21 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 @NodeInfo(shortName = "writeln")
+@NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class WritelnBuiltinNode extends BuiltinNode {
+
+    private final PascalContext context;
+
+    public WritelnBuiltinNode(PascalContext context) {
+        this.context = context;
+    }
+
+    private PascalContext getContext() {
+        return this.context;
+    }
 
 	// TODO: specializations
 
