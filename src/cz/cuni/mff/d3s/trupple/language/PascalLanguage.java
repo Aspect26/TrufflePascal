@@ -15,7 +15,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.IParser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
-@TruffleLanguage.Registration(name = "Pascal", version = "0.9", mimeType = PascalLanguage.MIME_TYPE)
+@TruffleLanguage.Registration(name = "Pascal", version = "0.10", mimeType = PascalLanguage.MIME_TYPE)
 public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 
     public static final PascalLanguage INSTANCE = new PascalLanguage();
