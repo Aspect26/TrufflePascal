@@ -23,7 +23,7 @@ public abstract class ReadVariableNode extends ExpressionNode {
 		try {
 			return slotsFrame.getLong(getSlot());
 		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause permormanfe slowdown
+			// TODO: these tryGetReference() calls may cause performance slowdown
 			Reference referenceObject = tryGetReference(slotsFrame);
 			return referenceObject.getFromFrame().getLong(referenceObject.getFrameSlot());
 		}
@@ -38,7 +38,7 @@ public abstract class ReadVariableNode extends ExpressionNode {
 		try {
 			return slotsFrame.getBoolean(getSlot());
 		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause permormanfe slowdown
+			// TODO: these tryGetReference() calls may cause performance slowdown
 			Reference referenceObject = tryGetReference(slotsFrame);
 			return referenceObject.getFromFrame().getBoolean(referenceObject.getFrameSlot());
 		}
@@ -53,7 +53,7 @@ public abstract class ReadVariableNode extends ExpressionNode {
 		try {
 			return (char) (slotsFrame.getByte(getSlot()));
 		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause permormanfe slowdown
+			// TODO: these tryGetReference() calls may cause performance slowdown
 			Reference referenceObject = tryGetReference(slotsFrame);
 			return (char) referenceObject.getFromFrame().getByte(referenceObject.getFrameSlot());
 		}
@@ -68,7 +68,7 @@ public abstract class ReadVariableNode extends ExpressionNode {
 		try {
 			return slotsFrame.getDouble(getSlot());
 		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause permormanfe slowdown
+			// TODO: these tryGetReference() calls may cause performance slowdown
 			Reference referenceObject = tryGetReference(slotsFrame);
 			return referenceObject.getFromFrame().getDouble(referenceObject.getFrameSlot());
 		}
@@ -83,7 +83,7 @@ public abstract class ReadVariableNode extends ExpressionNode {
 		try {
 			return slotsFrame.getObject(getSlot());
 		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause permormanfe slowdown
+			// TODO: these tryGetReference() calls may cause performance slowdown
 			Reference referenceObject = tryGetReference(slotsFrame);
 			return referenceObject.getFromFrame().getObject(referenceObject.getFrameSlot());
 		}

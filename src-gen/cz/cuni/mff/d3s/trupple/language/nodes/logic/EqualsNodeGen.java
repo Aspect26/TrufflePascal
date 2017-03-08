@@ -346,14 +346,14 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
         public boolean executeBoolean(VirtualFrame frameValue) {
             EnumValue leftNodeValue_;
             try {
-                leftNodeValue_ = PascalTypesGen.expectEnumValue(root.leftNode_.executeGeneric(frameValue));
+                leftNodeValue_ = root.leftNode_.executeEnum(frameValue);
             } catch (UnexpectedResultException ex) {
                 Object rightNodeValue = executeRightNode_(frameValue);
                 return getNext().executeBoolean_(frameValue, ex.getResult(), rightNodeValue);
             }
             EnumValue rightNodeValue_;
             try {
-                rightNodeValue_ = PascalTypesGen.expectEnumValue(root.rightNode_.executeGeneric(frameValue));
+                rightNodeValue_ = root.rightNode_.executeEnum(frameValue);
             } catch (UnexpectedResultException ex) {
                 return getNext().executeBoolean_(frameValue, leftNodeValue_, ex.getResult());
             }
