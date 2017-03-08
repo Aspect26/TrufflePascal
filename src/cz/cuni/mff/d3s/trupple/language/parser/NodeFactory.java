@@ -763,18 +763,4 @@ public class NodeFactory {
 	    this.identifiersPrefix = "";
     }
 
-    // *************************************************************
-    // Not refactored section
-    // *************************************************************
-    public StatementNode createRandomizeNode() {
-        return new RandomizeBuiltinNode(lexicalScope.getContext());
-    }
-
-    public ExpressionNode createRandomNode() {
-        return new RandomBuiltinNode(lexicalScope.getContext());
-    }
-
-    public ExpressionNode createRandomNode(Token numericLiteral) {
-        return new RandomBuiltinNode(lexicalScope.getContext(), Long.parseLong(numericLiteral.val));
-    }
 }

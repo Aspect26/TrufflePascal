@@ -13,10 +13,8 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class WritelnBuiltinNode extends BuiltinNode {
 
-    private final PascalContext context;
-
     public WritelnBuiltinNode(PascalContext context) {
-        this.context = context;
+        super(context);
     }
 
     private PascalContext getContext() {

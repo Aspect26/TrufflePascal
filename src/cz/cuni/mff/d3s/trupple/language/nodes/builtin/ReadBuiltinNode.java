@@ -20,10 +20,8 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
 
     protected static final String NEW_LINE = System.getProperty("line.separator");
 
-    private final PascalContext context;
-
     public ReadBuiltinNode(PascalContext context) {
-        this.context = context;
+        super(context);
     }
 
     protected PascalContext getContext() {

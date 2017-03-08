@@ -373,8 +373,6 @@ Statement<out StatementNode statement>
     Block<out statement>
 |
     IdentifierBeginningStatement<out statement>
-|
-	"randomize"									(. statement = factory.createRandomizeNode(); .)		
 )
 .
 
@@ -570,8 +568,6 @@ SignedFactor<out ExpressionNode expression>
 Factor<out ExpressionNode expression>
 =							                    (. expression = null; .)
 (
-	Random<out expression>
-|
 	identifier
     (
 	    MemberExpression<out expression, t>
@@ -611,24 +607,6 @@ LogicLiteral<out boolean result>
 	"true"										(. result = true; .)
 |
 	"false"										(. result = false; .)
-)
-.
-
-
-
-Random<out ExpressionNode expression>
-=
-"random"										(. expression = null; .)
-(
-												(. expression = factory.createRandomNode(); .)
-|
-	"("
-	(
-		")"										(. expression = factory.createRandomNode(); .)
-	|
-		integerLiteral							(. expression = factory.createRandomNode(t); .)
-		")"
-	)
 )
 .
 
