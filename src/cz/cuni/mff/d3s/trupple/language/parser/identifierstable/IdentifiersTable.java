@@ -65,6 +65,8 @@ public class IdentifiersTable {
     protected void addBuiltinFunctions() {
         identifiersMap.put("write", new BuiltinProcedureDescriptor.Write());
         identifiersMap.put("read", new BuiltinProcedureDescriptor.Read());
+        identifiersMap.put("succ", new BuiltinProcedureDescriptor.Succ());
+        identifiersMap.put("pred", new BuiltinProcedureDescriptor.Pred());
     }
 
     public FrameSlot getFrameSlot(String identifier) {

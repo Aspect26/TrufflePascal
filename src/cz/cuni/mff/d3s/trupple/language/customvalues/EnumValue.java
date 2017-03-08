@@ -25,4 +25,11 @@ public class EnumValue implements ICustomValue {
 		return this.enumType.getIdentifiers().indexOf(value);
 	}
 
+	public EnumValue getNext() {
+	    return this.enumType.getNext(this.value);
+    }
+
+    public EnumValue getPrevious() {
+	    return this.enumType.getPrevious(this.value);
+    }
 }

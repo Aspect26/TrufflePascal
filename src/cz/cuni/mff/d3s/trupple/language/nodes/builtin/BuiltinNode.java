@@ -7,9 +7,7 @@ import com.oracle.truffle.api.dsl.NodeField;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
-@NodeField(name = "context", type = PascalContext.class)
 @GenerateNodeFactory
 public abstract class BuiltinNode extends ExpressionNode {
 
-	public abstract PascalContext getContext();
 }

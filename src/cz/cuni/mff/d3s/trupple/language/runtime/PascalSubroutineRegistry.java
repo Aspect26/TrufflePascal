@@ -14,6 +14,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.function.ReadSubroutineArgumentNodeGen;
 
 public class PascalSubroutineRegistry {
 	private final Map<String, PascalFunction> functions = new HashMap<>();
@@ -45,7 +46,17 @@ public class PascalSubroutineRegistry {
 	protected void installBuiltins() {
 		installBuiltinWithVariableArgumentsCount(WriteBuiltinNodeFactory.getInstance());
 		installBuiltinWithVariableArgumentsCount(ReadBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(SuccBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(PredBuiltinNodeFactory.getInstance());
 	}
+
+	private void installBuiltinOneArgument(NodeFactory<? extends BuiltinNode> factory) {
+	    ExpressionNode argument = new ReadArgumentNode(0);
+	    BuiltinNode builtinNode = factory.createNode(argument);
+	    PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinNode);
+        String name = lookupNodeInfo(builtinNode.getClass()).shortName();
+        this.register(name, rootNode);
+    }
 
 	@SuppressWarnings("unused")
 	private void installBuiltin(NodeFactory<? extends BuiltinNode> factory) {
@@ -66,7 +77,7 @@ public class PascalSubroutineRegistry {
 	protected void installBuiltinWithVariableArgumentsCount(NodeFactory<? extends BuiltinNode> factory) {
 		ExpressionNode argumentsNode[] = new ExpressionNode[1];
 		argumentsNode[0] = new ReadAllArgumentsNode();
-		BuiltinNode bodyNode = factory.createNode(argumentsNode, context);
+		BuiltinNode bodyNode = factory.createNode(context, argumentsNode);
 		PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), bodyNode);
 
 		String name = lookupNodeInfo(bodyNode.getClass()).shortName();

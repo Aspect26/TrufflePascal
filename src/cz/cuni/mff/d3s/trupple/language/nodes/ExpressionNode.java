@@ -30,4 +30,5 @@ public abstract class ExpressionNode extends StatementNode {
 	public char executeChar(VirtualFrame frame) throws UnexpectedResultException {
 		return PascalTypesGen.expectCharacter(executeGeneric(frame));
 	}
+
 }

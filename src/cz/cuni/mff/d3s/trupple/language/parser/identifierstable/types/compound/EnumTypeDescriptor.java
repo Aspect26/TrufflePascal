@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 
 import java.util.List;
@@ -37,5 +38,25 @@ public class EnumTypeDescriptor implements OrdinalDescriptor {
 
     public List<String> getIdentifiers() {
         return this.identifiers;
+    }
+
+    public EnumValue getNext(String value) {
+        int index = this.identifiers.indexOf(value);
+        if (index == this.identifiers.size() - 1) {
+            // TODO: throw a custom exception
+            throw new IllegalArgumentException("No next element.");
+        }
+
+        return new EnumValue(this, this.identifiers.get(++index));
+    }
+
+    public EnumValue getPrevious(String value) {
+        int index = this.identifiers.indexOf(value);
+        if (index == 0) {
+            // TODO: throw a custom exception
+            throw new IllegalArgumentException("No previous element.");
+        }
+
+        return new EnumValue(this, this.identifiers.get(--index));
     }
 }

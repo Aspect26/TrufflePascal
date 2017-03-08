@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 import com.oracle.truffle.api.dsl.NodeChild;
+import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.nodes.NodeInfo;
@@ -11,12 +12,23 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 @NodeInfo(shortName = "read")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class ReadBuiltinNode extends BuiltinNode {
 
     protected static final String NEW_LINE = System.getProperty("line.separator");
+
+    private final PascalContext context;
+
+    public ReadBuiltinNode(PascalContext context) {
+        this.context = context;
+    }
+
+    protected PascalContext getContext() {
+        return this.context;
+    }
 
 	@Specialization
     public Object read(Object[] arguments) {

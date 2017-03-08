@@ -36,13 +36,13 @@ public final class ReadBuiltinNodeFactory implements NodeFactory<ReadBuiltinNode
 
     @Override
     public List getNodeSignatures() {
-        return Arrays.asList(Arrays.asList(ExpressionNode[].class, PascalContext.class));
+        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode[].class));
     }
 
     @Override
     public ReadBuiltinNode createNode(Object... arguments) {
-        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof ExpressionNode[]) && (arguments[1] == null || arguments[1] instanceof PascalContext)) {
-            return create((ExpressionNode[]) arguments[0], (PascalContext) arguments[1]);
+        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode[])) {
+            return create((PascalContext) arguments[0], (ExpressionNode[]) arguments[1]);
         } else {
             throw new IllegalArgumentException("Invalid create signature.");
         }
@@ -55,25 +55,19 @@ public final class ReadBuiltinNodeFactory implements NodeFactory<ReadBuiltinNode
         return instance;
     }
 
-    public static ReadBuiltinNode create(ExpressionNode[] arguments, PascalContext context) {
-        return new ReadBuiltinNodeGen(arguments, context);
+    public static ReadBuiltinNode create(PascalContext context, ExpressionNode[] arguments) {
+        return new ReadBuiltinNodeGen(context, arguments);
     }
 
     @GeneratedBy(ReadBuiltinNode.class)
     public static final class ReadBuiltinNodeGen extends ReadBuiltinNode {
 
-        private final PascalContext context;
         @Child private ExpressionNode arguments0_;
         @CompilationFinal private boolean seenUnsupported0;
 
-        private ReadBuiltinNodeGen(ExpressionNode[] arguments, PascalContext context) {
-            this.context = context;
+        private ReadBuiltinNodeGen(PascalContext context, ExpressionNode[] arguments) {
+            super(context);
             this.arguments0_ = arguments != null && 0 < arguments.length ? arguments[0] : null;
-        }
-
-        @Override
-        public PascalContext getContext() {
-            return this.context;
         }
 
         @Override
