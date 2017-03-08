@@ -5,10 +5,15 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 @NodeInfo(shortName = "succ")
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class SuccBuiltinNode extends BuiltinNode {
+
+    public SuccBuiltinNode(PascalContext context) {
+        super(context);
+    }
 
     @Specialization
     public long succ(long value) {

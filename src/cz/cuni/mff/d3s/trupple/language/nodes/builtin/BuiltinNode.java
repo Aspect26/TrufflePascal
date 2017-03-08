@@ -10,4 +10,10 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @GenerateNodeFactory
 public abstract class BuiltinNode extends ExpressionNode {
 
+    protected final PascalContext context;
+
+    public BuiltinNode(PascalContext context) {
+        this.context = context;
+    }
+
 }

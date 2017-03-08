@@ -14,11 +14,10 @@ import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.ReadSubroutineArgumentNodeGen;
 
 public class PascalSubroutineRegistry {
 	private final Map<String, PascalFunction> functions = new HashMap<>();
-	private final PascalContext context;
+	protected final PascalContext context;
 
 	PascalSubroutineRegistry(PascalContext context, boolean installBuiltins) {
 		this.context = context;
@@ -50,31 +49,21 @@ public class PascalSubroutineRegistry {
         installBuiltinOneArgument(PredBuiltinNodeFactory.getInstance());
 	}
 
-	private void installBuiltinOneArgument(NodeFactory<? extends BuiltinNode> factory) {
-	    ExpressionNode argument = new ReadArgumentNode(0);
-	    BuiltinNode builtinNode = factory.createNode(argument);
-	    PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinNode);
-        String name = lookupNodeInfo(builtinNode.getClass()).shortName();
-        this.register(name, rootNode);
-    }
-
-	@SuppressWarnings("unused")
-	private void installBuiltin(NodeFactory<? extends BuiltinNode> factory) {
-		int argumentCount = factory.getExecutionSignature().size();
-		ExpressionNode[] argumentNodes = new ExpressionNode[argumentCount];
-
-		for (int i = 0; i < argumentCount; i++) {
-			argumentNodes[i] = new ReadArgumentNode(i);
-		}
-
-		BuiltinNode builtinBodyNode = factory.createNode(argumentNodes, context);
-		PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinBodyNode);
-
-		String name = lookupNodeInfo(builtinBodyNode.getClass()).shortName();
+	void installBuiltinNoArgument(BuiltinNode builtinNode) {
+		PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinNode);
+		String name = lookupNodeInfo(builtinNode.getClass()).shortName();
 		this.register(name, rootNode);
 	}
 
-	protected void installBuiltinWithVariableArgumentsCount(NodeFactory<? extends BuiltinNode> factory) {
+	void installBuiltinOneArgument(NodeFactory<? extends BuiltinNode> factory) {
+		ExpressionNode argument = new ReadArgumentNode(0);
+		BuiltinNode builtinNode = factory.createNode(context, argument);
+		PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinNode);
+		String name = lookupNodeInfo(builtinNode.getClass()).shortName();
+		this.register(name, rootNode);
+	}
+
+	void installBuiltinWithVariableArgumentsCount(NodeFactory<? extends BuiltinNode> factory) {
 		ExpressionNode argumentsNode[] = new ExpressionNode[1];
 		argumentsNode[0] = new ReadAllArgumentsNode();
 		BuiltinNode bodyNode = factory.createNode(context, argumentsNode);

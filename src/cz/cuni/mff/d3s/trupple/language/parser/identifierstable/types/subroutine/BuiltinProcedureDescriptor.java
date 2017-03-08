@@ -1,32 +1,23 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine;
 
+import java.util.Collections;
+
 public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 
     private BuiltinProcedureDescriptor() {
-        super(null);
+        super(Collections.emptyList());
     }
 
 
-    private static abstract class NoReferenceParameterBuiltin extends BuiltinProcedureDescriptor {
+    public static class NoReferenceParameterBuiltin extends BuiltinProcedureDescriptor {
 
+        @Override
         public boolean isReferenceParameter(int parameterIndex) {
             return false;
         }
     }
 
-    // **********************************************************************
-    // Actual builtin subroutine's descriptors
-    // **********************************************************************
-
-    public static class Write extends NoReferenceParameterBuiltin {
-
-    }
-
-    public static class Writeln extends NoReferenceParameterBuiltin {
-
-    }
-
-    public static class Read extends BuiltinProcedureDescriptor {
+    public static class FullReferenceParameterBuiltin extends BuiltinProcedureDescriptor {
 
         @Override
         public boolean isReferenceParameter(int index) {
@@ -34,20 +25,4 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
         }
     }
 
-    public static class Readln extends BuiltinProcedureDescriptor {
-
-        @Override
-        public boolean isReferenceParameter(int index) {
-            return true;
-        }
-
-    }
-
-    public static class Succ extends NoReferenceParameterBuiltin {
-
-    }
-
-    public static class Pred extends NoReferenceParameterBuiltin {
-
-    }
 }

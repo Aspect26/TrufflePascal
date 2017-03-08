@@ -8,7 +8,9 @@ public class IdentifiersTableTP extends IdentifiersTable {
     protected void addBuiltinFunctions() {
         super.addBuiltinFunctions();
 
-        this.identifiersMap.put("writeln", new BuiltinProcedureDescriptor.Writeln());
-        this.identifiersMap.put("readln", new BuiltinProcedureDescriptor.Readln());
+        this.identifiersMap.put("writeln", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
+        this.identifiersMap.put("readln", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
+        this.identifiersMap.put("random", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
+        this.identifiersMap.put("randomize", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
     }
 }
