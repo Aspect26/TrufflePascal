@@ -1,8 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.sun.istack.internal.NotNull;
@@ -27,6 +26,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
@@ -188,6 +188,34 @@ public class NodeFactory {
 
     public TypeDescriptor createFileType(TypeDescriptor contentTypeDescriptor) {
         return this.lexicalScope.createFileDescriptor(contentTypeDescriptor);
+    }
+
+    public TypeDescriptor createRecordType(Map<String, TypeDescriptor> variables) {
+	    return this.lexicalScope.createRecordDescriptor(variables);
+    }
+
+    public Map<String, TypeDescriptor> createVariables(List<String> identifiers, TypeDescriptor type) {
+	    Map<String, TypeDescriptor> result = new HashMap<>();
+	    for (String identifier : identifiers) {
+	        if (result.containsKey(identifier)) {
+                parser.SemErr(new DuplicitIdentifierException(identifier).getMessage());
+            } else {
+	            result.put(identifier, type);
+            }
+        }
+
+        return  result;
+    }
+
+    public void appendVariablesMap(Map<String, TypeDescriptor> origin, Map<String, TypeDescriptor> newVariables) {
+	    for (Map.Entry<String, TypeDescriptor> newVariable : newVariables.entrySet()) {
+	        String identifier = newVariable.getKey();
+	        if (origin.containsKey(identifier)) {
+                parser.SemErr(new DuplicitIdentifierException(identifier).getMessage());
+            } else {
+	            origin.put(identifier, newVariable.getValue());
+            }
+        }
     }
 
     public OrdinalDescriptor createSimpleOrdinalDescriptor(final ConstantDescriptor lowerBound, final ConstantDescriptor upperBound) {
@@ -660,10 +688,6 @@ public class NodeFactory {
         String subroutineIdentifier = lexicalScope.getName();
         lexicalScope = lexicalScope.getOuterScope();
         lexicalScope.getContext().setSubroutineRootNode(subroutineIdentifier, rootNode);
-    }
-
-    public boolean containsIdentifier(String identifier) {
-        return this.lexicalScope.containsLocalIdentifier(identifier);
     }
 
     public long getLongFromToken(Token token) {

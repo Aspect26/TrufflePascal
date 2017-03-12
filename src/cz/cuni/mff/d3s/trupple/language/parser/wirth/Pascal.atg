@@ -135,17 +135,17 @@ Type<out TypeDescriptor contentType>            (. fileDescriptor = factory.crea
 
 
 RecordType<out TypeDescriptor typeDescriptor>
-=                                               (. typeDescriptor = null; .)
+=
 "record"
-RecordFieldList
+RecordFieldList<out typeDescriptor>
 "end"
 .
 
 
-RecordFieldList
-=
+RecordFieldList<out TypeDescriptor typeDescriptor>
+=                                               (. Map<String, TypeDescriptor> variables = new HashMap<>(); .)
 (
-    RecordFixedPart
+    RecordFixedPart<out variables>
     [
         IF(recordVariantPartStarts())
         ";"
@@ -154,26 +154,27 @@ RecordFieldList
 |
     RecordVariantPart
 )
-[ ";" ]
+[ ";" ]                                         (. typeDescriptor = factory.createRecordType(variables); .)
 .
 
 
-RecordFixedPart
+RecordFixedPart<. out Map<String, TypeDescriptor> declaredVariables .>
 =
-RecordFixedSection
+RecordFixedSection<out declaredVariables>
 {
-    IF(recordFixedPartContinues())
+    IF(recordFixedPartContinues())              (. Map<String, TypeDescriptor> additionalVariables; .)
     ";"
-    RecordFixedSection
+    RecordFixedSection<out additionalVariables>
+                                                (. factory.appendVariablesMap(declaredVariables, additionalVariables); .)
 }
 .
 
 
-RecordFixedSection
+RecordFixedSection<. out Map<String, TypeDescriptor> declaredVariables .>
 =
 IdentifiersList<. out List<String> identifiers .>
 ":"
-Type<out TypeDescriptor type>
+Type<out TypeDescriptor type>                   (. declaredVariables = factory.createVariables(identifiers, type); .)
 .
 
 
@@ -201,7 +202,7 @@ RecordVariants
 CaseConstantList
 ":"
 "("
-RecordFieldList
+RecordFieldList<out TypeDescriptor type>
 ")"
 .
 

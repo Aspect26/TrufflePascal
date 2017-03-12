@@ -10,6 +10,8 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescri
 import com.oracle.truffle.api.source.Source;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Parser implements IParser {
 	public static final int _EOF = 0;
@@ -278,16 +280,17 @@ public class Parser implements IParser {
 
 	TypeDescriptor  RecordType() {
 		TypeDescriptor  typeDescriptor;
-		typeDescriptor = null; 
 		Expect(19);
-		RecordFieldList();
+		typeDescriptor = RecordFieldList();
 		Expect(20);
 		return typeDescriptor;
 	}
 
-	void RecordFieldList() {
+	TypeDescriptor  RecordFieldList() {
+		TypeDescriptor  typeDescriptor;
+		Map<String, TypeDescriptor> variables = new HashMap<>(); 
 		if (la.kind == 1) {
-			RecordFixedPart();
+			variables = RecordFixedPart();
 			if (recordVariantPartStarts()) {
 				Expect(6);
 				RecordVariantPart();
@@ -298,14 +301,20 @@ public class Parser implements IParser {
 		if (la.kind == 6) {
 			Get();
 		}
+		typeDescriptor = factory.createRecordType(variables); 
+		return typeDescriptor;
 	}
 
-	void RecordFixedPart() {
-		RecordFixedSection();
+	Map<String, TypeDescriptor>  RecordFixedPart() {
+		Map<String, TypeDescriptor>  declaredVariables;
+		declaredVariables = RecordFixedSection();
 		while (recordFixedPartContinues()) {
+			Map<String, TypeDescriptor> additionalVariables; 
 			Expect(6);
-			RecordFixedSection();
+			additionalVariables = RecordFixedSection();
+			factory.appendVariablesMap(declaredVariables, additionalVariables); 
 		}
+		return declaredVariables;
 	}
 
 	void RecordVariantPart() {
@@ -315,10 +324,13 @@ public class Parser implements IParser {
 		RecordVariants();
 	}
 
-	void RecordFixedSection() {
+	Map<String, TypeDescriptor>  RecordFixedSection() {
+		Map<String, TypeDescriptor>  declaredVariables;
 		List<String> identifiers  = IdentifiersList();
 		Expect(21);
 		TypeDescriptor type = Type();
+		declaredVariables = factory.createVariables(identifiers, type); 
+		return declaredVariables;
 	}
 
 	List<String>  IdentifiersList() {
@@ -347,7 +359,7 @@ public class Parser implements IParser {
 		CaseConstantList();
 		Expect(21);
 		Expect(16);
-		RecordFieldList();
+		TypeDescriptor type = RecordFieldList();
 		Expect(17);
 	}
 

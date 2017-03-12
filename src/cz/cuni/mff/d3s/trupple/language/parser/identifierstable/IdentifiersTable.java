@@ -12,10 +12,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.ReferenceDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.ArrayDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumValueDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.SetDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.*;
 
@@ -160,6 +157,10 @@ public class IdentifiersTable {
 
     public FileDescriptor createFileDescriptor(TypeDescriptor contentTypeDescriptor) {
         return new FileDescriptor(contentTypeDescriptor);
+    }
+
+    public RecordDescriptor createRecordDescriptor(Map<String, TypeDescriptor> variables) {
+        return new RecordDescriptor(variables);
     }
 
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {
