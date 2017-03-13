@@ -11,8 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
@@ -32,6 +30,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierExcep
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -190,8 +189,17 @@ public class NodeFactory {
         return this.lexicalScope.createFileDescriptor(contentTypeDescriptor);
     }
 
-    public TypeDescriptor createRecordType(Map<String, TypeDescriptor> variables) {
-	    return this.lexicalScope.createRecordDescriptor(variables);
+    public void startRecord() {
+	    this.lexicalScope = new LexicalScope(this.lexicalScope, "_record", this.usingTPExtension);
+    }
+
+    public TypeDescriptor createRecordType() {
+	    return this.lexicalScope.createRecordDescriptor();
+    }
+
+    public void finishRecord() {
+        assert this.lexicalScope.getOuterScope() != null;
+        this.lexicalScope = this.lexicalScope.getOuterScope();
     }
 
     public Map<String, TypeDescriptor> createVariables(List<String> identifiers, TypeDescriptor type) {
@@ -584,6 +592,13 @@ public class NodeFactory {
                 lexicalScope.getLocalSlot(identifier));
     }
 
+    public ExpressionNode createReadFromRecord(Token recordIdentifierToken, ExpressionNode readInnerNode) {
+	    String recordIdentifier = this.getIdentifierFromToken(recordIdentifierToken);
+        FrameSlot slot = this.doLookup(recordIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(recordIdentifier));
+
+	    return new ReadFromRecordNode(slot, readInnerNode);
+    }
+
     public ExpressionNode createArrayIndexAssignment(Token identifierToken, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
@@ -706,6 +721,20 @@ public class NodeFactory {
     public String getIdentifierFromToken(Token identifierToken) {
         String identifier = identifierToken.val.toLowerCase();
         return this.identifiersPrefix + identifier;
+    }
+
+    public LexicalScope getRecordScope(Token identifierToken) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+        RecordDescriptor record = (RecordDescriptor) this.lexicalScope.getIdentifiersDescriptor(identifier);
+        return record.getLexicalScope();
+    }
+
+    public LexicalScope getScope() {
+	    return this.lexicalScope;
+    }
+
+    public void setScope(LexicalScope scope) {
+	    this.lexicalScope = scope;
     }
 
 

@@ -6,6 +6,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -14,87 +15,54 @@ public abstract class ReadVariableNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
 
-	@Specialization(rewriteOn = FrameSlotTypeException.class)
-	protected long readLong(VirtualFrame frame) throws FrameSlotTypeException {
+	@Specialization(guards = "isLongKindOrLongReference(frame, getSlot())")
+	long readLong(VirtualFrame frame) {
 		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-		if (slotsFrame == null) {
-			throw new FrameSlotTypeException();
-		}
 		try {
 			return slotsFrame.getLong(getSlot());
 		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause performance slowdown
-			Reference referenceObject = tryGetReference(slotsFrame);
-			return referenceObject.getFromFrame().getLong(referenceObject.getFrameSlot());
-		}
-	}
-	
-	@Specialization(rewriteOn = FrameSlotTypeException.class)
-	protected boolean readBool(VirtualFrame frame) throws FrameSlotTypeException {
-		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-		if (slotsFrame == null) {
-			throw new FrameSlotTypeException();
-		}
-		try {
-			return slotsFrame.getBoolean(getSlot());
-		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause performance slowdown
-			Reference referenceObject = tryGetReference(slotsFrame);
-			return referenceObject.getFromFrame().getBoolean(referenceObject.getFrameSlot());
+			throw new PascalRuntimeException("Unexpected error");
 		}
 	}
 
-	@Specialization(rewriteOn = FrameSlotTypeException.class)
-	protected char readChar(VirtualFrame frame) throws FrameSlotTypeException {
-		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-		if (slotsFrame == null) {
-			throw new FrameSlotTypeException();
-		}
-		try {
-			return (char) (slotsFrame.getByte(getSlot()));
-		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause performance slowdown
-			Reference referenceObject = tryGetReference(slotsFrame);
-			return (char) referenceObject.getFromFrame().getByte(referenceObject.getFrameSlot());
-		}
+	@Specialization(guards = "isBoolKindOrBoolReference(frame, getSlot())")
+	boolean readBool(VirtualFrame frame) {
+        VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+        try {
+            return slotsFrame.getBoolean(getSlot());
+        } catch (FrameSlotTypeException e) {
+            throw new PascalRuntimeException("Unexpected error");
+        }
 	}
 
-	@Specialization(rewriteOn = FrameSlotTypeException.class)
-	protected double readDouble(VirtualFrame frame) throws FrameSlotTypeException {
-		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-		if (slotsFrame == null) {
-			throw new FrameSlotTypeException();
-		}
-		try {
-			return slotsFrame.getDouble(getSlot());
-		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause performance slowdown
-			Reference referenceObject = tryGetReference(slotsFrame);
-			return referenceObject.getFromFrame().getDouble(referenceObject.getFrameSlot());
-		}
+    @Specialization(guards = "isCharKindOrCharReference(frame, getSlot())")
+	char readChar(VirtualFrame frame) {
+        VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+        try {
+            return (char) slotsFrame.getByte(getSlot());
+        } catch (FrameSlotTypeException e) {
+            throw new PascalRuntimeException("Unexpected error");
+        }
 	}
 
-	@Specialization(rewriteOn = FrameSlotTypeException.class)
-	protected Object readObject(VirtualFrame frame) throws FrameSlotTypeException {
-		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-		if (slotsFrame == null) {
-			throw new FrameSlotTypeException();
-		}
-		try {
-			return slotsFrame.getObject(getSlot());
-		} catch (FrameSlotTypeException e) {
-			// TODO: these tryGetReference() calls may cause performance slowdown
-			Reference referenceObject = tryGetReference(slotsFrame);
-			return referenceObject.getFromFrame().getObject(referenceObject.getFrameSlot());
-		}
+    @Specialization(guards = "isDoubleKindOrDoubleReference(frame, getSlot())")
+	double readDouble(VirtualFrame frame) {
+        VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+        try {
+            return slotsFrame.getDouble(getSlot());
+        } catch (FrameSlotTypeException e) {
+            throw new PascalRuntimeException("Unexpected error");
+        }
 	}
 
-	private Reference tryGetReference(VirtualFrame frame) throws FrameSlotTypeException {
-		Object mayBereferenceObject = frame.getObject(getSlot());
-		try {
-			return (Reference)mayBereferenceObject;
-		} catch (ClassCastException e) {
-			throw new FrameSlotTypeException();
-		}
+    @Specialization(guards = "isObjectKindOrObjectReference(frame, getSlot())")
+	Object readObject(VirtualFrame frame) {
+        VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
+        try {
+            return slotsFrame.getObject(getSlot());
+        } catch (FrameSlotTypeException e) {
+            throw new PascalRuntimeException("Unexpected error");
+        }
 	}
+
 }

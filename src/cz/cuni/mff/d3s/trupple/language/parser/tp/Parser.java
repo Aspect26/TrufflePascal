@@ -328,7 +328,7 @@ public class Parser implements IParser {
 		if (la.kind == 6) {
 			Get();
 		}
-		typeDescriptor = factory.createRecordType(variables); 
+		typeDescriptor = factory.createRecordType();
 		return typeDescriptor;
 	}
 

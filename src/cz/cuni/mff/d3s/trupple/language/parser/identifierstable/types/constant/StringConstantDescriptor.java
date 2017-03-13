@@ -14,7 +14,7 @@ public class StringConstantDescriptor implements ConstantDescriptor {
 
     @Override
     public FrameSlotKind getSlotKind() {
-        return FrameSlotKind.Long;
+        return FrameSlotKind.Object;
     }
 
     @Override

@@ -1,13 +1,13 @@
 // CheckStyle: start generated
 package cz.cuni.mff.d3s.trupple.language.nodes.variables;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.dsl.GeneratedBy;
 import com.oracle.truffle.api.dsl.internal.SpecializationNode;
 import com.oracle.truffle.api.dsl.internal.SpecializedNode;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
@@ -18,11 +18,6 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 public final class ReadVariableNodeGen extends ReadVariableNode implements SpecializedNode {
 
     private final FrameSlot slot;
-    @CompilationFinal private boolean excludeReadLong_;
-    @CompilationFinal private boolean excludeReadBool_;
-    @CompilationFinal private boolean excludeReadChar_;
-    @CompilationFinal private boolean excludeReadDouble_;
-    @CompilationFinal private boolean excludeReadObject_;
     @Child private BaseNode_ specialization_;
 
     private ReadVariableNodeGen(FrameSlot slot) {
@@ -126,22 +121,31 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue) {
-            if (!root.excludeReadLong_) {
+            if ((root.isLongKindOrLongReference((VirtualFrame) frameValue, root.getSlot()))) {
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return ReadLongNode_.create(root);
             }
-            if (!root.excludeReadBool_) {
+            if ((root.isBoolKindOrBoolReference((VirtualFrame) frameValue, root.getSlot()))) {
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return ReadBoolNode_.create(root);
             }
-            if (!root.excludeReadChar_) {
+            if ((root.isCharKindOrCharReference((VirtualFrame) frameValue, root.getSlot()))) {
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return ReadCharNode_.create(root);
             }
-            if (!root.excludeReadDouble_) {
+            if ((root.isDoubleKindOrDoubleReference((VirtualFrame) frameValue, root.getSlot()))) {
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return ReadDoubleNode_.create(root);
             }
-            if (!root.excludeReadObject_) {
+            if ((root.isObjectKindOrObjectReference((VirtualFrame) frameValue, root.getSlot()))) {
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return ReadObjectNode_.create(root);
             }
             return null;
+        }
+
+        protected final BaseNode_ getNext() {
+            return (BaseNode_) this.next;
         }
 
     }
@@ -180,12 +184,10 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
 
         @Override
         public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
-            try {
+            if ((root.isLongKindOrLongReference(frameValue, root.getSlot()))) {
                 return root.readLong(frameValue);
-            } catch (FrameSlotTypeException ex) {
-                root.excludeReadLong_ = true;
-                return PascalTypesGen.expectLong(remove("threw rewrite exception", frameValue));
             }
+            return getNext().executeLong(frameValue);
         }
 
         static BaseNode_ create(ReadVariableNodeGen root) {
@@ -211,12 +213,10 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
 
         @Override
         public boolean executeBoolean(VirtualFrame frameValue) throws UnexpectedResultException {
-            try {
+            if ((root.isBoolKindOrBoolReference(frameValue, root.getSlot()))) {
                 return root.readBool(frameValue);
-            } catch (FrameSlotTypeException ex) {
-                root.excludeReadBool_ = true;
-                return PascalTypesGen.expectBoolean(remove("threw rewrite exception", frameValue));
             }
+            return getNext().executeBoolean(frameValue);
         }
 
         static BaseNode_ create(ReadVariableNodeGen root) {
@@ -242,12 +242,10 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
 
         @Override
         public char executeChar(VirtualFrame frameValue) throws UnexpectedResultException {
-            try {
+            if ((root.isCharKindOrCharReference(frameValue, root.getSlot()))) {
                 return root.readChar(frameValue);
-            } catch (FrameSlotTypeException ex) {
-                root.excludeReadChar_ = true;
-                return PascalTypesGen.expectCharacter(remove("threw rewrite exception", frameValue));
             }
+            return getNext().executeChar(frameValue);
         }
 
         static BaseNode_ create(ReadVariableNodeGen root) {
@@ -264,12 +262,10 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
 
         @Override
         public Object execute(VirtualFrame frameValue) {
-            try {
+            if ((root.isDoubleKindOrDoubleReference(frameValue, root.getSlot()))) {
                 return root.readDouble(frameValue);
-            } catch (FrameSlotTypeException ex) {
-                root.excludeReadDouble_ = true;
-                return remove("threw rewrite exception", frameValue);
             }
+            return getNext().execute(frameValue);
         }
 
         static BaseNode_ create(ReadVariableNodeGen root) {
@@ -286,12 +282,10 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
 
         @Override
         public Object execute(VirtualFrame frameValue) {
-            try {
+            if ((root.isObjectKindOrObjectReference(frameValue, root.getSlot()))) {
                 return root.readObject(frameValue);
-            } catch (FrameSlotTypeException ex) {
-                root.excludeReadObject_ = true;
-                return remove("threw rewrite exception", frameValue);
             }
+            return getNext().execute(frameValue);
         }
 
         static BaseNode_ create(ReadVariableNodeGen root) {

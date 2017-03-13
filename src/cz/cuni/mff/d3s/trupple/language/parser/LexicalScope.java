@@ -6,6 +6,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTableTP;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
@@ -19,8 +20,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.*;
 
-class LexicalScope {
-
+public class LexicalScope {
 
     private String name;
     private final LexicalScope outer;
@@ -52,7 +52,7 @@ class LexicalScope {
         return this.context;
     }
 
-    FrameDescriptor getFrameDescriptor() {
+    public FrameDescriptor getFrameDescriptor() {
         return this.localIdentifiers.getFrameDescriptor();
     }
 
@@ -74,6 +74,10 @@ class LexicalScope {
 
     TypeDescriptor getTypeTypeDescriptor(String typeIdentifier) {
         return this.localIdentifiers.getTypeTypeDescriptor(typeIdentifier);
+    }
+
+    TypeDescriptor getIdentifiersDescriptor(String identifier) {
+        return this.localIdentifiers.getIdentifiersDescriptor(identifier);
     }
 
     ConstantDescriptor getConstant(String identifier) throws LexicalException {
@@ -142,8 +146,8 @@ class LexicalScope {
         return this.localIdentifiers.createFileDescriptor(contentTypeDescriptor);
     }
 
-    RecordDescriptor createRecordDescriptor(Map<String, TypeDescriptor> variables) {
-        return this.localIdentifiers.createRecordDescriptor(variables);
+    RecordDescriptor createRecordDescriptor() {
+        return this.localIdentifiers.createRecordDescriptor(this);
     }
 
     TypeDescriptor createSetType(OrdinalDescriptor baseType) {

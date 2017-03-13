@@ -14,7 +14,7 @@ public class CharConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public FrameSlotKind getSlotKind() {
-        return FrameSlotKind.Long;
+        return FrameSlotKind.Byte;
     }
 
     @Override

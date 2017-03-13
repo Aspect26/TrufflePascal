@@ -86,19 +86,48 @@ public abstract class ExpressionNode extends StatementNode {
 		return isKind(frame, FrameSlotKind.Long, frameSlot);
 	}
 
+	protected boolean isLongKindOrLongReference(VirtualFrame frame, FrameSlot frameSlot) {
+	    return isKind(frame, FrameSlotKind.Long, frameSlot) || isReferenceKind(frame, FrameSlotKind.Long, frameSlot);
+    }
+
 	protected boolean isBoolKind(VirtualFrame frame, FrameSlot frameSlot) {
 		return isKind(frame, FrameSlotKind.Boolean, frameSlot);
 	}
+
+    protected boolean isBoolKindOrBoolReference(VirtualFrame frame, FrameSlot frameSlot) {
+        return isKind(frame, FrameSlotKind.Boolean, frameSlot) || isReferenceKind(frame, FrameSlotKind.Boolean, frameSlot);
+    }
 
 	protected boolean isCharKind(VirtualFrame frame, FrameSlot frameSlot) {
 		return isKind(frame, FrameSlotKind.Byte, frameSlot);
 	}
 
+    protected boolean isCharKindOrCharReference(VirtualFrame frame, FrameSlot frameSlot) {
+        return isKind(frame, FrameSlotKind.Byte, frameSlot) || isReferenceKind(frame, FrameSlotKind.Byte, frameSlot);
+    }
+
 	protected boolean isDoubleKind(VirtualFrame frame, FrameSlot frameSlot) {
 		return isKind(frame, FrameSlotKind.Double, frameSlot);
 	}
 
-    protected boolean isKind(VirtualFrame frame, FrameSlotKind kind, FrameSlot frameSlot) {
+    protected boolean isDoubleKindOrDoubleReference(VirtualFrame frame, FrameSlot frameSlot) {
+        return isKind(frame, FrameSlotKind.Double, frameSlot) || isReferenceKind(frame, FrameSlotKind.Double, frameSlot);
+    }
+
+    protected boolean isObjectKindOrObjectReference(VirtualFrame frame, FrameSlot frameSlot) {
+        return isKind(frame, FrameSlotKind.Object, frameSlot) || isReferenceKind(frame, FrameSlotKind.Object, frameSlot);
+    }
+
+	private boolean isReferenceKind(VirtualFrame frame, FrameSlotKind kind, FrameSlot frameSlot) {
+        frame = getFrameContainingSlot(frame, frameSlot);
+        if (frame == null)
+            return false;
+
+        Reference reference = this.tryGetReference(frame, frameSlot);
+        return reference != null && reference.getFrameSlot().getKind().equals(kind);
+    }
+
+    private boolean isKind(VirtualFrame frame, FrameSlotKind kind, FrameSlot frameSlot) {
 		frame = getFrameContainingSlot(frame, frameSlot);
 		if (frame == null)
 			return false;

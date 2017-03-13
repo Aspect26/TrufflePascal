@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
@@ -86,16 +87,16 @@ public class IdentifiersTable {
         return this.typeDescriptors.get(typeIdentifier);
     }
 
+    public TypeDescriptor getIdentifiersDescriptor(String identifier) {
+        return this.identifiersMap.get(identifier);
+    }
+
     public Map<String, TypeDescriptor> getAll() {
         return this.identifiersMap;
     }
 
     public boolean containsIdentifier(String identifier) {
         return this.identifiersMap.containsKey(identifier);
-    }
-
-    public boolean isConstant(String identifier) {
-        return this.identifiersMap.get(identifier) instanceof ConstantDescriptor;
     }
 
     public boolean isSubroutine(String identifier) {
@@ -159,8 +160,8 @@ public class IdentifiersTable {
         return new FileDescriptor(contentTypeDescriptor);
     }
 
-    public RecordDescriptor createRecordDescriptor(Map<String, TypeDescriptor> variables) {
-        return new RecordDescriptor(variables);
+    public RecordDescriptor createRecordDescriptor(LexicalScope recordScope) {
+        return new RecordDescriptor(recordScope);
     }
 
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {

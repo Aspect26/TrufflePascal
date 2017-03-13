@@ -1,22 +1,16 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
-import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
+import cz.cuni.mff.d3s.trupple.language.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
-
-import java.util.Map;
 
 public class RecordDescriptor implements TypeDescriptor {
 
-    private final FrameDescriptor frameDescriptor;
+    private final LexicalScope innerScope;
 
-    public RecordDescriptor(Map<String, TypeDescriptor> variables) {
-        frameDescriptor = new FrameDescriptor();
-
-        for (Map.Entry<String, TypeDescriptor> variable : variables.entrySet()) {
-            frameDescriptor.addFrameSlot(variable.getKey(), variable.getValue().getSlotKind());
-        }
+    public RecordDescriptor(LexicalScope innerScope) {
+        this.innerScope = innerScope;
     }
 
     @Override
@@ -26,6 +20,11 @@ public class RecordDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return new RecordValue(this.frameDescriptor);
+        return new RecordValue(this.innerScope.getFrameDescriptor());
     }
+
+    public LexicalScope getLexicalScope() {
+        return innerScope;
+    }
+
 }

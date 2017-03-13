@@ -155,16 +155,16 @@ Type<out TypeDescriptor contentType>            (. fileDescriptor = factory.crea
 
 RecordType<out TypeDescriptor typeDescriptor>
 =
-"record"
+"record"                                        (. factory.startRecord(); .)
 RecordFieldList<out typeDescriptor>
-"end"
+"end"                                           (. factory.finishRecord(); .)
 .
 
 
 RecordFieldList<out TypeDescriptor typeDescriptor>
-=                                               (. Map<String, TypeDescriptor> variables = new HashMap<>(); .)
+=
 (
-    RecordFixedPart<out variables>
+    RecordFixedPart
     [
         IF(recordVariantPartStarts())
         ";"
@@ -173,27 +173,24 @@ RecordFieldList<out TypeDescriptor typeDescriptor>
 |
     RecordVariantPart
 )
-[ ";" ]                                         (. typeDescriptor = factory.createRecordType(variables); .)
+[ ";" ]                                         (. typeDescriptor = factory.createRecordType(); .)
 .
 
 
-RecordFixedPart<. out Map<String, TypeDescriptor> declaredVariables .>
+RecordFixedPart
 =
-RecordFixedSection<out declaredVariables>
+RecordFixedSection
 {
-    IF(recordFixedPartContinues())              (. Map<String, TypeDescriptor> additionalVariables; .)
+    IF(recordFixedPartContinues())
     ";"
-    RecordFixedSection<out additionalVariables>
-                                                (. factory.appendVariablesMap(declaredVariables, additionalVariables); .)
+    RecordFixedSection
 }
 .
 
 
-RecordFixedSection<. out Map<String, TypeDescriptor> declaredVariables .>
+RecordFixedSection
 =
-IdentifiersList<. out List<String> identifiers .>
-":"
-Type<out TypeDescriptor type>                   (. declaredVariables = factory.createVariables(identifiers, type); .)
+VariableLineDeclaration
 .
 
 
@@ -658,12 +655,7 @@ SignedFactor<out ExpressionNode expression>
 Factor<out ExpressionNode expression>
 =							                    (. expression = null; .)
 (
-	identifier
-    (
-	    MemberExpression<out expression, t>
-    |
-                                                (. expression = factory.createExpressionFromSingleIdentifier(t); .)
-    )
+	IdentifierAccess<out expression>
 |
     "("
     Expression<out expression>                  
@@ -681,6 +673,48 @@ Factor<out ExpressionNode expression>
 |
     SetConstructor<out expression>
 )
+.
+
+
+IdentifierAccess<out ExpressionNode expression>
+=
+identifier                                      (. expression = null; .)
+(
+                                                (. expression = factory.createExpressionFromSingleIdentifier(t); .)
+|
+    InnerIdentifierAccess<out expression, t>
+)
+.
+
+
+InnerIdentifierAccess<out ExpressionNode expression, Token identifierName>
+=							                    (. expression = null; .)
+(
+	SubroutineCall<out expression, identifierName>
+|
+	ArrayIndex<. out List<ExpressionNode> indexNodes .>  (. expression = factory.createReadArrayValue(identifierName, indexNodes); .)
+|
+    RecordAccess<out expression, identifierName>
+)
+.
+
+
+SubroutineCall<out ExpressionNode expression, Token identifierToken>
+=
+"("
+                                                (. List<ExpressionNode> parameters = new ArrayList<>(); .)
+    [
+        ActualParameters<out parameters, identifierToken>
+    ]
+")"                                             (. expression = factory.createSubroutineCall(identifierToken, parameters); .)
+.
+
+
+RecordAccess<out ExpressionNode expression, Token identifierToken>
+=
+"."
+IdentifierAccess<out ExpressionNode innerAccessNode>
+                                                (. expression = factory.createReadFromRecord(identifierToken, innerAccessNode); .)
 .
 
 
