@@ -651,11 +651,11 @@ Factor<out ExpressionNode expression>
 
 IdentifierAccess<out ExpressionNode expression>
 =
-identifier                                      (. expression = null; .)
+identifier                                      (. Token identifierToken = t; expression = null; .)
 (
-                                                (. expression = factory.createExpressionFromSingleIdentifier(t); .)
+                                                (. expression = factory.createExpressionFromSingleIdentifier(identifierToken); .)
 |
-    InnerIdentifierAccess<out expression, t>
+    InnerIdentifierAccess<out expression, identifierToken>
 )
 .
 
@@ -688,8 +688,8 @@ RecordAccess<out ExpressionNode expression, Token identifierToken>
 "."                                             (. LexicalScope thisScope = factory.getScope(); .)
                                                 (. factory.setScope(factory.getRecordScope(identifierToken)); .)
 IdentifierAccess<out ExpressionNode innerAccessNode>
-                                                (. expression = factory.createReadFromRecord(identifierToken, innerAccessNode); .)
                                                 (. factory.setScope(thisScope); .)
+                                                (. expression = factory.createReadFromRecord(identifierToken, innerAccessNode); .)
 .
 
 

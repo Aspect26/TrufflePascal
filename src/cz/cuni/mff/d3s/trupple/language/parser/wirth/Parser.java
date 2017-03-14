@@ -921,11 +921,11 @@ public class Parser implements IParser {
 	ExpressionNode  IdentifierAccess() {
 		ExpressionNode  expression;
 		Expect(1);
-		expression = null; 
+		Token identifierToken = t; expression = null; 
 		if (StartOf(10)) {
-			expression = factory.createExpressionFromSingleIdentifier(t); 
+			expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
 		} else if (la.kind == 13 || la.kind == 16 || la.kind == 31) {
-			expression = InnerIdentifierAccess(t);
+			expression = InnerIdentifierAccess(identifierToken);
 		} else SynErr(73);
 		return expression;
 	}
@@ -984,8 +984,8 @@ public class Parser implements IParser {
 		LexicalScope thisScope = factory.getScope(); 
 		factory.setScope(factory.getRecordScope(identifierToken)); 
 		ExpressionNode innerAccessNode = IdentifierAccess();
-		expression = factory.createReadFromRecord(identifierToken, innerAccessNode); 
 		factory.setScope(thisScope); 
+		expression = factory.createReadFromRecord(identifierToken, innerAccessNode); 
 		return expression;
 	}
 

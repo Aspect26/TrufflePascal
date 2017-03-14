@@ -3,6 +3,8 @@ package cz.cuni.mff.d3s.trupple.language.nodes;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import java.util.List;
+
 public class InitializationNodeFactory{
 
 	public static StatementNode create(FrameSlot frameSlot, long numericValue) {

@@ -52,6 +52,10 @@ public class LexicalScope {
         return this.context;
     }
 
+    IdentifiersTable getIdentifiersTable() {
+        return this.localIdentifiers;
+    }
+
     public FrameDescriptor getFrameDescriptor() {
         return this.localIdentifiers.getFrameDescriptor();
     }
