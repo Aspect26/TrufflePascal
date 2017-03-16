@@ -26,4 +26,14 @@ public abstract class StatementNode extends Node {
 	protected boolean frameContainsSlot(VirtualFrame frame, FrameSlot slot) {
 		return frame.getFrameDescriptor().getSlots().contains(slot);
 	}
+
+	protected FrameSlot findSlotByIdentifier(VirtualFrame frame, String identifier) {
+	    for (FrameSlot frameSlot : frame.getFrameDescriptor().getSlots()) {
+	        if (frameSlot.getIdentifier().equals(identifier)) {
+	            return frameSlot;
+            }
+        }
+
+        return null;
+    }
 }

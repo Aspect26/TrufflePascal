@@ -137,7 +137,8 @@ public abstract class AssignmentNodeWithRoute extends ExpressionNode {
 	        if (accessRouteNode instanceof AccessRouteNode.EnterRecord) {
 	            RecordValue record = (recordFromArray == null)? (RecordValue) this.slotsFrame.getObject(this.finalSlot) : recordFromArray;
 	            this.slotsFrame = record.getFrame();
-	            this.finalSlot = ((AccessRouteNode.EnterRecord) accessRouteNode).getRecordFrameSlot();
+	            String variableIdentifier = ((AccessRouteNode.EnterRecord) accessRouteNode).getVariableIdentifier();
+	            this.finalSlot = this.findSlotByIdentifier(slotsFrame, variableIdentifier);
 	            this.isArray = false;
 	            recordFromArray = null;
             } else if (accessRouteNode instanceof AccessRouteNode.ArrayIndex) {

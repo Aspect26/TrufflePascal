@@ -668,10 +668,8 @@ public class Parser implements IParser {
 		} else if (la.kind == 16) {
 			statement = SubroutineCall(identifierToken);
 		} else if (la.kind == 13 || la.kind == 31 || la.kind == 33) {
-			LexicalScope mainScope = factory.getScope(); 
 			List<AccessRouteNode> accessRoute = InnerAccessRoute(identifierToken );
 			Expect(33);
-			factory.setScope(mainScope); 
 			ExpressionNode value = Expression();
 			statement = factory.createAssignmentWithRoute(identifierToken, accessRoute, value); 
 		} else SynErr(69);
@@ -693,13 +691,10 @@ public class Parser implements IParser {
 	List<AccessRouteNode>  InnerAccessRoute(Token identifierToken ) {
 		List<AccessRouteNode>  accessRoute;
 		accessRoute = new ArrayList<>(); 
-		LexicalScope outmostScope = factory.getScope(); 
-		factory.setScopeIfRecord(identifierToken); 
 		while (la.kind == 13 || la.kind == 31) {
-			AccessRouteNode element = InnerAccessRouteElement(outmostScope);
+			AccessRouteNode element = InnerAccessRouteElement();
 			accessRoute.add(element); 
 		}
-		factory.setScope(outmostScope); 
 		return accessRoute;
 	}
 
@@ -715,21 +710,17 @@ public class Parser implements IParser {
 		return expression;
 	}
 
-	AccessRouteNode  InnerAccessRouteElement(LexicalScope outmostScope) {
+	AccessRouteNode  InnerAccessRouteElement() {
 		AccessRouteNode  element;
 		element = null; 
 		if (la.kind == 13) {
-			LexicalScope currentScope = factory.getScope(); 
-			factory.setScope(outmostScope); 
 			List<ExpressionNode> indexNodes  = ArrayIndex();
-			factory.setScope(outmostScope); 
 			element = new AccessRouteNode.ArrayIndex(indexNodes); 
 		} else if (la.kind == 31) {
 			Get();
 			Expect(1);
-			FrameSlot slot = factory.getLocalSlot(t); 
-			factory.setScopeIfRecord(t); 
-			element = new AccessRouteNode.EnterRecord(slot); 
+			String variableIdentifier = factory.getIdentifierFromToken(t); 
+			element = new AccessRouteNode.EnterRecord(variableIdentifier); 
 		} else SynErr(70);
 		return element;
 	}

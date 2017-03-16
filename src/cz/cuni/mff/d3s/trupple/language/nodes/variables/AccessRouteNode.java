@@ -11,10 +11,10 @@ public abstract class AccessRouteNode extends StatementNode {
 
     public static class EnterRecord extends AccessRouteNode {
 
-        private final FrameSlot recordFrameSlot;
+        private final String variableIdentifier;
 
-        public EnterRecord(FrameSlot recordFrameSlot) {
-            this.recordFrameSlot = recordFrameSlot;
+        public EnterRecord(String variableIdentifier) {
+            this.variableIdentifier = variableIdentifier;
         }
 
         @Override
@@ -22,8 +22,8 @@ public abstract class AccessRouteNode extends StatementNode {
 
         }
 
-        public FrameSlot getRecordFrameSlot() {
-            return this.recordFrameSlot;
+        public String getVariableIdentifier() {
+            return this.variableIdentifier;
         }
 
     }

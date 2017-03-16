@@ -446,9 +446,8 @@ identifier                                      (. Token identifierToken = t; .)
 |
     SubroutineCall<out statement, identifierToken>
 |
-                                                (. LexicalScope mainScope = factory.getScope(); .)
     InnerAccessRoute<. out List<AccessRouteNode> accessRoute, identifierToken .>
-    ":="                                        (. factory.setScope(mainScope); .)
+    ":="
     Expression<out ExpressionNode value>        (. statement = factory.createAssignmentWithRoute(identifierToken, accessRoute, value); .)
 )
 .
@@ -456,29 +455,22 @@ identifier                                      (. Token identifierToken = t; .)
 
 InnerAccessRoute<. out List<AccessRouteNode> accessRoute, Token identifierToken .>
 =                                               (. accessRoute = new ArrayList<>(); .)
-                                                (. LexicalScope outmostScope = factory.getScope(); .)
-                                                (. factory.setScopeIfRecord(identifierToken); .)
 {
-    InnerAccessRouteElement<out AccessRouteNode element, outmostScope>
+    InnerAccessRouteElement<out AccessRouteNode element>
                                                 (. accessRoute.add(element); .)
 }
-                                                (. factory.setScope(outmostScope); .)
 .
 
 
-InnerAccessRouteElement<out AccessRouteNode element, LexicalScope outmostScope>
+InnerAccessRouteElement<out AccessRouteNode element>
 =                                               (. element = null; .)
 (
-                                                (. LexicalScope currentScope = factory.getScope(); .)
-                                                (. factory.setScope(outmostScope); .)
     ArrayIndex<. out List<ExpressionNode> indexNodes .>
-                                                (. factory.setScope(outmostScope); .)
                                                 (. element = new AccessRouteNode.ArrayIndex(indexNodes); .)
 |
     "."
-    identifier                                  (. FrameSlot slot = factory.getLocalSlot(t); .)
-                                                (. factory.setScopeIfRecord(t); .)
-                                                (. element = new AccessRouteNode.EnterRecord(slot); .)
+    identifier                                  (. String variableIdentifier = factory.getIdentifierFromToken(t); .)
+                                                (. element = new AccessRouteNode.EnterRecord(variableIdentifier); .)
 )
 .
 
