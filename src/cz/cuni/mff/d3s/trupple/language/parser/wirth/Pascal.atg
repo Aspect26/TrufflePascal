@@ -442,26 +442,45 @@ IdentifierBeginningStatement<out StatementNode statement>
 =                                               (. statement = null; .)
 identifier                                      (. Token identifierToken = t; .)
 (
-                                                (. statement = factory.createSubroutineCall(identifierToken, new ArrayList<ExpressionNode>()); .)
+                                                (. statement = factory.createSubroutineCall(identifierToken, new ArrayList<>()); .)
 |
     SubroutineCall<out statement, identifierToken>
 |
-    AssignmentAfterIdentifierPart<out statement, identifierToken>
+                                                (. LexicalScope mainScope = factory.getScope(); .)
+    InnerAccessRoute<. out List<AccessRouteNode> accessRoute, identifierToken .>
+    ":="                                        (. factory.setScope(mainScope); .)
+    Expression<out ExpressionNode value>        (. statement = (accessRoute.isEmpty())? factory.createAssignment(identifierToken, value) : factory.createAssignmentWithRoute(identifierToken, accessRoute, value); .)
 )
 .
 
 
-
-AssignmentAfterIdentifierPart<out StatementNode statement, Token identifierToken>
-=
-                                                (. List<ExpressionNode> indexNodes = null; .)
-    [
-        ArrayIndex<out indexNodes>
-    ]
-    ":="
-    Expression<out ExpressionNode value>        (. statement = (indexNodes == null)? factory.createAssignment(identifierToken, value) : factory.createArrayIndexAssignment(identifierToken, indexNodes, value); .)
+InnerAccessRoute<. out List<AccessRouteNode> accessRoute, Token identifierToken .>
+=                                               (. accessRoute = new ArrayList<>(); .)
+                                                (. LexicalScope outmostScope = factory.getScope(); .)
+                                                (. factory.setScopeIfRecord(identifierToken); .)
+{
+    InnerAccessRouteElement<out AccessRouteNode element, outmostScope>
+                                                (. accessRoute.add(element); .)
+}
+                                                (. factory.setScope(outmostScope); .)
 .
 
+
+InnerAccessRouteElement<out AccessRouteNode element, LexicalScope outmostScope>
+=                                               (. element = null; .)
+(
+                                                (. LexicalScope currentScope = factory.getScope(); .)
+                                                (. factory.setScope(outmostScope); .)
+    ArrayIndex<. out List<ExpressionNode> indexNodes .>
+                                                (. factory.setScope(outmostScope); .)
+                                                (. element = new AccessRouteNode.ArrayIndex(indexNodes); .)
+|
+    "."
+    identifier                                  (. FrameSlot slot = factory.getLocalSlot(t); .)
+                                                (. factory.setScopeIfRecord(t); .)
+                                                (. element = new AccessRouteNode.EnterRecord(slot); .)
+)
+.
 
 
 CaseStatement<out StatementNode statement>
@@ -660,14 +679,15 @@ identifier                                      (. Token identifierToken = t; ex
 .
 
 
-InnerIdentifierAccess<out ExpressionNode expression, Token identifierName>
+InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
 =							                    (. expression = null; .)
 (
-	SubroutineCall<out expression, identifierName>
+	SubroutineCall<out expression, identifierToken>
 |
-	ArrayIndex<. out List<ExpressionNode> indexNodes .>  (. expression = factory.createReadArrayValue(identifierName, indexNodes); .)
+	ArrayIndex<. out List<ExpressionNode> indexNodes .>
+	                                            (. expression = factory.createReadArrayValue(identifierToken, indexNodes); .)
 |
-    RecordAccess<out expression, identifierName>
+    RecordAccess<out expression, identifierToken>
 )
 .
 

@@ -516,6 +516,7 @@ public class NodeFactory {
     public ExpressionNode createAssignment(Token identifierToken, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
 
+        // TODO: use lookUp function
         LexicalScope ls = this.lexicalScope;
         while (ls != null) {
             if (ls.containsLocalIdentifier(variableIdentifier)) {
@@ -529,6 +530,14 @@ public class NodeFactory {
 
         parser.SemErr("Assignment target is an unknown identifier");
         return null;
+    }
+
+    public ExpressionNode createAssignmentWithRoute(Token identifierToken, List<AccessRouteNode> accessRoute, ExpressionNode valueNode) {
+        String variableIdentifier = this.getIdentifierFromToken(identifierToken);
+        FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier));
+
+        // TODO: check if it is assignable
+        return AssignmentNodeWithRouteNodeGen.create(accessRoute.toArray(new AccessRouteNode[accessRoute.size()]), valueNode, frameSlot);
     }
 
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
@@ -723,6 +732,11 @@ public class NodeFactory {
         return this.identifiersPrefix + identifier;
     }
 
+    public FrameSlot getLocalSlot(Token identifierToken) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+        return this.lexicalScope.getLocalSlot(identifier);
+    }
+
     public LexicalScope getRecordScope(Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
         RecordDescriptor record = (RecordDescriptor) this.lexicalScope.getIdentifiersDescriptor(identifier);
@@ -735,6 +749,16 @@ public class NodeFactory {
 
     public void setScope(LexicalScope scope) {
 	    this.lexicalScope = scope;
+    }
+
+    public void setScopeIfRecord(Token recordIdentifierToken) {
+	    String recordIdentifier = this.getIdentifierFromToken(recordIdentifierToken);
+	    TypeDescriptor recordDescriptor = this.lexicalScope.getIdentifiersDescriptor(recordIdentifier);
+	    if (! (recordDescriptor instanceof RecordDescriptor)) {
+	        return;
+        }
+
+        this.lexicalScope = ((RecordDescriptor) recordDescriptor).getLexicalScope();
     }
 
 

@@ -14,11 +14,32 @@ public class PascalArray implements ICustomValue {
 		int realIndex = ordinalSource.getRealIndex(index);
 		return data[realIndex];
 	}
+
+	public Object getValueAt(Object[] indexes) {
+        Object value = this;
+
+        for (Object index : indexes) {
+            value = ((PascalArray) value).getValueAt(index);
+        }
+
+        return value;
+    }
 	
 	public void setValueAt(Object index, Object value) {
 		// TODO: throw custom exception at array index out of range
         this.data[ordinalSource.getRealIndex(index)] = value;
 	}
+
+	public void setValueAt(Object[] indexes, Object value) {
+        PascalArray innerArray = this;
+
+        for (int i = 0; i < indexes.length - 1; ++i) {
+            Object index = indexes[i];
+            innerArray = (PascalArray) innerArray.getValueAt(index);
+        }
+
+        innerArray.setValueAt(indexes[indexes.length - 1], value);
+    }
 	
 	@Override
 	public Object getValue() {
