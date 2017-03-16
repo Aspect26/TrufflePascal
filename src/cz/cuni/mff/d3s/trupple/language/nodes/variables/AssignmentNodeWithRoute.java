@@ -9,17 +9,13 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.RouteTarget;
 
 @NodeChild("valueNode")
 @NodeField(name = "slot", type = FrameSlot.class)
 public abstract class AssignmentNodeWithRoute extends ExpressionNode {
 
     @Children private final AccessRouteNode[] accessRouteNodes;
-
-    private VirtualFrame slotsFrame;
-    private FrameSlot finalSlot;
-    private boolean isArray;
-    private Object[] arrayIndexes;
 
     AssignmentNodeWithRoute(AccessRouteNode[] accessRouteNodes) {
         this.accessRouteNodes = accessRouteNodes;
@@ -36,12 +32,12 @@ public abstract class AssignmentNodeWithRoute extends ExpressionNode {
     private void makeAssignment(VirtualFrame frame, FrameSlot slot, SlotAssignment slotAssignment, Object value) {
         try {
             frame = this.getFrameContainingSlot(frame, slot);
-            this.getAssignmentTarget(frame, slot);
-            if (this.isArray) {
-                PascalArray array = (PascalArray) this.slotsFrame.getObject(this.finalSlot);
-                array.setValueAt(this.arrayIndexes, value);
+            RouteTarget routeTarget = this.getRouteTarget(frame, slot, accessRouteNodes);
+            if (routeTarget.isArray) {
+                PascalArray array = (PascalArray) routeTarget.frame.getObject(routeTarget.slot);
+                array.setValueAt(routeTarget.arrayIndexes, value);
             } else {
-                slotAssignment.assign(this.slotsFrame, this.finalSlot, value);
+                slotAssignment.assign(routeTarget.frame, routeTarget.slot, value);
             }
         } catch (FrameSlotTypeException e) {
             throw new PascalRuntimeException("Wrong access");
@@ -111,58 +107,10 @@ public abstract class AssignmentNodeWithRoute extends ExpressionNode {
 	}
 
     @Specialization(guards = "isSet(frame, getSlot())")
-    protected Object assignSet(VirtualFrame frame, SetTypeValue set) {
+    Object assignSet(VirtualFrame frame, SetTypeValue set) {
         SetTypeValue setCopy = set.createDeepCopy();
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, setCopy);
         return setCopy;
-    }
-
-    /**
-     * Find the VirtualFrame and its FrameSlot where the assignment target is located. The variables are found via
-     * list of access route nodes. The result is stored in object's private properties slotsFrame and finalSlot. It also
-     * sets the isArray field to true, if the assignment target shall be extracted from an array (the last access of the
-     * variable is an array access, not record element access).
-     * @param frame the frame, in which the array index expressions shall be evaluated
-     * @return true if the target is an array, false otherwise
-     * @throws FrameSlotTypeException if the access goes wrong (e.g.: it is indexing a variable which is not an array)
-     */
-    private void getAssignmentTarget(VirtualFrame frame, FrameSlot firstSlot) throws FrameSlotTypeException {
-        this.isArray = false;
-        this.finalSlot = firstSlot;
-	    this.slotsFrame = frame;
-	    this.evaluateIndexNodes(frame);
-	    RecordValue recordFromArray = null;
-
-	    for (AccessRouteNode accessRouteNode : this.accessRouteNodes) {
-	        if (accessRouteNode instanceof AccessRouteNode.EnterRecord) {
-	            RecordValue record = (recordFromArray == null)? (RecordValue) this.slotsFrame.getObject(this.finalSlot) : recordFromArray;
-	            this.slotsFrame = record.getFrame();
-	            String variableIdentifier = ((AccessRouteNode.EnterRecord) accessRouteNode).getVariableIdentifier();
-	            this.finalSlot = this.findSlotByIdentifier(slotsFrame, variableIdentifier);
-	            this.isArray = false;
-	            recordFromArray = null;
-            } else if (accessRouteNode instanceof AccessRouteNode.ArrayIndex) {
-	            PascalArray array = (PascalArray) this.slotsFrame.getObject(this.finalSlot);
-                this.arrayIndexes = ((AccessRouteNode.ArrayIndex) accessRouteNode).getIndexes();
-                Object value = array.getValueAt(this.arrayIndexes);
-                if (value instanceof RecordValue) {
-                    recordFromArray = (RecordValue) value;
-                }
-                this.isArray = true;
-            }
-        }
-
-        Reference referenceVariable = this.tryGetReference(this.slotsFrame, this.finalSlot);
-        if (referenceVariable != null) {
-            this.slotsFrame = referenceVariable.getFromFrame();
-            this.finalSlot = referenceVariable.getFrameSlot();
-        }
-    }
-
-    private void evaluateIndexNodes(VirtualFrame frame) {
-        for (AccessRouteNode accessRouteNode : this.accessRouteNodes) {
-            accessRouteNode.executeVoid(frame);
-        }
     }
 
 }

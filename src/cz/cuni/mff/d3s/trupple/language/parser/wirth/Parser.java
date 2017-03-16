@@ -668,7 +668,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 16) {
 			statement = SubroutineCall(identifierToken);
 		} else if (la.kind == 13 || la.kind == 31 || la.kind == 33) {
-			List<AccessRouteNode> accessRoute = InnerAccessRoute(identifierToken );
+			List<AccessRouteNode> accessRoute  = InnerAccessRoute();
 			Expect(33);
 			ExpressionNode value = Expression();
 			statement = factory.createAssignmentWithRoute(identifierToken, accessRoute, value); 
@@ -688,7 +688,7 @@ public class Parser implements IParser {
 		return expression;
 	}
 
-	List<AccessRouteNode>  InnerAccessRoute(Token identifierToken ) {
+	List<AccessRouteNode>  InnerAccessRoute() {
 		List<AccessRouteNode>  accessRoute;
 		accessRoute = new ArrayList<>(); 
 		while (la.kind == 13 || la.kind == 31) {
@@ -723,6 +723,18 @@ public class Parser implements IParser {
 			element = new AccessRouteNode.EnterRecord(variableIdentifier); 
 		} else SynErr(70);
 		return element;
+	}
+
+	List<AccessRouteNode>  InnerAccessRouteNonEmpty() {
+		List<AccessRouteNode>  accessRoute;
+		accessRoute = new ArrayList<>(); 
+		AccessRouteNode element = InnerAccessRouteElement();
+		accessRoute.add(element); 
+		while (la.kind == 13 || la.kind == 31) {
+			element = InnerAccessRouteElement();
+			accessRoute.add(element); 
+		}
+		return accessRoute;
 	}
 
 	List<ExpressionNode>  ArrayIndex() {
@@ -987,23 +999,10 @@ public class Parser implements IParser {
 		expression = null; 
 		if (la.kind == 16) {
 			expression = SubroutineCall(identifierToken);
-		} else if (la.kind == 13) {
-			List<ExpressionNode> indexNodes  = ArrayIndex();
-			expression = factory.createReadArrayValue(identifierToken, indexNodes); 
-		} else if (la.kind == 31) {
-			expression = RecordAccess(identifierToken);
+		} else if (la.kind == 13 || la.kind == 31) {
+			List<AccessRouteNode> accessRoute  = InnerAccessRouteNonEmpty();
+			expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); 
 		} else SynErr(77);
-		return expression;
-	}
-
-	ExpressionNode  RecordAccess(Token identifierToken) {
-		ExpressionNode  expression;
-		Expect(31);
-		LexicalScope thisScope = factory.getScope(); 
-		factory.setScope(factory.getRecordScope(identifierToken)); 
-		ExpressionNode innerAccessNode = IdentifierAccess();
-		factory.setScope(thisScope); 
-		expression = factory.createReadFromRecord(identifierToken, innerAccessNode); 
 		return expression;
 	}
 

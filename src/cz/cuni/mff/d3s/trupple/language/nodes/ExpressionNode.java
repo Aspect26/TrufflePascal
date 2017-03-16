@@ -141,12 +141,4 @@ public abstract class ExpressionNode extends StatementNode {
 		}
 	}
 
-    protected Reference tryGetReference(VirtualFrame frame, FrameSlot slot) {
-        try {
-            return (Reference)frame.getObject(slot);
-        } catch (FrameSlotTypeException | ClassCastException e) {
-            return null;
-        }
-    }
-
 }

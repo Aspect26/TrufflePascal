@@ -554,6 +554,16 @@ public class NodeFactory {
         }, new UnknownIdentifierException(identifier));
     }
 
+    public ExpressionNode createExpressionFromIdentifierWithRoute(Token identifierToken, List<AccessRouteNode> accessRoute) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+
+        return this.doLookup(
+                identifier,
+                (LexicalScope foundInLexicalScope, String foundIdentifier) -> new ReadVariableWithRouteNode(accessRoute.toArray(new AccessRouteNode[accessRoute.size()]), foundInLexicalScope.getLocalSlot(foundIdentifier)),
+                new UnknownIdentifierException(identifier)
+        );
+    }
+
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
 	    String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
 	    try {
@@ -730,35 +740,6 @@ public class NodeFactory {
     public String getIdentifierFromToken(Token identifierToken) {
         String identifier = identifierToken.val.toLowerCase();
         return this.identifiersPrefix + identifier;
-    }
-
-    public FrameSlot getLocalSlot(Token identifierToken) {
-	    String identifier = this.getIdentifierFromToken(identifierToken);
-        return this.lexicalScope.getLocalSlot(identifier);
-    }
-
-    public LexicalScope getRecordScope(Token identifierToken) {
-	    String identifier = this.getIdentifierFromToken(identifierToken);
-        RecordDescriptor record = (RecordDescriptor) this.lexicalScope.getIdentifiersDescriptor(identifier);
-        return record.getLexicalScope();
-    }
-
-    public LexicalScope getScope() {
-	    return this.lexicalScope;
-    }
-
-    public void setScope(LexicalScope scope) {
-	    this.lexicalScope = scope;
-    }
-
-    public void setScopeIfRecord(Token recordIdentifierToken) {
-	    String recordIdentifier = this.getIdentifierFromToken(recordIdentifierToken);
-	    TypeDescriptor recordDescriptor = this.lexicalScope.getIdentifiersDescriptor(recordIdentifier);
-	    if (! (recordDescriptor instanceof RecordDescriptor)) {
-	        return;
-        }
-
-        this.lexicalScope = ((RecordDescriptor) recordDescriptor).getLexicalScope();
     }
 
 

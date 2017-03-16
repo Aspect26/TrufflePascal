@@ -446,17 +446,27 @@ identifier                                      (. Token identifierToken = t; .)
 |
     SubroutineCall<out statement, identifierToken>
 |
-    InnerAccessRoute<. out List<AccessRouteNode> accessRoute, identifierToken .>
+    InnerAccessRoute<. out List<AccessRouteNode> accessRoute .>
     ":="
     Expression<out ExpressionNode value>        (. statement = factory.createAssignmentWithRoute(identifierToken, accessRoute, value); .)
 )
 .
 
 
-InnerAccessRoute<. out List<AccessRouteNode> accessRoute, Token identifierToken .>
+InnerAccessRoute<. out List<AccessRouteNode> accessRoute .>
 =                                               (. accessRoute = new ArrayList<>(); .)
 {
     InnerAccessRouteElement<out AccessRouteNode element>
+                                                (. accessRoute.add(element); .)
+}
+.
+
+InnerAccessRouteNonEmpty<. out List<AccessRouteNode> accessRoute .>
+=                                               (. accessRoute = new ArrayList<>(); .)
+InnerAccessRouteElement<out AccessRouteNode element>
+                                                (. accessRoute.add(element); .)
+{
+    InnerAccessRouteElement<out element>
                                                 (. accessRoute.add(element); .)
 }
 .
@@ -676,10 +686,8 @@ InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
 (
 	SubroutineCall<out expression, identifierToken>
 |
-	ArrayIndex<. out List<ExpressionNode> indexNodes .>
-	                                            (. expression = factory.createReadArrayValue(identifierToken, indexNodes); .)
-|
-    RecordAccess<out expression, identifierToken>
+	InnerAccessRouteNonEmpty<. out List<AccessRouteNode> accessRoute .>
+	                                            (. expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); .)
 )
 .
 
@@ -692,16 +700,6 @@ SubroutineCall<out ExpressionNode expression, Token identifierToken>
         ActualParameters<out parameters, identifierToken>
     ]
 ")"                                             (. expression = factory.createSubroutineCall(identifierToken, parameters); .)
-.
-
-
-RecordAccess<out ExpressionNode expression, Token identifierToken>
-=
-"."                                             (. LexicalScope thisScope = factory.getScope(); .)
-                                                (. factory.setScope(factory.getRecordScope(identifierToken)); .)
-IdentifierAccess<out ExpressionNode innerAccessNode>
-                                                (. factory.setScope(thisScope); .)
-                                                (. expression = factory.createReadFromRecord(identifierToken, innerAccessNode); .)
 .
 
 
