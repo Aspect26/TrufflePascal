@@ -449,7 +449,7 @@ identifier                                      (. Token identifierToken = t; .)
                                                 (. LexicalScope mainScope = factory.getScope(); .)
     InnerAccessRoute<. out List<AccessRouteNode> accessRoute, identifierToken .>
     ":="                                        (. factory.setScope(mainScope); .)
-    Expression<out ExpressionNode value>        (. statement = (accessRoute.isEmpty())? factory.createAssignment(identifierToken, value) : factory.createAssignmentWithRoute(identifierToken, accessRoute, value); .)
+    Expression<out ExpressionNode value>        (. statement = factory.createAssignmentWithRoute(identifierToken, accessRoute, value); .)
 )
 .
 

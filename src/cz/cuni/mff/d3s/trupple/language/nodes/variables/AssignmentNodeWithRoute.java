@@ -35,6 +35,7 @@ public abstract class AssignmentNodeWithRoute extends ExpressionNode {
 
     private void makeAssignment(VirtualFrame frame, FrameSlot slot, SlotAssignment slotAssignment, Object value) {
         try {
+            frame = this.getFrameContainingSlot(frame, slot);
             this.getAssignmentTarget(frame, slot);
             if (this.isArray) {
                 PascalArray array = (PascalArray) this.slotsFrame.getObject(this.finalSlot);

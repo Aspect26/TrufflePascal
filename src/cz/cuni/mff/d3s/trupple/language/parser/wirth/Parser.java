@@ -673,7 +673,7 @@ public class Parser implements IParser {
 			Expect(33);
 			factory.setScope(mainScope); 
 			ExpressionNode value = Expression();
-			statement = (accessRoute.isEmpty())? factory.createAssignment(identifierToken, value) : factory.createAssignmentWithRoute(identifierToken, accessRoute, value); 
+			statement = factory.createAssignmentWithRoute(identifierToken, accessRoute, value); 
 		} else SynErr(69);
 		return statement;
 	}
