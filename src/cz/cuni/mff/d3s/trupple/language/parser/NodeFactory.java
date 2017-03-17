@@ -173,12 +173,10 @@ public class NodeFactory {
     }
 
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
-        try {
-            return lexicalScope.createArrayType(ordinalDimensions, returnTypeToken.val.toLowerCase());
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-            return UnknownDescriptor.SINGLETON;
-        }
+	    String typeIdentifier = this.getTypeNameFromToken(returnTypeToken);
+	    TypeDescriptor returnTypeDescriptor = this.doLookup(typeIdentifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(typeIdentifier));
+
+	    return lexicalScope.createArrayType(ordinalDimensions, returnTypeDescriptor);
     }
 
     public TypeDescriptor createSetType(OrdinalDescriptor baseType) {

@@ -164,15 +164,8 @@ public class IdentifiersTable {
         return new RecordDescriptor(recordScope);
     }
 
-    public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {
-        TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
-        TypeDescriptor typeDescriptor = new ArrayDescriptor(ordinalDimensions, returnTypeDescriptor);
-
-        if (returnTypeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new UnknownTypeException(returnType);
-        }
-
-        return typeDescriptor;
+    public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {
+        return new ArrayDescriptor(ordinalDimensions, typeDescriptor);
     }
 
     public TypeDescriptor createSetType(OrdinalDescriptor base) {

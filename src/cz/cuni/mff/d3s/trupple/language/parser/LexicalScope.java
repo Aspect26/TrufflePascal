@@ -6,7 +6,6 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
-import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTableTP;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
@@ -80,10 +79,6 @@ public class LexicalScope {
         return this.localIdentifiers.getTypeTypeDescriptor(typeIdentifier);
     }
 
-    TypeDescriptor getIdentifiersDescriptor(String identifier) {
-        return this.localIdentifiers.getIdentifiersDescriptor(identifier);
-    }
-
     ConstantDescriptor getConstant(String identifier) throws LexicalException {
         return this.localIdentifiers.getConstant(identifier);
     }
@@ -138,8 +133,8 @@ public class LexicalScope {
         this.readArgumentNodes.add(initializationNode);
     }
 
-    TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, String returnTypeName) throws LexicalException {
-        return this.localIdentifiers.createArray(ordinalDimensions, returnTypeName);
+    TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {
+        return this.localIdentifiers.createArray(ordinalDimensions, typeDescriptor);
     }
 
     TypeDescriptor createEnumType(List<String> identifiers) throws LexicalException {
