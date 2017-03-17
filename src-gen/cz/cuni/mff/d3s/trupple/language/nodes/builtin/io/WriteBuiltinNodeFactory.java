@@ -1,5 +1,5 @@
 // CheckStyle: start generated
-package cz.cuni.mff.d3s.trupple.language.nodes.builtin;
+package cz.cuni.mff.d3s.trupple.language.nodes.builtin.io;
 
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.dsl.GeneratedBy;
@@ -10,25 +10,23 @@ import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
-import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
-@GeneratedBy(WritelnBuiltinNode.class)
+@GeneratedBy(WriteBuiltinNode.class)
 @SuppressWarnings({"unchecked", "rawtypes"})
-public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuiltinNode> {
+public final class WriteBuiltinNodeFactory implements NodeFactory<WriteBuiltinNode> {
 
-    private static WritelnBuiltinNodeFactory instance;
+    private static WriteBuiltinNodeFactory instance;
 
-    private WritelnBuiltinNodeFactory() {
+    private WriteBuiltinNodeFactory() {
     }
 
     @Override
-    public Class<WritelnBuiltinNode> getNodeClass() {
-        return WritelnBuiltinNode.class;
+    public Class<WriteBuiltinNode> getNodeClass() {
+        return WriteBuiltinNode.class;
     }
 
     @Override
@@ -42,7 +40,7 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
     }
 
     @Override
-    public WritelnBuiltinNode createNode(Object... arguments) {
+    public WriteBuiltinNode createNode(Object... arguments) {
         if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode[])) {
             return create((PascalContext) arguments[0], (ExpressionNode[]) arguments[1]);
         } else {
@@ -50,24 +48,24 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
         }
     }
 
-    public static NodeFactory<WritelnBuiltinNode> getInstance() {
+    public static NodeFactory<WriteBuiltinNode> getInstance() {
         if (instance == null) {
-            instance = new WritelnBuiltinNodeFactory();
+            instance = new WriteBuiltinNodeFactory();
         }
         return instance;
     }
 
-    public static WritelnBuiltinNode create(PascalContext context, ExpressionNode[] arguments) {
-        return new WritelnBuiltinNodeGen(context, arguments);
+    public static WriteBuiltinNode create(PascalContext context, ExpressionNode[] arguments) {
+        return new WriteBuiltinNodeGen(context, arguments);
     }
 
-    @GeneratedBy(WritelnBuiltinNode.class)
-    public static final class WritelnBuiltinNodeGen extends WritelnBuiltinNode implements SpecializedNode {
+    @GeneratedBy(WriteBuiltinNode.class)
+    public static final class WriteBuiltinNodeGen extends WriteBuiltinNode implements SpecializedNode {
 
         @Child private ExpressionNode arguments0_;
         @Child private BaseNode_ specialization_;
 
-        private WritelnBuiltinNodeGen(PascalContext context, ExpressionNode[] arguments) {
+        private WriteBuiltinNodeGen(PascalContext context, ExpressionNode[] arguments) {
             super(context);
             this.arguments0_ = arguments != null && 0 < arguments.length ? arguments[0] : null;
             this.specialization_ = UninitializedNode_.create(this);
@@ -90,11 +88,6 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
         }
 
         @Override
-        public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
-            return specialization_.executeLong(frameValue);
-        }
-
-        @Override
         public SpecializationNode getSpecializationNode() {
             return specialization_;
         }
@@ -104,26 +97,19 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
             return SpecializationNode.updateRoot(super.deepCopy());
         }
 
-        private static long[] expectLongArray(Object value) throws UnexpectedResultException {
-            if (value instanceof long[]) {
-                return (long[]) value;
-            }
-            throw new UnexpectedResultException(value);
-        }
-
-        @GeneratedBy(WritelnBuiltinNode.class)
+        @GeneratedBy(WriteBuiltinNode.class)
         private abstract static class BaseNode_ extends SpecializationNode {
 
-            @CompilationFinal protected WritelnBuiltinNodeGen root;
+            @CompilationFinal protected WriteBuiltinNodeGen root;
 
-            BaseNode_(WritelnBuiltinNodeGen root, int index) {
+            BaseNode_(WriteBuiltinNodeGen root, int index) {
                 super(index);
                 this.root = root;
             }
 
             @Override
             protected final void setRoot(Node root) {
-                this.root = (WritelnBuiltinNodeGen) root;
+                this.root = (WriteBuiltinNodeGen) root;
             }
 
             @Override
@@ -148,20 +134,13 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
                 return;
             }
 
-            public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
-                return PascalTypesGen.expectLong(execute(frameValue));
-            }
-
             @Override
             protected final SpecializationNode createNext(Frame frameValue, Object arguments0Value) {
                 if (arguments0Value instanceof String[]) {
-                    return Writeln0Node_.create(root);
-                }
-                if (arguments0Value instanceof long[]) {
-                    return Writeln1Node_.create(root);
+                    return Write0Node_.create(root);
                 }
                 if (arguments0Value instanceof Object[]) {
-                    return Writeln2Node_.create(root);
+                    return Write1Node_.create(root);
                 }
                 return null;
             }
@@ -176,10 +155,10 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
             }
 
         }
-        @GeneratedBy(WritelnBuiltinNode.class)
+        @GeneratedBy(WriteBuiltinNode.class)
         private static final class UninitializedNode_ extends BaseNode_ {
 
-            UninitializedNode_(WritelnBuiltinNodeGen root) {
+            UninitializedNode_(WriteBuiltinNodeGen root) {
                 super(root, 2147483647);
             }
 
@@ -188,15 +167,15 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
                 return uninitialized(frameValue, arguments0Value);
             }
 
-            static BaseNode_ create(WritelnBuiltinNodeGen root) {
+            static BaseNode_ create(WriteBuiltinNodeGen root) {
                 return new UninitializedNode_(root);
             }
 
         }
-        @GeneratedBy(WritelnBuiltinNode.class)
+        @GeneratedBy(WriteBuiltinNode.class)
         private static final class PolymorphicNode_ extends BaseNode_ {
 
-            PolymorphicNode_(WritelnBuiltinNodeGen root) {
+            PolymorphicNode_(WriteBuiltinNodeGen root) {
                 super(root, 0);
             }
 
@@ -210,15 +189,15 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
                 return getNext().execute_(frameValue, arguments0Value);
             }
 
-            static BaseNode_ create(WritelnBuiltinNodeGen root) {
+            static BaseNode_ create(WriteBuiltinNodeGen root) {
                 return new PolymorphicNode_(root);
             }
 
         }
-        @GeneratedBy(methodName = "writeln(String[])", value = WritelnBuiltinNode.class)
-        private static final class Writeln0Node_ extends BaseNode_ {
+        @GeneratedBy(methodName = "write(String[])", value = WriteBuiltinNode.class)
+        private static final class Write0Node_ extends BaseNode_ {
 
-            Writeln0Node_(WritelnBuiltinNodeGen root) {
+            Write0Node_(WriteBuiltinNodeGen root) {
                 super(root, 1);
             }
 
@@ -226,66 +205,34 @@ public final class WritelnBuiltinNodeFactory implements NodeFactory<WritelnBuilt
             public Object execute_(VirtualFrame frameValue, Object arguments0Value) {
                 if (arguments0Value instanceof String[]) {
                     String[] arguments0Value_ = (String[]) arguments0Value;
-                    return root.writeln(arguments0Value_);
+                    return root.write(arguments0Value_);
                 }
                 return getNext().execute_(frameValue, arguments0Value);
             }
 
-            static BaseNode_ create(WritelnBuiltinNodeGen root) {
-                return new Writeln0Node_(root);
+            static BaseNode_ create(WriteBuiltinNodeGen root) {
+                return new Write0Node_(root);
             }
 
         }
-        @GeneratedBy(methodName = "writeln(long[])", value = WritelnBuiltinNode.class)
-        private static final class Writeln1Node_ extends BaseNode_ {
+        @GeneratedBy(methodName = "write(Object[])", value = WriteBuiltinNode.class)
+        private static final class Write1Node_ extends BaseNode_ {
 
-            Writeln1Node_(WritelnBuiltinNodeGen root) {
+            Write1Node_(WriteBuiltinNodeGen root) {
                 super(root, 2);
-            }
-
-            @Override
-            public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
-                long[] arguments0Value_;
-                try {
-                    arguments0Value_ = expectLongArray(root.arguments0_.executeGeneric(frameValue));
-                } catch (UnexpectedResultException ex) {
-                    return PascalTypesGen.expectLong(getNext().execute_(frameValue, ex.getResult()));
-                }
-                return root.writeln(arguments0Value_);
-            }
-
-            @Override
-            public Object execute_(VirtualFrame frameValue, Object arguments0Value) {
-                if (arguments0Value instanceof long[]) {
-                    long[] arguments0Value_ = (long[]) arguments0Value;
-                    return root.writeln(arguments0Value_);
-                }
-                return getNext().execute_(frameValue, arguments0Value);
-            }
-
-            static BaseNode_ create(WritelnBuiltinNodeGen root) {
-                return new Writeln1Node_(root);
-            }
-
-        }
-        @GeneratedBy(methodName = "writeln(Object[])", value = WritelnBuiltinNode.class)
-        private static final class Writeln2Node_ extends BaseNode_ {
-
-            Writeln2Node_(WritelnBuiltinNodeGen root) {
-                super(root, 3);
             }
 
             @Override
             public Object execute_(VirtualFrame frameValue, Object arguments0Value) {
                 if (arguments0Value instanceof Object[]) {
                     Object[] arguments0Value_ = (Object[]) arguments0Value;
-                    return root.writeln(arguments0Value_);
+                    return root.write(arguments0Value_);
                 }
                 return getNext().execute_(frameValue, arguments0Value);
             }
 
-            static BaseNode_ create(WritelnBuiltinNodeGen root) {
-                return new Writeln2Node_(root);
+            static BaseNode_ create(WriteBuiltinNodeGen root) {
+                return new Write1Node_(root);
             }
 
         }

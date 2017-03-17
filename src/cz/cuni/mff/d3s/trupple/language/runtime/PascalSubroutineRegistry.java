@@ -12,6 +12,11 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.arithmetic.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.ReadBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.WriteBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ordinal.PredBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ordinal.SuccBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 
@@ -47,6 +52,14 @@ public class PascalSubroutineRegistry {
 		installBuiltinWithVariableArgumentsCount(ReadBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(SuccBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(PredBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(AbsBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(SqrBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(SinBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(CosBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(ExpBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(LnBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(SqrtBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(ArctanBuiltinNodeFactory.getInstance());
 	}
 
 	void installBuiltinNoArgument(BuiltinNode builtinNode) {

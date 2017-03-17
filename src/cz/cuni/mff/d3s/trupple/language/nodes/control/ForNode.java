@@ -6,7 +6,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
-import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;

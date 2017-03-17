@@ -1,14 +1,8 @@
-package cz.cuni.mff.d3s.trupple.language.nodes.builtin;
+package cz.cuni.mff.d3s.trupple.language.nodes.builtin.io;
 
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.nodes.NodeInfo;
-import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-
-import java.io.IOException;
-import java.util.regex.Pattern;
 
 @NodeInfo(shortName = "readln")
 public abstract class ReadlnBuiltinNode extends ReadBuiltinNode {

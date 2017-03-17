@@ -8,12 +8,12 @@ public class CaseTest extends JUnitTest {
 	public void simpleTest() {
 		String code = "program main; \n"+
 				"begin\n" +
-				" case 3 of\n" + 
-				"  1:begin write('Star Wars'); end;	\n" + 
-				"  2:write('The Lord of the Rings'); \n" + 
-				"  3:write('Game of Thrones');\n" + 
-				"  4:begin write('Warcraft'); end;  \n" + 
-				" end;\n" + 
+				" case 3 of\n" +
+				"  1:begin write('Star Wars'); end;	\n" +
+				"  2:write('The Lord of the Rings'); \n" +
+				"  3:write('Game of Thrones');\n" +
+				"  4:begin write('Warcraft'); end;  \n" +
+				" end;\n" +
 				"end.";
 
 		String output = "Game of Thrones";

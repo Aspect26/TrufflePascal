@@ -1,5 +1,5 @@
 // CheckStyle: start generated
-package cz.cuni.mff.d3s.trupple.language.nodes.builtin;
+package cz.cuni.mff.d3s.trupple.language.nodes.builtin.ordinal;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
@@ -19,18 +19,18 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
-@GeneratedBy(SuccBuiltinNode.class)
+@GeneratedBy(PredBuiltinNode.class)
 @SuppressWarnings({"unchecked", "rawtypes"})
-public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode> {
+public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode> {
 
-    private static SuccBuiltinNodeFactory instance;
+    private static PredBuiltinNodeFactory instance;
 
-    private SuccBuiltinNodeFactory() {
+    private PredBuiltinNodeFactory() {
     }
 
     @Override
-    public Class<SuccBuiltinNode> getNodeClass() {
-        return SuccBuiltinNode.class;
+    public Class<PredBuiltinNode> getNodeClass() {
+        return PredBuiltinNode.class;
     }
 
     @Override
@@ -44,7 +44,7 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
     }
 
     @Override
-    public SuccBuiltinNode createNode(Object... arguments) {
+    public PredBuiltinNode createNode(Object... arguments) {
         if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
             return create((PascalContext) arguments[0], (ExpressionNode) arguments[1]);
         } else {
@@ -52,25 +52,25 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
         }
     }
 
-    public static NodeFactory<SuccBuiltinNode> getInstance() {
+    public static NodeFactory<PredBuiltinNode> getInstance() {
         if (instance == null) {
-            instance = new SuccBuiltinNodeFactory();
+            instance = new PredBuiltinNodeFactory();
         }
         return instance;
     }
 
-    public static SuccBuiltinNode create(PascalContext context, ExpressionNode argument) {
-        return new SuccBuiltinNodeGen(context, argument);
+    public static PredBuiltinNode create(PascalContext context, ExpressionNode argument) {
+        return new PredBuiltinNodeGen(context, argument);
     }
 
-    @GeneratedBy(SuccBuiltinNode.class)
-    public static final class SuccBuiltinNodeGen extends SuccBuiltinNode implements SpecializedNode {
+    @GeneratedBy(PredBuiltinNode.class)
+    public static final class PredBuiltinNodeGen extends PredBuiltinNode implements SpecializedNode {
 
         @Child private ExpressionNode argument_;
         @CompilationFinal private Class<?> argumentType_;
         @Child private BaseNode_ specialization_;
 
-        private SuccBuiltinNodeGen(PascalContext context, ExpressionNode argument) {
+        private PredBuiltinNodeGen(PascalContext context, ExpressionNode argument) {
             super(context);
             this.argument_ = argument;
             this.specialization_ = UninitializedNode_.create(this);
@@ -117,19 +117,19 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
             return SpecializationNode.updateRoot(super.deepCopy());
         }
 
-        @GeneratedBy(SuccBuiltinNode.class)
+        @GeneratedBy(PredBuiltinNode.class)
         private abstract static class BaseNode_ extends SpecializationNode {
 
-            @CompilationFinal protected SuccBuiltinNodeGen root;
+            @CompilationFinal protected PredBuiltinNodeGen root;
 
-            BaseNode_(SuccBuiltinNodeGen root, int index) {
+            BaseNode_(PredBuiltinNodeGen root, int index) {
                 super(index);
                 this.root = root;
             }
 
             @Override
             protected final void setRoot(Node root) {
-                this.root = (SuccBuiltinNodeGen) root;
+                this.root = (PredBuiltinNodeGen) root;
             }
 
             @Override
@@ -169,16 +169,16 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
             @Override
             protected final SpecializationNode createNext(Frame frameValue, Object argumentValue) {
                 if (argumentValue instanceof Long) {
-                    return Succ0Node_.create(root);
+                    return Pred0Node_.create(root);
                 }
                 if (argumentValue instanceof Character) {
-                    return Succ1Node_.create(root);
+                    return Pred1Node_.create(root);
                 }
                 if (argumentValue instanceof Boolean) {
-                    return Succ2Node_.create(root);
+                    return Pred2Node_.create(root);
                 }
                 if (argumentValue instanceof EnumValue) {
-                    return Succ3Node_.create(root);
+                    return Pred3Node_.create(root);
                 }
                 return null;
             }
@@ -229,10 +229,10 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
             }
 
         }
-        @GeneratedBy(SuccBuiltinNode.class)
+        @GeneratedBy(PredBuiltinNode.class)
         private static final class UninitializedNode_ extends BaseNode_ {
 
-            UninitializedNode_(SuccBuiltinNodeGen root) {
+            UninitializedNode_(PredBuiltinNodeGen root) {
                 super(root, 2147483647);
             }
 
@@ -241,15 +241,15 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
                 return uninitialized(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(SuccBuiltinNodeGen root) {
+            static BaseNode_ create(PredBuiltinNodeGen root) {
                 return new UninitializedNode_(root);
             }
 
         }
-        @GeneratedBy(SuccBuiltinNode.class)
+        @GeneratedBy(PredBuiltinNode.class)
         private static final class PolymorphicNode_ extends BaseNode_ {
 
-            PolymorphicNode_(SuccBuiltinNodeGen root) {
+            PolymorphicNode_(PredBuiltinNodeGen root) {
                 super(root, 0);
             }
 
@@ -263,15 +263,15 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
                 return getNext().execute_(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(SuccBuiltinNodeGen root) {
+            static BaseNode_ create(PredBuiltinNodeGen root) {
                 return new PolymorphicNode_(root);
             }
 
         }
-        @GeneratedBy(methodName = "succ(long)", value = SuccBuiltinNode.class)
-        private static final class Succ0Node_ extends BaseNode_ {
+        @GeneratedBy(methodName = "pred(long)", value = PredBuiltinNode.class)
+        private static final class Pred0Node_ extends BaseNode_ {
 
-            Succ0Node_(SuccBuiltinNodeGen root) {
+            Pred0Node_(PredBuiltinNodeGen root) {
                 super(root, 1);
             }
 
@@ -292,27 +292,27 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
                 } catch (UnexpectedResultException ex) {
                     return PascalTypesGen.expectLong(getNext().execute_(frameValue, ex.getResult()));
                 }
-                return root.succ(argumentValue_);
+                return root.pred(argumentValue_);
             }
 
             @Override
             public Object execute_(VirtualFrame frameValue, Object argumentValue) {
                 if (argumentValue instanceof Long) {
                     long argumentValue_ = (long) argumentValue;
-                    return root.succ(argumentValue_);
+                    return root.pred(argumentValue_);
                 }
                 return getNext().execute_(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(SuccBuiltinNodeGen root) {
-                return new Succ0Node_(root);
+            static BaseNode_ create(PredBuiltinNodeGen root) {
+                return new Pred0Node_(root);
             }
 
         }
-        @GeneratedBy(methodName = "succ(char)", value = SuccBuiltinNode.class)
-        private static final class Succ1Node_ extends BaseNode_ {
+        @GeneratedBy(methodName = "pred(char)", value = PredBuiltinNode.class)
+        private static final class Pred1Node_ extends BaseNode_ {
 
-            Succ1Node_(SuccBuiltinNodeGen root) {
+            Pred1Node_(PredBuiltinNodeGen root) {
                 super(root, 2);
             }
 
@@ -333,27 +333,27 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
                 } catch (UnexpectedResultException ex) {
                     return PascalTypesGen.expectCharacter(getNext().execute_(frameValue, ex.getResult()));
                 }
-                return root.succ(argumentValue_);
+                return root.pred(argumentValue_);
             }
 
             @Override
             public Object execute_(VirtualFrame frameValue, Object argumentValue) {
                 if (argumentValue instanceof Character) {
                     char argumentValue_ = (char) argumentValue;
-                    return root.succ(argumentValue_);
+                    return root.pred(argumentValue_);
                 }
                 return getNext().execute_(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(SuccBuiltinNodeGen root) {
-                return new Succ1Node_(root);
+            static BaseNode_ create(PredBuiltinNodeGen root) {
+                return new Pred1Node_(root);
             }
 
         }
-        @GeneratedBy(methodName = "succ(boolean)", value = SuccBuiltinNode.class)
-        private static final class Succ2Node_ extends BaseNode_ {
+        @GeneratedBy(methodName = "pred(boolean)", value = PredBuiltinNode.class)
+        private static final class Pred2Node_ extends BaseNode_ {
 
-            Succ2Node_(SuccBuiltinNodeGen root) {
+            Pred2Node_(PredBuiltinNodeGen root) {
                 super(root, 3);
             }
 
@@ -374,27 +374,27 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
                 } catch (UnexpectedResultException ex) {
                     return PascalTypesGen.expectBoolean(getNext().execute_(frameValue, ex.getResult()));
                 }
-                return root.succ(argumentValue_);
+                return root.pred(argumentValue_);
             }
 
             @Override
             public Object execute_(VirtualFrame frameValue, Object argumentValue) {
                 if (argumentValue instanceof Boolean) {
                     boolean argumentValue_ = (boolean) argumentValue;
-                    return root.succ(argumentValue_);
+                    return root.pred(argumentValue_);
                 }
                 return getNext().execute_(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(SuccBuiltinNodeGen root) {
-                return new Succ2Node_(root);
+            static BaseNode_ create(PredBuiltinNodeGen root) {
+                return new Pred2Node_(root);
             }
 
         }
-        @GeneratedBy(methodName = "succ(EnumValue)", value = SuccBuiltinNode.class)
-        private static final class Succ3Node_ extends BaseNode_ {
+        @GeneratedBy(methodName = "pred(EnumValue)", value = PredBuiltinNode.class)
+        private static final class Pred3Node_ extends BaseNode_ {
 
-            Succ3Node_(SuccBuiltinNodeGen root) {
+            Pred3Node_(PredBuiltinNodeGen root) {
                 super(root, 4);
             }
 
@@ -402,13 +402,13 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
             public Object execute_(VirtualFrame frameValue, Object argumentValue) {
                 if (argumentValue instanceof EnumValue) {
                     EnumValue argumentValue_ = (EnumValue) argumentValue;
-                    return root.succ(argumentValue_);
+                    return root.pred(argumentValue_);
                 }
                 return getNext().execute_(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(SuccBuiltinNodeGen root) {
-                return new Succ3Node_(root);
+            static BaseNode_ create(PredBuiltinNodeGen root) {
+                return new Pred3Node_(root);
             }
 
         }

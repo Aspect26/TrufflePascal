@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.nodes.builtin;
+package cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp;
 
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeChildren;
@@ -8,6 +8,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 @NodeInfo(shortName = "random")
@@ -21,7 +22,7 @@ public abstract class RandomBuiltinNode extends BuiltinNode {
 	}
 
 	@Specialization
-	long getRandom(long upperBound) {
+	public long getRandom(long upperBound) {
 		return this.context.getRandom(upperBound);
 	}
 

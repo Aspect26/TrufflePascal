@@ -65,6 +65,14 @@ public class IdentifiersTable {
         identifiersMap.put("read", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
         identifiersMap.put("succ", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
         identifiersMap.put("pred", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
+        identifiersMap.put("abs", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("sqr", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("sin", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("cos", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("exp", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("ln", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("sqrt", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("arctan", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
     }
 
     public FrameSlot getFrameSlot(String identifier) {
@@ -85,10 +93,6 @@ public class IdentifiersTable {
 
     public TypeDescriptor getTypeTypeDescriptor(String typeIdentifier) {
         return this.typeDescriptors.get(typeIdentifier);
-    }
-
-    public TypeDescriptor getIdentifiersDescriptor(String identifier) {
-        return this.identifiersMap.get(identifier);
     }
 
     public Map<String, TypeDescriptor> getAll() {
