@@ -11,6 +11,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.LongConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
@@ -18,8 +19,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.*;
 
-class LexicalScope {
-
+public class LexicalScope {
 
     private String name;
     private final LexicalScope outer;
@@ -51,7 +51,11 @@ class LexicalScope {
         return this.context;
     }
 
-    FrameDescriptor getFrameDescriptor() {
+    IdentifiersTable getIdentifiersTable() {
+        return this.localIdentifiers;
+    }
+
+    public FrameDescriptor getFrameDescriptor() {
         return this.localIdentifiers.getFrameDescriptor();
     }
 
@@ -129,8 +133,8 @@ class LexicalScope {
         this.readArgumentNodes.add(initializationNode);
     }
 
-    TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, String returnTypeName) throws LexicalException {
-        return this.localIdentifiers.createArray(ordinalDimensions, returnTypeName);
+    TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {
+        return this.localIdentifiers.createArray(ordinalDimensions, typeDescriptor);
     }
 
     TypeDescriptor createEnumType(List<String> identifiers) throws LexicalException {
@@ -139,6 +143,10 @@ class LexicalScope {
 
     FileDescriptor createFileDescriptor(TypeDescriptor contentTypeDescriptor) {
         return this.localIdentifiers.createFileDescriptor(contentTypeDescriptor);
+    }
+
+    RecordDescriptor createRecordDescriptor() {
+        return this.localIdentifiers.createRecordDescriptor(this);
     }
 
     TypeDescriptor createSetType(OrdinalDescriptor baseType) {

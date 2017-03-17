@@ -14,7 +14,7 @@ public class BooleanConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public FrameSlotKind getSlotKind() {
-        return FrameSlotKind.Long;
+        return FrameSlotKind.Boolean;
     }
 
     @Override

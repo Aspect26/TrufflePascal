@@ -12,7 +12,7 @@ public class RealConstantDescriptor implements ConstantDescriptor {
 
     @Override
     public FrameSlotKind getSlotKind() {
-        return FrameSlotKind.Long;
+        return FrameSlotKind.Double;
     }
 
     @Override

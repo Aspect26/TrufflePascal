@@ -28,7 +28,9 @@ Coco/R itself) does not fall under the GNU General Public License.
 -->begin
 package cz.cuni.mff.d3s.trupple.language.parser.wirth;
 
+import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.nodes.RootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.AccessRouteNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.parser.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
@@ -37,6 +39,8 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescri
 import com.oracle.truffle.api.source.Source;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class Parser implements IParser {
 -->constants
@@ -148,22 +152,16 @@ public class Parser implements IParser {
     		
     	else if(la.val.toLowerCase().equals(";")){
     		Token next = scanner.Peek();
+    		scanner.ResetPeek();
     		return next.val.toLowerCase().equals("end") || next.val.toLowerCase().equals("else");
     	}
     	
     	return false;
     }
     
-    public boolean isSingleIdentifier() {
-    	Token next = scanner.Peek();
-    	if(next.val.equals("]") && factory.containsIdentifier(la.val.toLowerCase()))
-    		return true;
-
-    	return false;
-    }
-    
     public boolean continuesArray() {
     	Token next = scanner.Peek();
+    	scanner.ResetPeek();
     	if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
     		return true;
 
@@ -172,8 +170,36 @@ public class Parser implements IParser {
 
     public boolean isSubrange() {
         Token next = scanner.Peek();
+        scanner.ResetPeek();
         return next.val.toLowerCase().equals("..");
     }
+
+    public  boolean recordFixedPartContinues() {
+        String actual = la.val.toLowerCase();
+        String next = scanner.Peek().val.toLowerCase();
+        scanner.ResetPeek();
+
+        boolean variantPartStarts = actual.equals(";") && next.equals("case");
+        boolean innerFieldListEnds = actual.equals(")") || (actual.equals(";") && next.equals(")") );
+        boolean recordsEnds = actual.equals("end") || (actual.equals(";") && next.equals("end") );
+
+        return !variantPartStarts && !recordsEnds && !innerFieldListEnds;
+    }
+
+    public boolean isVariantSelectorTag() {
+        Token next = scanner.Peek();
+        scanner.ResetPeek();
+
+        return next.val.equals(":");
+    }
+
+    public boolean recordVariantPartStarts() {
+        Token next = scanner.Peek();
+        scanner.ResetPeek();
+
+        return next.val.equals("case");
+    }
+
 } // end Parser
 
 class Errors {

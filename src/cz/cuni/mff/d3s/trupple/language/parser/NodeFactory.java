@@ -1,8 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.sun.istack.internal.NotNull;
@@ -12,8 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
@@ -27,11 +24,13 @@ import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
+import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -174,12 +173,10 @@ public class NodeFactory {
     }
 
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
-        try {
-            return lexicalScope.createArrayType(ordinalDimensions, returnTypeToken.val.toLowerCase());
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-            return UnknownDescriptor.SINGLETON;
-        }
+	    String typeIdentifier = this.getTypeNameFromToken(returnTypeToken);
+	    TypeDescriptor returnTypeDescriptor = this.doLookup(typeIdentifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(typeIdentifier));
+
+	    return lexicalScope.createArrayType(ordinalDimensions, returnTypeDescriptor);
     }
 
     public TypeDescriptor createSetType(OrdinalDescriptor baseType) {
@@ -188,6 +185,43 @@ public class NodeFactory {
 
     public TypeDescriptor createFileType(TypeDescriptor contentTypeDescriptor) {
         return this.lexicalScope.createFileDescriptor(contentTypeDescriptor);
+    }
+
+    public void startRecord() {
+	    this.lexicalScope = new LexicalScope(this.lexicalScope, "_record", this.usingTPExtension);
+    }
+
+    public TypeDescriptor createRecordType() {
+	    return this.lexicalScope.createRecordDescriptor();
+    }
+
+    public void finishRecord() {
+        assert this.lexicalScope.getOuterScope() != null;
+        this.lexicalScope = this.lexicalScope.getOuterScope();
+    }
+
+    public Map<String, TypeDescriptor> createVariables(List<String> identifiers, TypeDescriptor type) {
+	    Map<String, TypeDescriptor> result = new HashMap<>();
+	    for (String identifier : identifiers) {
+	        if (result.containsKey(identifier)) {
+                parser.SemErr(new DuplicitIdentifierException(identifier).getMessage());
+            } else {
+	            result.put(identifier, type);
+            }
+        }
+
+        return  result;
+    }
+
+    public void appendVariablesMap(Map<String, TypeDescriptor> origin, Map<String, TypeDescriptor> newVariables) {
+	    for (Map.Entry<String, TypeDescriptor> newVariable : newVariables.entrySet()) {
+	        String identifier = newVariable.getKey();
+	        if (origin.containsKey(identifier)) {
+                parser.SemErr(new DuplicitIdentifierException(identifier).getMessage());
+            } else {
+	            origin.put(identifier, newVariable.getValue());
+            }
+        }
     }
 
     public OrdinalDescriptor createSimpleOrdinalDescriptor(final ConstantDescriptor lowerBound, final ConstantDescriptor upperBound) {
@@ -480,6 +514,7 @@ public class NodeFactory {
     public ExpressionNode createAssignment(Token identifierToken, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
 
+        // TODO: use lookUp function
         LexicalScope ls = this.lexicalScope;
         while (ls != null) {
             if (ls.containsLocalIdentifier(variableIdentifier)) {
@@ -495,6 +530,14 @@ public class NodeFactory {
         return null;
     }
 
+    public ExpressionNode createAssignmentWithRoute(Token identifierToken, List<AccessRouteNode> accessRoute, ExpressionNode valueNode) {
+        String variableIdentifier = this.getIdentifierFromToken(identifierToken);
+        FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier));
+
+        // TODO: check if it is assignable
+        return AssignmentNodeWithRouteNodeGen.create(accessRoute.toArray(new AccessRouteNode[accessRoute.size()]), valueNode, frameSlot);
+    }
+
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
@@ -507,6 +550,16 @@ public class NodeFactory {
                 return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier));
             }
         }, new UnknownIdentifierException(identifier));
+    }
+
+    public ExpressionNode createExpressionFromIdentifierWithRoute(Token identifierToken, List<AccessRouteNode> accessRoute) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+
+        return this.doLookup(
+                identifier,
+                (LexicalScope foundInLexicalScope, String foundIdentifier) -> new ReadVariableWithRouteNode(accessRoute.toArray(new AccessRouteNode[accessRoute.size()]), foundInLexicalScope.getLocalSlot(foundIdentifier)),
+                new UnknownIdentifierException(identifier)
+        );
     }
 
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
@@ -554,6 +607,13 @@ public class NodeFactory {
 
         return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]),
                 lexicalScope.getLocalSlot(identifier));
+    }
+
+    public ExpressionNode createReadFromRecord(Token recordIdentifierToken, ExpressionNode readInnerNode) {
+	    String recordIdentifier = this.getIdentifierFromToken(recordIdentifierToken);
+        FrameSlot slot = this.doLookup(recordIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(recordIdentifier));
+
+	    return new ReadFromRecordNode(slot, readInnerNode);
     }
 
     public ExpressionNode createArrayIndexAssignment(Token identifierToken, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
@@ -660,10 +720,6 @@ public class NodeFactory {
         String subroutineIdentifier = lexicalScope.getName();
         lexicalScope = lexicalScope.getOuterScope();
         lexicalScope.getContext().setSubroutineRootNode(subroutineIdentifier, rootNode);
-    }
-
-    public boolean containsIdentifier(String identifier) {
-        return this.lexicalScope.containsLocalIdentifier(identifier);
     }
 
     public long getLongFromToken(Token token) {

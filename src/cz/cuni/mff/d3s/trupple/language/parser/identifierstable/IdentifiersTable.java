@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.parser.identifierstable;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
@@ -12,10 +13,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.ReferenceDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.ArrayDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumValueDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.SetDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.*;
 
@@ -89,16 +87,16 @@ public class IdentifiersTable {
         return this.typeDescriptors.get(typeIdentifier);
     }
 
+    public TypeDescriptor getIdentifiersDescriptor(String identifier) {
+        return this.identifiersMap.get(identifier);
+    }
+
     public Map<String, TypeDescriptor> getAll() {
         return this.identifiersMap;
     }
 
     public boolean containsIdentifier(String identifier) {
         return this.identifiersMap.containsKey(identifier);
-    }
-
-    public boolean isConstant(String identifier) {
-        return this.identifiersMap.get(identifier) instanceof ConstantDescriptor;
     }
 
     public boolean isSubroutine(String identifier) {
@@ -162,15 +160,12 @@ public class IdentifiersTable {
         return new FileDescriptor(contentTypeDescriptor);
     }
 
-    public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, String returnType) throws LexicalException {
-        TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
-        TypeDescriptor typeDescriptor = new ArrayDescriptor(ordinalDimensions, returnTypeDescriptor);
+    public RecordDescriptor createRecordDescriptor(LexicalScope recordScope) {
+        return new RecordDescriptor(recordScope);
+    }
 
-        if (returnTypeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new UnknownTypeException(returnType);
-        }
-
-        return typeDescriptor;
+    public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {
+        return new ArrayDescriptor(ordinalDimensions, typeDescriptor);
     }
 
     public TypeDescriptor createSetType(OrdinalDescriptor base) {

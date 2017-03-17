@@ -1,20 +1,16 @@
 package cz.cuni.mff.d3s.trupple.language.parser;
 
 import com.oracle.truffle.api.frame.FrameSlot;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalOrdinal;
-import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.RecordInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.ArrayDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumValueDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.SetDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 
 import java.util.ArrayList;
@@ -62,6 +58,8 @@ class InitializationNodeGenerator {
             return createEnumValue(frameSlot, ((EnumValueDescriptor)typeDescriptor).getEnumTypeDescriptor(), identifier);
         } else if (typeDescriptor instanceof SetDescriptor) {
             return createSetValue(frameSlot, (SetDescriptor)typeDescriptor);
+        } else if (typeDescriptor instanceof RecordDescriptor) {
+            return createRecordValueAndInnerValues(frameSlot, (RecordDescriptor)typeDescriptor);
         }
 
         return null;
@@ -79,15 +77,15 @@ class InitializationNodeGenerator {
 
     private StatementNode createConstantValue(FrameSlot frameSlot, TypeDescriptor typeDescriptor) {
         if (typeDescriptor instanceof LongConstantDescriptor)
-            return InitializationNodeFactory.create(frameSlot, ((LongConstantDescriptor)typeDescriptor).getValue());
+            return InitializationNodeFactory.create(frameSlot, (long) ((LongConstantDescriptor)typeDescriptor).getValue());
         else if (typeDescriptor instanceof RealConstantDescriptor)
-            return InitializationNodeFactory.create(frameSlot, ((RealConstantDescriptor)typeDescriptor).getValue());
+            return InitializationNodeFactory.create(frameSlot, (double) ((RealConstantDescriptor)typeDescriptor).getValue());
         else if (typeDescriptor instanceof CharConstantDescriptor)
-            return InitializationNodeFactory.create(frameSlot, ((CharConstantDescriptor)typeDescriptor).getValue());
+            return InitializationNodeFactory.create(frameSlot, (char) ((CharConstantDescriptor)typeDescriptor).getValue());
         else if (typeDescriptor instanceof StringConstantDescriptor)
             return InitializationNodeFactory.create(frameSlot, ((StringConstantDescriptor)typeDescriptor).getValue());
         else if (typeDescriptor instanceof BooleanConstantDescriptor)
-            return InitializationNodeFactory.create(frameSlot, ((BooleanConstantDescriptor)typeDescriptor).getValue());
+            return InitializationNodeFactory.create(frameSlot, (boolean) ((BooleanConstantDescriptor)typeDescriptor).getValue());
         else
             return null;
     }
@@ -121,6 +119,21 @@ class InitializationNodeGenerator {
 
     private StatementNode createSetValue(FrameSlot frameSlot, SetDescriptor descriptor) throws LexicalException {
         return InitializationNodeFactory.create(frameSlot, new SetTypeValue());
+    }
+
+    private StatementNode createRecordValueAndInnerValues(FrameSlot frameSlot, RecordDescriptor descriptor) throws LexicalException {
+        RecordValue record =  new RecordValue(descriptor.getLexicalScope().getFrameDescriptor());
+
+        List<StatementNode> recordInitializers = new ArrayList<>();
+        recordInitializers.add(InitializationNodeFactory.create(frameSlot, record));
+
+        InitializationNodeGenerator innerGen = new InitializationNodeGenerator(descriptor.getLexicalScope().getIdentifiersTable());
+        List<StatementNode> innerRecordInitializationNodes = new ArrayList<>();
+        innerRecordInitializationNodes.addAll(innerGen.generate());
+
+        recordInitializers.add(new RecordInitializationNode(record.getFrame(), innerRecordInitializationNodes));
+
+        return new BlockNode(recordInitializers.toArray(new StatementNode[recordInitializers.size()]));
     }
 
     private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) throws LexicalException {
