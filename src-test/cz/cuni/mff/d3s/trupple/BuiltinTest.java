@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.trupple;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class BuiltinTest extends JUnitTest {
@@ -21,6 +22,60 @@ public class BuiltinTest extends JUnitTest {
                 "end.";
 
         String output = "8true4truetruetruetruetruetrue";
+        test(code, output);
+    }
+
+    @Ignore
+    @Test
+    public void successorTest() {
+        String code = "program main;\n"+
+                "\n"+
+                "var i: integer;\n"+
+                " c: char;\n"+
+                " e: (red, green, blue);\n"+
+                " r: 1..10;\n"+
+                "\n"+
+                "begin\n"+
+                " i:=41;\n"+
+                " c:=\'i\';\n"+
+                " e:=green;\n"+
+                " r:=7;\n"+
+                "\n"+
+                " write(succ(i));\n"+
+                " write(succ(c));\n"+
+                " write(succ(e) = blue);\n"+
+                " write(succ(e) = red);\n"+
+                " write(succ(r));\n"+
+                "end.";
+
+        String output = "42jtruefalse8";
+        test(code, output);
+    }
+
+    @Ignore
+    @Test
+    public void predecessorTest() {
+        String code = "program main;\n"+
+                "\n"+
+                "var i: integer;\n"+
+                " c: char;\n"+
+                " e: (red, green, blue);\n"+
+                " r: 1..10;\n"+
+                "\n"+
+                "begin\n"+
+                " i:=41;\n"+
+                " c:=\'i\';\n"+
+                " e:=green;\n"+
+                " r:=7;\n"+
+                "\n"+
+                " write(pred(i));\n"+
+                " write(pred(c));\n"+
+                " write(pred(e) = red);\n"+
+                " write(pred(e) = blue);\n"+
+                " write(succ(r));\n"+
+                "end.";
+
+        String output = "40htruefalse6";
         test(code, output);
     }
 
