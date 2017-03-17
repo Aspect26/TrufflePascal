@@ -4,7 +4,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
-import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;

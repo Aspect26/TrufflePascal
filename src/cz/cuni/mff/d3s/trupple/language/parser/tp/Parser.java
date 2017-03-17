@@ -2,6 +2,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser.tp;
 
 import com.oracle.truffle.api.nodes.RootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.AccessRouteNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.parser.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;

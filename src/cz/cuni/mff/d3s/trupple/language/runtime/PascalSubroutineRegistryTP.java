@@ -1,9 +1,9 @@
 package cz.cuni.mff.d3s.trupple.language.runtime;
 
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomBuiltinNodeFactory;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.RandomizeBuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ReadlnBuiltinNodeFactory;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.WritelnBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.ReadlnBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.WritelnBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomizeBuiltinNode;
 
 public class PascalSubroutineRegistryTP extends PascalSubroutineRegistry {
 

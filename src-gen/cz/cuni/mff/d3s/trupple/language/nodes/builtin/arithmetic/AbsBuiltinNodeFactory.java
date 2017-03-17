@@ -1,5 +1,5 @@
 // CheckStyle: start generated
-package cz.cuni.mff.d3s.trupple.language.nodes.builtin;
+package cz.cuni.mff.d3s.trupple.language.nodes.builtin.arithmetic;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
@@ -13,24 +13,23 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
-@GeneratedBy(PredBuiltinNode.class)
+@GeneratedBy(AbsBuiltinNode.class)
 @SuppressWarnings({"unchecked", "rawtypes"})
-public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode> {
+public final class AbsBuiltinNodeFactory implements NodeFactory<AbsBuiltinNode> {
 
-    private static PredBuiltinNodeFactory instance;
+    private static AbsBuiltinNodeFactory instance;
 
-    private PredBuiltinNodeFactory() {
+    private AbsBuiltinNodeFactory() {
     }
 
     @Override
-    public Class<PredBuiltinNode> getNodeClass() {
-        return PredBuiltinNode.class;
+    public Class<AbsBuiltinNode> getNodeClass() {
+        return AbsBuiltinNode.class;
     }
 
     @Override
@@ -44,7 +43,7 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
     }
 
     @Override
-    public PredBuiltinNode createNode(Object... arguments) {
+    public AbsBuiltinNode createNode(Object... arguments) {
         if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
             return create((PascalContext) arguments[0], (ExpressionNode) arguments[1]);
         } else {
@@ -52,25 +51,25 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
         }
     }
 
-    public static NodeFactory<PredBuiltinNode> getInstance() {
+    public static NodeFactory<AbsBuiltinNode> getInstance() {
         if (instance == null) {
-            instance = new PredBuiltinNodeFactory();
+            instance = new AbsBuiltinNodeFactory();
         }
         return instance;
     }
 
-    public static PredBuiltinNode create(PascalContext context, ExpressionNode argument) {
-        return new PredBuiltinNodeGen(context, argument);
+    public static AbsBuiltinNode create(PascalContext context, ExpressionNode argument) {
+        return new AbsBuiltinNodeGen(context, argument);
     }
 
-    @GeneratedBy(PredBuiltinNode.class)
-    public static final class PredBuiltinNodeGen extends PredBuiltinNode implements SpecializedNode {
+    @GeneratedBy(AbsBuiltinNode.class)
+    public static final class AbsBuiltinNodeGen extends AbsBuiltinNode implements SpecializedNode {
 
         @Child private ExpressionNode argument_;
         @CompilationFinal private Class<?> argumentType_;
         @Child private BaseNode_ specialization_;
 
-        private PredBuiltinNodeGen(PascalContext context, ExpressionNode argument) {
+        private AbsBuiltinNodeGen(PascalContext context, ExpressionNode argument) {
             super(context);
             this.argument_ = argument;
             this.specialization_ = UninitializedNode_.create(this);
@@ -93,16 +92,6 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
         }
 
         @Override
-        public boolean executeBoolean(VirtualFrame frameValue) throws UnexpectedResultException {
-            return specialization_.executeBoolean(frameValue);
-        }
-
-        @Override
-        public char executeChar(VirtualFrame frameValue) throws UnexpectedResultException {
-            return specialization_.executeChar(frameValue);
-        }
-
-        @Override
         public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
             return specialization_.executeLong(frameValue);
         }
@@ -117,19 +106,19 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
             return SpecializationNode.updateRoot(super.deepCopy());
         }
 
-        @GeneratedBy(PredBuiltinNode.class)
+        @GeneratedBy(AbsBuiltinNode.class)
         private abstract static class BaseNode_ extends SpecializationNode {
 
-            @CompilationFinal protected PredBuiltinNodeGen root;
+            @CompilationFinal protected AbsBuiltinNodeGen root;
 
-            BaseNode_(PredBuiltinNodeGen root, int index) {
+            BaseNode_(AbsBuiltinNodeGen root, int index) {
                 super(index);
                 this.root = root;
             }
 
             @Override
             protected final void setRoot(Node root) {
-                this.root = (PredBuiltinNodeGen) root;
+                this.root = (AbsBuiltinNodeGen) root;
             }
 
             @Override
@@ -154,14 +143,6 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
                 return;
             }
 
-            public boolean executeBoolean(VirtualFrame frameValue) throws UnexpectedResultException {
-                return PascalTypesGen.expectBoolean(execute(frameValue));
-            }
-
-            public char executeChar(VirtualFrame frameValue) throws UnexpectedResultException {
-                return PascalTypesGen.expectCharacter(execute(frameValue));
-            }
-
             public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
                 return PascalTypesGen.expectLong(execute(frameValue));
             }
@@ -169,16 +150,10 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
             @Override
             protected final SpecializationNode createNext(Frame frameValue, Object argumentValue) {
                 if (argumentValue instanceof Long) {
-                    return Pred0Node_.create(root);
+                    return IntegerAbsoluteValueNode_.create(root);
                 }
-                if (argumentValue instanceof Character) {
-                    return Pred1Node_.create(root);
-                }
-                if (argumentValue instanceof Boolean) {
-                    return Pred2Node_.create(root);
-                }
-                if (argumentValue instanceof EnumValue) {
-                    return Pred3Node_.create(root);
+                if (argumentValue instanceof Double) {
+                    return UbleAbsoluteValueNode_.create(root);
                 }
                 return null;
             }
@@ -195,22 +170,14 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
             protected final Object executeArgument_(Frame frameValue) {
                 Class<?> argumentType_ = root.argumentType_;
                 try {
-                    if (argumentType_ == boolean.class) {
-                        return root.argument_.executeBoolean((VirtualFrame) frameValue);
-                    } else if (argumentType_ == char.class) {
-                        return root.argument_.executeChar((VirtualFrame) frameValue);
-                    } else if (argumentType_ == long.class) {
+                    if (argumentType_ == long.class) {
                         return root.argument_.executeLong((VirtualFrame) frameValue);
                     } else if (argumentType_ == null) {
                         CompilerDirectives.transferToInterpreterAndInvalidate();
                         Class<?> _type = Object.class;
                         try {
                             Object _value = root.argument_.executeGeneric((VirtualFrame) frameValue);
-                            if (_value instanceof Boolean) {
-                                _type = boolean.class;
-                            } else if (_value instanceof Character) {
-                                _type = char.class;
-                            } else if (_value instanceof Long) {
+                            if (_value instanceof Long) {
                                 _type = long.class;
                             } else {
                                 _type = Object.class;
@@ -229,10 +196,10 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
             }
 
         }
-        @GeneratedBy(PredBuiltinNode.class)
+        @GeneratedBy(AbsBuiltinNode.class)
         private static final class UninitializedNode_ extends BaseNode_ {
 
-            UninitializedNode_(PredBuiltinNodeGen root) {
+            UninitializedNode_(AbsBuiltinNodeGen root) {
                 super(root, 2147483647);
             }
 
@@ -241,15 +208,15 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
                 return uninitialized(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(PredBuiltinNodeGen root) {
+            static BaseNode_ create(AbsBuiltinNodeGen root) {
                 return new UninitializedNode_(root);
             }
 
         }
-        @GeneratedBy(PredBuiltinNode.class)
+        @GeneratedBy(AbsBuiltinNode.class)
         private static final class PolymorphicNode_ extends BaseNode_ {
 
-            PolymorphicNode_(PredBuiltinNodeGen root) {
+            PolymorphicNode_(AbsBuiltinNodeGen root) {
                 super(root, 0);
             }
 
@@ -263,15 +230,15 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
                 return getNext().execute_(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(PredBuiltinNodeGen root) {
+            static BaseNode_ create(AbsBuiltinNodeGen root) {
                 return new PolymorphicNode_(root);
             }
 
         }
-        @GeneratedBy(methodName = "pred(long)", value = PredBuiltinNode.class)
-        private static final class Pred0Node_ extends BaseNode_ {
+        @GeneratedBy(methodName = "integerAbsoluteValue(long)", value = AbsBuiltinNode.class)
+        private static final class IntegerAbsoluteValueNode_ extends BaseNode_ {
 
-            Pred0Node_(PredBuiltinNodeGen root) {
+            IntegerAbsoluteValueNode_(AbsBuiltinNodeGen root) {
                 super(root, 1);
             }
 
@@ -292,123 +259,41 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
                 } catch (UnexpectedResultException ex) {
                     return PascalTypesGen.expectLong(getNext().execute_(frameValue, ex.getResult()));
                 }
-                return root.pred(argumentValue_);
+                return root.integerAbsoluteValue(argumentValue_);
             }
 
             @Override
             public Object execute_(VirtualFrame frameValue, Object argumentValue) {
                 if (argumentValue instanceof Long) {
                     long argumentValue_ = (long) argumentValue;
-                    return root.pred(argumentValue_);
+                    return root.integerAbsoluteValue(argumentValue_);
                 }
                 return getNext().execute_(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(PredBuiltinNodeGen root) {
-                return new Pred0Node_(root);
+            static BaseNode_ create(AbsBuiltinNodeGen root) {
+                return new IntegerAbsoluteValueNode_(root);
             }
 
         }
-        @GeneratedBy(methodName = "pred(char)", value = PredBuiltinNode.class)
-        private static final class Pred1Node_ extends BaseNode_ {
+        @GeneratedBy(methodName = "doubleAbsoluteValue(double)", value = AbsBuiltinNode.class)
+        private static final class UbleAbsoluteValueNode_ extends BaseNode_ {
 
-            Pred1Node_(PredBuiltinNodeGen root) {
+            UbleAbsoluteValueNode_(AbsBuiltinNodeGen root) {
                 super(root, 2);
             }
 
             @Override
-            public Object execute(VirtualFrame frameValue) {
-                try {
-                    return executeChar(frameValue);
-                } catch (UnexpectedResultException ex) {
-                    return ex.getResult();
-                }
-            }
-
-            @Override
-            public char executeChar(VirtualFrame frameValue) throws UnexpectedResultException {
-                char argumentValue_;
-                try {
-                    argumentValue_ = root.argument_.executeChar(frameValue);
-                } catch (UnexpectedResultException ex) {
-                    return PascalTypesGen.expectCharacter(getNext().execute_(frameValue, ex.getResult()));
-                }
-                return root.pred(argumentValue_);
-            }
-
-            @Override
             public Object execute_(VirtualFrame frameValue, Object argumentValue) {
-                if (argumentValue instanceof Character) {
-                    char argumentValue_ = (char) argumentValue;
-                    return root.pred(argumentValue_);
+                if (argumentValue instanceof Double) {
+                    double argumentValue_ = (double) argumentValue;
+                    return root.doubleAbsoluteValue(argumentValue_);
                 }
                 return getNext().execute_(frameValue, argumentValue);
             }
 
-            static BaseNode_ create(PredBuiltinNodeGen root) {
-                return new Pred1Node_(root);
-            }
-
-        }
-        @GeneratedBy(methodName = "pred(boolean)", value = PredBuiltinNode.class)
-        private static final class Pred2Node_ extends BaseNode_ {
-
-            Pred2Node_(PredBuiltinNodeGen root) {
-                super(root, 3);
-            }
-
-            @Override
-            public Object execute(VirtualFrame frameValue) {
-                try {
-                    return executeBoolean(frameValue);
-                } catch (UnexpectedResultException ex) {
-                    return ex.getResult();
-                }
-            }
-
-            @Override
-            public boolean executeBoolean(VirtualFrame frameValue) throws UnexpectedResultException {
-                boolean argumentValue_;
-                try {
-                    argumentValue_ = root.argument_.executeBoolean(frameValue);
-                } catch (UnexpectedResultException ex) {
-                    return PascalTypesGen.expectBoolean(getNext().execute_(frameValue, ex.getResult()));
-                }
-                return root.pred(argumentValue_);
-            }
-
-            @Override
-            public Object execute_(VirtualFrame frameValue, Object argumentValue) {
-                if (argumentValue instanceof Boolean) {
-                    boolean argumentValue_ = (boolean) argumentValue;
-                    return root.pred(argumentValue_);
-                }
-                return getNext().execute_(frameValue, argumentValue);
-            }
-
-            static BaseNode_ create(PredBuiltinNodeGen root) {
-                return new Pred2Node_(root);
-            }
-
-        }
-        @GeneratedBy(methodName = "pred(EnumValue)", value = PredBuiltinNode.class)
-        private static final class Pred3Node_ extends BaseNode_ {
-
-            Pred3Node_(PredBuiltinNodeGen root) {
-                super(root, 4);
-            }
-
-            @Override
-            public Object execute_(VirtualFrame frameValue, Object argumentValue) {
-                if (argumentValue instanceof EnumValue) {
-                    EnumValue argumentValue_ = (EnumValue) argumentValue;
-                    return root.pred(argumentValue_);
-                }
-                return getNext().execute_(frameValue, argumentValue);
-            }
-
-            static BaseNode_ create(PredBuiltinNodeGen root) {
-                return new Pred3Node_(root);
+            static BaseNode_ create(AbsBuiltinNodeGen root) {
+                return new UbleAbsoluteValueNode_(root);
             }
 
         }

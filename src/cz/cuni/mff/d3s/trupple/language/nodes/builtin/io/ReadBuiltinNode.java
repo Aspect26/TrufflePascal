@@ -1,24 +1,25 @@
-package cz.cuni.mff.d3s.trupple.language.nodes.builtin;
+package cz.cuni.mff.d3s.trupple.language.nodes.builtin.io;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
 
 import com.oracle.truffle.api.dsl.NodeChild;
-import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.CantReadInputException;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 @NodeInfo(shortName = "read")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class ReadBuiltinNode extends BuiltinNode {
 
-    protected static final String NEW_LINE = System.getProperty("line.separator");
+    private static final String NEW_LINE = System.getProperty("line.separator");
 
     public ReadBuiltinNode(PascalContext context) {
         super(context);
@@ -46,7 +47,7 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
 	    try {
 	        return this.readString();
         } catch (IOException e) {
-	        throw new PascalRuntimeException.CantReadInputException(e);
+	        throw new CantReadInputException(e);
         }
     }
 
@@ -73,7 +74,7 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
                     throw new PascalRuntimeException("Wrong value passed to read.");
             }
         } catch (IOException e) {
-	        throw new PascalRuntimeException.CantReadInputException(e);
+	        throw new CantReadInputException(e);
         }
     }
 

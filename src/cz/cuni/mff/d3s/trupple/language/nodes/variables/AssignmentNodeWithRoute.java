@@ -6,7 +6,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import cz.cuni.mff.d3s.trupple.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.RouteTarget;
