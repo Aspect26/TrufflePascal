@@ -299,7 +299,7 @@ public class Scanner {
 		literals.put("file", new Integer(19));
 		literals.put("record", new Integer(20));
 		literals.put("end", new Integer(21));
-		literals.put("case", new Integer(23));
+		literals.put("case", new Integer(22));
 		literals.put("const", new Integer(25));
 		literals.put("var", new Integer(28));
 		literals.put("procedure", new Integer(29));
@@ -556,9 +556,9 @@ public class Scanner {
 				case 32:
 					{t.kind = 57; break loop;}
 				case 33:
-					recEnd = pos; recKind = 22;
+					recEnd = pos; recKind = 23;
 					if (ch == '=') {AddCh(); state = 26; break;}
-					else {t.kind = 22; break loop;}
+					else {t.kind = 23; break loop;}
 				case 34:
 					recEnd = pos; recKind = 32;
 					if (ch == '.') {AddCh(); state = 23; break;}
