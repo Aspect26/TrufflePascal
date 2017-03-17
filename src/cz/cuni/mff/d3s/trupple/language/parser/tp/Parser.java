@@ -207,17 +207,14 @@ public class Parser implements IParser {
 	TypeDescriptor  Type() {
 		TypeDescriptor  typeDescriptor;
 		typeDescriptor = null; 
-		switch (la.kind) {
-		case 1: {
-			Get();
+		if (!isSubrange()) {
+			Expect(1);
 			typeDescriptor = factory.getTypeDescriptor(t); 
-			break;
-		}
-		case 17: {
+		} else if (StartOf(1)) {
+			typeDescriptor = SubrangeType();
+		} else if (la.kind == 17) {
 			typeDescriptor = EnumDefinition();
-			break;
-		}
-		case 13: case 14: {
+		} else if (la.kind == 13 || la.kind == 14) {
 			List<OrdinalDescriptor> ordinalDimensions  = ArrayDefinition();
 			while (continuesArray()) {
 				Expect(11);
@@ -227,26 +224,26 @@ public class Parser implements IParser {
 			Expect(11);
 			Expect(1);
 			typeDescriptor = factory.createArray(ordinalDimensions, t); 
-			break;
-		}
-		case 12: {
+		} else if (la.kind == 12) {
 			Get();
 			Expect(11);
 			OrdinalDescriptor ordinal = Ordinal();
 			typeDescriptor = factory.createSetType(ordinal); 
-			break;
-		}
-		case 19: {
+		} else if (la.kind == 19) {
 			typeDescriptor = FileType();
-			break;
-		}
-		case 20: {
+		} else if (la.kind == 20) {
 			typeDescriptor = RecordType();
-			break;
-		}
-		default: SynErr(68); break;
-		}
+		} else SynErr(68);
 		return typeDescriptor;
+	}
+
+	OrdinalDescriptor  SubrangeType() {
+		OrdinalDescriptor  ordinal;
+		ConstantDescriptor lowerBound = Constant();
+		Expect(24);
+		ConstantDescriptor upperBound = Constant();
+		ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); 
+		return ordinal;
 	}
 
 	TypeDescriptor  EnumDefinition() {
@@ -290,7 +287,7 @@ public class Parser implements IParser {
 		ordinal = null; 
 		if (isSubrange()) {
 			ordinal = SubrangeType();
-		} else if (StartOf(1)) {
+		} else if (StartOf(2)) {
 			TypeDescriptor typeDescriptor = Type();
 			ordinal = factory.castTypeToOrdinalType(typeDescriptor); 
 		} else SynErr(69);
@@ -415,15 +412,6 @@ public class Parser implements IParser {
 		return constant;
 	}
 
-	OrdinalDescriptor  SubrangeType() {
-		OrdinalDescriptor  ordinal;
-		ConstantDescriptor lowerBound = Constant();
-		Expect(24);
-		ConstantDescriptor upperBound = Constant();
-		ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); 
-		return ordinal;
-	}
-
 	void ConstantDefinition() {
 		Expect(1);
 		Token identifier = t; 
@@ -498,7 +486,7 @@ public class Parser implements IParser {
 		if (la.kind == 30) {
 			Get();
 			factory.forwardProcedure(identifierToken, formalParameters); 
-		} else if (StartOf(2)) {
+		} else if (StartOf(3)) {
 			factory.startProcedureImplementation(identifierToken, formalParameters); 
 			Declarations();
 			StatementNode bodyNode = Block();
@@ -521,7 +509,7 @@ public class Parser implements IParser {
 		if (la.kind == 30) {
 			Get();
 			factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); 
-		} else if (StartOf(2)) {
+		} else if (StartOf(3)) {
 			factory.startFunctionImplementation(identifierToken, formalParameters, returnTypeToken); 
 			Declarations();
 			StatementNode bodyNode = Block();
@@ -549,7 +537,7 @@ public class Parser implements IParser {
 		StatementNode  blockNode;
 		Expect(33);
 		List<StatementNode> bodyNodes = new ArrayList<>(); 
-		if (StartOf(3)) {
+		if (StartOf(4)) {
 			StatementSequence(bodyNodes);
 		}
 		Expect(21);
@@ -715,7 +703,7 @@ public class Parser implements IParser {
 		statement = null; 
 		Expect(1);
 		Token identifierToken = t; 
-		if (StartOf(4)) {
+		if (StartOf(5)) {
 			statement = factory.createSubroutineCall(identifierToken, new ArrayList<>()); 
 		} else if (la.kind == 17) {
 			statement = SubroutineCall(identifierToken);
@@ -732,7 +720,7 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		Expect(17);
 		List<ExpressionNode> parameters = new ArrayList<>(); 
-		if (StartOf(5)) {
+		if (StartOf(6)) {
 			parameters = ActualParameters(identifierToken);
 		}
 		Expect(18);
@@ -854,7 +842,7 @@ public class Parser implements IParser {
 			Token op = t; 
 			ExpressionNode right = SignedLogicFactor();
 			expression = factory.createUnaryExpression(op, right); 
-		} else if (StartOf(6)) {
+		} else if (StartOf(7)) {
 			expression = LogicFactor();
 		} else SynErr(79);
 		return expression;
@@ -863,7 +851,7 @@ public class Parser implements IParser {
 	ExpressionNode  LogicFactor() {
 		ExpressionNode  expression;
 		expression = Arithmetic();
-		if (StartOf(7)) {
+		if (StartOf(8)) {
 			switch (la.kind) {
 			case 49: {
 				Get();
@@ -924,7 +912,7 @@ public class Parser implements IParser {
 	ExpressionNode  Term() {
 		ExpressionNode  expression;
 		expression = SignedFactor();
-		while (StartOf(8)) {
+		while (StartOf(9)) {
 			if (la.kind == 56) {
 				Get();
 			} else if (la.kind == 57) {
@@ -953,7 +941,7 @@ public class Parser implements IParser {
 			Token unOp = t; 
 			expression = SignedFactor();
 			expression = factory.createUnaryExpression(unOp, expression); 
-		} else if (StartOf(9)) {
+		} else if (StartOf(10)) {
 			expression = Factor();
 		} else SynErr(80);
 		return expression;
@@ -1008,7 +996,7 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		Expect(1);
 		Token identifierToken = t; expression = null; 
-		if (StartOf(10)) {
+		if (StartOf(11)) {
 			expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
 		} else if (la.kind == 15 || la.kind == 17 || la.kind == 32) {
 			expression = InnerIdentifierAccess(identifierToken);
@@ -1022,7 +1010,7 @@ public class Parser implements IParser {
 		Expect(15);
 		if (la.kind == 16) {
 			expression = factory.createSetConstructorNode(new ArrayList<>()); 
-		} else if (StartOf(5)) {
+		} else if (StartOf(6)) {
 			List<ExpressionNode> valueNodes = new ArrayList<ExpressionNode>(); 
 			ExpressionNode valueNode = Expression();
 			valueNodes.add(valueNode); 
@@ -1069,7 +1057,7 @@ public class Parser implements IParser {
 		if (factory.shouldBeReference(subroutineToken, currentParameterIndex)) {
 			Expect(1);
 			parameter = factory.createReferenceNode(t); 
-		} else if (StartOf(5)) {
+		} else if (StartOf(6)) {
 			parameter = Expression();
 		} else SynErr(85);
 		return parameter;
@@ -1084,7 +1072,7 @@ public class Parser implements IParser {
 
 	void InterfaceSection() {
 		Expect(63);
-		while (StartOf(11)) {
+		while (StartOf(12)) {
 			if (la.kind == 29) {
 				ProcedureHeading();
 			} else if (la.kind == 31) {
@@ -1099,7 +1087,7 @@ public class Parser implements IParser {
 
 	void ImplementationSection() {
 		Expect(64);
-		while (StartOf(11)) {
+		while (StartOf(12)) {
 			if (la.kind == 29 || la.kind == 31) {
 				UnitSubroutineImplementation();
 			} else if (la.kind == 28) {
@@ -1200,7 +1188,8 @@ public class Parser implements IParser {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_T,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
