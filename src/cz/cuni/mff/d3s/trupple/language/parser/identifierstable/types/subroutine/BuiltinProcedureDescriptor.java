@@ -15,6 +15,7 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
         public boolean isReferenceParameter(int parameterIndex) {
             return false;
         }
+
     }
 
     public static class FullReferenceParameterBuiltin extends BuiltinProcedureDescriptor {
@@ -23,6 +24,20 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
         public boolean isReferenceParameter(int index) {
             return true;
         }
+
+    }
+
+    public static class OneArgumentBuiltin extends BuiltinProcedureDescriptor {
+
+        public boolean hasParameters() {
+            return true;
+        }
+
+        @Override
+        public boolean isReferenceParameter(int parameterIndex) {
+            return false;
+        }
+
     }
 
 }
