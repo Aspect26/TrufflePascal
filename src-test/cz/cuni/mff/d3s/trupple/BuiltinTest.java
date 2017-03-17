@@ -26,6 +26,25 @@ public class BuiltinTest extends JUnitTest {
     }
 
     @Test
+    public void transferTest() {
+        String code = "program main;\n"+
+                "\n"+
+                "begin\n"+
+                " write(round(0.6));\n"+
+                " write(round(0.3));\n"+
+                " write(round(-1.3));\n"+
+                " write(round(-1.8));\n"+
+                " write(trunc(0.3));\n"+
+                " write(trunc(0.8));\n"+
+                " write(trunc(-1.3));\n"+
+                " write(trunc(-1.8));\n"+
+                "end.";
+
+        String output = "10-1-200-1-1";
+        test(code, output);
+    }
+
+    @Test
     public void successorTest() {
         String code = "program main;\n"+
                 "\n"+

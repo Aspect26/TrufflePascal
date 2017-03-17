@@ -60,6 +60,8 @@ public class PascalSubroutineRegistry {
         installBuiltinOneArgument(LnBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(SqrtBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(ArctanBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(TruncBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(RoundBuiltinNodeFactory.getInstance());
 	}
 
 	void installBuiltinNoArgument(BuiltinNode builtinNode) {
