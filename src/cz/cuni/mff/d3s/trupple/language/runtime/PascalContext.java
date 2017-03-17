@@ -27,7 +27,7 @@ public final class PascalContext extends ExecutionContext {
 		this.output = output;
 		this.outerContext = outerContext;
 
-		this.random = new Random(165132464);
+		this.random = new Random(26270);
 		this.functionRegistry = (usingTPExtension)? new PascalSubroutineRegistryTP(this,true) :
 				new PascalSubroutineRegistry(this, true);
 	}
@@ -44,10 +44,6 @@ public final class PascalContext extends ExecutionContext {
 	
 	public long getRandom(long upperBound) {
 		return Math.abs(random.nextLong()) % upperBound;
-	}
-	
-	public long getRandom() {
-		return random.nextLong();
 	}
 	
 	public void randomize() {

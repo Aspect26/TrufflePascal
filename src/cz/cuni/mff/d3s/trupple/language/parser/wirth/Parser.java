@@ -181,17 +181,14 @@ public class Parser implements IParser {
 	TypeDescriptor  Type() {
 		TypeDescriptor  typeDescriptor;
 		typeDescriptor = null; 
-		switch (la.kind) {
-		case 1: {
-			Get();
+		if (!isSubrange()) {
+			Expect(1);
 			typeDescriptor = factory.getTypeDescriptor(t); 
-			break;
-		}
-		case 16: {
+		} else if (StartOf(1)) {
+			typeDescriptor = SubrangeType();
+		} else if (la.kind == 16) {
 			typeDescriptor = EnumDefinition();
-			break;
-		}
-		case 11: case 12: {
+		} else if (la.kind == 11 || la.kind == 12) {
 			List<OrdinalDescriptor> ordinalDimensions  = ArrayDefinition();
 			while (continuesArray()) {
 				Expect(9);
@@ -201,26 +198,26 @@ public class Parser implements IParser {
 			Expect(9);
 			Expect(1);
 			typeDescriptor = factory.createArray(ordinalDimensions, t); 
-			break;
-		}
-		case 10: {
+		} else if (la.kind == 10) {
 			Get();
 			Expect(9);
 			OrdinalDescriptor ordinal = Ordinal();
 			typeDescriptor = factory.createSetType(ordinal); 
-			break;
-		}
-		case 18: {
+		} else if (la.kind == 18) {
 			typeDescriptor = FileType();
-			break;
-		}
-		case 19: {
+		} else if (la.kind == 19) {
 			typeDescriptor = RecordType();
-			break;
-		}
-		default: SynErr(61); break;
-		}
+		} else SynErr(61);
 		return typeDescriptor;
+	}
+
+	OrdinalDescriptor  SubrangeType() {
+		OrdinalDescriptor  ordinal;
+		ConstantDescriptor lowerBound = Constant();
+		Expect(23);
+		ConstantDescriptor upperBound = Constant();
+		ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); 
+		return ordinal;
 	}
 
 	TypeDescriptor  EnumDefinition() {
@@ -264,7 +261,7 @@ public class Parser implements IParser {
 		ordinal = null; 
 		if (isSubrange()) {
 			ordinal = SubrangeType();
-		} else if (StartOf(1)) {
+		} else if (StartOf(2)) {
 			TypeDescriptor typeDescriptor = Type();
 			ordinal = factory.castTypeToOrdinalType(typeDescriptor); 
 		} else SynErr(62);
@@ -386,15 +383,6 @@ public class Parser implements IParser {
 		return constant;
 	}
 
-	OrdinalDescriptor  SubrangeType() {
-		OrdinalDescriptor  ordinal;
-		ConstantDescriptor lowerBound = Constant();
-		Expect(23);
-		ConstantDescriptor upperBound = Constant();
-		ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); 
-		return ordinal;
-	}
-
 	void ConstantDefinition() {
 		Expect(1);
 		Token identifier = t; 
@@ -456,7 +444,7 @@ public class Parser implements IParser {
 		if (la.kind == 29) {
 			Get();
 			factory.forwardProcedure(identifierToken, formalParameters); 
-		} else if (StartOf(2)) {
+		} else if (StartOf(3)) {
 			factory.startProcedureImplementation(identifierToken, formalParameters); 
 			Declarations();
 			StatementNode bodyNode = Block();
@@ -479,7 +467,7 @@ public class Parser implements IParser {
 		if (la.kind == 29) {
 			Get();
 			factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); 
-		} else if (StartOf(2)) {
+		} else if (StartOf(3)) {
 			factory.startFunctionImplementation(identifierToken, formalParameters, returnTypeToken); 
 			Declarations();
 			StatementNode bodyNode = Block();
@@ -507,7 +495,7 @@ public class Parser implements IParser {
 		StatementNode  blockNode;
 		Expect(32);
 		List<StatementNode> bodyNodes = new ArrayList<>(); 
-		if (StartOf(3)) {
+		if (StartOf(4)) {
 			StatementSequence(bodyNodes);
 		}
 		Expect(20);
@@ -663,7 +651,7 @@ public class Parser implements IParser {
 		statement = null; 
 		Expect(1);
 		Token identifierToken = t; 
-		if (StartOf(4)) {
+		if (StartOf(5)) {
 			statement = factory.createSubroutineCall(identifierToken, new ArrayList<>()); 
 		} else if (la.kind == 16) {
 			statement = SubroutineCall(identifierToken);
@@ -680,7 +668,7 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		Expect(16);
 		List<ExpressionNode> parameters = new ArrayList<>(); 
-		if (StartOf(5)) {
+		if (StartOf(6)) {
 			parameters = ActualParameters(identifierToken);
 		}
 		Expect(17);
@@ -802,7 +790,7 @@ public class Parser implements IParser {
 			Token op = t; 
 			ExpressionNode right = SignedLogicFactor();
 			expression = factory.createUnaryExpression(op, right); 
-		} else if (StartOf(6)) {
+		} else if (StartOf(7)) {
 			expression = LogicFactor();
 		} else SynErr(71);
 		return expression;
@@ -811,7 +799,7 @@ public class Parser implements IParser {
 	ExpressionNode  LogicFactor() {
 		ExpressionNode  expression;
 		expression = Arithmetic();
-		if (StartOf(7)) {
+		if (StartOf(8)) {
 			switch (la.kind) {
 			case 47: {
 				Get();
@@ -868,7 +856,7 @@ public class Parser implements IParser {
 	ExpressionNode  Term() {
 		ExpressionNode  expression;
 		expression = SignedFactor();
-		while (StartOf(8)) {
+		while (StartOf(9)) {
 			if (la.kind == 53) {
 				Get();
 			} else if (la.kind == 54) {
@@ -897,7 +885,7 @@ public class Parser implements IParser {
 			Token unOp = t; 
 			expression = SignedFactor();
 			expression = factory.createUnaryExpression(unOp, expression); 
-		} else if (StartOf(9)) {
+		} else if (StartOf(10)) {
 			expression = Factor();
 		} else SynErr(72);
 		return expression;
@@ -952,7 +940,7 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		Expect(1);
 		Token identifierToken = t; expression = null; 
-		if (StartOf(10)) {
+		if (StartOf(11)) {
 			expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
 		} else if (la.kind == 13 || la.kind == 16 || la.kind == 31) {
 			expression = InnerIdentifierAccess(identifierToken);
@@ -979,7 +967,7 @@ public class Parser implements IParser {
 		Expect(13);
 		if (la.kind == 15) {
 			expression = factory.createSetConstructorNode(new ArrayList<>()); 
-		} else if (StartOf(5)) {
+		} else if (StartOf(6)) {
 			List<ExpressionNode> valueNodes = new ArrayList<ExpressionNode>(); 
 			ExpressionNode valueNode = Expression();
 			valueNodes.add(valueNode); 
@@ -1026,7 +1014,7 @@ public class Parser implements IParser {
 		if (factory.shouldBeReference(subroutineToken, currentParameterIndex)) {
 			Expect(1);
 			parameter = factory.createReferenceNode(t); 
-		} else if (StartOf(5)) {
+		} else if (StartOf(6)) {
 			parameter = Expression();
 		} else SynErr(78);
 		return parameter;
@@ -1046,7 +1034,8 @@ public class Parser implements IParser {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
-		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
+		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _T,_x,_T,_T, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _T,_x,_T,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_T,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_T, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x},

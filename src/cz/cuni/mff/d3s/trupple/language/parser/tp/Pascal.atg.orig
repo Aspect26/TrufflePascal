@@ -19,7 +19,7 @@ TOKENS
 identifier = letter {letter | digit}.
 stringLiteral = "'" { stringChar } "'".
 integerLiteral = "0" | nonZeroDigit { digit }.
-doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] ("0" | nonZeroDigit { digit }) | ("0" | nonZeroDigit { digit }) "." ("0" | nonZeroDigit { digit }) ["e" ["-"|"+"] ("0" | nonZeroDigit { digit })].
+doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] { digit } | ("0" | nonZeroDigit { digit }) "." digit { digit } ["e" ["-"|"+"] { digit }].
 
 PRAGMAS
 
@@ -155,16 +155,16 @@ Type<out TypeDescriptor contentType>            (. fileDescriptor = factory.crea
 
 RecordType<out TypeDescriptor typeDescriptor>
 =
-"record"
+"record"                                        (. factory.startRecord(); .)
 RecordFieldList<out typeDescriptor>
-"end"
+"end"                                           (. factory.finishRecord(); .)
 .
 
 
 RecordFieldList<out TypeDescriptor typeDescriptor>
-=                                               (. Map<String, TypeDescriptor> variables = new HashMap<>(); .)
+=
 (
-    RecordFixedPart<out variables>
+    RecordFixedPart
     [
         IF(recordVariantPartStarts())
         ";"
@@ -173,27 +173,24 @@ RecordFieldList<out TypeDescriptor typeDescriptor>
 |
     RecordVariantPart
 )
-[ ";" ]                                         (. typeDescriptor = factory.createRecordType(variables); .)
+[ ";" ]                                         (. typeDescriptor = factory.createRecordType(); .)
 .
 
 
-RecordFixedPart<. out Map<String, TypeDescriptor> declaredVariables .>
+RecordFixedPart
 =
-RecordFixedSection<out declaredVariables>
+RecordFixedSection
 {
-    IF(recordFixedPartContinues())              (. Map<String, TypeDescriptor> additionalVariables; .)
+    IF(recordFixedPartContinues())
     ";"
-    RecordFixedSection<out additionalVariables>
-                                                (. factory.appendVariablesMap(declaredVariables, additionalVariables); .)
+    RecordFixedSection
 }
 .
 
 
-RecordFixedSection<. out Map<String, TypeDescriptor> declaredVariables .>
+RecordFixedSection
 =
-IdentifiersList<. out List<String> identifiers .>
-":"
-Type<out TypeDescriptor type>                   (. declaredVariables = factory.createVariables(identifiers, type); .)
+VariableLineDeclaration
 .
 
 
@@ -467,31 +464,52 @@ Statement<out StatementNode statement>
 .
 
 
-
 IdentifierBeginningStatement<out StatementNode statement>
 =                                               (. statement = null; .)
 identifier                                      (. Token identifierToken = t; .)
 (
-                                                (. statement = factory.createSubroutineCall(identifierToken, new ArrayList<ExpressionNode>()); .)
+                                                (. statement = factory.createSubroutineCall(identifierToken, new ArrayList<>()); .)
 |
     SubroutineCall<out statement, identifierToken>
 |
-    AssignmentAfterIdentifierPart<out statement, identifierToken>
+    InnerAccessRoute<. out List<AccessRouteNode> accessRoute .>
+    ":="
+    Expression<out ExpressionNode value>        (. statement = factory.createAssignmentWithRoute(identifierToken, accessRoute, value); .)
 )
 .
 
 
-
-AssignmentAfterIdentifierPart<out StatementNode statement, Token identifierToken>
-=
-                                                (. List<ExpressionNode> indexNodes = null; .)
-    [
-        ArrayIndex<out indexNodes>
-    ]
-    ":="
-    Expression<out ExpressionNode value>        (. statement = (indexNodes == null)? factory.createAssignment(identifierToken, value) : factory.createArrayIndexAssignment(identifierToken, indexNodes, value); .)
+InnerAccessRoute<. out List<AccessRouteNode> accessRoute .>
+=                                               (. accessRoute = new ArrayList<>(); .)
+{
+    InnerAccessRouteElement<out AccessRouteNode element>
+                                                (. accessRoute.add(element); .)
+}
 .
 
+
+InnerAccessRouteNonEmpty<. out List<AccessRouteNode> accessRoute .>
+=                                               (. accessRoute = new ArrayList<>(); .)
+InnerAccessRouteElement<out AccessRouteNode element>
+                                                (. accessRoute.add(element); .)
+{
+    InnerAccessRouteElement<out element>
+                                                (. accessRoute.add(element); .)
+}
+.
+
+
+InnerAccessRouteElement<out AccessRouteNode element>
+=                                               (. element = null; .)
+(
+    ArrayIndex<. out List<ExpressionNode> indexNodes .>
+                                                (. element = new AccessRouteNode.ArrayIndex(indexNodes); .)
+|
+    "."
+    identifier                                  (. String variableIdentifier = factory.getIdentifierFromToken(t); .)
+                                                (. element = new AccessRouteNode.EnterRecord(variableIdentifier); .)
+)
+.
 
 
 CaseStatement<out StatementNode statement>
@@ -658,12 +676,7 @@ SignedFactor<out ExpressionNode expression>
 Factor<out ExpressionNode expression>
 =							                    (. expression = null; .)
 (
-	identifier
-    (
-	    MemberExpression<out expression, t>
-    |
-                                                (. expression = factory.createExpressionFromSingleIdentifier(t); .)
-    )
+	IdentifierAccess<out expression>
 |
     "("
     Expression<out expression>                  
@@ -684,11 +697,43 @@ Factor<out ExpressionNode expression>
 .
 
 
+IdentifierAccess<out ExpressionNode expression>
+=
+identifier                                      (. Token identifierToken = t; expression = null; .)
+(
+                                                (. expression = factory.createExpressionFromSingleIdentifier(identifierToken); .)
+|
+    InnerIdentifierAccess<out expression, identifierToken>
+)
+.
+
+
+InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
+=							                    (. expression = null; .)
+(
+	SubroutineCall<out expression, identifierToken>
+|
+	InnerAccessRouteNonEmpty<. out List<AccessRouteNode> accessRoute .>
+	                                            (. expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); .)
+)
+.
+
+
+SubroutineCall<out ExpressionNode expression, Token identifierToken>
+=
+"("
+                                                (. List<ExpressionNode> parameters = new ArrayList<>(); .)
+    [
+        ActualParameters<out parameters, identifierToken>
+    ]
+")"                                             (. expression = factory.createSubroutineCall(identifierToken, parameters); .)
+.
+
+
 StringLiteral<out String value>
 =
 stringLiteral                                   (. value = factory.createStringFromToken(t); .)
 .
-
 
 
 LogicLiteral<out boolean result>
@@ -716,27 +761,6 @@ SetConstructor<out ExpressionNode expression>
                                                 (. expression = factory.createSetConstructorNode(valueNodes); .)
     )
 "]"
-.
-
-
-MemberExpression<out ExpressionNode expression, Token identifierName>
-=							                    (. expression = null; .)
-(                                               
-	SubroutineCall<out expression, identifierName>
-|
-	ArrayIndex<. out List<ExpressionNode> indexNodes .>  (. expression = factory.createReadArrayValue(identifierName, indexNodes); .)
-)
-.
-
-
-SubroutineCall<out ExpressionNode expression, Token identifierToken>
-=
-"("
-                                                (. List<ExpressionNode> parameters = new ArrayList<>(); .)
-    [
-        ActualParameters<out parameters, identifierToken>
-    ]
-")"                                             (. expression = factory.createSubroutineCall(identifierToken, parameters); .)
 .
 
 
