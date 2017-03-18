@@ -17,7 +17,7 @@ public class CharDescriptor extends PrimitiveDescriptor implements OrdinalDescri
 
     @Override
     public int getSize() {
-        return Character.SIZE;
+        return 256;
     }
 
     @Override

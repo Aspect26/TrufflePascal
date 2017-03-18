@@ -12,7 +12,7 @@ public class LongDescriptor extends PrimitiveDescriptor implements OrdinalDescri
 
     @Override
     public Object getDefaultValue() {
-        return 0;
+        return 0L;
     }
 
     @Override

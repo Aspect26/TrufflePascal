@@ -2,21 +2,15 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import cz.cuni.mff.d3s.trupple.language.customvalues.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
-import cz.cuni.mff.d3s.trupple.language.nodes.RecordInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.NilPointerDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.BooleanDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.CharDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.PrimitiveDescriptor;
 
 import java.util.ArrayList;
@@ -109,22 +103,7 @@ class InitializationNodeGenerator {
     }
 
     private StatementNode createArrayValue(FrameSlot frameSlot, ArrayDescriptor arrayDescriptor) throws LexicalException {
-        List<OrdinalDescriptor> dimensions = arrayDescriptor.getDimensionDescriptors();
-
-        PascalOrdinal ordinal = this.createOrdinal(dimensions.get(dimensions.size() - 1));
-        Object[] data = createArrayData(arrayDescriptor.getReturnTypeDescriptor(), ordinal.getSize());
-        PascalArray currentArray = new PascalArray(this.createOrdinal(dimensions.get(dimensions.size() - 1)), data);
-
-        for (int i = dimensions.size() - 2; i > -1; --i) {
-            ordinal = this.createOrdinal(dimensions.get(i));
-            Object[] arrayOfArray = new Object[ordinal.getSize()];
-            for (int j = 0; j < arrayOfArray.length; ++j) {
-                arrayOfArray[j] = currentArray.createDeepCopy();
-            }
-            currentArray = new PascalArray(ordinal, arrayOfArray);
-        }
-
-        return InitializationNodeFactory.create(frameSlot, currentArray);
+        return InitializationNodeFactory.create(frameSlot, arrayDescriptor.getDefaultValue());
     }
 
     private StatementNode createSetValue(FrameSlot frameSlot) throws LexicalException {
@@ -132,18 +111,8 @@ class InitializationNodeGenerator {
     }
 
     private StatementNode createRecordValueAndInnerValues(FrameSlot frameSlot, RecordDescriptor descriptor) throws LexicalException {
-        RecordValue record =  new RecordValue(descriptor.getLexicalScope().getFrameDescriptor());
-
-        List<StatementNode> recordInitializers = new ArrayList<>();
-        recordInitializers.add(InitializationNodeFactory.create(frameSlot, record));
-
-        InitializationNodeGenerator innerGen = new InitializationNodeGenerator(descriptor.getLexicalScope().getIdentifiersTable());
-        List<StatementNode> innerRecordInitializationNodes = new ArrayList<>();
-        innerRecordInitializationNodes.addAll(innerGen.generate());
-
-        recordInitializers.add(new RecordInitializationNode(record.getFrame(), innerRecordInitializationNodes));
-
-        return new BlockNode(recordInitializers.toArray(new StatementNode[recordInitializers.size()]));
+        RecordValue record = (RecordValue) descriptor.getDefaultValue();
+        return InitializationNodeFactory.create(frameSlot, record);
     }
 
     private StatementNode createNilPointerValue(FrameSlot frameSlot) throws LexicalException {
@@ -154,26 +123,4 @@ class InitializationNodeGenerator {
         return InitializationNodeFactory.create(frameSlot, new PointerValue(descriptor));
     }
 
-    private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) throws LexicalException {
-        if (descriptor instanceof OrdinalDescriptor.RangeDescriptor || descriptor instanceof LongDescriptor) {
-            return new PascalOrdinal.RangePascalOrdinal(descriptor.getSize(), descriptor.getFirstIndex());
-        } else if (descriptor instanceof BooleanDescriptor) {
-            return PascalOrdinal.booleanPascalOrdinal;
-        } else if (descriptor instanceof CharDescriptor) {
-            return PascalOrdinal.charPascalOrdinal;
-        } else if (descriptor instanceof  EnumTypeDescriptor) {
-            return new PascalOrdinal.EnumPascalOrdinal((EnumTypeDescriptor) descriptor);
-        } else {
-            throw new LexicalException("Not an ordinal type");
-        }
-    }
-
-    private Object[] createArrayData(TypeDescriptor typeDescriptor, int size) {
-        Object[] data = new Object[size];
-        for (int i = 0; i < data.length; ++i) {
-            data[i] = typeDescriptor.getDefaultValue();
-        }
-
-        return data;
-    }
 }

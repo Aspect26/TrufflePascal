@@ -1,19 +1,24 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalOrdinal;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.BooleanDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.CharDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.LongDescriptor;
 
 import java.util.List;
 
 public class ArrayDescriptor implements TypeDescriptor {
 
-    private final List<OrdinalDescriptor> ordinalDimensions;
-    private final TypeDescriptor returnTypeDescriptor;
+    private final List<OrdinalDescriptor> dimensions;
+    private final TypeDescriptor finalReturnTypeDescriptor;
 
     public ArrayDescriptor(List<OrdinalDescriptor> dimensions, TypeDescriptor returnTypeDescriptor) {
-        this.ordinalDimensions = dimensions;
-        this.returnTypeDescriptor = returnTypeDescriptor;
+        this.dimensions = dimensions;
+        this.finalReturnTypeDescriptor = returnTypeDescriptor;
     }
 
     @Override
@@ -23,14 +28,47 @@ public class ArrayDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return null;
+        Object[] data = this.createArrayData();
+        return new PascalArray(this.createOrdinal(dimensions.get(0)), data);
     }
 
-    public List<OrdinalDescriptor> getDimensionDescriptors() {
-        return this.ordinalDimensions;
+    private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) {
+        if (descriptor instanceof OrdinalDescriptor.RangeDescriptor || descriptor instanceof LongDescriptor) {
+            return new PascalOrdinal.RangePascalOrdinal(descriptor.getSize(), descriptor.getFirstIndex());
+        } else if (descriptor instanceof BooleanDescriptor) {
+            return PascalOrdinal.booleanPascalOrdinal;
+        } else if (descriptor instanceof CharDescriptor) {
+            return PascalOrdinal.charPascalOrdinal;
+        } else if (descriptor instanceof  EnumTypeDescriptor) {
+            return new PascalOrdinal.EnumPascalOrdinal((EnumTypeDescriptor) descriptor);
+        } else {
+            return null;
+        }
     }
 
-    public TypeDescriptor getReturnTypeDescriptor() {
-        return this.returnTypeDescriptor;
+    private Object[] createArrayData() {
+        OrdinalDescriptor myDimension = this.dimensions.get(0);
+        Object[] data = new Object[myDimension.getSize()];
+        TypeDescriptor innerDescriptor = this.createInnerDescriptor();
+
+        for (int i = 0; i < data.length; ++i) {
+            data[i] = innerDescriptor.getDefaultValue();
+        }
+
+        return data;
     }
+
+    private TypeDescriptor createInnerDescriptor() {
+        if (this.dimensions.size() > 1) {
+            return this.createInnerArrayDescriptor();
+        } else {
+            return this.finalReturnTypeDescriptor;
+        }
+    }
+
+    private TypeDescriptor createInnerArrayDescriptor() {
+        List<OrdinalDescriptor> innerDimensions = this.dimensions.subList(1, this.dimensions.size());
+        return new ArrayDescriptor(innerDimensions, this.finalReturnTypeDescriptor);
+    }
+
 }

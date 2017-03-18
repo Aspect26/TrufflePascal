@@ -59,22 +59,22 @@ public abstract class StatementNode extends Node {
         Object[] arrayIndexes = null;
 
         this.evaluateIndexNodes(frame, accessRouteNodes);
-        RecordValue recordFromArray = null;
+        RecordValue currentRecord = null;
 
         for (AccessRouteNode accessRouteNode : accessRouteNodes) {
             if (accessRouteNode instanceof AccessRouteNode.EnterRecord) {
-                RecordValue record = (recordFromArray == null)? (RecordValue) slotsFrame.getObject(finalSlot) : recordFromArray;
+                RecordValue record = (currentRecord == null)? (RecordValue) slotsFrame.getObject(finalSlot) : currentRecord;
                 slotsFrame = record.getFrame();
                 String variableIdentifier = ((AccessRouteNode.EnterRecord) accessRouteNode).getVariableIdentifier();
                 finalSlot = this.findSlotByIdentifier(slotsFrame, variableIdentifier);
                 isArray = false;
-                recordFromArray = null;
+                currentRecord = null;
             } else if (accessRouteNode instanceof AccessRouteNode.ArrayIndex) {
                 PascalArray array = (PascalArray) slotsFrame.getObject(finalSlot);
                 arrayIndexes = ((AccessRouteNode.ArrayIndex) accessRouteNode).getIndexes();
                 Object value = array.getValueAt(arrayIndexes);
                 if (value instanceof RecordValue) {
-                    recordFromArray = (RecordValue) value;
+                    currentRecord = (RecordValue) value;
                 }
                 isArray = true;
             }
@@ -88,14 +88,51 @@ public abstract class StatementNode extends Node {
 
         return new RouteTarget(slotsFrame, finalSlot, isArray, arrayIndexes);
     }
+/*
+    protected RouteTarget getRouteTarget2(VirtualFrame frame, FrameSlot firstSlot, AccessRouteNode[] accessRouteNodes) throws FrameSlotTypeException {
+        VirtualFrame slotsFrame = frame;
+        FrameSlot finalSlot = firstSlot;
+        boolean isArray = false;
+        Object[] arrayIndexes = null;
 
+        this.evaluateIndexNodes(frame, accessRouteNodes);
+        Object currentValue = null;
+
+        for (AccessRouteNode accessRouteNode : accessRouteNodes) {
+            if (accessRouteNode instanceof AccessRouteNode.EnterRecord) {
+                RecordValue record = (currentValue == null)? (RecordValue) slotsFrame.getObject(finalSlot) : currentValue;
+                slotsFrame = record.getFrame();
+                String variableIdentifier = ((AccessRouteNode.EnterRecord) accessRouteNode).getVariableIdentifier();
+                finalSlot = this.findSlotByIdentifier(slotsFrame, variableIdentifier);
+                isArray = false;
+                currentValue = null;
+            } else if (accessRouteNode instanceof AccessRouteNode.ArrayIndex) {
+                PascalArray array = (PascalArray) slotsFrame.getObject(finalSlot);
+                arrayIndexes = ((AccessRouteNode.ArrayIndex) accessRouteNode).getIndexes();
+                Object value = array.getValueAt(arrayIndexes);
+                if (value instanceof RecordValue) {
+                    currentValue = (RecordValue) value;
+                }
+                isArray = true;
+            }
+        }
+
+        Reference referenceVariable = this.tryGetReference(slotsFrame, finalSlot);
+        if (referenceVariable != null) {
+            slotsFrame = referenceVariable.getFromFrame();
+            finalSlot = referenceVariable.getFrameSlot();
+        }
+
+        return new RouteTarget(slotsFrame, finalSlot, isArray, arrayIndexes);
+    }
+*/
     private void evaluateIndexNodes(VirtualFrame frame, AccessRouteNode[] accessRouteNodes) {
         for (AccessRouteNode accessRouteNode : accessRouteNodes) {
             accessRouteNode.executeVoid(frame);
         }
     }
 
-    protected Reference tryGetReference(VirtualFrame frame, FrameSlot slot) {
+    Reference tryGetReference(VirtualFrame frame, FrameSlot slot) {
         try {
             return (Reference)frame.getObject(slot);
         } catch (FrameSlotTypeException | ClassCastException e) {

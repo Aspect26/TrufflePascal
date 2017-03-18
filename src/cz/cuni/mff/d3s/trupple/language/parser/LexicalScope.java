@@ -52,7 +52,7 @@ public class LexicalScope {
         return this.context;
     }
 
-    IdentifiersTable getIdentifiersTable() {
+    public IdentifiersTable getIdentifiersTable() {
         return this.localIdentifiers;
     }
 
