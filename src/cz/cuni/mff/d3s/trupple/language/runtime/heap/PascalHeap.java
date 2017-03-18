@@ -18,6 +18,16 @@ public class PascalHeap {
     private static PascalHeap INSTANCE = new PascalHeap();
 
     /**
+     * Represents the nil value.
+     */
+    public static HeapSlot NIL = new HeapSlot(Integer.MIN_VALUE);
+
+    /**
+     * Represents the minimal address that can be allocated
+     */
+    private static final int MIN_ADDRESS = Integer.MIN_VALUE + 1;
+
+    /**
      * The representation of heap's memory. Key represents an address (as integer) and value is the actual data structure
      * stored on the specified address. NOTE: faster implementation would be with an array.
      */
@@ -38,7 +48,7 @@ public class PascalHeap {
     private PascalHeap() {
         this.memory = new HashMap<>();
         this.heapSlots = new HashSet<>();
-        this.emptyMemorySlot = Integer.MIN_VALUE;
+        this.emptyMemorySlot = this.MIN_ADDRESS;
     }
 
     public static PascalHeap getInstance() {
@@ -72,7 +82,7 @@ public class PascalHeap {
 
     // TODO: this needs to be tested
     private void doGarbageCollecting() {
-        this.emptyMemorySlot = this.findFirstEmptyMemorySlot(Integer.MIN_VALUE);
+        this.emptyMemorySlot = this.findFirstEmptyMemorySlot(this.MIN_ADDRESS);
 
         for (HeapSlot slot : this.heapSlots) {
 

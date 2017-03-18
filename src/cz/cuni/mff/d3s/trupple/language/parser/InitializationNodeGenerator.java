@@ -9,6 +9,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.NilPointerDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
@@ -61,6 +62,8 @@ class InitializationNodeGenerator {
             return createSetValue(frameSlot, (SetDescriptor)typeDescriptor);
         } else if (typeDescriptor instanceof RecordDescriptor) {
             return createRecordValueAndInnerValues(frameSlot, (RecordDescriptor)typeDescriptor);
+        } else if (typeDescriptor instanceof NilPointerDescriptor) {
+            return createNilPointerValue(frameSlot);
         } else if (typeDescriptor instanceof PointerDescriptor) {
             return createPointerValue(frameSlot, (PointerDescriptor) typeDescriptor);
         }
@@ -137,6 +140,10 @@ class InitializationNodeGenerator {
         recordInitializers.add(new RecordInitializationNode(record.getFrame(), innerRecordInitializationNodes));
 
         return new BlockNode(recordInitializers.toArray(new StatementNode[recordInitializers.size()]));
+    }
+
+    private StatementNode createNilPointerValue(FrameSlot frameSlot) throws LexicalException {
+        return InitializationNodeFactory.create(frameSlot, PointerValue.NIL);
     }
 
     private StatementNode createPointerValue(FrameSlot frameSlot, PointerDescriptor descriptor) throws LexicalException {

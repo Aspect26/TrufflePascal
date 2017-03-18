@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.customvalues;
 
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.HeapSlot;
+import cz.cuni.mff.d3s.trupple.language.runtime.heap.PascalHeap;
 
 public class PointerValue implements ICustomValue {
 
@@ -10,7 +11,10 @@ public class PointerValue implements ICustomValue {
 
     public PointerValue(TypeDescriptor innerType) {
         this.innerType = innerType;
+        this.heapSlot = PascalHeap.NIL;
     }
+
+    public static PointerValue NIL = new PointerValue(null);
 
     @Override
     public Object getValue() {

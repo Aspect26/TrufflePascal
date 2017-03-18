@@ -15,6 +15,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -135,34 +136,31 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Long) {
-                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return WriteLongNode_.create(root);
             }
             if (valueNodeValue instanceof Boolean) {
-                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return WriteBooleanNode_.create(root);
             }
             if (valueNodeValue instanceof Character) {
-                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return WriteCharNode_.create(root);
             }
             if (valueNodeValue instanceof Double) {
-                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return WriteDoubleNode_.create(root);
             }
             if (valueNodeValue instanceof EnumValue) {
-                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return WriteEnumNode_.create(root);
             }
             if (valueNodeValue instanceof PascalArray) {
-                CompilerDirectives.transferToInterpreterAndInvalidate();
                 return AssignArrayNode_.create(root);
             }
             if (valueNodeValue instanceof SetTypeValue) {
-                if ((root.isSet((VirtualFrame) frameValue, root.getSlot()))) {
-                    CompilerDirectives.transferToInterpreterAndInvalidate();
-                    return AssignSetNode_.create(root);
-                }
+                return AssignSetNode_.create(root);
+            }
+            if (valueNodeValue instanceof PointerValue) {
+                return AssignPointersNode_.create(root);
+            }
+            if (valueNodeValue instanceof VirtualFrame) {
+                return TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_.create(root);
             }
             return null;
         }
@@ -449,15 +447,56 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof SetTypeValue) {
                 SetTypeValue valueNodeValue_ = (SetTypeValue) valueNodeValue;
-                if ((root.isSet(frameValue, root.getSlot()))) {
-                    return root.assignSet(frameValue, valueNodeValue_);
-                }
+                return root.assignSet(frameValue, valueNodeValue_);
             }
             return getNext().execute_(frameValue, valueNodeValue);
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
             return new AssignSetNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "assignPointers(VirtualFrame, PointerValue)", value = AssignmentNodeWithRoute.class)
+    private static final class AssignPointersNode_ extends BaseNode_ {
+
+        AssignPointersNode_(AssignmentNodeWithRouteNodeGen root) {
+            super(root, 8);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof PointerValue) {
+                PointerValue valueNodeValue_ = (PointerValue) valueNodeValue;
+                return root.assignPointers(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
+            return new AssignPointersNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "totallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLife(VirtualFrame)", value = AssignmentNodeWithRoute.class)
+    private static final class TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_ extends BaseNode_ {
+
+        TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_(AssignmentNodeWithRouteNodeGen root) {
+            super(root, 9);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof VirtualFrame) {
+                VirtualFrame valueNodeValue_ = (VirtualFrame) valueNodeValue;
+                root.totallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLife(valueNodeValue_);
+                return null;
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
+            return new TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_(root);
         }
 
     }
