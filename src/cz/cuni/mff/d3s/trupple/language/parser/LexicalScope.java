@@ -11,6 +11,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.LongConstantDescriptor;
@@ -147,6 +148,10 @@ public class LexicalScope {
 
     RecordDescriptor createRecordDescriptor() {
         return this.localIdentifiers.createRecordDescriptor(this);
+    }
+
+    PointerDescriptor createPointerDescriptor(TypeDescriptor innerType) {
+        return this.localIdentifiers.createPointerDescriptor(innerType);
     }
 
     TypeDescriptor createSetType(OrdinalDescriptor baseType) {

@@ -30,7 +30,6 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierExcep
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -196,7 +195,7 @@ public class NodeFactory {
     }
 
     public TypeDescriptor createPointerType(TypeDescriptor innerType) {
-        return null;
+        return this.lexicalScope.createPointerDescriptor(innerType);
     }
 
     public void finishRecord() {

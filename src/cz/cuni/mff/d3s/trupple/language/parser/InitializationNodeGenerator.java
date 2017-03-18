@@ -10,6 +10,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 
@@ -60,6 +61,8 @@ class InitializationNodeGenerator {
             return createSetValue(frameSlot, (SetDescriptor)typeDescriptor);
         } else if (typeDescriptor instanceof RecordDescriptor) {
             return createRecordValueAndInnerValues(frameSlot, (RecordDescriptor)typeDescriptor);
+        } else if (typeDescriptor instanceof PointerDescriptor) {
+            return createPointerValue(frameSlot, (PointerDescriptor) typeDescriptor);
         }
 
         return null;
@@ -134,6 +137,10 @@ class InitializationNodeGenerator {
         recordInitializers.add(new RecordInitializationNode(record.getFrame(), innerRecordInitializationNodes));
 
         return new BlockNode(recordInitializers.toArray(new StatementNode[recordInitializers.size()]));
+    }
+
+    private StatementNode createPointerValue(FrameSlot frameSlot, PointerDescriptor descriptor) throws LexicalException {
+        return InitializationNodeFactory.create(frameSlot, new PointerValue(descriptor));
     }
 
     private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) throws LexicalException {
