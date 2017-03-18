@@ -10,6 +10,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -100,6 +101,18 @@ public abstract class AssignmentNode extends ExpressionNode {
         SetTypeValue setCopy = set.createDeepCopy();
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, setCopy);
         return setCopy;
+    }
+
+    @Specialization
+    Object assignPointers(VirtualFrame frame, PointerValue pointer) {
+        this.makeAssignment(frame, getSlot(),
+                (VirtualFrame assignmentFrame, FrameSlot frameSlot, Object value) ->
+                {
+                    PointerValue assignmentTarget = (PointerValue) assignmentFrame.getObject(frameSlot);
+                    assignmentTarget.setHeapSlot(((PointerValue) value).getHeapSlot());
+                },
+                pointer);
+        return pointer;
     }
 
 }

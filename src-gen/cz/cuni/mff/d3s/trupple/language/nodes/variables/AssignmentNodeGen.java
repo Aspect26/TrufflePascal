@@ -15,6 +15,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -153,6 +154,9 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             }
             if (valueNodeValue instanceof SetTypeValue) {
                 return AssignSetNode_.create(root);
+            }
+            if (valueNodeValue instanceof PointerValue) {
+                return AssignPointersNode_.create(root);
             }
             return null;
         }
@@ -446,6 +450,27 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
 
         static BaseNode_ create(AssignmentNodeGen root) {
             return new AssignSetNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "assignPointers(VirtualFrame, PointerValue)", value = AssignmentNode.class)
+    private static final class AssignPointersNode_ extends BaseNode_ {
+
+        AssignPointersNode_(AssignmentNodeGen root) {
+            super(root, 8);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof PointerValue) {
+                PointerValue valueNodeValue_ = (PointerValue) valueNodeValue;
+                return root.assignPointers(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignPointersNode_(root);
         }
 
     }
