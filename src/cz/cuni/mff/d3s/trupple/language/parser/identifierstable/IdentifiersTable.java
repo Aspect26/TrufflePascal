@@ -82,6 +82,8 @@ public class IdentifiersTable {
         identifiersMap.put("arctan", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
         identifiersMap.put("trunc", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
         identifiersMap.put("round", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("new", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("dispose", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
     }
 
     public FrameSlot getFrameSlot(String identifier) {

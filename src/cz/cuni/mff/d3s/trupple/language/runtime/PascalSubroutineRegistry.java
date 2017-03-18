@@ -12,6 +12,8 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.allocation.DisposeBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.allocation.NewBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.ReadBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.WriteBuiltinNodeFactory;
@@ -62,6 +64,8 @@ public class PascalSubroutineRegistry {
         installBuiltinOneArgument(ArctanBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(TruncBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(RoundBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(NewBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(DisposeBuiltinNodeFactory.getInstance());
 	}
 
 	void installBuiltinNoArgument(BuiltinNode builtinNode) {
