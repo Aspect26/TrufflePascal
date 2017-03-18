@@ -195,6 +195,10 @@ public class NodeFactory {
 	    return this.lexicalScope.createRecordDescriptor();
     }
 
+    public TypeDescriptor createPointerType(TypeDescriptor innerType) {
+        return null;
+    }
+
     public void finishRecord() {
         assert this.lexicalScope.getOuterScope() != null;
         this.lexicalScope = this.lexicalScope.getOuterScope();
