@@ -10,9 +10,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.FileDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.ReferenceDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.*;
@@ -34,6 +32,7 @@ public class IdentifiersTable {
     public IdentifiersTable() {
         this.initialize();
         addBuiltinTypes();
+        addBuiltinConstants();
         addBuiltinFunctions();
     }
 
@@ -57,6 +56,14 @@ public class IdentifiersTable {
 
         for (Map.Entry<String, TypeDescriptor> typeEntry : typeDescriptors.entrySet()) {
             identifiersMap.put(typeEntry.getKey(), new TypeTypeDescriptor(typeEntry.getValue()));
+        }
+    }
+
+    private void addBuiltinConstants() {
+        try {
+            this.registerNewIdentifier("nil", new NilPointerDescriptor());
+        } catch (LexicalException e) {
+            // TODO: could not initialize exception
         }
     }
 
@@ -168,6 +175,10 @@ public class IdentifiersTable {
 
     public RecordDescriptor createRecordDescriptor(LexicalScope recordScope) {
         return new RecordDescriptor(recordScope);
+    }
+
+    public PointerDescriptor createPointerDescriptor(TypeDescriptor innerType) {
+        return new PointerDescriptor(innerType);
     }
 
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {

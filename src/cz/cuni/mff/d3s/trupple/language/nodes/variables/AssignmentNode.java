@@ -4,11 +4,13 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -16,96 +18,101 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 @NodeField(name = "slot", type = FrameSlot.class)
 public abstract class AssignmentNode extends ExpressionNode {
 
-	protected abstract FrameSlot getSlot();
+    protected interface SlotAssignment {
 
-	@Specialization(guards = "isLongKind(frame, getSlot())")
-	protected long writeLong(VirtualFrame frame, long value) {
-        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
-	    Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
-	    if (referenceVariable == null) {
-            slotFrame.setLong(getSlot(), value);
-        } else {
-	        referenceVariable.getFromFrame().setLong(referenceVariable.getFrameSlot(), value);
-        }
-		return value;
-	}
+        void assign(VirtualFrame frame, FrameSlot frameSlot, Object value) throws FrameSlotTypeException;
 
-	@Specialization(guards = "isBoolKind(frame, getSlot())")
-	protected boolean writeBoolean(VirtualFrame frame, boolean value) {
-        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
-        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
-        if (referenceVariable == null) {
-            slotFrame.setBoolean(getSlot(), value);
-        } else {
-            referenceVariable.getFromFrame().setBoolean(referenceVariable.getFrameSlot(), value);
+    }
+
+    protected abstract FrameSlot getSlot();
+
+    protected void makeAssignment(VirtualFrame frame, FrameSlot slot, AssignmentNodeWithRoute.SlotAssignment slotAssignment, Object value) {
+        try {
+            slotAssignment.assign(frame, slot, value);
+        } catch (FrameSlotTypeException e) {
+            throw new PascalRuntimeException("Wrong access");
         }
+    }
+
+    @Specialization
+    long writeLong(VirtualFrame frame, long value) {
+        this.makeAssignment(
+                frame,
+                getSlot(),
+                (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setLong(assignmentFrameSlot, (long) assignmentValue),
+                value
+        );
+
         return value;
-	}
+    }
 
-	// NOTE: characters are stored as bytes, since there is no FrameSlotKind for
-	// char
-	@Specialization(guards = "isCharKind(frame, getSlot())")
-	protected char writeChar(VirtualFrame frame, char value) {
-        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
-        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
-        if (referenceVariable == null) {
-            slotFrame.setByte(getSlot(), (byte)value);
-        } else {
-            referenceVariable.getFromFrame().setByte(referenceVariable.getFrameSlot(), (byte)value);
-        }
-        return value;
-	}
+    @Specialization
+    boolean writeBoolean(VirtualFrame frame, boolean value) {
+        this.makeAssignment(
+                frame,
+                getSlot(),
+                (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setBoolean(assignmentFrameSlot, (boolean) assignmentValue),
+                value
+        );
 
-	@Specialization(guards = "isDoubleKind(frame, getSlot())")
-	protected double writeDouble(VirtualFrame frame, double value) {
-        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
-        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
-        if (referenceVariable == null) {
-            slotFrame.setDouble(getSlot(), value);
-        } else {
-            referenceVariable.getFromFrame().setDouble(referenceVariable.getFrameSlot(), value);
-        }
         return value;
-	}
-	
-	@Specialization(guards = "isEnum(frame, getSlot())")
-	protected Object writeEnum(VirtualFrame frame, EnumValue value) {
-        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
-        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
-        if (referenceVariable == null) {
-            slotFrame.setObject(getSlot(), value);
-        } else {
-            referenceVariable.getFromFrame().setObject(referenceVariable.getFrameSlot(), value);
-        }
-        return value;
-	}
-	
-	@Specialization(guards = "isPascalArray(frame, getSlot())")
-	protected Object assignArray(VirtualFrame frame, PascalArray array) {
-		PascalArray arrayCopy = array.createDeepCopy();
+    }
 
-        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
-        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
-        if (referenceVariable == null) {
-            slotFrame.setObject(getSlot(), arrayCopy);
-        } else {
-            referenceVariable.getFromFrame().setObject(referenceVariable.getFrameSlot(), arrayCopy);
-        }
+    // NOTE: characters are stored as bytes, since there is no FrameSlotKind for char
+    @Specialization
+    char writeChar(VirtualFrame frame, char value) {
+        this.makeAssignment(
+                frame,
+                getSlot(),
+                (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setByte(assignmentFrameSlot, (byte)((char) assignmentValue)),
+                value
+        );
+
+        return value;
+    }
+
+    @Specialization
+    double writeDouble(VirtualFrame frame, double value) {
+        this.makeAssignment(
+                frame,
+                getSlot(),
+                (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setDouble(assignmentFrameSlot, (double) assignmentValue),
+                value
+        );
+
+        return value;
+    }
+
+    @Specialization
+    Object writeEnum(VirtualFrame frame, EnumValue value) {
+        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, value);
+        return value;
+    }
+
+    @Specialization
+    Object assignArray(VirtualFrame frame, PascalArray array) {
+        PascalArray arrayCopy = array.createDeepCopy();
+        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, arrayCopy);
         return arrayCopy;
-	}
+    }
 
-    @Specialization(guards = "isSet(frame, getSlot())")
-    protected Object assignSet(VirtualFrame frame, SetTypeValue set) {
+    @Specialization
+    Object assignSet(VirtualFrame frame, SetTypeValue set) {
         SetTypeValue setCopy = set.createDeepCopy();
-
-        VirtualFrame slotFrame = getFrameContainingSlot(frame, getSlot());
-        Reference referenceVariable = this.tryGetReference(slotFrame, getSlot());
-        if (referenceVariable == null) {
-            slotFrame.setObject(getSlot(), setCopy);
-        } else {
-            referenceVariable.getFromFrame().setObject(referenceVariable.getFrameSlot(), setCopy);
-        }
+        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, setCopy);
         return setCopy;
+    }
+
+    @Specialization
+    Object assignPointers(VirtualFrame frame, PointerValue pointer) {
+        this.makeAssignment(frame, getSlot(),
+                (VirtualFrame assignmentFrame, FrameSlot frameSlot, Object value) ->
+                {
+                    PointerValue assignmentTarget = (PointerValue) assignmentFrame.getObject(frameSlot);
+                    assignmentTarget.setHeapSlot(((PointerValue) value).getHeapSlot());
+                },
+                pointer);
+        return pointer;
     }
 
 }

@@ -24,13 +24,11 @@ import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
-import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
@@ -195,33 +193,13 @@ public class NodeFactory {
 	    return this.lexicalScope.createRecordDescriptor();
     }
 
+    public TypeDescriptor createPointerType(TypeDescriptor innerType) {
+        return this.lexicalScope.createPointerDescriptor(innerType);
+    }
+
     public void finishRecord() {
         assert this.lexicalScope.getOuterScope() != null;
         this.lexicalScope = this.lexicalScope.getOuterScope();
-    }
-
-    public Map<String, TypeDescriptor> createVariables(List<String> identifiers, TypeDescriptor type) {
-	    Map<String, TypeDescriptor> result = new HashMap<>();
-	    for (String identifier : identifiers) {
-	        if (result.containsKey(identifier)) {
-                parser.SemErr(new DuplicitIdentifierException(identifier).getMessage());
-            } else {
-	            result.put(identifier, type);
-            }
-        }
-
-        return  result;
-    }
-
-    public void appendVariablesMap(Map<String, TypeDescriptor> origin, Map<String, TypeDescriptor> newVariables) {
-	    for (Map.Entry<String, TypeDescriptor> newVariable : newVariables.entrySet()) {
-	        String identifier = newVariable.getKey();
-	        if (origin.containsKey(identifier)) {
-                parser.SemErr(new DuplicitIdentifierException(identifier).getMessage());
-            } else {
-	            origin.put(identifier, newVariable.getValue());
-            }
-        }
     }
 
     public OrdinalDescriptor createSimpleOrdinalDescriptor(final ConstantDescriptor lowerBound, final ConstantDescriptor upperBound) {
@@ -511,25 +489,6 @@ public class NodeFactory {
         }
     }
 
-    public ExpressionNode createAssignment(Token identifierToken, ExpressionNode valueNode) {
-        String variableIdentifier = this.getIdentifierFromToken(identifierToken);
-
-        // TODO: use lookUp function
-        LexicalScope ls = this.lexicalScope;
-        while (ls != null) {
-            if (ls.containsLocalIdentifier(variableIdentifier)) {
-                // TODO: check if it is assignable
-                FrameSlot frameSlot = ls.getLocalSlot(variableIdentifier);
-                return AssignmentNodeGen.create(valueNode, frameSlot);
-            } else {
-                ls = ls.getOuterScope();
-            }
-        }
-
-        parser.SemErr("Assignment target is an unknown identifier");
-        return null;
-    }
-
     public ExpressionNode createAssignmentWithRoute(Token identifierToken, List<AccessRouteNode> accessRoute, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier));
@@ -600,27 +559,6 @@ public class NodeFactory {
 	    String variableIdentifier = this.getIdentifierFromToken(variableToken);
 	    FrameSlot slot = this.lexicalScope.getLocalSlot(variableIdentifier);
         return new ReadReferencePassNode(slot);
-    }
-
-    public ExpressionNode createReadArrayValue(Token identifierToken, List<ExpressionNode> indexingNodes) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-
-        return ReadArrayIndexNodeGen.create(indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]),
-                lexicalScope.getLocalSlot(identifier));
-    }
-
-    public ExpressionNode createReadFromRecord(Token recordIdentifierToken, ExpressionNode readInnerNode) {
-	    String recordIdentifier = this.getIdentifierFromToken(recordIdentifierToken);
-        FrameSlot slot = this.doLookup(recordIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(recordIdentifier));
-
-	    return new ReadFromRecordNode(slot, readInnerNode);
-    }
-
-    public ExpressionNode createArrayIndexAssignment(Token identifierToken, List<ExpressionNode> indexingNodes, ExpressionNode valueNode) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-
-        return new ArrayIndexAssignmentNode(lexicalScope.getLocalSlot(identifier),
-                indexingNodes.toArray(new ExpressionNode[indexingNodes.size()]), valueNode);
     }
 
     public ExpressionNode createLogicLiteralNode(boolean value) {
