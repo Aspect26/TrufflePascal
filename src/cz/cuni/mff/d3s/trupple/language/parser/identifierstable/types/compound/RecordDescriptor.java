@@ -5,6 +5,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
+
 public class RecordDescriptor implements TypeDescriptor {
 
     private final LexicalScope innerScope;
@@ -20,11 +21,7 @@ public class RecordDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return new RecordValue(this.innerScope.getFrameDescriptor());
-    }
-
-    public LexicalScope getLexicalScope() {
-        return innerScope;
+        return new RecordValue(this.innerScope.getFrameDescriptor(), innerScope.getIdentifiersTable().getAll());
     }
 
 }

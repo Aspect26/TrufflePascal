@@ -22,8 +22,8 @@ public class EnumTypeDescriptor implements OrdinalDescriptor {
     }
 
     @Override
-    public String getDefaultValue() {
-        return this.defaultValue;
+    public Object getDefaultValue() {
+        return new EnumValue(this, this.defaultValue);
     }
 
     @Override

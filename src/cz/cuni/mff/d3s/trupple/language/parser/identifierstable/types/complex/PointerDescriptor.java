@@ -19,6 +19,7 @@ public class PointerDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return PointerValue.NIL;
+        return new PointerValue(innerType);
     }
+
 }

@@ -166,7 +166,7 @@ public class IdentifiersTable {
             if (this.typeDescriptors.containsKey(identifier)) {
                 throw new DuplicitIdentifierException(identifier);
             }
-            this.registerNewIdentifier(identifier, new EnumValueDescriptor(enumTypeDescriptor, identifier));
+            this.registerNewIdentifier(identifier, new EnumLiteralDescriptor(enumTypeDescriptor, identifier));
         }
 
         return enumTypeDescriptor;

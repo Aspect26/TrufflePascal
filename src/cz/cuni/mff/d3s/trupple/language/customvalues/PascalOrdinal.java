@@ -63,6 +63,7 @@ public abstract class PascalOrdinal {
     public static PascalOrdinal charPascalOrdinal = new CharPascalOrdinal();
 
     private static class BooleanPascalOrdinal extends PascalOrdinal {
+
         @Override
         public int getRealIndex(Object index) {
             return  ((boolean)index)? 1 : 0;
@@ -75,6 +76,7 @@ public abstract class PascalOrdinal {
     }
 
     private static class CharPascalOrdinal extends PascalOrdinal {
+
         @Override
         public int getRealIndex(Object index) {
             return  (char)index;

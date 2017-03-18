@@ -19,7 +19,7 @@ public class StringConstantDescriptor implements ConstantDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return null;
+        return this.value;
     }
 
     @Override

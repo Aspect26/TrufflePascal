@@ -1,14 +1,15 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
-public class EnumValueDescriptor implements TypeDescriptor {
+public class EnumLiteralDescriptor implements TypeDescriptor {
 
     private final EnumTypeDescriptor enumTypeDescriptor;
     private final String identifier;
 
-    public EnumValueDescriptor(EnumTypeDescriptor enumTypeDescriptor, String identifier) {
+    public EnumLiteralDescriptor(EnumTypeDescriptor enumTypeDescriptor, String identifier) {
         this.enumTypeDescriptor = enumTypeDescriptor;
         this.identifier = identifier;
     }
@@ -20,7 +21,7 @@ public class EnumValueDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return null;
+        return new EnumValue(this.enumTypeDescriptor, this.identifier);
     }
 
     @Override

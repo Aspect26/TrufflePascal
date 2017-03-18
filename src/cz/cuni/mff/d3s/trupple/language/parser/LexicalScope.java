@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.parser;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
@@ -52,7 +53,7 @@ public class LexicalScope {
         return this.context;
     }
 
-    IdentifiersTable getIdentifiersTable() {
+    public IdentifiersTable getIdentifiersTable() {
         return this.localIdentifiers;
     }
 
@@ -215,13 +216,13 @@ public class LexicalScope {
         return new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(1));
     }
 
-    List<StatementNode> createInitializationNodes() throws LexicalException {
+    BlockNode createInitializationNode() {
         InitializationNodeGenerator initNodeGenerator = new InitializationNodeGenerator(this.localIdentifiers);
 
         List<StatementNode> initializationNodes = initNodeGenerator.generate();
         initializationNodes.addAll(this.readArgumentNodes);
 
-        return initializationNodes;
+        return new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
     }
 
     void markAllIdentifiersFromUnitPublic(String unitName) {

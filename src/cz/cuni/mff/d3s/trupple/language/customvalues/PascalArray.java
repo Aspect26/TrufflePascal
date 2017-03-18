@@ -9,7 +9,7 @@ public class PascalArray implements ICustomValue {
 		this.data = data;
 	}
 	
-	public Object getValueAt(Object index) {
+	private Object getValueAt(Object index) {
         // TODO: throw custom exception at array index out of range
 		int realIndex = ordinalSource.getRealIndex(index);
 		return data[realIndex];
@@ -25,7 +25,7 @@ public class PascalArray implements ICustomValue {
         return value;
     }
 	
-	public void setValueAt(Object index, Object value) {
+	private void setValueAt(Object index, Object value) {
 		// TODO: throw custom exception at array index out of range
         this.data[ordinalSource.getRealIndex(index)] = value;
 	}
