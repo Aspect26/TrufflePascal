@@ -77,10 +77,11 @@ Type<out TypeDescriptor typeDescriptor>         (. factory.registerNewType(ident
 Type<out TypeDescriptor typeDescriptor>
 =                                               (. typeDescriptor = null; .)
 (
-    IF(!isSubrange())
-	identifier                                  (.  typeDescriptor = factory.getTypeDescriptor(t); .)
+    IF(isSubrange())
+    SubrangeType<out typeDescriptor>
 |
-	SubrangeType<out typeDescriptor>
+	identifier                                  (.  typeDescriptor = factory.getTypeDescriptor(t); .)
+
 |
     EnumDefinition<out typeDescriptor>
 |
