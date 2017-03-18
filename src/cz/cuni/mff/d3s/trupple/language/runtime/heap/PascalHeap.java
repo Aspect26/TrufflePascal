@@ -71,7 +71,7 @@ public class PascalHeap {
         }
     }
 
-    public void deleteObject(HeapSlot slot) {
+    public void disposeObject(HeapSlot slot) {
         if (!this.heapSlots.contains(slot)) {
             throw new SegmentationFaultException();
         }

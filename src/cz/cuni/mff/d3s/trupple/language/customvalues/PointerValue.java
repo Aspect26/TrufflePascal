@@ -7,6 +7,8 @@ import cz.cuni.mff.d3s.trupple.language.runtime.heap.PascalHeap;
 public class PointerValue implements ICustomValue {
 
     private HeapSlot heapSlot;
+
+
     private final TypeDescriptor innerType;
 
     public PointerValue(TypeDescriptor innerType) {
@@ -23,6 +25,10 @@ public class PointerValue implements ICustomValue {
 
     public HeapSlot getHeapSlot() {
         return heapSlot;
+    }
+
+    public TypeDescriptor getType() {
+        return innerType;
     }
 
     public void setHeapSlot(HeapSlot heapSlot) {
