@@ -2,29 +2,21 @@ package cz.cuni.mff.d3s.trupple.language.nodes;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.util.List;
 
 public class InitializationNodeFactory{
 
-	public static StatementNode create(FrameSlot frameSlot, long numericValue) {
-		return new LongInitializationNode(frameSlot, numericValue);
-	}
-	
-	public static StatementNode create(FrameSlot frameSlot, double doubleValue) {
-		return new DoubleInitializationNode(frameSlot, doubleValue);
-	}
-	
-	public static StatementNode create(FrameSlot frameSlot, boolean booleanValue) {
-		return new BooleanInitializationNode(frameSlot, booleanValue);
-	}
-	
-	public static StatementNode create(FrameSlot frameSlot, char byteValue) {
-		return new CharInitializationNode(frameSlot, byteValue);
-	}
-	
-	public static StatementNode create(FrameSlot frameSlot, Object numericValue) {
-		return new ObjectInitializationNode(frameSlot, numericValue);
+	public static StatementNode create(FrameSlot frameSlot, Object value) {
+	    // TODO: this is a duplicity
+        switch (frameSlot.getKind()) {
+            case Long: return new LongInitializationNode(frameSlot, (long) value);
+            case Double: return new DoubleInitializationNode(frameSlot, (double) value);
+            case Boolean: return new BooleanInitializationNode(frameSlot, (boolean) value);
+            case Byte: return new CharInitializationNode(frameSlot, (char) value);
+            default: return new ObjectInitializationNode(frameSlot, value);
+        }
 	}
 }
 

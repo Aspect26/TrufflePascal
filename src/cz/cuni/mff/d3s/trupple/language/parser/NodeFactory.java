@@ -611,13 +611,9 @@ public class NodeFactory {
     }
 
     private StatementNode createSubroutineNode(StatementNode bodyNode) {
-        // TODO: the syntax tree would look nicer if the initialization nodes were in a separate block node
         List<StatementNode> subroutineNodes = new ArrayList<>();
-        try {
-            subroutineNodes = lexicalScope.createInitializationNodes();
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-        }
+
+        subroutineNodes.add(lexicalScope.createInitializationNode());
         subroutineNodes.add(bodyNode);
 
         return new BlockNode(subroutineNodes.toArray(new StatementNode[subroutineNodes.size()]));

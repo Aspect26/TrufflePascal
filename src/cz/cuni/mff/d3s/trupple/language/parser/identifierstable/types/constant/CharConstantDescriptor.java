@@ -19,7 +19,7 @@ public class CharConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return '\0';
+        return this.value;
     }
 
     @Override

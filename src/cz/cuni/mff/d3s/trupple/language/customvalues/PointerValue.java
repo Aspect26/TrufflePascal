@@ -16,8 +16,6 @@ public class PointerValue implements ICustomValue {
         this.heapSlot = PascalHeap.NIL;
     }
 
-    public static PointerValue NIL = new PointerValue(null);
-
     @Override
     public Object getValue() {
         return this;

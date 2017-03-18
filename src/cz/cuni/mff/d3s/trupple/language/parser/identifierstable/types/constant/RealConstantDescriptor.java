@@ -17,7 +17,7 @@ public class RealConstantDescriptor implements ConstantDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return 0d;
+        return this.value;
     }
 
     @Override

@@ -19,7 +19,7 @@ public class BooleanConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return false;
+        return value;
     }
 
     @Override

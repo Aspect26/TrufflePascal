@@ -17,7 +17,7 @@ public class LongConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return 0;
+        return value;
     }
 
     @Override
