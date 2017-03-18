@@ -13,6 +13,7 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine.*;
 
 import java.util.HashMap;
@@ -43,16 +44,16 @@ public class IdentifiersTable {
     }
 
     private void addBuiltinTypes() {
-        typeDescriptors.put("integer", PrimitiveDescriptor.longDescriptor());
-        typeDescriptors.put("shortint", PrimitiveDescriptor.longDescriptor());
-        typeDescriptors.put("longint", PrimitiveDescriptor.longDescriptor());
-        typeDescriptors.put("byte", PrimitiveDescriptor.longDescriptor());
-        typeDescriptors.put("word", PrimitiveDescriptor.longDescriptor());
-        typeDescriptors.put("single", PrimitiveDescriptor.floatDescriptor());
-        typeDescriptors.put("real", PrimitiveDescriptor.floatDescriptor());
-        typeDescriptors.put("double", PrimitiveDescriptor.floatDescriptor());
-        typeDescriptors.put("boolean", PrimitiveDescriptor.booleanDescriptor());
-        typeDescriptors.put("char", PrimitiveDescriptor.charDescriptor());
+        typeDescriptors.put("integer", new LongDescriptor());
+        typeDescriptors.put("shortint", new LongDescriptor());
+        typeDescriptors.put("longint", new LongDescriptor());
+        typeDescriptors.put("byte", new LongDescriptor());
+        typeDescriptors.put("word", new LongDescriptor());
+        typeDescriptors.put("single", new RealDescriptor());
+        typeDescriptors.put("real", new RealDescriptor());
+        typeDescriptors.put("double", new RealDescriptor());
+        typeDescriptors.put("boolean", new BooleanDescriptor());
+        typeDescriptors.put("char", new CharDescriptor());
 
         for (Map.Entry<String, TypeDescriptor> typeEntry : typeDescriptors.entrySet()) {
             identifiersMap.put(typeEntry.getKey(), new TypeTypeDescriptor(typeEntry.getValue()));

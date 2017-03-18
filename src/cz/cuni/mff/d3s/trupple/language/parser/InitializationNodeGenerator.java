@@ -14,6 +14,10 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.Or
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.*;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.BooleanDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.CharDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.LongDescriptor;
+import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.primitive.PrimitiveDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +63,7 @@ class InitializationNodeGenerator {
             //   the enum type are EnumValue objects at run time
             return createEnumValue(frameSlot, ((EnumValueDescriptor)typeDescriptor).getEnumTypeDescriptor(), identifier);
         } else if (typeDescriptor instanceof SetDescriptor) {
-            return createSetValue(frameSlot, (SetDescriptor)typeDescriptor);
+            return createSetValue(frameSlot);
         } else if (typeDescriptor instanceof RecordDescriptor) {
             return createRecordValueAndInnerValues(frameSlot, (RecordDescriptor)typeDescriptor);
         } else if (typeDescriptor instanceof NilPointerDescriptor) {
@@ -123,7 +127,7 @@ class InitializationNodeGenerator {
         return InitializationNodeFactory.create(frameSlot, currentArray);
     }
 
-    private StatementNode createSetValue(FrameSlot frameSlot, SetDescriptor descriptor) throws LexicalException {
+    private StatementNode createSetValue(FrameSlot frameSlot) throws LexicalException {
         return InitializationNodeFactory.create(frameSlot, new SetTypeValue());
     }
 
@@ -151,11 +155,11 @@ class InitializationNodeGenerator {
     }
 
     private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) throws LexicalException {
-        if (descriptor instanceof OrdinalDescriptor.RangeDescriptor || descriptor instanceof PrimitiveDescriptor.LongDescriptor) {
+        if (descriptor instanceof OrdinalDescriptor.RangeDescriptor || descriptor instanceof LongDescriptor) {
             return new PascalOrdinal.RangePascalOrdinal(descriptor.getSize(), descriptor.getFirstIndex());
-        } else if (descriptor instanceof PrimitiveDescriptor.BooleanDescriptor) {
+        } else if (descriptor instanceof BooleanDescriptor) {
             return PascalOrdinal.booleanPascalOrdinal;
-        } else if (descriptor instanceof PrimitiveDescriptor.CharDescriptor) {
+        } else if (descriptor instanceof CharDescriptor) {
             return PascalOrdinal.charPascalOrdinal;
         } else if (descriptor instanceof  EnumTypeDescriptor) {
             return new PascalOrdinal.EnumPascalOrdinal((EnumTypeDescriptor) descriptor);
