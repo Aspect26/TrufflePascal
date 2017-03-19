@@ -10,24 +10,19 @@ import cz.cuni.mff.d3s.trupple.language.nodes.RouteTarget;
 
 public class ReadVariableWithRouteNode extends ExpressionNode {
 
-    @Children private final AccessRouteNode[] accessRoute;
+    @Child private AccessRouteNode accessRouteNode;
     private final FrameSlot firstSlot;
 
-	public ReadVariableWithRouteNode(AccessRouteNode[] accessRoute, FrameSlot firstSlot) {
-	    this.accessRoute = accessRoute;
+	public ReadVariableWithRouteNode(AccessRouteNode accessRouteNode, FrameSlot firstSlot) {
+	    this.accessRouteNode = accessRouteNode;
         this.firstSlot = firstSlot;
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
 	    try {
-            RouteTarget routeTarget = this.getRouteTarget(frame, firstSlot, accessRoute);
-            if (routeTarget.isArray) {
-                PascalArray array = (PascalArray) routeTarget.frame.getObject(routeTarget.slot);
-                return array.getValueAt(routeTarget.arrayIndexes);
-            } else {
-                return this.getValueFromSlot(routeTarget.frame, routeTarget.slot);
-            }
+	        accessRouteNode.executeVoid(frame);
+            return accessRouteNode.getValue(frame);
         } catch (FrameSlotTypeException e) {
             throw new PascalRuntimeException("Unexpected error");
         }

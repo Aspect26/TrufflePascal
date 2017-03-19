@@ -665,11 +665,11 @@ public class Parser implements IParser {
 			statement = factory.createSubroutineCall(identifierToken, new ArrayList<>()); 
 		} else if (la.kind == 16) {
 			statement = SubroutineCall(identifierToken);
-		} else if (la.kind == 13 || la.kind == 32 || la.kind == 34) {
-			List<AccessRouteNode> accessRoute  = InnerAccessRoute();
+		} else if (StartOf(5)) {
+			AccessRouteNode accessRouteNode = InnerAccessRoute(identifierToken);
 			Expect(34);
 			ExpressionNode value = Expression();
-			statement = factory.createAssignmentWithRoute(identifierToken, accessRoute, value); 
+			statement = factory.createAssignmentWithRoute(identifierToken, accessRouteNode, value); 
 		} else SynErr(70);
 		return statement;
 	}
@@ -678,7 +678,7 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		Expect(16);
 		List<ExpressionNode> parameters = new ArrayList<>(); 
-		if (StartOf(5)) {
+		if (StartOf(6)) {
 			parameters = ActualParameters(identifierToken);
 		}
 		Expect(17);
@@ -686,12 +686,11 @@ public class Parser implements IParser {
 		return expression;
 	}
 
-	List<AccessRouteNode>  InnerAccessRoute() {
-		List<AccessRouteNode>  accessRoute;
-		accessRoute = new ArrayList<>(); 
-		while (la.kind == 13 || la.kind == 32) {
-			AccessRouteNode element = InnerAccessRouteElement();
-			accessRoute.add(element); 
+	AccessRouteNode  InnerAccessRoute(Token identifierToken) {
+		AccessRouteNode  accessRoute;
+		accessRoute = factory.createSimpleAccessRouteNode(identifierToken); 
+		while (la.kind == 13 || la.kind == 21 || la.kind == 32) {
+			accessRoute = InnerAccessRouteElement(accessRoute);
 		}
 		return accessRoute;
 	}
@@ -708,29 +707,30 @@ public class Parser implements IParser {
 		return expression;
 	}
 
-	AccessRouteNode  InnerAccessRouteElement() {
-		AccessRouteNode  element;
-		element = null; 
+	AccessRouteNode  InnerAccessRouteElement(AccessRouteNode previousAccessNode) {
+		AccessRouteNode  accessNode;
+		accessNode = null; 
 		if (la.kind == 13) {
 			List<ExpressionNode> indexNodes  = ArrayIndex();
-			element = new AccessRouteNode.ArrayIndex(indexNodes); 
+			accessNode = new AccessRouteNode.ArrayIndex(previousAccessNode, indexNodes); 
 		} else if (la.kind == 32) {
 			Get();
 			Expect(1);
 			String variableIdentifier = factory.getIdentifierFromToken(t); 
-			element = new AccessRouteNode.EnterRecord(variableIdentifier); 
+			accessNode = new AccessRouteNode.EnterRecord(previousAccessNode, variableIdentifier); 
+		} else if (la.kind == 21) {
+			Get();
+			accessNode = new AccessRouteNode.PointerDereference(previousAccessNode); 
 		} else SynErr(71);
-		return element;
+		return accessNode;
 	}
 
-	List<AccessRouteNode>  InnerAccessRouteNonEmpty() {
-		List<AccessRouteNode>  accessRoute;
-		accessRoute = new ArrayList<>(); 
-		AccessRouteNode element = InnerAccessRouteElement();
-		accessRoute.add(element); 
-		while (la.kind == 13 || la.kind == 32) {
-			element = InnerAccessRouteElement();
-			accessRoute.add(element); 
+	AccessRouteNode  InnerAccessRouteNonEmpty(Token identifierToken) {
+		AccessRouteNode  accessRoute;
+		accessRoute = factory.createSimpleAccessRouteNode(identifierToken); 
+		accessRoute = InnerAccessRouteElement(accessRoute);
+		while (la.kind == 13 || la.kind == 21 || la.kind == 32) {
+			accessRoute = InnerAccessRouteElement(accessRoute);
 		}
 		return accessRoute;
 	}
@@ -800,7 +800,7 @@ public class Parser implements IParser {
 			Token op = t; 
 			ExpressionNode right = SignedLogicFactor();
 			expression = factory.createUnaryExpression(op, right); 
-		} else if (StartOf(6)) {
+		} else if (StartOf(7)) {
 			expression = LogicFactor();
 		} else SynErr(72);
 		return expression;
@@ -809,7 +809,7 @@ public class Parser implements IParser {
 	ExpressionNode  LogicFactor() {
 		ExpressionNode  expression;
 		expression = Arithmetic();
-		if (StartOf(7)) {
+		if (StartOf(8)) {
 			switch (la.kind) {
 			case 48: {
 				Get();
@@ -866,7 +866,7 @@ public class Parser implements IParser {
 	ExpressionNode  Term() {
 		ExpressionNode  expression;
 		expression = SignedFactor();
-		while (StartOf(8)) {
+		while (StartOf(9)) {
 			if (la.kind == 54) {
 				Get();
 			} else if (la.kind == 55) {
@@ -895,7 +895,7 @@ public class Parser implements IParser {
 			Token unOp = t; 
 			expression = SignedFactor();
 			expression = factory.createUnaryExpression(unOp, expression); 
-		} else if (StartOf(9)) {
+		} else if (StartOf(10)) {
 			expression = Factor();
 		} else SynErr(73);
 		return expression;
@@ -950,9 +950,9 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		Expect(1);
 		Token identifierToken = t; expression = null; 
-		if (StartOf(10)) {
+		if (StartOf(11)) {
 			expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
-		} else if (la.kind == 13 || la.kind == 16 || la.kind == 32) {
+		} else if (StartOf(12)) {
 			expression = InnerIdentifierAccess(identifierToken);
 		} else SynErr(75);
 		return expression;
@@ -977,7 +977,7 @@ public class Parser implements IParser {
 		Expect(13);
 		if (la.kind == 15) {
 			expression = factory.createSetConstructorNode(new ArrayList<>()); 
-		} else if (StartOf(5)) {
+		} else if (StartOf(6)) {
 			List<ExpressionNode> valueNodes = new ArrayList<ExpressionNode>(); 
 			ExpressionNode valueNode = Expression();
 			valueNodes.add(valueNode); 
@@ -997,8 +997,8 @@ public class Parser implements IParser {
 		expression = null; 
 		if (la.kind == 16) {
 			expression = SubroutineCall(identifierToken);
-		} else if (la.kind == 13 || la.kind == 32) {
-			List<AccessRouteNode> accessRoute  = InnerAccessRouteNonEmpty();
+		} else if (la.kind == 13 || la.kind == 21 || la.kind == 32) {
+			AccessRouteNode accessRoute = InnerAccessRouteNonEmpty(identifierToken);
 			expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); 
 		} else SynErr(78);
 		return expression;
@@ -1024,7 +1024,7 @@ public class Parser implements IParser {
 		if (factory.shouldBeReference(subroutineToken, currentParameterIndex)) {
 			Expect(1);
 			parameter = factory.createReferenceNode(t); 
-		} else if (StartOf(5)) {
+		} else if (StartOf(6)) {
 			parameter = Expression();
 		} else SynErr(79);
 		return parameter;
@@ -1048,12 +1048,14 @@ public class Parser implements IParser {
 		{_x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_T,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x},
 		{_x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_T,_T, _x,_T,_x,_x, _T,_x,_x,_T, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x}
+		{_x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_T,_T, _x,_T,_x,_x, _T,_x,_x,_T, _x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _T,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
 
 	};
 

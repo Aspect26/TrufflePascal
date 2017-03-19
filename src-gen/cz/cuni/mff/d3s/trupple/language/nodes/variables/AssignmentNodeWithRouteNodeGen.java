@@ -27,8 +27,8 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
     @CompilationFinal private Class<?> valueNodeType_;
     @Child private BaseNode_ specialization_;
 
-    private AssignmentNodeWithRouteNodeGen(AccessRouteNode[] accessRouteNodes, ExpressionNode valueNode, FrameSlot slot) {
-        super(accessRouteNodes);
+    private AssignmentNodeWithRouteNodeGen(AccessRouteNode accessRouteNode, ExpressionNode valueNode, FrameSlot slot) {
+        super(accessRouteNode);
         this.slot = slot;
         this.valueNode_ = valueNode;
         this.specialization_ = UninitializedNode_.create(this);
@@ -80,8 +80,8 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         return SpecializationNode.updateRoot(super.deepCopy());
     }
 
-    public static AssignmentNodeWithRoute create(AccessRouteNode[] accessRouteNodes, ExpressionNode valueNode, FrameSlot slot) {
-        return new AssignmentNodeWithRouteNodeGen(accessRouteNodes, valueNode, slot);
+    public static AssignmentNodeWithRoute create(AccessRouteNode accessRouteNode, ExpressionNode valueNode, FrameSlot slot) {
+        return new AssignmentNodeWithRouteNodeGen(accessRouteNode, valueNode, slot);
     }
 
     @GeneratedBy(AssignmentNodeWithRoute.class)

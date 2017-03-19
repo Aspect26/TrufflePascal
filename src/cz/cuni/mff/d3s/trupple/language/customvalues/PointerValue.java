@@ -8,7 +8,6 @@ public class PointerValue implements ICustomValue {
 
     private HeapSlot heapSlot;
 
-
     private final TypeDescriptor innerType;
 
     public PointerValue(TypeDescriptor innerType) {
@@ -21,6 +20,10 @@ public class PointerValue implements ICustomValue {
         return this;
     }
 
+    public Object getDereferenceValue() {
+        return PascalHeap.getInstance().getValueAt(this.heapSlot);
+    }
+
     public HeapSlot getHeapSlot() {
         return heapSlot;
     }
@@ -31,5 +34,9 @@ public class PointerValue implements ICustomValue {
 
     public void setHeapSlot(HeapSlot heapSlot) {
         this.heapSlot = heapSlot;
+    }
+
+    public void setDereferenceValue(Object value) {
+        PascalHeap.getInstance().setValueAt(this.heapSlot, value);
     }
 }

@@ -9,6 +9,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
+// TODO: omg refactor this class
 @NodeField(name = "slot", type = FrameSlot.class)
 public abstract class ReadVariableNode extends ExpressionNode {
 

@@ -489,12 +489,19 @@ public class NodeFactory {
         }
     }
 
-    public ExpressionNode createAssignmentWithRoute(Token identifierToken, List<AccessRouteNode> accessRoute, ExpressionNode valueNode) {
+    public AccessRouteNode createSimpleAccessRouteNode(Token identifierToken) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(identifier));
+
+	    return new AccessRouteNode.Simple(frameSlot);
+    }
+
+    public ExpressionNode createAssignmentWithRoute(Token identifierToken, AccessRouteNode accessRouteNode, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier));
 
         // TODO: check if it is assignable
-        return AssignmentNodeWithRouteNodeGen.create(accessRoute.toArray(new AccessRouteNode[accessRoute.size()]), valueNode, frameSlot);
+        return AssignmentNodeWithRouteNodeGen.create(accessRouteNode, valueNode, frameSlot);
     }
 
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
@@ -511,12 +518,12 @@ public class NodeFactory {
         }, new UnknownIdentifierException(identifier));
     }
 
-    public ExpressionNode createExpressionFromIdentifierWithRoute(Token identifierToken, List<AccessRouteNode> accessRoute) {
+    public ExpressionNode createExpressionFromIdentifierWithRoute(Token identifierToken, AccessRouteNode accessRouteNode) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         return this.doLookup(
                 identifier,
-                (LexicalScope foundInLexicalScope, String foundIdentifier) -> new ReadVariableWithRouteNode(accessRoute.toArray(new AccessRouteNode[accessRoute.size()]), foundInLexicalScope.getLocalSlot(foundIdentifier)),
+                (LexicalScope foundInLexicalScope, String foundIdentifier) -> new ReadVariableWithRouteNode(accessRouteNode, foundInLexicalScope.getLocalSlot(foundIdentifier)),
                 new UnknownIdentifierException(identifier)
         );
     }
