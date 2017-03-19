@@ -49,6 +49,10 @@ public class EnumValue implements ICustomValue, Serializable {
 	    return this.enumType.getPrevious(this.value);
     }
 
+    public long getOrdinalValue() {
+        return this.enumType.getOrdinalValue(this.value);
+    }
+
     public boolean lesserThan(EnumValue compareTo) {
 		return this.enumType.getIdentifiers().indexOf(this.value) < this.enumType.getIdentifiers().indexOf(compareTo.getValue());
 	}

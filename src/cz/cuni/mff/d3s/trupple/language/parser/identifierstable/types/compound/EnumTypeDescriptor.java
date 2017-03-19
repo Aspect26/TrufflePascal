@@ -60,4 +60,8 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
 
         return new EnumValue(this, this.identifiers.get(--index));
     }
+
+    public long getOrdinalValue(String value) {
+        return this.identifiers.indexOf(value);
+    }
 }

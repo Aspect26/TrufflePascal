@@ -89,6 +89,7 @@ public class IdentifiersTable {
         identifiersMap.put("reset", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
         identifiersMap.put("eof", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
         identifiersMap.put("chr", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        identifiersMap.put("ord", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
     }
 
     public FrameSlot getFrameSlot(String identifier) {
