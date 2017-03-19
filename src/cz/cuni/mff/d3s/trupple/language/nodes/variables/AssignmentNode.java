@@ -8,10 +8,7 @@ import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeChild("valueNode")
@@ -26,9 +23,10 @@ public abstract class AssignmentNode extends ExpressionNode {
 
     protected abstract FrameSlot getSlot();
 
+    // TODO: the third argument shall be removed
     protected void makeAssignment(VirtualFrame frame, FrameSlot slot, AssignmentNodeWithRoute.SlotAssignment slotAssignment, Object value) {
         try {
-            slotAssignment.assign(frame, slot, value);
+            this.setValueToSlot(frame, slot, value);
         } catch (FrameSlotTypeException e) {
             throw new PascalRuntimeException("Wrong access");
         }
@@ -101,6 +99,18 @@ public abstract class AssignmentNode extends ExpressionNode {
         SetTypeValue setCopy = set.createDeepCopy();
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, setCopy);
         return setCopy;
+    }
+
+    @Specialization
+    Object assignReference(VirtualFrame frame, Reference reference) {
+        // TODO: this if is so wrong, refactor it somehow
+        Object referenceValue = this.getValueFromSlot(reference.getFromFrame(), reference.getFrameSlot());
+        if (referenceValue instanceof PointerValue) {
+            this.assignPointers(frame, (PointerValue) referenceValue);
+        } else {
+            this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, referenceValue);
+        }
+        return referenceValue;
     }
 
     @Specialization

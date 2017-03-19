@@ -6,10 +6,27 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescri
 
 public class PointerDescriptor implements TypeDescriptor {
 
-    private final TypeDescriptor innerType;
+    private TypeDescriptor innerType;
+    private String innerTypeIdentifier;
+    private boolean innerTypeInitialized;
 
     public PointerDescriptor(TypeDescriptor innerType) {
         this.innerType = innerType;
+        this.innerTypeInitialized = true;
+    }
+
+    public PointerDescriptor(String innerTypeIdentifier) {
+        this.innerTypeIdentifier = innerTypeIdentifier;
+        this.innerTypeInitialized = false;
+    }
+
+    // TODO: refactor <- parent class should not know about its subclasses
+    /**
+     * This c'tor is only used for NilPointerDescriptor
+     */
+    protected PointerDescriptor() {
+        this.innerTypeInitialized = true;
+        this.innerType = null;
     }
 
     @Override
@@ -20,6 +37,19 @@ public class PointerDescriptor implements TypeDescriptor {
     @Override
     public Object getDefaultValue() {
         return new PointerValue(innerType);
+    }
+
+    public String getInnerTypeIdentifier() {
+        return this.innerTypeIdentifier;
+    }
+
+    public void setInnerType(TypeDescriptor innerType) {
+        this.innerType = innerType;
+        this.innerTypeInitialized = true;
+    }
+
+    public boolean isInnerTypeInitialized() {
+        return this.innerTypeInitialized;
     }
 
 }

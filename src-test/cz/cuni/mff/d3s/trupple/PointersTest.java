@@ -114,4 +114,45 @@ public class PointersTest extends JUnitTest {
         test(code, "00000000000000000000123456789012345678902468024680246802468036925814703692581470482604826048260482605050505050505050505062840628406284062840741852963074185296308642086420864208642098765432109876543210000000000000000000001234567890123456789024680246802468024680369258147036925814704826048260482604826050505050505050505050");
     }
 
+    @Test
+    public void linkedListWithReverseOutputTest() {
+        String code = "program main;\n"+
+                "\n"+
+                "type pnode = ^node;\n"+
+                " node = record\n"+
+                " previous: ^pnode;\n"+
+                " value: char;\n"+
+                " end;\n"+
+                "\n"+
+                "var i: integer;\n"+
+                " linkedList: pnode;\n"+
+                " c: char;\n"+
+                "\n"+
+                "procedure appendValue(var prevHead: pnode; value: char);\n"+
+                "var newHead: pnode;\n"+
+                "begin\n"+
+                " prevHead^.value := value;\n"+
+                " new(newHead);\n"+
+                " newHead^.previous := prevHead;\n"+
+                " prevHead := newHead;\n"+
+                "end;\n"+
+                "\n"+
+                "begin\n"+
+                " new(linkedList);\n"+
+                "\n"+
+                " for i:=1 to 13 do begin\n"+
+                " read(c);\n"+
+                " appendValue(linkedList, c);\n"+
+                " end;\n"+
+                "\n"+
+                " linkedList := linkedList^.previous; { the head is always empty }\n"+
+                " while linkedList <> nil do begin\n"+
+                " write(linkedList^.value);\n"+
+                " linkedList := linkedList^.previous;\n"+
+                " end;\n"+
+                "end.";
+
+        testWithInput(code, "lemmiF sivarT", "Travis Fimmel", true);
+    }
+
 }

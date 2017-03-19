@@ -151,12 +151,16 @@ public class LexicalScope {
         return this.localIdentifiers.createRecordDescriptor(this);
     }
 
-    PointerDescriptor createPointerDescriptor(TypeDescriptor innerType) {
-        return this.localIdentifiers.createPointerDescriptor(innerType);
+    PointerDescriptor createPointerDescriptor(String innerTypeIdentifier) {
+        return this.localIdentifiers.createPointerDescriptor(innerTypeIdentifier);
     }
 
     TypeDescriptor createSetType(OrdinalDescriptor baseType) {
         return this.localIdentifiers.createSetType(baseType);
+    }
+
+    void initializeAllUninitializedPointerDescriptors() throws LexicalException {
+        this.localIdentifiers.initializeAllUninitializedPointerDescriptors();
     }
 
     // NOTE: the procedure could have been forwarded

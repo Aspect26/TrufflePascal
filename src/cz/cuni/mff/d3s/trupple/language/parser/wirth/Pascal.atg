@@ -61,7 +61,7 @@ TypeDefinitions
 TypeDefinition ";"
 {
     TypeDefinition ";"
-}
+}                                               (. factory.initializeAllUninitializedPointerDescriptors(); .)
 .
 
 
@@ -151,7 +151,7 @@ RecordFieldList<out typeDescriptor>
 PointerType<out TypeDescriptor typeDescriptor>
 =
 "^"
-Type<out TypeDescriptor innerType>              (. typeDescriptor = factory.createPointerType(innerType); .)
+identifier                                      (. typeDescriptor = factory.createPointerType(t); .)
 .
 
 

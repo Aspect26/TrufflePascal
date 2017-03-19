@@ -69,4 +69,24 @@ public abstract class StatementNode extends Node {
         }
     }
 
+    protected void setValueToSlot(VirtualFrame frame, FrameSlot slot, Object value) throws FrameSlotTypeException {
+        switch (slot.getKind()) {
+            case Boolean:
+                frame.setBoolean(slot, (boolean) value);
+                break;
+            case Long:
+                frame.setLong(slot, (long) value);
+                break;
+            case Double:
+                frame.setDouble(slot, (double) value);
+                break;
+            case Byte:
+                frame.setByte(slot, (byte) (char) value);
+                break;
+            case Object:
+                frame.setObject(slot, value);
+                break;
+        }
+    }
+
 }

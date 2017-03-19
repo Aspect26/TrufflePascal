@@ -195,13 +195,22 @@ public class NodeFactory {
 	    return this.lexicalScope.createRecordDescriptor();
     }
 
-    public TypeDescriptor createPointerType(TypeDescriptor innerType) {
-        return this.lexicalScope.createPointerDescriptor(innerType);
+    public TypeDescriptor createPointerType(Token typeToken) {
+	    String typeIdentifier = this.getTypeNameFromToken(typeToken);
+        return this.lexicalScope.createPointerDescriptor(typeIdentifier);
     }
 
     public void finishRecord() {
         assert this.lexicalScope.getOuterScope() != null;
         this.lexicalScope = this.lexicalScope.getOuterScope();
+    }
+
+    public void initializeAllUninitializedPointerDescriptors() {
+	    try {
+            this.lexicalScope.initializeAllUninitializedPointerDescriptors();
+        } catch (LexicalException e) {
+	        parser.SemErr(e.getMessage());
+        }
     }
 
     public OrdinalDescriptor createSimpleOrdinalDescriptor(final ConstantDescriptor lowerBound, final ConstantDescriptor upperBound) {
