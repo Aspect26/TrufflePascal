@@ -145,6 +145,7 @@ public class Parser implements IParser {
 			TypeDefinition();
 			Expect(6);
 		}
+		factory.initializeAllUninitializedPointerDescriptors(); 
 	}
 
 	void VariableDeclarations() {
@@ -289,8 +290,8 @@ public class Parser implements IParser {
 	TypeDescriptor  PointerType() {
 		TypeDescriptor  typeDescriptor;
 		Expect(21);
-		TypeDescriptor innerType = Type();
-		typeDescriptor = factory.createPointerType(innerType); 
+		Expect(1);
+		typeDescriptor = factory.createPointerType(t); 
 		return typeDescriptor;
 	}
 

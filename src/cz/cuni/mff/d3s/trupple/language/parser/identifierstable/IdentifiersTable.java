@@ -137,6 +137,23 @@ public class IdentifiersTable {
         }
     }
 
+    public void initializeAllUninitializedPointerDescriptors() throws LexicalException {
+        for (Map.Entry<String, TypeDescriptor> typeEntry : this.typeDescriptors.entrySet()) {
+            TypeDescriptor type = typeEntry.getValue();
+            if (type instanceof PointerDescriptor) {
+                PointerDescriptor pointerDescriptor = (PointerDescriptor) type;
+                if (!pointerDescriptor.isInnerTypeInitialized()) {
+                    TypeDescriptor pointerInnerType = this.getTypeDescriptor(pointerDescriptor.getInnerTypeIdentifier());
+                    if (pointerInnerType == null) {
+                        throw new LexicalException("Pointer type not declared in the same type statement.");
+                    } else {
+                        pointerDescriptor.setInnerType(pointerInnerType);
+                    }
+                }
+            }
+        }
+    }
+
     public FrameSlot addReference(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         return this.registerNewIdentifier(identifier, new ReferenceDescriptor(typeDescriptor));
     }
@@ -180,8 +197,9 @@ public class IdentifiersTable {
         return new RecordDescriptor(recordScope);
     }
 
-    public PointerDescriptor createPointerDescriptor(TypeDescriptor innerType) {
-        return new PointerDescriptor(innerType);
+    public PointerDescriptor createPointerDescriptor(String innerTypeIdentifier) {
+        TypeDescriptor innerTypeDescriptor = this.getTypeDescriptor(innerTypeIdentifier);
+        return (innerTypeDescriptor == null)? new PointerDescriptor(innerTypeIdentifier) : new PointerDescriptor(innerTypeDescriptor);
     }
 
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {
