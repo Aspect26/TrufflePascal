@@ -63,6 +63,15 @@ public class FileValue implements ICustomValue {
         }
     }
 
+    public boolean isEof() {
+        try {
+            return this.inputStream.available() == 0;
+        } catch (IOException e) {
+            // TODO: custom exception
+            throw new PascalRuntimeException("IOException");
+        }
+    }
+
     private void verifyPathSet() {
         if (filePath == null) {
             // TODO: custom exception
@@ -72,6 +81,13 @@ public class FileValue implements ICustomValue {
 
     private void verifyOpenToWrite() {
         if (outputStream == null) {
+            // TODO: custom exception
+            throw new PascalRuntimeException("File not opened to write.");
+        }
+    }
+
+    private void verifyOpenToRead() {
+        if (inputStream == null) {
             // TODO: custom exception
             throw new PascalRuntimeException("File not opened to write.");
         }
