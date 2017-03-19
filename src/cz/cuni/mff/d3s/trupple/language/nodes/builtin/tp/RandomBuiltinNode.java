@@ -15,8 +15,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class RandomBuiltinNode extends BuiltinNode {
 
-
-
 	public RandomBuiltinNode(PascalContext context) {
 		super(context);
 	}

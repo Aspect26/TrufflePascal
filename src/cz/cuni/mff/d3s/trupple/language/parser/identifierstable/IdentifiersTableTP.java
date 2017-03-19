@@ -12,5 +12,6 @@ public class IdentifiersTableTP extends IdentifiersTable {
         this.identifiersMap.put("readln", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
         this.identifiersMap.put("random", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
         this.identifiersMap.put("randomize", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
+        this.identifiersMap.put("assign", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
     }
 }

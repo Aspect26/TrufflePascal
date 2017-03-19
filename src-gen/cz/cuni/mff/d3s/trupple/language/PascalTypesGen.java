@@ -4,6 +4,7 @@ package cz.cuni.mff.d3s.trupple.language;
 import com.oracle.truffle.api.dsl.GeneratedBy;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
@@ -175,6 +176,22 @@ public final class PascalTypesGen extends PascalTypes {
     public static SetTypeValue expectSetTypeValue(Object value) throws UnexpectedResultException {
         if (value instanceof SetTypeValue) {
             return (SetTypeValue) value;
+        }
+        throw new UnexpectedResultException(value);
+    }
+
+    public static boolean isFileValue(Object value) {
+        return value instanceof FileValue;
+    }
+
+    public static FileValue asFileValue(Object value) {
+        assert value instanceof FileValue : "PascalTypesGen.asFileValue: FileValue expected";
+        return (FileValue) value;
+    }
+
+    public static FileValue expectFileValue(Object value) throws UnexpectedResultException {
+        if (value instanceof FileValue) {
+            return (FileValue) value;
         }
         throw new UnexpectedResultException(value);
     }

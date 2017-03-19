@@ -74,13 +74,22 @@ public class PascalSubroutineRegistry {
 		this.register(name, rootNode);
 	}
 
-	void installBuiltinOneArgument(NodeFactory<? extends BuiltinNode> factory) {
-		ExpressionNode argument = new ReadArgumentNode(0);
-		BuiltinNode builtinNode = factory.createNode(context, argument);
-		PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinNode);
-		String name = lookupNodeInfo(builtinNode.getClass()).shortName();
-		this.register(name, rootNode);
-	}
+    void installBuiltinOneArgument(NodeFactory<? extends BuiltinNode> factory) {
+        ExpressionNode argument = new ReadArgumentNode(0);
+        BuiltinNode builtinNode = factory.createNode(context, argument);
+        PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinNode);
+        String name = lookupNodeInfo(builtinNode.getClass()).shortName();
+        this.register(name, rootNode);
+    }
+
+    void installBuiltinTwoArguments(NodeFactory<? extends BuiltinNode> factory) {
+        ExpressionNode argument1 = new ReadArgumentNode(0);
+        ExpressionNode argument2 = new ReadArgumentNode(1);
+        BuiltinNode builtinNode = factory.createNode(context, argument1, argument2);
+        PascalRootNode rootNode = new PascalRootNode(new FrameDescriptor(), builtinNode);
+        String name = lookupNodeInfo(builtinNode.getClass()).shortName();
+        this.register(name, rootNode);
+    }
 
 	void installBuiltinWithVariableArgumentsCount(NodeFactory<? extends BuiltinNode> factory) {
 		ExpressionNode argumentsNode[] = new ExpressionNode[1];
