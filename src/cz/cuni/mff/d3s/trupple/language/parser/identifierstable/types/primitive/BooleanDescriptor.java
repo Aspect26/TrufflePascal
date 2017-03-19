@@ -25,10 +25,4 @@ public class BooleanDescriptor extends PrimitiveDescriptor implements OrdinalDes
         return 2;
     }
 
-    @Override
-    public byte[] getBinaryRepresentation(Object value) {
-        byte[] data = new byte[1];
-        data[0] = ((boolean) value)? (byte)1 : (byte)0;  // fuck java for no byte literal ...
-        return data;
-    }
 }

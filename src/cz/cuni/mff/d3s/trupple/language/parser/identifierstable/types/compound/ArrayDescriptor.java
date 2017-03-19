@@ -1,7 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.exceptions.runtime.NoBinaryRepresentationException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalOrdinal;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
@@ -31,11 +30,6 @@ public class ArrayDescriptor implements TypeDescriptor {
     public Object getDefaultValue() {
         Object[] data = this.createArrayData();
         return new PascalArray(this.createOrdinal(dimensions.get(0)), data);
-    }
-
-    @Override
-    public byte[] getBinaryRepresentation(Object value) {
-        throw new NoBinaryRepresentationException();
     }
 
     private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) {

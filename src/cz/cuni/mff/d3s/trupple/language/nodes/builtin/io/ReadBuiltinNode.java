@@ -1,20 +1,21 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.builtin.io;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.regex.Pattern;
-
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.nodes.NodeInfo;
-
 import cz.cuni.mff.d3s.trupple.exceptions.runtime.CantReadInputException;
 import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
+// TODO: refactor this class pls, this is a horrid mess
 @NodeInfo(shortName = "read")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class ReadBuiltinNode extends BuiltinNode {
@@ -32,15 +33,29 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
 	@Specialization
     public Object read(Object[] arguments) {
         if (arguments.length == 0) {
+            // TODO: wtf is this?
             return readOne();
         }
 
-        for (Object argument : arguments) {
-            Reference reference = (Reference)argument;
-            this.readOneToReference(reference);
+        FileValue file = tryGetFileValue((Reference) arguments[0]);
+        if (file != null) {
+            return read(file, Arrays.copyOfRange(arguments, 1, arguments.length));
+        } else {
+            return read(null, arguments);
         }
+    }
 
-        return new Object();
+    private FileValue tryGetFileValue(Reference reference) {
+        try {
+            Object referenceValue = reference.getFromFrame().getObject(reference.getFrameSlot());
+            if (referenceValue instanceof FileValue) {
+                return (FileValue) referenceValue;
+            } else {
+                return null;
+            }
+        } catch (FrameSlotTypeException e) {
+            return null;
+        }
     }
 
     private String readOne() {
@@ -51,23 +66,32 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
         }
     }
 
-    private void readOneToReference(Reference reference) {
+    private Object read(FileValue file, Object[] arguments) {
+        for (Object argument : arguments) {
+            Reference reference = (Reference)argument;
+            this.readOneToReference(file, reference);
+        }
+
+        return new Object();
+    }
+
+    private void readOneToReference(FileValue file, Reference reference) {
 	    try {
             switch (reference.getFrameSlot().getKind()) {
                 case Byte:
-                    char value = readChar();
+                    char value = readChar(file);
                     this.setReferenceChar(reference, value);
                     break;
                 case Double:
-                    double doubleValue = readDouble();
+                    double doubleValue = readDouble(file);
                     this.setReferenceDouble(reference, doubleValue);
                     break;
                 case Long:
-                    long longValue = readLong();
+                    long longValue = readLong(file);
                     this.setReferenceLong(reference, longValue);
                     break;
                 case Object:
-                    Object objectValue = readObject(reference);
+                    Object objectValue = readObject(file, reference);
                     this.setReferenceObject(reference, objectValue);
                     break;
                 default:
@@ -83,34 +107,68 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
         return false;
     }
 
-    private char readChar() throws IOException {
-        Pattern delimiterPattern = this.getContext().getInput().delimiter();
-        this.getContext().getInput().useDelimiter("");
-	    char value = this.getContext().getInput().next().charAt(0);
-	    this.getContext().getInput().useDelimiter(delimiterPattern);
+    private char readChar(FileValue file) throws IOException {
+        if (file == null) {
+            Pattern delimiterPattern = this.getContext().getInput().delimiter();
+            this.getContext().getInput().useDelimiter("");
+            char value = this.getContext().getInput().next().charAt(0);
+            this.getContext().getInput().useDelimiter(delimiterPattern);
 
-	    return value;
+            return value;
+        } else {
+            try {
+                Object obj = file.read();
+                return (char) (byte) obj;
+            } catch (ClassCastException e) {
+                // TODO: custom exception?
+                throw new PascalRuntimeException("Object in a file is not a character");
+            }
+        }
     }
 
-    private double readDouble() throws IOException {
-        return this.getContext().getInput().nextDouble();
+    private double readDouble(FileValue file) throws IOException {
+        if (file == null) {
+            return this.getContext().getInput().nextDouble();
+        } else {
+            try {
+                Object obj = file.read();
+                return (double) obj;
+            } catch (ClassCastException e) {
+                // TODO: custom exception?
+                throw new PascalRuntimeException("Object in a file is not a double");
+            }
+        }
     }
 
-    private long readLong() throws IOException {
-        return this.getContext().getInput().nextLong();
+    private long readLong(FileValue file) throws IOException {
+        if (file == null) {
+            return this.getContext().getInput().nextLong();
+        } else {
+            try {
+                Object obj = file.read();
+                return (long) obj;
+            } catch (ClassCastException e) {
+                // TODO: custom exception?
+                throw new PascalRuntimeException("Object in a file is not an integral value");
+            }
+        }
     }
 
-    private Object readObject(Reference reference) throws IOException {
-	    try {
+    private Object readObject(FileValue file, Reference reference) throws IOException {
+        try {
             Object referenceValue = reference.getFromFrame().getObject(reference.getFrameSlot());
-            if (referenceValue instanceof String) {
-                return readString();
+            if (file == null) {
+                if (referenceValue instanceof String) {
+                    return readString();
+                } else {
+                    // TODO: arrays
+                    throw new PascalRuntimeException("Not supported yet.");
+                }
             } else {
-                // TODO: arrays
-                throw new PascalRuntimeException("Not supported yet.");
+                return file.read();
             }
         } catch (FrameSlotTypeException e) {
-	        throw new PascalRuntimeException("Unknown read type");
+            throw new PascalRuntimeException("Unknown read type");
         }
     }
 

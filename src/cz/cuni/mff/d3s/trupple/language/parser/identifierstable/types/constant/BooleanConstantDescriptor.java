@@ -42,11 +42,4 @@ public class BooleanConstantDescriptor implements OrdinalConstantDescriptor {
         return (value)? 1 : 0;
     }
 
-    @Override
-    public byte[] getBinaryRepresentation(Object value) {
-        byte[] data = new byte[1];
-        data[0] = ((boolean) value)? (byte)1 : (byte)0;  // fuck java for no byte literal ...
-        return data;
-    }
-
 }

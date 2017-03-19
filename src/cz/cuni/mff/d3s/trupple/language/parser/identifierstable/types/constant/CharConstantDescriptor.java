@@ -42,10 +42,4 @@ public class CharConstantDescriptor implements OrdinalConstantDescriptor {
         return (int)this.value;
     }
 
-    @Override
-    public byte[] getBinaryRepresentation(Object value) {
-        byte b = (byte) (char) value;
-        return new byte[] { b };
-    }
-
 }

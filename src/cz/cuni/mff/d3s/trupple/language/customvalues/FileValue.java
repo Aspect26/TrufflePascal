@@ -62,12 +62,25 @@ public class FileValue implements ICustomValue {
         }
     }
 
+    public Object read() {
+        this.verifyOpenToRead();
+
+        try {
+            return this.inputStream.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new PascalRuntimeException("Unknown data in a file.");
+        } catch (IOException e) {
+            // TODO: custom exception
+            throw new PascalRuntimeException("Can't read from a file.");
+        }
+    }
+
     public boolean isEof() {
         this.verifyOpenToRead();
 
         try {
             // TODO: is this right? java streams doesnt have eof() function? fuck java
-            return this.inputStream.available() == 0;
+            return this.inputStream.available() == -1;
         } catch (IOException e) {
             // TODO: custom exception
             throw new PascalRuntimeException("IOException");
@@ -91,7 +104,7 @@ public class FileValue implements ICustomValue {
     private void verifyOpenToRead() {
         if (inputStream == null) {
             // TODO: custom exception
-            throw new PascalRuntimeException("File not opened to write.");
+            throw new PascalRuntimeException("File not opened to read.");
         }
     }
 

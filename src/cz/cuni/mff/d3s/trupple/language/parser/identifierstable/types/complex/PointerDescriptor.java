@@ -1,7 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.exceptions.runtime.NoBinaryRepresentationException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
@@ -39,12 +38,6 @@ public class PointerDescriptor implements TypeDescriptor {
     public Object getDefaultValue() {
         return new PointerValue(innerType);
     }
-
-    @Override
-    public byte[] getBinaryRepresentation(Object value) {
-        throw new NoBinaryRepresentationException();
-    }
-
 
     public String getInnerTypeIdentifier() {
         return this.innerTypeIdentifier;

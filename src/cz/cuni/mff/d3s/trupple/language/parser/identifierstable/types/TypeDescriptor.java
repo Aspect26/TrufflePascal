@@ -9,7 +9,5 @@ public interface TypeDescriptor {
 
     Object getDefaultValue();
 
-    byte[] getBinaryRepresentation(Object value);
-
 }
 
