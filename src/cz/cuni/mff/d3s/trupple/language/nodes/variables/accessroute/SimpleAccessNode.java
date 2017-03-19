@@ -11,6 +11,7 @@ public class SimpleAccessNode extends AccessNode {
     private final FrameSlot slot;
 
     public SimpleAccessNode(FrameSlot slot) {
+        super(null);
         this.slot = slot;
     }
 
@@ -30,7 +31,7 @@ public class SimpleAccessNode extends AccessNode {
     }
 
     @Override
-    public Object getValue(VirtualFrame frame) throws FrameSlotTypeException {
+    protected Object applyTo(VirtualFrame frame, Object value) {
         return this.getValueFromSlot(frame, this.slot);
     }
 

@@ -10,22 +10,21 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 
 public class RecordAccessNode extends AccessNode {
 
-    @Child AccessNode previousNode;
     private final String variableIdentifier;
 
-    public RecordAccessNode(AccessNode previousNode, String variableIdentifier) {
-        this.previousNode = previousNode;
+    public RecordAccessNode(AccessNode applyToNode, String variableIdentifier) {
+        super(applyToNode);
         this.variableIdentifier = variableIdentifier;
     }
 
     @Override
     public void executeVoid(VirtualFrame frame) {
-        previousNode.executeVoid(frame);
+        this.applyToNode.executeVoid(frame);
     }
 
     @Override
     protected void assignValue(VirtualFrame frame, AssignmentNode.SlotAssignment slotAssignment, Object value) throws FrameSlotTypeException {
-        RecordValue record = (RecordValue) this.previousNode.getValue(frame);
+        RecordValue record = (RecordValue) this.applyToNode.getValue(frame);
         VirtualFrame recordsFrame = record.getFrame();
         FrameSlot targetSlot = this.findSlotByIdentifier(recordsFrame, this.variableIdentifier);
         slotAssignment.assign(recordsFrame, targetSlot, value);
@@ -37,12 +36,16 @@ public class RecordAccessNode extends AccessNode {
     }
 
     @Override
-    public Object getValue(VirtualFrame frame) throws FrameSlotTypeException {
-        RecordValue record = (RecordValue) this.previousNode.getValue(frame);
-        VirtualFrame recordsFrame = record.getFrame();
-        FrameSlot targetSlot = this.findSlotByIdentifier(recordsFrame, this.variableIdentifier);
+    protected Object applyTo(VirtualFrame frame, Object value) {
+        if (value instanceof RecordValue) {
+            RecordValue record = (RecordValue) value;
+            VirtualFrame recordsFrame = record.getFrame();
+            FrameSlot targetSlot = this.findSlotByIdentifier(recordsFrame, this.variableIdentifier);
 
-        return this.getValueFromSlot(recordsFrame, targetSlot);
+            return this.getValueFromSlot(recordsFrame, targetSlot);
+        } else {
+            throw new PascalRuntimeException("Can't access element of this type.");
+        }
     }
 
 }

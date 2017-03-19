@@ -12,12 +12,11 @@ import java.util.List;
 
 public class ArrayAccessNode extends AccessNode {
 
-    @Child private AccessNode previousNode;
     @Children private final ExpressionNode[] indexExpressions;
     private Object[] indexes;
 
-    public ArrayAccessNode(AccessNode previousNode, List<ExpressionNode> indexExpressions) {
-        this.previousNode = previousNode;
+    public ArrayAccessNode(AccessNode applyToNode, List<ExpressionNode> indexExpressions) {
+        super(applyToNode);
         this.indexExpressions = indexExpressions.toArray(new ExpressionNode[indexExpressions.size()]);
     }
 
@@ -29,12 +28,12 @@ public class ArrayAccessNode extends AccessNode {
             indexes[i] = this.indexExpressions[i].executeGeneric(frame);
         }
 
-        previousNode.executeVoid(frame);
+        applyToNode.executeVoid(frame);
     }
 
     @Override
     protected void assignValue(VirtualFrame frame, AssignmentNode.SlotAssignment slotAssignment, Object value) throws FrameSlotTypeException {
-        PascalArray array = (PascalArray) this.previousNode.getValue(frame);
+        PascalArray array = (PascalArray) this.applyToNode.getValue(frame);
         array.setValueAt(this.indexes, value);
     }
 
@@ -44,8 +43,13 @@ public class ArrayAccessNode extends AccessNode {
     }
 
     @Override
-    public Object getValue(VirtualFrame frame) throws FrameSlotTypeException {
-        PascalArray array = (PascalArray) this.previousNode.getValue(frame);
-        return array.getValueAt(this.indexes);
+    protected Object applyTo(VirtualFrame frame, Object value) {
+        if (value instanceof PascalArray) {
+            PascalArray array = (PascalArray) value;
+            return array.getValueAt(this.indexes);
+        } else {
+            throw new PascalRuntimeException("Cannot index a variable of this type.");
+        }
     }
+
 }

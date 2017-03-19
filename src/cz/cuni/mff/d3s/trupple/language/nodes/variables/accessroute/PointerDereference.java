@@ -9,20 +9,18 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 
 public class PointerDereference extends AccessNode {
 
-    @Child private AccessNode previousNode;
-
-    public PointerDereference(AccessNode previousNode) {
-        this.previousNode = previousNode;
+    public PointerDereference(AccessNode applyToNode) {
+        super(applyToNode);
     }
 
     @Override
     public void executeVoid(VirtualFrame frame) {
-        previousNode.executeVoid(frame);
+        this.applyToNode.executeVoid(frame);
     }
 
     @Override
     protected void assignValue(VirtualFrame frame, AssignmentNode.SlotAssignment slotAssignment, Object value) throws FrameSlotTypeException {
-        PointerValue pointer = (PointerValue) this.previousNode.getValue(frame);
+        PointerValue pointer = (PointerValue) this.applyToNode.getValue(frame);
         pointer.setDereferenceValue(value);
     }
 
@@ -32,8 +30,14 @@ public class PointerDereference extends AccessNode {
     }
 
     @Override
-    public Object getValue(VirtualFrame frame) throws FrameSlotTypeException {
-        PointerValue pointer = (PointerValue) this.previousNode.getValue(frame);
-        return pointer.getDereferenceValue();
+    protected Object applyTo(VirtualFrame frame, Object value) {
+        if (value instanceof PointerValue) {
+            PointerValue pointer = (PointerValue) value;
+            return pointer.getDereferenceValue();
+        } else {
+            throw new PascalRuntimeException("Can't dereference this type.");
+        }
+
     }
+
 }

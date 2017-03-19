@@ -20,6 +20,12 @@ public class PointerValue implements ICustomValue {
         return this;
     }
 
+    @Override
+    public boolean equals(Object pointerValue) {
+        PointerValue comprareTo = (PointerValue) pointerValue;
+        return comprareTo.getHeapSlot().equals(this.getHeapSlot());
+    }
+
     public Object getDereferenceValue() {
         return PascalHeap.getInstance().getValueAt(this.heapSlot);
     }
