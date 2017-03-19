@@ -78,13 +78,8 @@ public class FileValue implements ICustomValue {
     public boolean isEof() {
         this.verifyOpenToRead();
 
-        try {
-            // TODO: is this right? java streams doesnt have eof() function? fuck java
-            return this.inputStream.available() == -1;
-        } catch (IOException e) {
-            // TODO: custom exception
-            throw new PascalRuntimeException("IOException");
-        }
+        // TODO: java streams doesnt have eof() function? fuck java
+        return false;
     }
 
     private void verifyPathSet() {

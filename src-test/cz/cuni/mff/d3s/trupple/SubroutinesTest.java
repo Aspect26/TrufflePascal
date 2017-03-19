@@ -8,14 +8,14 @@ public class SubroutinesTest extends JUnitTest {
 	public void simpleProcedureTest(){
 		String code = "program main; \n"+
 				"procedure Hello;\n" +
-				"begin\n" + 
-				" write('Hello World');\n" + 
-				"end;\n" + 
-				"\n" + 
-				"begin\n" + 
-				" Hello();\n" + 
+				"begin\n" +
+				" write('Hello World');\n" +
+				"end;\n" +
+				"\n" +
+				"begin\n" +
+				" Hello();\n" +
 				"end.";
-		
+
 		test(code, "Hello World");
 	}
 	
