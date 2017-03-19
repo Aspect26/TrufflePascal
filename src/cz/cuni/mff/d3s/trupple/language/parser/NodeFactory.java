@@ -24,6 +24,8 @@ import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.SimpleAccessNode;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.UnknownTypeException;
@@ -489,19 +491,19 @@ public class NodeFactory {
         }
     }
 
-    public AccessRouteNode createSimpleAccessRouteNode(Token identifierToken) {
+    public AccessNode createSimpleAccessNode(Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(identifier));
 
-	    return new AccessRouteNode.Simple(frameSlot);
+	    return new SimpleAccessNode(frameSlot);
     }
 
-    public ExpressionNode createAssignmentWithRoute(Token identifierToken, AccessRouteNode accessRouteNode, ExpressionNode valueNode) {
+    public ExpressionNode createAssignmentWithRoute(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier));
 
         // TODO: check if it is assignable
-        return AssignmentNodeWithRouteNodeGen.create(accessRouteNode, valueNode, frameSlot);
+        return AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
     }
 
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
@@ -518,12 +520,12 @@ public class NodeFactory {
         }, new UnknownIdentifierException(identifier));
     }
 
-    public ExpressionNode createExpressionFromIdentifierWithRoute(Token identifierToken, AccessRouteNode accessRouteNode) {
+    public ExpressionNode createExpressionFromIdentifierWithRoute(Token identifierToken, AccessNode accessNode) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
         return this.doLookup(
                 identifier,
-                (LexicalScope foundInLexicalScope, String foundIdentifier) -> new ReadVariableWithRouteNode(accessRouteNode, foundInLexicalScope.getLocalSlot(foundIdentifier)),
+                (LexicalScope foundInLexicalScope, String foundIdentifier) -> new ReadVariableWithRouteNode(accessNode, foundInLexicalScope.getLocalSlot(foundIdentifier)),
                 new UnknownIdentifierException(identifier)
         );
     }

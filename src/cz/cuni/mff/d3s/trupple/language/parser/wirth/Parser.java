@@ -1,9 +1,8 @@
 
 package cz.cuni.mff.d3s.trupple.language.parser.wirth;
 
-import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.nodes.RootNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.AccessRouteNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.parser.*;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant.ConstantDescriptor;
@@ -12,8 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescri
 import com.oracle.truffle.api.source.Source;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 public class Parser implements IParser {
 	public static final int _EOF = 0;
@@ -666,10 +663,10 @@ public class Parser implements IParser {
 		} else if (la.kind == 16) {
 			statement = SubroutineCall(identifierToken);
 		} else if (StartOf(5)) {
-			AccessRouteNode accessRouteNode = InnerAccessRoute(identifierToken);
+			AccessNode accessNode = InnerAccessRoute(identifierToken);
 			Expect(34);
 			ExpressionNode value = Expression();
-			statement = factory.createAssignmentWithRoute(identifierToken, accessRouteNode, value); 
+			statement = factory.createAssignmentWithRoute(identifierToken, accessNode, value); 
 		} else SynErr(70);
 		return statement;
 	}
@@ -686,9 +683,9 @@ public class Parser implements IParser {
 		return expression;
 	}
 
-	AccessRouteNode  InnerAccessRoute(Token identifierToken) {
-		AccessRouteNode  accessRoute;
-		accessRoute = factory.createSimpleAccessRouteNode(identifierToken); 
+	AccessNode  InnerAccessRoute(Token identifierToken) {
+		AccessNode  accessRoute;
+		accessRoute = factory.createSimpleAccessNode(identifierToken); 
 		while (la.kind == 13 || la.kind == 21 || la.kind == 32) {
 			accessRoute = InnerAccessRouteElement(accessRoute);
 		}
@@ -707,27 +704,27 @@ public class Parser implements IParser {
 		return expression;
 	}
 
-	AccessRouteNode  InnerAccessRouteElement(AccessRouteNode previousAccessNode) {
-		AccessRouteNode  accessNode;
+	AccessNode  InnerAccessRouteElement(AccessNode previousAccessNode) {
+		AccessNode  accessNode;
 		accessNode = null; 
 		if (la.kind == 13) {
 			List<ExpressionNode> indexNodes  = ArrayIndex();
-			accessNode = new AccessRouteNode.ArrayIndex(previousAccessNode, indexNodes); 
+			accessNode = new ArrayAccessNode(previousAccessNode, indexNodes); 
 		} else if (la.kind == 32) {
 			Get();
 			Expect(1);
 			String variableIdentifier = factory.getIdentifierFromToken(t); 
-			accessNode = new AccessRouteNode.EnterRecord(previousAccessNode, variableIdentifier); 
+			accessNode = new RecordAccessNode(previousAccessNode, variableIdentifier); 
 		} else if (la.kind == 21) {
 			Get();
-			accessNode = new AccessRouteNode.PointerDereference(previousAccessNode); 
+			accessNode = new PointerDereference(previousAccessNode); 
 		} else SynErr(71);
 		return accessNode;
 	}
 
-	AccessRouteNode  InnerAccessRouteNonEmpty(Token identifierToken) {
-		AccessRouteNode  accessRoute;
-		accessRoute = factory.createSimpleAccessRouteNode(identifierToken); 
+	AccessNode  InnerAccessRouteNonEmpty(Token identifierToken) {
+		AccessNode  accessRoute;
+		accessRoute = factory.createSimpleAccessNode(identifierToken); 
 		accessRoute = InnerAccessRouteElement(accessRoute);
 		while (la.kind == 13 || la.kind == 21 || la.kind == 32) {
 			accessRoute = InnerAccessRouteElement(accessRoute);
@@ -998,7 +995,7 @@ public class Parser implements IParser {
 		if (la.kind == 16) {
 			expression = SubroutineCall(identifierToken);
 		} else if (la.kind == 13 || la.kind == 21 || la.kind == 32) {
-			AccessRouteNode accessRoute = InnerAccessRouteNonEmpty(identifierToken);
+			AccessNode accessRoute = InnerAccessRouteNonEmpty(identifierToken);
 			expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); 
 		} else SynErr(78);
 		return expression;

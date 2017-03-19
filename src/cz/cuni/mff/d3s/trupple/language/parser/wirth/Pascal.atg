@@ -459,23 +459,23 @@ identifier                                      (. Token identifierToken = t; .)
 |
     SubroutineCall<out statement, identifierToken>
 |
-    InnerAccessRoute<out AccessRouteNode accessRouteNode, identifierToken>
+    InnerAccessRoute<out AccessNode accessNode, identifierToken>
     ":="
-    Expression<out ExpressionNode value>        (. statement = factory.createAssignmentWithRoute(identifierToken, accessRouteNode, value); .)
+    Expression<out ExpressionNode value>        (. statement = factory.createAssignmentWithRoute(identifierToken, accessNode, value); .)
 )
 .
 
 
-InnerAccessRoute<out AccessRouteNode accessRoute, Token identifierToken>
-=                                               (. accessRoute = factory.createSimpleAccessRouteNode(identifierToken); .)
+InnerAccessRoute<out AccessNode accessRoute, Token identifierToken>
+=                                               (. accessRoute = factory.createSimpleAccessNode(identifierToken); .)
 {
     InnerAccessRouteElement<out accessRoute, accessRoute>
 }
 .
 
 
-InnerAccessRouteNonEmpty<out AccessRouteNode accessRoute, Token identifierToken>
-=                                               (. accessRoute = factory.createSimpleAccessRouteNode(identifierToken); .)
+InnerAccessRouteNonEmpty<out AccessNode accessRoute, Token identifierToken>
+=                                               (. accessRoute = factory.createSimpleAccessNode(identifierToken); .)
 InnerAccessRouteElement<out accessRoute, accessRoute>
 {
     InnerAccessRouteElement<out accessRoute, accessRoute>
@@ -483,17 +483,17 @@ InnerAccessRouteElement<out accessRoute, accessRoute>
 .
 
 
-InnerAccessRouteElement<out AccessRouteNode accessNode, AccessRouteNode previousAccessNode>
+InnerAccessRouteElement<out AccessNode accessNode, AccessNode previousAccessNode>
 =                                               (. accessNode = null; .)
 (
     ArrayIndex<. out List<ExpressionNode> indexNodes .>
-                                                (. accessNode = new AccessRouteNode.ArrayIndex(previousAccessNode, indexNodes); .)
+                                                (. accessNode = new ArrayAccessNode(previousAccessNode, indexNodes); .)
 |
     "."
     identifier                                  (. String variableIdentifier = factory.getIdentifierFromToken(t); .)
-                                                (. accessNode = new AccessRouteNode.EnterRecord(previousAccessNode, variableIdentifier); .)
+                                                (. accessNode = new RecordAccessNode(previousAccessNode, variableIdentifier); .)
 |
-    "^"                                         (. accessNode = new AccessRouteNode.PointerDereference(previousAccessNode); .)
+    "^"                                         (. accessNode = new PointerDereference(previousAccessNode); .)
 )
 .
 
@@ -699,7 +699,7 @@ InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
 (
 	SubroutineCall<out expression, identifierToken>
 |
-	InnerAccessRouteNonEmpty<out AccessRouteNode accessRoute, identifierToken>
+	InnerAccessRouteNonEmpty<out AccessNode accessRoute, identifierToken>
 	                                            (. expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); .)
 )
 .

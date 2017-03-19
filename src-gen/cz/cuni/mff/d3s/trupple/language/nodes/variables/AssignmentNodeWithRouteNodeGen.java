@@ -18,6 +18,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
 
 @GeneratedBy(AssignmentNodeWithRoute.class)
 public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRoute implements SpecializedNode {
@@ -27,8 +28,8 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
     @CompilationFinal private Class<?> valueNodeType_;
     @Child private BaseNode_ specialization_;
 
-    private AssignmentNodeWithRouteNodeGen(AccessRouteNode accessRouteNode, ExpressionNode valueNode, FrameSlot slot) {
-        super(accessRouteNode);
+    private AssignmentNodeWithRouteNodeGen(AccessNode accessNode, ExpressionNode valueNode, FrameSlot slot) {
+        super(accessNode);
         this.slot = slot;
         this.valueNode_ = valueNode;
         this.specialization_ = UninitializedNode_.create(this);
@@ -80,8 +81,8 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         return SpecializationNode.updateRoot(super.deepCopy());
     }
 
-    public static AssignmentNodeWithRoute create(AccessRouteNode accessRouteNode, ExpressionNode valueNode, FrameSlot slot) {
-        return new AssignmentNodeWithRouteNodeGen(accessRouteNode, valueNode, slot);
+    public static AssignmentNodeWithRoute create(AccessNode accessNode, ExpressionNode valueNode, FrameSlot slot) {
+        return new AssignmentNodeWithRouteNodeGen(accessNode, valueNode, slot);
     }
 
     @GeneratedBy(AssignmentNodeWithRoute.class)

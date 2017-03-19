@@ -18,7 +18,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 @NodeField(name = "slot", type = FrameSlot.class)
 public abstract class AssignmentNode extends ExpressionNode {
 
-    protected interface SlotAssignment {
+    public interface SlotAssignment {
 
         void assign(VirtualFrame frame, FrameSlot frameSlot, Object value) throws FrameSlotTypeException;
 
