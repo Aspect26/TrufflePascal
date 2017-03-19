@@ -4,9 +4,10 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class EnumTypeDescriptor implements OrdinalDescriptor {
+public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
 
     private final List<String> identifiers;
     private final String defaultValue;

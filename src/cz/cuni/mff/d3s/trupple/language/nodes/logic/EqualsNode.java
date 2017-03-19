@@ -31,7 +31,7 @@ public abstract class EqualsNode extends BinaryNode {
     }
 
 	@Specialization
-	protected boolean equals(EnumValue left, EnumValue right) { return left.getValue() == right.getValue(); }
+	protected boolean equals(EnumValue left, EnumValue right) { return left.getValue().equals(right.getValue()); }
 
 	@Specialization
 	protected boolean equals(SetTypeValue left, SetTypeValue right) {

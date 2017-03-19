@@ -56,6 +56,8 @@ public class FileValue implements ICustomValue {
                 this.outputStream.writeObject(value);
             }
             this.outputStream.flush();
+        } catch (NotSerializableException e) {
+            throw new PascalRuntimeException("This object cannot be stored in a file.");
         } catch (IOException e) {
             // TODO: custom exception
             throw new PascalRuntimeException("Can't write to file.");
