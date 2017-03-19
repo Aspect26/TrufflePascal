@@ -14,4 +14,11 @@ public class RealDescriptor extends PrimitiveDescriptor {
         return 0.0d;
     }
 
+    @Override
+    public byte[] getBinaryRepresentation(Object value) {
+        byte[] data = new byte[8];
+        java.nio.ByteBuffer.wrap(data).putDouble((double) value);
+        return data;
+    }
+
 }

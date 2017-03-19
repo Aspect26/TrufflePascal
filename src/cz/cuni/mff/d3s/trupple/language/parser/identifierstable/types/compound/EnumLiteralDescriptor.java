@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.NoBinaryRepresentationException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
@@ -29,8 +30,9 @@ public class EnumLiteralDescriptor implements TypeDescriptor {
         return this.identifier;
     }
 
-    public EnumTypeDescriptor getEnumTypeDescriptor() {
-        return this.enumTypeDescriptor;
+    @Override
+    public byte[] getBinaryRepresentation(Object value) {
+        throw new NoBinaryRepresentationException();
     }
 
 }

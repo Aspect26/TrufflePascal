@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.NoBinaryRepresentationException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.CantBeNegatedException;
 import cz.cuni.mff.d3s.trupple.language.parser.exceptions.LexicalException;
 
@@ -20,6 +21,11 @@ public class StringConstantDescriptor implements ConstantDescriptor {
     @Override
     public Object getDefaultValue() {
         return this.value;
+    }
+
+    @Override
+    public byte[] getBinaryRepresentation(Object value) {
+        throw new NoBinaryRepresentationException();
     }
 
     @Override

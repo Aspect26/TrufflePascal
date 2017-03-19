@@ -34,4 +34,11 @@ public class RealConstantDescriptor implements ConstantDescriptor {
     public boolean isSigned() {
         return true;
     }
+
+    @Override
+    public byte[] getBinaryRepresentation(Object value) {
+        byte[] data = new byte[8];
+        java.nio.ByteBuffer.wrap(data).putDouble((double) value);
+        return data;
+    }
 }

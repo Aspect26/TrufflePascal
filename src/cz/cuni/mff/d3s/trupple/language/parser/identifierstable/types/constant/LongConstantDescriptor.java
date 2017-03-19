@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.constant;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.NoBinaryRepresentationException;
 
 public class LongConstantDescriptor implements OrdinalConstantDescriptor {
 
@@ -38,5 +39,12 @@ public class LongConstantDescriptor implements OrdinalConstantDescriptor {
     @Override
     public int getOrdinalValue() {
         return (int)this.value;
+    }
+
+    @Override
+    public byte[] getBinaryRepresentation(Object value) {
+        byte[] data = new byte[8];
+        java.nio.ByteBuffer.wrap(data).putLong((long) value);
+        return data;
     }
 }

@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.subroutine;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.NoBinaryRepresentationException;
 import cz.cuni.mff.d3s.trupple.language.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
@@ -17,6 +18,11 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
     @Override
     public FrameSlotKind getSlotKind() {
         return FrameSlotKind.Object;
+    }
+
+    @Override
+    public byte[] getBinaryRepresentation(Object value) {
+        throw new NoBinaryRepresentationException();
     }
 
     public boolean hasParameters() {

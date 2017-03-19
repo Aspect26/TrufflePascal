@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.NoBinaryRepresentationException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex.OrdinalDescriptor;
 
@@ -34,6 +35,11 @@ public class EnumTypeDescriptor implements OrdinalDescriptor {
     @Override
     public int getFirstIndex() {
         return 0;
+    }
+
+    @Override
+    public byte[] getBinaryRepresentation(Object value) {
+        throw new NoBinaryRepresentationException();
     }
 
     public List<String> getIdentifiers() {

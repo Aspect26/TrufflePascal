@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.complex;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.exceptions.runtime.NoBinaryRepresentationException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
 
@@ -19,7 +20,12 @@ public class FileDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return new FileValue();
+        return new FileValue(this.contentTypeDescriptor);
+    }
+
+    @Override
+    public byte[] getBinaryRepresentation(Object value) {
+        throw new NoBinaryRepresentationException();
     }
 
 }
