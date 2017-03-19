@@ -16,6 +16,7 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
@@ -156,6 +157,9 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
             }
             if (valueNodeValue instanceof SetTypeValue) {
                 return AssignSetNode_.create(root);
+            }
+            if (valueNodeValue instanceof Reference) {
+                return AssignReferenceNode_.create(root);
             }
             if (valueNodeValue instanceof PointerValue) {
                 return AssignPointersNode_.create(root);
@@ -458,11 +462,32 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
     }
+    @GeneratedBy(methodName = "assignReference(VirtualFrame, Reference)", value = AssignmentNodeWithRoute.class)
+    private static final class AssignReferenceNode_ extends BaseNode_ {
+
+        AssignReferenceNode_(AssignmentNodeWithRouteNodeGen root) {
+            super(root, 8);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof Reference) {
+                Reference valueNodeValue_ = (Reference) valueNodeValue;
+                return root.assignReference(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
+            return new AssignReferenceNode_(root);
+        }
+
+    }
     @GeneratedBy(methodName = "assignPointers(VirtualFrame, PointerValue)", value = AssignmentNodeWithRoute.class)
     private static final class AssignPointersNode_ extends BaseNode_ {
 
         AssignPointersNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 8);
+            super(root, 9);
         }
 
         @Override
@@ -483,7 +508,7 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
     private static final class TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_ extends BaseNode_ {
 
         TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 9);
+            super(root, 10);
         }
 
         @Override

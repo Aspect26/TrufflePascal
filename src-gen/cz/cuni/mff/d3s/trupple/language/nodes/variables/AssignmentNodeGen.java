@@ -16,6 +16,7 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -154,6 +155,9 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             }
             if (valueNodeValue instanceof SetTypeValue) {
                 return AssignSetNode_.create(root);
+            }
+            if (valueNodeValue instanceof Reference) {
+                return AssignReferenceNode_.create(root);
             }
             if (valueNodeValue instanceof PointerValue) {
                 return AssignPointersNode_.create(root);
@@ -453,11 +457,32 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         }
 
     }
+    @GeneratedBy(methodName = "assignReference(VirtualFrame, Reference)", value = AssignmentNode.class)
+    private static final class AssignReferenceNode_ extends BaseNode_ {
+
+        AssignReferenceNode_(AssignmentNodeGen root) {
+            super(root, 8);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof Reference) {
+                Reference valueNodeValue_ = (Reference) valueNodeValue;
+                return root.assignReference(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignReferenceNode_(root);
+        }
+
+    }
     @GeneratedBy(methodName = "assignPointers(VirtualFrame, PointerValue)", value = AssignmentNode.class)
     private static final class AssignPointersNode_ extends BaseNode_ {
 
         AssignPointersNode_(AssignmentNodeGen root) {
-            super(root, 8);
+            super(root, 9);
         }
 
         @Override
