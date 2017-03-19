@@ -4,30 +4,24 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.exceptions.runtime.PascalRuntimeException;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.RouteTarget;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
 
 public class ReadVariableWithRouteNode extends ExpressionNode {
 
-    @Children private final AccessRouteNode[] accessRoute;
+    @Child private AccessNode accessNode;
     private final FrameSlot firstSlot;
 
-	public ReadVariableWithRouteNode(AccessRouteNode[] accessRoute, FrameSlot firstSlot) {
-	    this.accessRoute = accessRoute;
+	public ReadVariableWithRouteNode(AccessNode accessNode, FrameSlot firstSlot) {
+	    this.accessNode = accessNode;
         this.firstSlot = firstSlot;
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frame) {
 	    try {
-            RouteTarget routeTarget = this.getRouteTarget(frame, firstSlot, accessRoute);
-            if (routeTarget.isArray) {
-                PascalArray array = (PascalArray) routeTarget.frame.getObject(routeTarget.slot);
-                return array.getValueAt(routeTarget.arrayIndexes);
-            } else {
-                return this.getValueFromSlot(routeTarget.frame, routeTarget.slot);
-            }
+	        accessNode.executeVoid(frame);
+            return accessNode.getValue(frame);
         } catch (FrameSlotTypeException e) {
             throw new PascalRuntimeException("Unexpected error");
         }

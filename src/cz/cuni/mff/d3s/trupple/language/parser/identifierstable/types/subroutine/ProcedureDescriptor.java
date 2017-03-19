@@ -10,4 +10,9 @@ public class ProcedureDescriptor extends SubroutineDescriptor {
         super(formalParameters);
     }
 
+    @Override
+    public Object getDefaultValue() {
+        return null;
+    }
+
 }

@@ -19,11 +19,6 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
         return FrameSlotKind.Object;
     }
 
-    @Override
-    public Object getDefaultValue() {
-        return null;
-    }
-
     public boolean hasParameters() {
         return this.formalParameters.size() != 0;
     }

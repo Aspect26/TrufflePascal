@@ -7,12 +7,16 @@ import java.util.List;
 
 public class FunctionDescriptor extends SubroutineDescriptor {
 
-    // TODO: why is it here when it is not used (future type checking?)
     private final TypeDescriptor returnType;
 
     public FunctionDescriptor(List<FormalParameter> formalParameters, TypeDescriptor returnType) {
         super(formalParameters);
         this.returnType = returnType;
+    }
+
+    @Override
+    public Object getDefaultValue() {
+        return returnType.getDefaultValue();
     }
 
 }

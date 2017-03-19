@@ -35,23 +35,23 @@ public class LoopsTest extends JUnitTest{
 		test(code, "gfedc");
 	}
 
-	@Test
-	public void forEnumTest() {
-		String code = "program main;\n"+
-				"type day = (null, mon, tue, wed, thu, fri, sat, sun, unusedValue, unusedValue2);\n"+
-				"var goodDays: set of day;\n"+
-				" iterator: day;\n"+
-				"\n"+
-				"begin\n"+
-				" goodDays := [wed, fri, sat, sun];\n"+
-				"\n"+
-				" for iterator := mon to sun do begin\n"+
-				" write(iterator in goodDays, ', ');\n"+
-				" end;\n"+
-				"end.";
+    @Test
+    public void forEnumTest() {
+        String code = "program main;\n"+
+                "type day = (null, mon, tue, wed, thu, fri, sat, sun, unusedValue, unusedValue2);\n"+
+                "var goodDays: set of day;\n"+
+                " iterator: day;\n"+
+                "\n"+
+                "begin\n"+
+                " goodDays := [wed, fri, sat, sun];\n"+
+                "\n"+
+                " for iterator := mon to sun do begin\n"+
+                " write(iterator in goodDays, ', ');\n"+
+                " end;\n"+
+                "end.";
 
-		test(code, "false, false, true, false, true, true, true, ");
-	}
+        test(code, "false, false, true, false, true, true, true, ");
+    }
 	
 	@Test
 	public void whileTest(){
@@ -116,4 +116,5 @@ public class LoopsTest extends JUnitTest{
 		
 		test(code, "18", true);
 	}
+
 }

@@ -120,6 +120,8 @@ Type<out TypeDescriptor typeDescriptor>
     FileType<out typeDescriptor>
 |
     RecordType<out typeDescriptor>
+|
+    PointerType<out typeDescriptor>
 )
 .
 
@@ -162,6 +164,13 @@ RecordType<out TypeDescriptor typeDescriptor>
 "record"                                        (. factory.startRecord(); .)
 RecordFieldList<out typeDescriptor>
 "end"                                           (. factory.finishRecord(); .)
+.
+
+
+PointerType<out TypeDescriptor typeDescriptor>
+=
+"^"
+Type<out TypeDescriptor innerType>              (. typeDescriptor = factory.createPointerType(innerType); .)
 .
 
 

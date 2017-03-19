@@ -80,6 +80,22 @@ public class PascalHeap {
         this.memory.remove(slot.getMemoryIndex());
     }
 
+    public void setValueAt(HeapSlot heapSlot, Object value) {
+        if (!this.heapSlots.contains(heapSlot)) {
+            throw new SegmentationFaultException();
+        }
+
+        this.memory.put(heapSlot.getMemoryIndex(), value);
+    }
+
+    public Object getValueAt(HeapSlot heapSlot) {
+        if (!this.heapSlots.contains(heapSlot)) {
+            throw new SegmentationFaultException();
+        }
+
+        return this.memory.get(heapSlot.getMemoryIndex());
+    }
+
     // TODO: this needs to be tested
     private void doGarbageCollecting() {
         this.emptyMemorySlot = this.findFirstEmptyMemorySlot(this.MIN_ADDRESS);
