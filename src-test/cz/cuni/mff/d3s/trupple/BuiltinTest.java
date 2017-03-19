@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.trupple;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class BuiltinTest extends JUnitTest {
@@ -87,6 +86,23 @@ public class BuiltinTest extends JUnitTest {
                 "end.";
 
         String output = "40htruefalse";
+        test(code, output);
+    }
+
+    @Test
+    public void chrOrdTest() {
+        String code = "program main;\n"+
+                "\n"+
+                "type c = (red, green, blue, cyan, magenta, yellow, black);\n"+
+                "\n"+
+                "begin\n"+
+                " write(chr(113));\n"+
+                " write(ord(\'q\'));\n"+
+                " write(ord(true));\n"+
+                " write(ord(magenta));\n"+
+                "end.";
+
+        String output = "q11314";
         test(code, output);
     }
 
