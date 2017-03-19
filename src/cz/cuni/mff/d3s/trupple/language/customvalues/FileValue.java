@@ -8,8 +8,8 @@ import java.io.*;
 public class FileValue implements ICustomValue {
 
     private final TypeDescriptor typeOfFile;
-    private BufferedOutputStream outputStream;
-    private BufferedInputStream inputStream;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
     private String filePath;
 
     public FileValue(TypeDescriptor typeOfFile) {
@@ -29,8 +29,8 @@ public class FileValue implements ICustomValue {
         this.verifyPathSet();
 
         try {
-            this.outputStream = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
-        } catch (FileNotFoundException e) {
+            this.outputStream = new ObjectOutputStream(new FileOutputStream(new File(filePath)));
+        } catch (IOException e) {
             // TODO: custom exception
             throw new PascalRuntimeException("Can't open file: " + this.filePath);
         }
@@ -40,8 +40,8 @@ public class FileValue implements ICustomValue {
         this.verifyPathSet();
 
         try {
-            this.inputStream = new BufferedInputStream(new FileInputStream(new File(filePath)));
-        } catch (FileNotFoundException e) {
+            this.inputStream = new ObjectInputStream(new FileInputStream(new File(filePath)));
+        } catch (IOException e) {
             // TODO: custom exception
             throw new PascalRuntimeException("Can't open file: " + this.filePath);
         }
@@ -53,8 +53,7 @@ public class FileValue implements ICustomValue {
         // TODO: type check (file against values)
         try {
             for (Object value : values) {
-                byte[] valueData = this.typeOfFile.getBinaryRepresentation(value);
-                this.outputStream.write(valueData);
+                this.outputStream.writeObject(value);
             }
             this.outputStream.flush();
         } catch (IOException e) {
@@ -64,7 +63,10 @@ public class FileValue implements ICustomValue {
     }
 
     public boolean isEof() {
+        this.verifyOpenToRead();
+
         try {
+            // TODO: is this right? java streams doesnt have eof() function? fuck java
             return this.inputStream.available() == 0;
         } catch (IOException e) {
             // TODO: custom exception
