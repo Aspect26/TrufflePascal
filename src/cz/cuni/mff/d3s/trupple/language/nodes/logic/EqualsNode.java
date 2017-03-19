@@ -42,4 +42,6 @@ public abstract class EqualsNode extends BinaryNode {
     protected boolean equals(PointerValue left, PointerValue right) {
 	    return left.equals(right);
     }
+
+    // TODO: what about record type? file type?
 }

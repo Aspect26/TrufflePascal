@@ -57,4 +57,27 @@ public class FilesTest extends JUnitTest {
         // TODO: cleanup the created file
     }
 
+    @Test
+    public void simpleStoreLoadEnumTest(){
+        String code = "program main;\n"+
+                "\n"+
+                "type color = (red, green, blue);\n"+
+                "\n"+
+                "var f: file of color;\n"+
+                " c: color;\n"+
+                "\n"+
+                "begin\n"+
+                " assign(f,\'test.out\');\n"+
+                " rewrite(f);\n"+
+                " write(f, green);\n"+
+                "\n"+
+                " reset(f);\n"+
+                " read(f, c);\n"+
+                " write(c = green);\n"+
+                "end.";
+
+        test(code, "true", true);
+        // TODO: cleanup the created file
+    }
+
 }

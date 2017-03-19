@@ -1,9 +1,10 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SetTypeValue implements ICustomValue {
+public class SetTypeValue implements ICustomValue, Serializable {
 
     private final Set<Object> data;
 
