@@ -100,6 +100,22 @@ public final class PascalTypesGen extends PascalTypes {
         throw new UnexpectedResultException(value);
     }
 
+    public static boolean isString(Object value) {
+        return value instanceof String;
+    }
+
+    public static String asString(Object value) {
+        assert value instanceof String : "PascalTypesGen.asString: String expected";
+        return (String) value;
+    }
+
+    public static String expectString(Object value) throws UnexpectedResultException {
+        if (value instanceof String) {
+            return (String) value;
+        }
+        throw new UnexpectedResultException(value);
+    }
+
     public static boolean isEnumValue(Object value) {
         return value instanceof EnumValue;
     }

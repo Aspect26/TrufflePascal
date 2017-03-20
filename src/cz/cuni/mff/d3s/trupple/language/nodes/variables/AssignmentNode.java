@@ -125,4 +125,10 @@ public abstract class AssignmentNode extends ExpressionNode {
         return pointer;
     }
 
+    @Specialization
+    String assignString(VirtualFrame frame, String value) {
+        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, value);
+        return value;
+    }
+
 }

@@ -164,6 +164,9 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
             if (valueNodeValue instanceof PointerValue) {
                 return AssignPointersNode_.create(root);
             }
+            if (valueNodeValue instanceof String) {
+                return AssignStringNode_.create(root);
+            }
             if (valueNodeValue instanceof VirtualFrame) {
                 return TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_.create(root);
             }
@@ -504,11 +507,32 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
     }
+    @GeneratedBy(methodName = "assignString(VirtualFrame, String)", value = AssignmentNodeWithRoute.class)
+    private static final class AssignStringNode_ extends BaseNode_ {
+
+        AssignStringNode_(AssignmentNodeWithRouteNodeGen root) {
+            super(root, 10);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof String) {
+                String valueNodeValue_ = (String) valueNodeValue;
+                return root.assignString(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
+            return new AssignStringNode_(root);
+        }
+
+    }
     @GeneratedBy(methodName = "totallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLife(VirtualFrame)", value = AssignmentNodeWithRoute.class)
     private static final class TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_ extends BaseNode_ {
 
         TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 10);
+            super(root, 11);
         }
 
         @Override

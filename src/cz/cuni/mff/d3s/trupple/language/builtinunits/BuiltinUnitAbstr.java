@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.builtinunits;
 
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
 import java.util.List;
@@ -15,7 +15,7 @@ abstract class BuiltinUnitAbstr implements BuiltinUnit {
         for (UnitFunctionData unitFunction : unitFunctions) {
             String identifier = unitFunction.identifier;
             SubroutineDescriptor descriptor = unitFunction.descriptor;
-            BuiltinNode bodyNode = unitFunction.bodyNode;
+            ExpressionNode bodyNode = unitFunction.bodyNode;
 
             // register to identifiers table and function registry
             lexicalScope.registerSubroutine(identifier, bodyNode, descriptor);

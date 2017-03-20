@@ -31,7 +31,7 @@ public class IdentifiersTable {
     Map<String, TypeDescriptor> identifiersMap;
 
     /** Map of type identifiers: e.g.: integer, boolean, enums, records, ... */
-    private Map<String, TypeDescriptor> typeDescriptors;
+    Map<String, TypeDescriptor> typeDescriptors;
 
     private FrameDescriptor frameDescriptor;
 
@@ -48,7 +48,7 @@ public class IdentifiersTable {
         this.frameDescriptor = new FrameDescriptor();
     }
 
-    private void addBuiltinTypes() {
+    protected void addBuiltinTypes() {
         typeDescriptors.put("integer", new LongDescriptor());
         typeDescriptors.put("shortint", new LongDescriptor());
         typeDescriptors.put("longint", new LongDescriptor());

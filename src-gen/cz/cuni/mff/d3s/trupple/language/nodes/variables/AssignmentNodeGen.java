@@ -162,6 +162,9 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             if (valueNodeValue instanceof PointerValue) {
                 return AssignPointersNode_.create(root);
             }
+            if (valueNodeValue instanceof String) {
+                return AssignStringNode_.create(root);
+            }
             return null;
         }
 
@@ -496,6 +499,27 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
 
         static BaseNode_ create(AssignmentNodeGen root) {
             return new AssignPointersNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "assignString(VirtualFrame, String)", value = AssignmentNode.class)
+    private static final class AssignStringNode_ extends BaseNode_ {
+
+        AssignStringNode_(AssignmentNodeGen root) {
+            super(root, 10);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof String) {
+                String valueNodeValue_ = (String) valueNodeValue;
+                return root.assignString(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignStringNode_(root);
         }
 
     }
