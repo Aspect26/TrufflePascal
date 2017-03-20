@@ -5,6 +5,7 @@ import java.util.*;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.sun.istack.internal.NotNull;
+import cz.cuni.mff.d3s.trupple.language.builtinunits.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
@@ -54,7 +55,7 @@ public class NodeFactory {
 	private LexicalScope lexicalScope;
 
     /**
-     * Map if included units. This contains every unit found in a directory specified by -I parameter of the compiler.
+     * List of included units. This contains every unit found in a directory specified by -I parameter of the compiler.
      * This doesn't mean that all of these units must be used in the program. On the other hand, each of the units that
      * are used in the program by the uses statement must be contained in this map.
      */
@@ -64,6 +65,16 @@ public class NodeFactory {
      * A list of actually used units by the uses statement.
      */
 	private List<String> usedUnits = new ArrayList<>();
+
+    /**
+     * List of all supported builtin units
+     */
+    private final Map<String, BuiltinUnit> builtinUnits = new HashMap<String, BuiltinUnit>(){{
+        put("crt", new CrtBuiltinUnit());
+        put("dos", new DosBuiltinUnit());
+        put("string", new StringBuiltinUnit());
+        put("graph", new GraphBuiltinUnit());
+    }};
 
     /**
      * Specifies a prefix to be added to all identifiers.
@@ -90,12 +101,15 @@ public class NodeFactory {
 
     public void registerUnit(Token unitIdentifierToken) {
         String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);
-        if (!this.includedUnits.contains(unitIdentifier)) {
-            parser.SemErr("Unknown unit: " + unitIdentifier + ". Did you forget to include it?");
-            return;
+        if (this.builtinUnits.containsKey(unitIdentifier)) {
+            BuiltinUnit builtinUnit = this.builtinUnits.get(unitIdentifier);
+            builtinUnit.importTo(this.lexicalScope);
+        } else if (this.includedUnits.contains(unitIdentifier)) {
+            this.usedUnits.add(unitIdentifier);
         }
-
-        this.usedUnits.add(unitIdentifier);
+        else {
+            parser.SemErr("Unknown unit: " + unitIdentifier + ". Did you forget to include it?");
+        }
     }
 
     public void registerNewType(Token identifierToken, TypeDescriptor typeDescriptor) {

@@ -235,6 +235,10 @@ public class IdentifiersTable {
         }
     }
 
+    public void addSubroutine(String identifier, SubroutineDescriptor descriptor) throws LexicalException {
+        this.registerNewIdentifier(identifier, descriptor);
+    }
+
     public ConstantDescriptor getConstant(String identifier) throws LexicalException {
         TypeDescriptor descriptor = this.getTypeDescriptor(identifier);
         if (descriptor == null) {
