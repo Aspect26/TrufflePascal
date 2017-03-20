@@ -17,7 +17,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.builtin.allocation.NewBuiltinNodeF
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.file.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.ReadBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.ReadlnBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.WriteBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.WritelnBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ordinal.ChrBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ordinal.OrdBuiltinNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ordinal.PredBuiltinNodeFactory;
@@ -55,6 +57,8 @@ public class PascalSubroutineRegistry {
 	protected void installBuiltins() {
 		installBuiltinWithVariableArgumentsCount(WriteBuiltinNodeFactory.getInstance());
 		installBuiltinWithVariableArgumentsCount(ReadBuiltinNodeFactory.getInstance());
+        installBuiltinWithVariableArgumentsCount(WritelnBuiltinNodeFactory.getInstance());
+        installBuiltinWithVariableArgumentsCount(ReadlnBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(SuccBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(PredBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(AbsBuiltinNodeFactory.getInstance());

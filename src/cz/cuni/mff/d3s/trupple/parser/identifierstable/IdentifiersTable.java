@@ -76,6 +76,8 @@ public class IdentifiersTable {
     protected void addBuiltinFunctions() {
         identifiersMap.put("write", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
         identifiersMap.put("read", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
+        identifiersMap.put("writeln", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
+        identifiersMap.put("readln", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
         identifiersMap.put("succ", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
         identifiersMap.put("pred", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
         identifiersMap.put("abs", new BuiltinProcedureDescriptor.OneArgumentBuiltin());

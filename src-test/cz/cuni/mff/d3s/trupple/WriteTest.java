@@ -27,6 +27,6 @@ public class WriteTest extends JUnitTest {
 	@Test
 	public void writelnTest() {
 		String text = "Metal in blood, rock in heart";
-		this.test("program main; begin writeln('" + text + "'); end.", text + "\n", true);
+		this.test("program main; begin writeln('" + text + "'); end.", text + "\n");
 	}
 }
