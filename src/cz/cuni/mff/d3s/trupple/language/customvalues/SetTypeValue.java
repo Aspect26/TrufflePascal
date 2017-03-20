@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SetTypeValue implements ICustomValue, Serializable {
+public class SetTypeValue implements Serializable {
 
     private final Set<Object> data;
 
@@ -14,11 +14,6 @@ public class SetTypeValue implements ICustomValue, Serializable {
 
     public SetTypeValue(Set<Object> data) {
         this.data = data;
-    }
-
-    @Override
-    public Object getValue() {
-        return this;
     }
 
     public Set<Object> getData() {

@@ -6,7 +6,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
-import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.BinaryNode;
 
 @NodeInfo(shortName = "<=")
 public abstract class LessThanOrEqualNode extends BinaryNode {
@@ -51,6 +51,6 @@ public abstract class LessThanOrEqualNode extends BinaryNode {
 
 	@Specialization
 	protected boolean lessThan(EnumValue left, EnumValue right) {
-		return left.lesserThan(right) || left.getValue().equals(right.getValue());
+		return left.lesserThan(right) || left.equals(right);
 	}
 }

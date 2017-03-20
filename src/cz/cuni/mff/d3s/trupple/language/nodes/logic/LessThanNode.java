@@ -6,7 +6,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
-import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.BinaryNode;
 
 @NodeInfo(shortName = "<")
 public abstract class LessThanNode extends BinaryNode {

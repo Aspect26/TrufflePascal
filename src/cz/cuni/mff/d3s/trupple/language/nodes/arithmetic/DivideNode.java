@@ -3,8 +3,6 @@ package cz.cuni.mff.d3s.trupple.language.nodes.arithmetic;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
-
 @NodeInfo(shortName = "/")
 public abstract class DivideNode extends BinaryNode {
 

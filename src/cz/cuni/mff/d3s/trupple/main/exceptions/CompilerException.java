@@ -19,7 +19,7 @@ public abstract class CompilerException extends Exception {
         }
     }
 
-    private ExitCodesEnum exitCode;
+    private final ExitCodesEnum exitCode;
     String message;
 
     CompilerException(String message, ExitCodesEnum exitCode) {

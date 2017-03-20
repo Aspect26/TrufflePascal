@@ -5,7 +5,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 import java.io.*;
 
-public class FileValue implements ICustomValue {
+public class FileValue {
 
     private final TypeDescriptor typeOfFile;
     private ObjectOutputStream outputStream;
@@ -14,11 +14,6 @@ public class FileValue implements ICustomValue {
 
     public FileValue(TypeDescriptor typeOfFile) {
         this.typeOfFile = typeOfFile;
-    }
-
-    @Override
-    public Object getValue() {
-        return this;
     }
 
     public void assignFilePath(String filePath) {

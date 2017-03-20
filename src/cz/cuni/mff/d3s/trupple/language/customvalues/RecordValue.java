@@ -7,7 +7,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import java.util.Map;
 
-public class RecordValue implements ICustomValue {
+public class RecordValue {
 
     private final VirtualFrame frame;
 
@@ -35,12 +35,8 @@ public class RecordValue implements ICustomValue {
         }
     }
 
-    @Override
-    public Object getValue() {
-        return this;
-    }
-
     public VirtualFrame getFrame() {
         return this.frame;
     }
+
 }

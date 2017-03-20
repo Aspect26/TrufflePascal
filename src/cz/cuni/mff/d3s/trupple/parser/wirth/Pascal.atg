@@ -700,7 +700,7 @@ InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
 	SubroutineCall<out expression, identifierToken>
 |
 	InnerAccessRouteNonEmpty<out AccessNode accessRoute, identifierToken>
-	                                            (. expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); .)
+	                                            (. expression = factory.createExpressionFromIdentifierWithRoute(accessRoute); .)
 )
 .
 

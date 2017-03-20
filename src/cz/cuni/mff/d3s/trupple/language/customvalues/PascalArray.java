@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
-public class PascalArray implements ICustomValue {
+public class PascalArray {
 	private final Object[] data;
 	private final PascalOrdinal ordinalSource;
 	
@@ -40,11 +40,6 @@ public class PascalArray implements ICustomValue {
 
         innerArray.setValueAt(indexes[indexes.length - 1], value);
     }
-	
-	@Override
-	public Object getValue() {
-		return data;
-	}
 	
 	public PascalArray createDeepCopy() {
 		Object[] dataCopy = new Object[this.data.length];

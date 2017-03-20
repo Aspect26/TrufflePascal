@@ -4,7 +4,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-import cz.cuni.mff.d3s.trupple.language.nodes.UnaryNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.UnaryNode;
 
 @NodeInfo(shortName = "!")
 public abstract class NotNode extends UnaryNode {

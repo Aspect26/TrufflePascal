@@ -7,7 +7,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
-import cz.cuni.mff.d3s.trupple.language.nodes.BinaryNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.BinaryNode;
 
 @NodeInfo(shortName = "=")
 public abstract class EqualsNode extends BinaryNode {
@@ -31,7 +31,7 @@ public abstract class EqualsNode extends BinaryNode {
     }
 
 	@Specialization
-	protected boolean equals(EnumValue left, EnumValue right) { return left.getValue().equals(right.getValue()); }
+	protected boolean equals(EnumValue left, EnumValue right) { return left.equals(right); }
 
 	@Specialization
 	protected boolean equals(SetTypeValue left, SetTypeValue right) {

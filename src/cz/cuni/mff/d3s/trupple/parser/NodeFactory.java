@@ -530,14 +530,8 @@ public class NodeFactory {
         }, new UnknownIdentifierException(identifier));
     }
 
-    public ExpressionNode createExpressionFromIdentifierWithRoute(Token identifierToken, AccessNode accessNode) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-
-        return this.doLookup(
-                identifier,
-                (LexicalScope foundInLexicalScope, String foundIdentifier) -> new ReadVariableWithRouteNode(accessNode, foundInLexicalScope.getLocalSlot(foundIdentifier)),
-                new UnknownIdentifierException(identifier)
-        );
+    public ExpressionNode createExpressionFromIdentifierWithRoute(AccessNode accessNode) {
+        return new ReadVariableWithRouteNode(accessNode);
     }
 
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {

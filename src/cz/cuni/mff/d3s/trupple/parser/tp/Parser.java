@@ -1041,7 +1041,7 @@ public class Parser implements IParser {
 			expression = SubroutineCall(identifierToken);
 		} else if (la.kind == 15 || la.kind == 22 || la.kind == 33) {
 			AccessNode accessRoute = InnerAccessRouteNonEmpty(identifierToken);
-			expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); 
+			expression = factory.createExpressionFromIdentifierWithRoute(accessRoute); 
 		} else SynErr(85);
 		return expression;
 	}

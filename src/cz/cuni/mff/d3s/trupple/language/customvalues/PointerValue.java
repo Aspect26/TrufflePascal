@@ -4,7 +4,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.HeapSlot;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.PascalHeap;
 
-public class PointerValue implements ICustomValue {
+public class PointerValue {
 
     private HeapSlot heapSlot;
 
@@ -16,14 +16,13 @@ public class PointerValue implements ICustomValue {
     }
 
     @Override
-    public Object getValue() {
-        return this;
-    }
-
-    @Override
-    public boolean equals(Object pointerValue) {
-        PointerValue comprareTo = (PointerValue) pointerValue;
-        return comprareTo.getHeapSlot().equals(this.getHeapSlot());
+    public boolean equals(Object compareTo) {
+        if (compareTo instanceof PointerValue) {
+            PointerValue pointerValue = (PointerValue) compareTo;
+            return pointerValue.getHeapSlot().equals(this.getHeapSlot());
+        } else {
+            return false;
+        }
     }
 
     public Object getDereferenceValue() {

@@ -4,7 +4,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumTypeDe
 
 import java.io.Serializable;
 
-public class EnumValue implements ICustomValue, Serializable {
+public class EnumValue implements Serializable {
 
 	private final EnumTypeDescriptor enumType;
 	private final String value;
@@ -13,20 +13,15 @@ public class EnumValue implements ICustomValue, Serializable {
 		this.enumType = type;
 		this.value = value;
 	}
-	
-	public EnumTypeDescriptor getTypeDescriptor() {
-		return this.enumType;
-	}
 
-	@Override
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 
 	@Override
 	public boolean equals(Object enumValue) {
 		if (enumValue instanceof EnumValue) {
-			return this.getValue().equals(((EnumValue) enumValue).getValue());
+			return this.value.equals(((EnumValue) enumValue).value);
 		} else {
 			return super.equals(enumValue);
 		}
@@ -34,7 +29,7 @@ public class EnumValue implements ICustomValue, Serializable {
 
 	@Override
 	public int hashCode() {
-	    return this.getValue().hashCode();
+	    return this.value.hashCode();
     }
 
 	int getIntValue() {
@@ -54,6 +49,6 @@ public class EnumValue implements ICustomValue, Serializable {
     }
 
     public boolean lesserThan(EnumValue compareTo) {
-		return this.enumType.getIdentifiers().indexOf(this.value) < this.enumType.getIdentifiers().indexOf(compareTo.getValue());
+		return this.enumType.getIdentifiers().indexOf(this.value) < this.enumType.getIdentifiers().indexOf(compareTo.value);
 	}
 }
