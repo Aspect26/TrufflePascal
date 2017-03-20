@@ -39,7 +39,7 @@
 		    </zipgroupfileset>
 
             <manifest>
-                <attribute name="Main-Class" value="cz.cuni.mff.d3s.trupple.compiler.CompilerMain"/>
+                <attribute name="Main-Class" value="cz.cuni.mff.d3s.trupple.main.CompilerMain"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
         </jar>

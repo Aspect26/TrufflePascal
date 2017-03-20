@@ -4,7 +4,7 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import java.util.Map;
 
 public class RecordValue implements ICustomValue {

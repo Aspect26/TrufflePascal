@@ -8,7 +8,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.cuni.mff.d3s.trupple.language.parser.IParser;
 import org.junit.Before;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;

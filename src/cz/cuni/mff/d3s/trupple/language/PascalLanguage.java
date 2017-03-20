@@ -11,9 +11,10 @@ import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.Source;
 
-import cz.cuni.mff.d3s.trupple.language.parser.IParser;
+import cz.cuni.mff.d3s.trupple.parser.IParser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
+import cz.cuni.mff.d3s.trupple.parser.tp.Parser;
 
 @TruffleLanguage.Registration(name = "Pascal", version = "0.10", mimeType = PascalLanguage.MIME_TYPE)
 public final class PascalLanguage extends TruffleLanguage<PascalContext> {
@@ -55,7 +56,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
     }
 
 	public static void start(String sourcePath, List<String> imports, boolean useTPExtension) throws IOException {
-		IParser parser = (useTPExtension)? new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser() : new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser();
+		IParser parser = (useTPExtension)? new Parser() : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
 
 		if (useTPExtension && !imports.isEmpty()) {
             if (!parseImports(imports, parser)) {
@@ -71,7 +72,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	}
 
 	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension) {
-        IParser parser = (useTPExtension)? new cz.cuni.mff.d3s.trupple.language.parser.tp.Parser() : new cz.cuni.mff.d3s.trupple.language.parser.wirth.Parser();
+        IParser parser = (useTPExtension)? new Parser() : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
 
         if (useTPExtension) {
             int i = 0;

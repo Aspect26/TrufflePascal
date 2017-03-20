@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
-import cz.cuni.mff.d3s.trupple.language.parser.identifierstable.types.compound.EnumTypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumTypeDescriptor;
 
 import java.io.Serializable;
 

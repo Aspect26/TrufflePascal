@@ -4,7 +4,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
-import cz.cuni.mff.d3s.trupple.exceptions.BreakExceptionTP;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.BreakExceptionTP;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 
