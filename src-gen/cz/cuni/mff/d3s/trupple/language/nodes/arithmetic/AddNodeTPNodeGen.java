@@ -61,13 +61,6 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
         return SpecializationNode.updateRoot(super.deepCopy());
     }
 
-    private static String expectString(Object value) throws UnexpectedResultException {
-        if (value instanceof String) {
-            return (String) value;
-        }
-        throw new UnexpectedResultException(value);
-    }
-
     public static AddNodeTP create(ExpressionNode leftNode, ExpressionNode rightNode) {
         return new AddNodeTPNodeGen(leftNode, rightNode);
     }
@@ -498,7 +491,7 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
             }
             String rightNodeValue_;
             try {
-                rightNodeValue_ = expectString(root.rightNode_.executeGeneric(frameValue));
+                rightNodeValue_ = PascalTypesGen.expectString(root.rightNode_.executeGeneric(frameValue));
             } catch (UnexpectedResultException ex) {
                 return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
             }
@@ -531,7 +524,7 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
         public Object execute(VirtualFrame frameValue) {
             String leftNodeValue_;
             try {
-                leftNodeValue_ = expectString(root.leftNode_.executeGeneric(frameValue));
+                leftNodeValue_ = PascalTypesGen.expectString(root.leftNode_.executeGeneric(frameValue));
             } catch (UnexpectedResultException ex) {
                 Object rightNodeValue = executeRightNode_(frameValue);
                 return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
