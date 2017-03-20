@@ -17,7 +17,7 @@ public class StringUnitTest extends JUnitTest {
                 " write(a);\n"+
                 "end.";
 
-        test(code, "Metallica - 2nd of April 2018 in Prague.METALLICA - 2ND OF APRIL 2018 IN PRAGUE.");
+        test(code, "Metallica - 2nd of April 2018 in Prague.METALLICA - 2ND OF APRIL 2018 IN PRAGUE.", true);
     }
 
 }
