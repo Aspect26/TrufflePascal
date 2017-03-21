@@ -106,4 +106,23 @@ public class BuiltinTest extends JUnitTest {
         test(code, output);
     }
 
+
+    @Test
+    public void eofTest() {
+        String code = "program main;\n"+
+                "\n"+
+                "var c: char;\n"+
+                "\n"+
+                "begin\n"+
+                " while not eof() do begin\n"+
+                " read(c);\n"+
+                " write(c);\n"+
+                " end;\n"+
+                "end.";
+
+        String input = "Barrel rider!";
+        String output = input;
+        this.testWithInput(code, input, output);
+    }
+
 }

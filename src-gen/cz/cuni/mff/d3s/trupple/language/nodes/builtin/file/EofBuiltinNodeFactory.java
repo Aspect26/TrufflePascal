@@ -10,8 +10,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
-import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
@@ -38,13 +36,13 @@ public final class EofBuiltinNodeFactory implements NodeFactory<EofBuiltinNode> 
 
     @Override
     public List getNodeSignatures() {
-        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode.class));
+        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode[].class));
     }
 
     @Override
     public EofBuiltinNode createNode(Object... arguments) {
-        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
-            return create((PascalContext) arguments[0], (ExpressionNode) arguments[1]);
+        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode[])) {
+            return create((PascalContext) arguments[0], (ExpressionNode[]) arguments[1]);
         } else {
             throw new IllegalArgumentException("Invalid create signature.");
         }
@@ -57,19 +55,19 @@ public final class EofBuiltinNodeFactory implements NodeFactory<EofBuiltinNode> 
         return instance;
     }
 
-    public static EofBuiltinNode create(PascalContext context, ExpressionNode file) {
-        return new EofBuiltinNodeGen(context, file);
+    public static EofBuiltinNode create(PascalContext context, ExpressionNode[] arguments) {
+        return new EofBuiltinNodeGen(context, arguments);
     }
 
     @GeneratedBy(EofBuiltinNode.class)
     public static final class EofBuiltinNodeGen extends EofBuiltinNode {
 
-        @Child private ExpressionNode file_;
+        @Child private ExpressionNode arguments0_;
         @CompilationFinal private boolean seenUnsupported0;
 
-        private EofBuiltinNodeGen(PascalContext context, ExpressionNode file) {
+        private EofBuiltinNodeGen(PascalContext context, ExpressionNode[] arguments) {
             super(context);
-            this.file_ = file;
+            this.arguments0_ = arguments != null && 0 < arguments.length ? arguments[0] : null;
         }
 
         @Override
@@ -90,21 +88,28 @@ public final class EofBuiltinNodeFactory implements NodeFactory<EofBuiltinNode> 
 
         @Override
         public boolean executeBoolean(VirtualFrame frameValue) {
-            FileValue fileValue_;
+            Object[] arguments0Value_;
             try {
-                fileValue_ = PascalTypesGen.expectFileValue(file_.executeGeneric(frameValue));
+                arguments0Value_ = expectObjectArray(arguments0_.executeGeneric(frameValue));
             } catch (UnexpectedResultException ex) {
                 throw unsupported(ex.getResult());
             }
-            return this.isEof(fileValue_);
+            return this.isEof(arguments0Value_);
         }
 
-        private UnsupportedSpecializationException unsupported(Object fileValue) {
+        private UnsupportedSpecializationException unsupported(Object arguments0Value) {
             if (!seenUnsupported0) {
                 CompilerDirectives.transferToInterpreterAndInvalidate();
                 seenUnsupported0 = true;
             }
-            return new UnsupportedSpecializationException(this, new Node[] {file_}, fileValue);
+            return new UnsupportedSpecializationException(this, new Node[] {arguments0_}, arguments0Value);
+        }
+
+        private static Object[] expectObjectArray(Object value) throws UnexpectedResultException {
+            if (value instanceof Object[]) {
+                return (Object[]) value;
+            }
+            throw new UnexpectedResultException(value);
         }
 
     }

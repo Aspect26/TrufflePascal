@@ -17,13 +17,16 @@ public abstract class EofBuiltinNode extends BuiltinNode {
     }
 
     @Specialization
-    boolean isEof(FileValue file) {
-        return file.isEof();
+    boolean isEof(Object... arguments) {
+        return (arguments.length == 0)? eof() : eof((FileValue) arguments[0]);
     }
 
-    /*@Specialization
-    boolean isEof() {
-        return false;
-    }*/
+    private boolean eof() {
+        return !this.context.getInput().hasNext();
+    }
+
+    private boolean eof(FileValue file) {
+        return file.isEof();
+    }
 
 }
