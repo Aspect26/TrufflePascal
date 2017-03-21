@@ -9,7 +9,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 @NodeInfo(shortName = "eof")
-@NodeChild(value = "file", type = ExpressionNode.class)
+@NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class EofBuiltinNode extends BuiltinNode {
 
     public EofBuiltinNode(PascalContext context) {
@@ -17,7 +17,15 @@ public abstract class EofBuiltinNode extends BuiltinNode {
     }
 
     @Specialization
-    boolean isEof(FileValue file) {
+    boolean isEof(Object... arguments) {
+        return (arguments.length == 0)? eof() : eof((FileValue) arguments[0]);
+    }
+
+    private boolean eof() {
+        return !this.context.getInput().hasNext();
+    }
+
+    private boolean eof(FileValue file) {
         return file.isEof();
     }
 
