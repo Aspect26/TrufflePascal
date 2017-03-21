@@ -27,9 +27,7 @@ public abstract class WritelnBuiltinNode extends BuiltinNode {
 	@Specialization
 	public String writeln(String... arguments) {
 		doWriteln(getContext().getOutput(), arguments);
-
-		// TODO: this return value?
-		return arguments[0];
+        return "";
 	}
 
 	@TruffleBoundary
@@ -43,9 +41,7 @@ public abstract class WritelnBuiltinNode extends BuiltinNode {
 	@Specialization
 	public long writeln(long... arguments) {
 		doWriteln(getContext().getOutput(), arguments);
-
-		// TODO: this return value?
-		return arguments[0];
+        return 0;
 	}
 
 	@TruffleBoundary
@@ -59,9 +55,7 @@ public abstract class WritelnBuiltinNode extends BuiltinNode {
 	@Specialization
 	public Object writeln(Object... arguments) {
 		doWriteln(getContext().getOutput(), arguments);
-
-		// TODO: this return value?
-		return arguments[0];
+        return new Object();
 	}
 
 	@TruffleBoundary
