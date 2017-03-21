@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
@@ -78,6 +79,7 @@ public class IdentifiersTable {
         identifiersMap.put("read", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
         identifiersMap.put("writeln", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
         identifiersMap.put("readln", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
+        identifiersMap.put("put", new BuiltinProcedureDescriptor.NotSupportedSubroutine());
         identifiersMap.put("succ", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
         identifiersMap.put("pred", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
         identifiersMap.put("abs", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
@@ -138,6 +140,11 @@ public class IdentifiersTable {
 
         TypeDescriptor descriptor = this.identifiersMap.get(identifier);
         return descriptor instanceof SubroutineDescriptor && !((SubroutineDescriptor) descriptor).hasParameters();
+    }
+
+    public void verifyPassedArgumentsToSubroutine(String identifier, List<ExpressionNode> params) throws LexicalException {
+        SubroutineDescriptor subroutineDescriptor = (SubroutineDescriptor) this.identifiersMap.get(identifier);
+        subroutineDescriptor.verifyArguments(params);
     }
 
     public void addType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {

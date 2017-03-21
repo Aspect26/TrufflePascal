@@ -115,6 +115,10 @@ public class LexicalScope {
         return this.publicIdentifiers.contains(identifier);
     }
 
+    void verifyPassedArgumentsToSubroutine(String identifier, List<ExpressionNode> params) throws LexicalException {
+        this.localIdentifiers.verifyPassedArgumentsToSubroutine(identifier, params);
+    }
+
     boolean containsLocalIdentifier(String identifier) {
         return this.localIdentifiers.containsIdentifier(identifier);
     }

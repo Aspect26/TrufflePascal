@@ -569,6 +569,7 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
         return this.doLookup(identifier, (LexicalScope foundInScope, String foundIdentifier) -> {
             if (foundInScope.isSubroutine(foundIdentifier)) {
+                foundInScope.verifyPassedArgumentsToSubroutine(foundIdentifier, params);
                 return this.createInvokeNode(foundInScope, foundIdentifier, params);
             } else {
                 throw new LexicalException(foundIdentifier + " is not a subroutine.");

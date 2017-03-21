@@ -1,6 +1,11 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine;
 
+import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.BuiltinNotSupportedException;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
+
 import java.util.Collections;
+import java.util.List;
 
 public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 
@@ -38,6 +43,14 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
             return false;
         }
 
+    }
+
+    public static class NotSupportedSubroutine extends NoReferenceParameterBuiltin {
+
+        @Override
+        public void verifyArguments(List<ExpressionNode> passedArguments) throws LexicalException {
+            throw new BuiltinNotSupportedException();
+        }
     }
 
 }
