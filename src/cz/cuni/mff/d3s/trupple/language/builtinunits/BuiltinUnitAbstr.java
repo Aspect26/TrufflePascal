@@ -13,7 +13,7 @@ abstract class BuiltinUnitAbstr implements BuiltinUnit {
     public void importTo(LexicalScope lexicalScope) {
         List<UnitFunctionData> unitFunctions = this.getIdentifiers();
         for (UnitFunctionData unitFunction : unitFunctions) {
-            String identifier = unitFunction.identifier;
+            String identifier = unitFunction.identifier.toLowerCase();
             SubroutineDescriptor descriptor = unitFunction.descriptor;
             ExpressionNode bodyNode = unitFunction.bodyNode;
 
