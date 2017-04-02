@@ -8,7 +8,7 @@ public class DosBuiltinUnit extends BuiltinUnitAbstr {
     private final List<UnitFunctionData> data = new ArrayList<>();
 
     @Override
-    protected List<UnitFunctionData> getIdentifiers() {
+    protected List<UnitFunctionData> getSubroutines() {
         return this.data;
     }
 

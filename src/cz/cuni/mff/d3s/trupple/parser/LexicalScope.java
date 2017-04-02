@@ -208,7 +208,15 @@ public class LexicalScope {
             this.context.registerSubroutineName(identifier);
             this.context.setSubroutineRootNode(identifier, rootNode);
         } catch (LexicalException e) {
-            // TODO: this is called from BuiltinUnitAbstr only
+            // TODO: this is called from BuiltinUnitAbstr only, so this should not happen
+        }
+    }
+
+    public void registerType(String identifier, TypeDescriptor type) {
+        try {
+            this.localIdentifiers.addType(identifier, type);
+        } catch (LexicalException e) {
+            // TODO: this is called from BuiltinUnitAbstr only, so this should not happen
         }
     }
 

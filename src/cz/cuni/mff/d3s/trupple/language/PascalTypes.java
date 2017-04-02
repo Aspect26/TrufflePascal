@@ -10,7 +10,8 @@ import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
 @TypeSystem({ long.class, boolean.class, char.class, double.class, PascalFunction.class, String.class, EnumValue.class,
-        PascalArray.class, Reference.class, PointerValue.class, SetTypeValue.class, FileValue.class, Null.class })
+        PascalArray.class, Reference.class, PointerValue.class, SetTypeValue.class, FileValue.class, PCharValue.class,
+        Null.class })
 @DSLOptions
 public class PascalTypes {
 
