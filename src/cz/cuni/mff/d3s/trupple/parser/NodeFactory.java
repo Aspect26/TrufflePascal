@@ -6,6 +6,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.sun.istack.internal.NotNull;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.*;
+import cz.cuni.mff.d3s.trupple.language.builtinunits.graph.GraphBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
