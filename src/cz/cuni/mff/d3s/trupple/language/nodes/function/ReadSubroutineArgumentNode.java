@@ -68,19 +68,19 @@ public abstract class ReadSubroutineArgumentNode extends ExpressionNode {
 		throw new RuntimeException("Wrong number of parmeters passed.");
 	}
 
-	protected boolean isLongKind() {
+	boolean isLongKind() {
 		return getSlotKind() == FrameSlotKind.Long;
 	}
 
-	protected boolean isBoolKind() {
+	boolean isBoolKind() {
 		return getSlotKind() == FrameSlotKind.Boolean;
 	}
 
-	protected boolean isCharKind() {
+	boolean isCharKind() {
 		return getSlotKind() == FrameSlotKind.Byte;
 	}
 
-    protected boolean isDoubleKind() {
+    boolean isDoubleKind() {
         return getSlotKind() == FrameSlotKind.Double;
     }
 

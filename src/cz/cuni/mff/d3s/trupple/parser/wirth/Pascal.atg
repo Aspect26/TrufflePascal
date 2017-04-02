@@ -41,10 +41,12 @@ Program
 =
     "program"
     identifier                                      (. factory.startPascal(t); .)
-                                                    (. List<String> programArgumentsIdentifiers; .)
-    "("
-    [ IdentifiersList<out programArgumentsIdentifiers> ]
-    ")"
+                                                    (. List<String> programArgumentsIdentifiers = new ArrayList<>(); .)
+    [
+        "("
+        IdentifiersList<out programArgumentsIdentifiers>
+        ")"
+    ]                                               (. factory.setMainProgramArguments(programArgumentsIdentifiers); .)
     ";"
 .
 
@@ -407,12 +409,12 @@ identifier										(. formalParameter = factory.createFormalParametersList(iden
 
 MainFunction 
 =
-Block<out StatementNode blockNode>              (. mainNode = factory.finishMainFunction(blockNode); .)
+Block<out BlockNode blockNode>                  (. mainNode = factory.finishMainFunction(blockNode); .)
 "."
 .
 
 
-Block<out StatementNode blockNode>
+Block<out BlockNode blockNode>
 =                                               
     "begin"                                     (. List<StatementNode> bodyNodes = new ArrayList<>(); .)
     [ 

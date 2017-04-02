@@ -110,12 +110,13 @@ public class Parser implements IParser {
 		Expect(5);
 		Expect(1);
 		factory.startPascal(t); 
-		List<String> programArgumentsIdentifiers; 
-		Expect(6);
-		if (la.kind == 1) {
+		List<String> programArgumentsIdentifiers = new ArrayList<>(); 
+		if (la.kind == 6) {
+			Get();
 			programArgumentsIdentifiers = IdentifiersList();
+			Expect(7);
 		}
-		Expect(7);
+		factory.setMainProgramArguments(programArgumentsIdentifiers); 
 		Expect(8);
 	}
 
@@ -147,7 +148,7 @@ public class Parser implements IParser {
 	}
 
 	void MainFunction() {
-		StatementNode blockNode = Block();
+		BlockNode blockNode = Block();
 		mainNode = factory.finishMainFunction(blockNode); 
 		Expect(33);
 	}
@@ -548,8 +549,8 @@ public class Parser implements IParser {
 		return formalParameters;
 	}
 
-	StatementNode  Block() {
-		StatementNode  blockNode;
+	BlockNode  Block() {
+		BlockNode  blockNode;
 		Expect(34);
 		List<StatementNode> bodyNodes = new ArrayList<>(); 
 		if (StartOf(3)) {

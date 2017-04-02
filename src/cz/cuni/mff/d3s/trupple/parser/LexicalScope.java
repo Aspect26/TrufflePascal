@@ -31,6 +31,8 @@ public class LexicalScope {
     private int loopDepth;
     private final PascalContext context;
     private final Set<String> publicIdentifiers;
+
+    // TODO: this should not be here
     private final List<StatementNode> readArgumentNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
