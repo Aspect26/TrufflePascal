@@ -26,6 +26,7 @@ public class PascalGraphMode {
     private static void openFrame() {
         frame = new PascalGraphFrame();
         frame.setVisible(true);
+        frame.getContentPane().setBackground(Color.black);
     }
 
     public static long close() {

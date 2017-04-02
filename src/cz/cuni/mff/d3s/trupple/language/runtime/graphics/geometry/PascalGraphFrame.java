@@ -14,6 +14,7 @@ public class PascalGraphFrame extends JFrame {
         super("Trupple graphics mode");
         geometries = new ArrayList<>();
         this.setSize(640, 480);
+        this.setResizable(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
