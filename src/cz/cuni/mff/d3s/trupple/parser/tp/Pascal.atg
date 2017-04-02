@@ -72,10 +72,21 @@ identifier										(. factory.registerUnit(t); .)
 
 Declarations
 =
-[ ConstantDefinitions ]
-[ TypeDefinitions ]
-[ VariableDeclarations ]
-{ Subroutine }
+{ Declaration }
+.
+
+
+Declaration
+=
+(
+    ConstantDefinitions
+|
+    TypeDefinitions
+|
+    VariableDeclarations
+|
+    Subroutine
+)
 .
 
 
