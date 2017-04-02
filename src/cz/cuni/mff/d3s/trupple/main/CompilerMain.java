@@ -38,7 +38,7 @@ public class CompilerMain {
 			System.out.println(welcomeMessage);
 		}
 
-		PascalLanguage.start(settings.sourcePath, settings.imports, settings.isTPExtensionSet());
+		PascalLanguage.start(settings.getSourcePath(), settings.getArguments(), settings.imports, settings.isTPExtensionSet());
 
 		if (settings.verbose) {
 			System.out.println(exitMessage);
