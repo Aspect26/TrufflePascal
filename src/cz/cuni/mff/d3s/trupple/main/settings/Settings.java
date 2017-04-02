@@ -22,10 +22,14 @@ public class Settings {
     public String standard = STANDARD_WIRTH;
 
     @Argument
-    public String sourcePath;
+    public List<String> arguments = new ArrayList<>();
 
     public String getSourcePath() {
-        return this.sourcePath;
+        return this.arguments.get(0);
+    }
+
+    public String[] getArguments() {
+        return this.arguments.subList(1, this.arguments.size()).toArray(new String[this.arguments.size() - 1]);
     }
 
     public static boolean isStandard(String value) {

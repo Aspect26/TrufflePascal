@@ -113,6 +113,10 @@ public class IdentifiersTable {
         return this.frameDescriptor;
     }
 
+    public TypeDescriptor getIdentifierDescriptor(String identifier) {
+        return this.identifiersMap.get(identifier);
+    }
+
     public TypeDescriptor getTypeDescriptor(String identifier)  {
         return this.typeDescriptors.get(identifier);
     }
