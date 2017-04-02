@@ -46,6 +46,10 @@ Program
 =
     "program"
     identifier                                      (. factory.startPascal(t); .)
+                                                    (. List<String> programArgumentsIdentifiers; .)
+    "("
+    [ IdentifiersList<out programArgumentsIdentifiers> ]
+    ")"
     ";"
 .
 
