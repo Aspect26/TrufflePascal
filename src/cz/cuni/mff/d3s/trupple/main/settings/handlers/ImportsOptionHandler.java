@@ -16,7 +16,7 @@ public class ImportsOptionHandler extends OptionHandler<String> {
     public int parseArguments(Parameters params) throws CmdLineException {
     	String dir;
     	int index = 0;
-    	while(index<params.size()-1){
+    	while(index < params.size()-1){
     		dir = params.getParameter(index++);
     		if(dir.matches("-.*"))
     			break;
