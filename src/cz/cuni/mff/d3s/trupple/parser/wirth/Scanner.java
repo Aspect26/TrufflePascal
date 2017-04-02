@@ -274,13 +274,13 @@ public class Scanner {
 		for (int i = 49; i <= 57; ++i) start.set(i, 10);
 		start.set(39, 2); 
 		start.set(48, 11); 
-		start.set(59, 12); 
-		start.set(61, 13); 
-		start.set(91, 14); 
-		start.set(44, 15); 
-		start.set(93, 16); 
-		start.set(40, 17); 
-		start.set(41, 18); 
+		start.set(40, 12); 
+		start.set(41, 13); 
+		start.set(59, 14); 
+		start.set(61, 15); 
+		start.set(91, 16); 
+		start.set(44, 17); 
+		start.set(93, 18); 
 		start.set(94, 19); 
 		start.set(58, 29); 
 		start.set(46, 30); 
@@ -292,11 +292,11 @@ public class Scanner {
 		start.set(47, 28); 
 		start.set(Buffer.EOF, -1);
 		literals.put("program", new Integer(5));
-		literals.put("type", new Integer(7));
-		literals.put("of", new Integer(9));
-		literals.put("set", new Integer(10));
-		literals.put("packed", new Integer(11));
-		literals.put("array", new Integer(12));
+		literals.put("type", new Integer(9));
+		literals.put("of", new Integer(11));
+		literals.put("set", new Integer(12));
+		literals.put("packed", new Integer(13));
+		literals.put("array", new Integer(14));
 		literals.put("file", new Integer(18));
 		literals.put("record", new Integer(19));
 		literals.put("end", new Integer(20));
@@ -504,11 +504,11 @@ public class Scanner {
 				case 12:
 					{t.kind = 6; break loop;}
 				case 13:
-					{t.kind = 8; break loop;}
+					{t.kind = 7; break loop;}
 				case 14:
-					{t.kind = 13; break loop;}
+					{t.kind = 8; break loop;}
 				case 15:
-					{t.kind = 14; break loop;}
+					{t.kind = 10; break loop;}
 				case 16:
 					{t.kind = 15; break loop;}
 				case 17:

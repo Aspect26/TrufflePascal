@@ -13,6 +13,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.CaseNode;
@@ -88,6 +89,11 @@ public class NodeFactory {
      */
 	private final boolean usingTPExtension;
 
+    /**
+     * Specifies identifiers of arguments of the main program
+     */
+	private List<String> mainProgramArgumentsIdentifiers;
+
 	public NodeFactory(IParser parser, boolean usingTPExtension) {
 		this.parser = parser;
 		this.usingTPExtension = usingTPExtension;
@@ -98,6 +104,12 @@ public class NodeFactory {
 	public void startPascal(Token identifierToken) {
 		this.lexicalScope.setName(this.getIdentifierFromToken(identifierToken));
 	}
+
+	public void setMainProgramArguments(List<String> argumentIdentifiers) {
+	    assert lexicalScope.getOuterScope() == null;
+
+	    this.mainProgramArgumentsIdentifiers = argumentIdentifiers;
+    }
 
     public void registerUnit(Token unitIdentifierToken) {
         String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);
@@ -609,14 +621,33 @@ public class NodeFactory {
         return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
     }
 
-    public StatementNode createBlockNode(List<StatementNode> bodyNodes) {
+    public BlockNode createBlockNode(List<StatementNode> bodyNodes) {
         return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
     }
 
     // TODO: this main node can be in lexical scope instead of a parser
-    public PascalRootNode finishMainFunction(StatementNode blockNode) {
+    public PascalRootNode finishMainFunction(BlockNode blockNode) {
+	    this.addProgramArgumentsAssignmentNodes();
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
         return new PascalRootNode(lexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
+    }
+
+    private List<StatementNode> addProgramArgumentsAssignmentNodes() {
+	    List<StatementNode> nodes = new ArrayList<>();
+	    int currentArgument = 0;
+	    for (String argumentIdentifier : this.mainProgramArgumentsIdentifiers) {
+	        FrameSlot argumentSlot = this.lexicalScope.getLocalSlot(argumentIdentifier);
+	        TypeDescriptor typeDescriptor = this.lexicalScope.getIdentifierDescriptor(argumentIdentifier);
+
+	        if (typeDescriptor != null) {
+                if (ProgramArgumentAssignmentNode.supportsType(typeDescriptor)) {
+                    this.lexicalScope.addScopeArgument(new ProgramArgumentAssignmentNode(argumentSlot, typeDescriptor, currentArgument++));
+                }
+                // TODO: else -> show warning
+            }
+        }
+
+        return nodes;
     }
 
     public String createStringFromToken(Token t) {

@@ -46,6 +46,10 @@ Program
 =
     "program"
     identifier                                      (. factory.startPascal(t); .)
+                                                    (. List<String> programArgumentsIdentifiers; .)
+    "("
+    [ IdentifiersList<out programArgumentsIdentifiers> ]
+    ")"
     ";"
 .
 
@@ -80,7 +84,7 @@ TypeDefinitions
 TypeDefinition ";"
 {
     TypeDefinition ";"
-}
+}                                               (. factory.initializeAllUninitializedPointerDescriptors(); .)
 .
 
 
@@ -170,7 +174,7 @@ RecordFieldList<out typeDescriptor>
 PointerType<out TypeDescriptor typeDescriptor>
 =
 "^"
-Type<out TypeDescriptor innerType>              (. typeDescriptor = factory.createPointerType(innerType); .)
+identifier                                      (. typeDescriptor = factory.createPointerType(t); .)
 .
 
 
@@ -726,7 +730,7 @@ InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
 	SubroutineCall<out expression, identifierToken>
 |
 	InnerAccessRouteNonEmpty<out AccessNode accessRoute, identifierToken>
-	                                            (. expression = factory.createExpressionFromIdentifierWithRoute(identifierToken, accessRoute); .)
+	                                            (. expression = factory.createExpressionFromIdentifierWithRoute(accessRoute); .)
 )
 .
 
