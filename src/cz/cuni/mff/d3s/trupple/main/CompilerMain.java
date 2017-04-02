@@ -21,7 +21,7 @@ public class CompilerMain {
 	private Settings settings;
 
 	private static final String welcomeMessage = "" +
-            "Welcome to Trupple v0.10 made by \"Aspect\"" +
+            "Welcome to Trupple v1.0 made by \"Aspect\"" +
             "Starting interpretation..." +
             "----------------------------------";
 
@@ -38,7 +38,7 @@ public class CompilerMain {
 			System.out.println(welcomeMessage);
 		}
 
-		PascalLanguage.start(settings.sourcePath, settings.imports, settings.isTPExtensionSet());
+		PascalLanguage.start(settings.getSourcePath(), settings.getArguments(), settings.imports, settings.isTPExtensionSet());
 
 		if (settings.verbose) {
 			System.out.println(exitMessage);

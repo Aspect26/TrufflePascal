@@ -28,7 +28,7 @@ public abstract class BuiltinUnitAbstr implements BuiltinUnit {
     private void importSubroutines(LexicalScope lexicalScope) {
         List<UnitFunctionData> unitFunctions = this.getSubroutines();
         for (UnitFunctionData unitFunction : unitFunctions) {
-            String identifier = unitFunction.identifier;
+            String identifier = unitFunction.identifier.toLowerCase();
             SubroutineDescriptor descriptor = unitFunction.descriptor;
             ExpressionNode bodyNode = unitFunction.bodyNode;
 

@@ -35,6 +35,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
 
 public class NodeFactory {
@@ -89,6 +90,11 @@ public class NodeFactory {
      */
 	private final boolean usingTPExtension;
 
+    /**
+     * Specifies identifiers of arguments of the main program
+     */
+	private List<String> mainProgramArgumentsIdentifiers;
+
 	public NodeFactory(IParser parser, boolean usingTPExtension) {
 		this.parser = parser;
 		this.usingTPExtension = usingTPExtension;
@@ -99,6 +105,12 @@ public class NodeFactory {
 	public void startPascal(Token identifierToken) {
 		this.lexicalScope.setName(this.getIdentifierFromToken(identifierToken));
 	}
+
+	public void setMainProgramArguments(List<String> argumentIdentifiers) {
+	    assert lexicalScope.getOuterScope() == null;
+
+	    this.mainProgramArgumentsIdentifiers = argumentIdentifiers;
+    }
 
     public void registerUnit(Token unitIdentifierToken) {
         String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);
@@ -445,6 +457,30 @@ public class NodeFactory {
         return new IfNode(condition, thenNode, elseNode);
     }
 
+    public List<FrameSlot> stepIntoRecordsScope(List<String> recordIdentifiers) {
+	    LexicalScope currentScope = this.getScope();
+        List<FrameSlot> recordsSlots = new ArrayList<>();
+
+        // TODO CRITICAL: a lookup function should be used for the first identifier
+	    for (String recordIdentifier : recordIdentifiers) {
+	        TypeDescriptor recordDescriptor = this.lexicalScope.getIdentifierDescriptor(recordIdentifier);
+            if (recordDescriptor == null || !(recordDescriptor instanceof RecordDescriptor)) {
+                parser.SemErr("Not a record: " + recordIdentifier);
+                this.lexicalScope = currentScope;
+                return Collections.emptyList();
+            } else {
+                recordsSlots.add(this.lexicalScope.getLocalSlot(recordIdentifier));
+                this.lexicalScope = ((RecordDescriptor) recordDescriptor).getLexicalScope();
+            }
+        }
+
+        return recordsSlots;
+    }
+
+    public WithNode createWithStatement(List<FrameSlot> frameSlots, StatementNode innerStatement) {
+	    return new WithNode(frameSlots, innerStatement);
+    }
+
     public CaseNode createCaseStatement(CaseStatementData data) {
         ExpressionNode[] indexes = data.indexNodes.toArray(new ExpressionNode[data.indexNodes.size()]);
         StatementNode[] statements = data.statementNodes.toArray(new StatementNode[data.statementNodes.size()]);
@@ -610,14 +646,33 @@ public class NodeFactory {
         return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
     }
 
-    public StatementNode createBlockNode(List<StatementNode> bodyNodes) {
+    public BlockNode createBlockNode(List<StatementNode> bodyNodes) {
         return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
     }
 
     // TODO: this main node can be in lexical scope instead of a parser
-    public PascalRootNode finishMainFunction(StatementNode blockNode) {
+    public PascalRootNode finishMainFunction(BlockNode blockNode) {
+	    this.addProgramArgumentsAssignmentNodes();
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
         return new PascalRootNode(lexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
+    }
+
+    private List<StatementNode> addProgramArgumentsAssignmentNodes() {
+	    List<StatementNode> nodes = new ArrayList<>();
+	    int currentArgument = 0;
+	    for (String argumentIdentifier : this.mainProgramArgumentsIdentifiers) {
+	        FrameSlot argumentSlot = this.lexicalScope.getLocalSlot(argumentIdentifier);
+	        TypeDescriptor typeDescriptor = this.lexicalScope.getIdentifierDescriptor(argumentIdentifier);
+
+	        if (typeDescriptor != null) {
+                if (ProgramArgumentAssignmentNode.supportsType(typeDescriptor)) {
+                    this.lexicalScope.addScopeArgument(new ProgramArgumentAssignmentNode(argumentSlot, typeDescriptor, currentArgument++));
+                }
+                // TODO: else -> show warning
+            }
+        }
+
+        return nodes;
     }
 
     public String createStringFromToken(Token t) {
@@ -701,6 +756,14 @@ public class NodeFactory {
     public String getIdentifierFromToken(Token identifierToken) {
         String identifier = identifierToken.val.toLowerCase();
         return this.identifiersPrefix + identifier;
+    }
+
+    public LexicalScope getScope() {
+	    return this.lexicalScope;
+    }
+
+    public void setScope(LexicalScope scope) {
+	    this.lexicalScope = scope;
     }
 
 

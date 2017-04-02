@@ -31,6 +31,8 @@ public class LexicalScope {
     private int loopDepth;
     private final PascalContext context;
     private final Set<String> publicIdentifiers;
+
+    // TODO: this should not be here
     private final List<StatementNode> readArgumentNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
@@ -71,6 +73,10 @@ public class LexicalScope {
 
     FrameSlot getReturnSlot() {
         return this.localIdentifiers.getFrameSlot(this.name);
+    }
+
+    TypeDescriptor getIdentifierDescriptor(String identifier) {
+        return this.localIdentifiers.getIdentifierDescriptor(identifier);
     }
 
     TypeDescriptor getTypeDescriptor(String identifier) {

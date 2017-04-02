@@ -90,7 +90,7 @@ public final class AssignBuiltinNodeFactory implements NodeFactory<AssignBuiltin
             }
             String pathValue_;
             try {
-                pathValue_ = expectString(path_.executeGeneric(frameValue));
+                pathValue_ = PascalTypesGen.expectString(path_.executeGeneric(frameValue));
             } catch (UnexpectedResultException ex) {
                 throw unsupported(fileValue_, ex.getResult());
             }
@@ -109,13 +109,6 @@ public final class AssignBuiltinNodeFactory implements NodeFactory<AssignBuiltin
                 seenUnsupported0 = true;
             }
             return new UnsupportedSpecializationException(this, new Node[] {file_, path_}, fileValue, pathValue);
-        }
-
-        private static String expectString(Object value) throws UnexpectedResultException {
-            if (value instanceof String) {
-                return (String) value;
-            }
-            throw new UnexpectedResultException(value);
         }
 
     }

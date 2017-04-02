@@ -41,6 +41,12 @@ Program
 =
     "program"
     identifier                                      (. factory.startPascal(t); .)
+                                                    (. List<String> programArgumentsIdentifiers = new ArrayList<>(); .)
+    [
+        "("
+        IdentifiersList<out programArgumentsIdentifiers>
+        ")"
+    ]                                               (. factory.setMainProgramArguments(programArgumentsIdentifiers); .)
     ";"
 .
 
@@ -403,12 +409,12 @@ identifier										(. formalParameter = factory.createFormalParametersList(iden
 
 MainFunction 
 =
-Block<out StatementNode blockNode>              (. mainNode = factory.finishMainFunction(blockNode); .)
+Block<out BlockNode blockNode>                  (. mainNode = factory.finishMainFunction(blockNode); .)
 "."
 .
 
 
-Block<out StatementNode blockNode>
+Block<out BlockNode blockNode>
 =                                               
     "begin"                                     (. List<StatementNode> bodyNodes = new ArrayList<>(); .)
     [ 
@@ -442,6 +448,8 @@ Statement<out StatementNode statement>
 	RepeatLoop<out statement>
 |
 	CaseStatement<out statement>
+|
+    WithStatement<out statement>
 |
     Block<out statement>
 |
@@ -529,6 +537,18 @@ Statement<out StatementNode caseStatement>		(. data.statementNodes.add(caseState
 [ ";" ]
 .
 
+
+WithStatement<out StatementNode statement>
+=
+"with"
+IdentifiersList<. out List<String> recordIdentifiers .>
+                                                (. LexicalScope initialScope = factory.getScope(); .)
+                                                (. List<FrameSlot> recordSlots = factory.stepIntoRecordsScope(recordIdentifiers); .)
+"do"
+Statement<out StatementNode innerStatement>
+                                                (. factory.setScope(initialScope); .)
+                                                (. statement = factory.createWithStatement(recordSlots, innerStatement); .)
+.
 
 
 ForLoop<out StatementNode statement>

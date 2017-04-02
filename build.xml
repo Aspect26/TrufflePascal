@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Trupple v0.10" default="info">
+<project name="Trupple" default="info">
 
     <property name="src.dir" value="src"/>
     <property name="srcgen.dir" value="src-gen"/>
