@@ -21,7 +21,7 @@ public class CompilerMain {
 	private Settings settings;
 
 	private static final String welcomeMessage = "" +
-            "Welcome to Trupple v0.10 made by \"Aspect\"" +
+            "Welcome to Trupple v1.0 made by \"Aspect\"" +
             "Starting interpretation..." +
             "----------------------------------";
 
