@@ -637,10 +637,13 @@ public class NodeFactory {
 	    int currentArgument = 0;
 	    for (String argumentIdentifier : this.mainProgramArgumentsIdentifiers) {
 	        FrameSlot argumentSlot = this.lexicalScope.getLocalSlot(argumentIdentifier);
-	        TypeDescriptor typeDescriptor = this.lexicalScope.getTypeDescriptor(argumentIdentifier);
+	        TypeDescriptor typeDescriptor = this.lexicalScope.getIdentifierDescriptor(argumentIdentifier);
 
 	        if (typeDescriptor != null) {
-	            this.lexicalScope.addScopeArgument(new ProgramArgumentAssignmentNode(argumentSlot, typeDescriptor, currentArgument++));
+                if (ProgramArgumentAssignmentNode.supportsType(typeDescriptor)) {
+                    this.lexicalScope.addScopeArgument(new ProgramArgumentAssignmentNode(argumentSlot, typeDescriptor, currentArgument++));
+                }
+                // TODO: else -> show warning
             }
         }
 

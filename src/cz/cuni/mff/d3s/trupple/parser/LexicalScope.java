@@ -75,6 +75,10 @@ public class LexicalScope {
         return this.localIdentifiers.getFrameSlot(this.name);
     }
 
+    TypeDescriptor getIdentifierDescriptor(String identifier) {
+        return this.localIdentifiers.getIdentifierDescriptor(identifier);
+    }
+
     TypeDescriptor getTypeDescriptor(String identifier) {
         return this.localIdentifiers.getTypeDescriptor(identifier);
     }

@@ -10,7 +10,17 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.FileDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDescriptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProgramArgumentAssignmentNode extends StatementNode{
+
+    private static List<Class<? extends TypeDescriptor>> supportedTypes = new ArrayList<Class<? extends TypeDescriptor>>() {
+        {
+            add(StringDescriptor.class);
+            add(FileDescriptor.class);
+        }
+    };
 
     private final FrameSlot targetSlot;
     private final TypeDescriptor variableType;
@@ -20,6 +30,10 @@ public class ProgramArgumentAssignmentNode extends StatementNode{
         this.targetSlot = targetSlot;
         this.variableType = variableType;
         this.argumentNumber = argumentNumber;
+    }
+
+    public static boolean supportsType(TypeDescriptor type) {
+        return supportedTypes.contains(type.getClass());
     }
 
     @Override
