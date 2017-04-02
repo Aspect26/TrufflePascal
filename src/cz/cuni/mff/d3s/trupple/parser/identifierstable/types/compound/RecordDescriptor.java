@@ -24,4 +24,8 @@ public class RecordDescriptor implements TypeDescriptor {
         return new RecordValue(this.innerScope.getFrameDescriptor(), innerScope.getIdentifiersTable().getAll());
     }
 
+    public LexicalScope getLexicalScope() {
+        return this.innerScope;
+    }
+
 }

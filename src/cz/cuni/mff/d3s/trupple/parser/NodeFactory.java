@@ -13,7 +13,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.CaseNode;
@@ -35,6 +34,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
 
 public class NodeFactory {
@@ -456,6 +456,30 @@ public class NodeFactory {
         return new IfNode(condition, thenNode, elseNode);
     }
 
+    public List<FrameSlot> stepIntoRecordsScope(List<String> recordIdentifiers) {
+	    LexicalScope currentScope = this.getScope();
+        List<FrameSlot> recordsSlots = new ArrayList<>();
+
+        // TODO CRITICAL: a lookup function should be used for the first identifier
+	    for (String recordIdentifier : recordIdentifiers) {
+	        TypeDescriptor recordDescriptor = this.lexicalScope.getIdentifierDescriptor(recordIdentifier);
+            if (recordDescriptor == null || !(recordDescriptor instanceof RecordDescriptor)) {
+                parser.SemErr("Not a record: " + recordIdentifier);
+                this.lexicalScope = currentScope;
+                return Collections.emptyList();
+            } else {
+                recordsSlots.add(this.lexicalScope.getLocalSlot(recordIdentifier));
+                this.lexicalScope = ((RecordDescriptor) recordDescriptor).getLexicalScope();
+            }
+        }
+
+        return recordsSlots;
+    }
+
+    public WithNode createWithStatement(List<FrameSlot> frameSlots, StatementNode innerStatement) {
+	    return new WithNode(frameSlots, innerStatement);
+    }
+
     public CaseNode createCaseStatement(CaseStatementData data) {
         ExpressionNode[] indexes = data.indexNodes.toArray(new ExpressionNode[data.indexNodes.size()]);
         StatementNode[] statements = data.statementNodes.toArray(new StatementNode[data.statementNodes.size()]);
@@ -731,6 +755,14 @@ public class NodeFactory {
     public String getIdentifierFromToken(Token identifierToken) {
         String identifier = identifierToken.val.toLowerCase();
         return this.identifiersPrefix + identifier;
+    }
+
+    public LexicalScope getScope() {
+	    return this.lexicalScope;
+    }
+
+    public void setScope(LexicalScope scope) {
+	    this.lexicalScope = scope;
     }
 
 
