@@ -53,9 +53,14 @@ public abstract class JUnitTest {
 	    test(sourceCode, imports, expectedOutput, false);
     }
 
-	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension) {
+    protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension) {
+	    this.test(sourceCode, imports, expectedOutput, useTPExtension, false);
+    }
+
+	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
+                        boolean extendedGotoSupport) {
 		setUpStreams();
-		PascalLanguage.startFromCodes(sourceCode, imports, useTPExtension);
+		PascalLanguage.startFromCodes(sourceCode, imports, useTPExtension, extendedGotoSupport);
 		assertEquals(expectedOutput, output.toString() + error.toString());
 	}
 }

@@ -5,7 +5,7 @@ import org.junit.Test;
 public class GotoTest extends JUnitTest {
 
     @Test
-    public void gotoFirstOptionOfStandard() {
+    public void firstCaseOfGotoFromStandard() {
         String code="program main;\n"+
                 "label 42;\n"+
                 "var i:integer;\n"+

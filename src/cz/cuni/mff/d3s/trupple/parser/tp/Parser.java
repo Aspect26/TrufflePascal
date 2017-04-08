@@ -33,11 +33,13 @@ public class Parser implements IParser {
 	public Errors errors;
 	private final NodeFactory factory;
     public PascalRootNode mainNode;
+    private boolean extendedGotoSupport;
 
 	
 
-	public Parser() {
+	public Parser(boolean extendedGotoSupport) {
 		this.factory = new NodeFactory(this, true);
+		this.extendedGotoSupport = extendedGotoSupport;
 		errors = new Errors();
 	}
 

@@ -55,8 +55,10 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	    return null;
     }
 
-	public static void start(String sourcePath, String[] arguments, List<String> imports, boolean useTPExtension) throws IOException {
-		IParser parser = (useTPExtension)? new Parser() : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
+	public static void start(String sourcePath, String[] arguments, List<String> imports, boolean useTPExtension,
+                             boolean extendedGotoSupport) throws IOException {
+		IParser parser = (useTPExtension)? new Parser(extendedGotoSupport) :
+                new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
 
 		if (useTPExtension && !imports.isEmpty()) {
             if (!parseImports(imports, parser)) {
@@ -71,8 +73,10 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call(arguments);
 	}
 
-	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension) {
-        IParser parser = (useTPExtension)? new Parser() : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
+	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension,
+                                      boolean extendedGotoSupport) {
+        IParser parser = (useTPExtension)? new Parser(extendedGotoSupport) :
+                new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
 
         if (useTPExtension) {
             int i = 0;
