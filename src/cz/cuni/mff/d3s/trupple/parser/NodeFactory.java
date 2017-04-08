@@ -659,12 +659,15 @@ public class NodeFactory {
         return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
     }
 
-    public BlockNode createBlockNode(List<StatementNode> bodyNodes) {
-        return new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
+    public StatementNode createBlockNode(List<StatementNode> bodyNodes, boolean useExtendedVersion) {
+        return (useExtendedVersion)?
+                new ExtendedBlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]))
+                :
+                new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
     }
 
     // TODO: this main node can be in lexical scope instead of a parser
-    public PascalRootNode finishMainFunction(BlockNode blockNode) {
+    public PascalRootNode finishMainFunction(StatementNode blockNode) {
 	    this.addProgramArgumentsAssignmentNodes();
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
         return new PascalRootNode(lexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));

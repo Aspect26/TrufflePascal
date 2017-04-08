@@ -135,7 +135,7 @@ public class Parser implements IParser {
 	}
 
 	void MainFunction() {
-		BlockNode blockNode = Block();
+		StatementNode blockNode = Block();
 		mainNode = factory.finishMainFunction(blockNode); 
 		Expect(33);
 	}
@@ -532,15 +532,15 @@ public class Parser implements IParser {
 		return formalParameters;
 	}
 
-	BlockNode  Block() {
-		BlockNode  blockNode;
+	StatementNode  Block() {
+		StatementNode  blockNode;
 		Expect(34);
 		List<StatementNode> bodyNodes = new ArrayList<>(); 
 		if (StartOf(3)) {
 			StatementSequence(bodyNodes);
 		}
 		Expect(21);
-		blockNode = factory.createBlockNode(bodyNodes); 
+		blockNode = factory.createBlockNode(bodyNodes, this.extendedGotoSupport); 
 		return blockNode;
 	}
 
@@ -683,7 +683,7 @@ public class Parser implements IParser {
 		StatementSequence(bodyNodes);
 		Expect(43);
 		ExpressionNode condition = Expression();
-		statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes)); 
+		statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes, this.extendedGotoSupport)); 
 		factory.finishLoop(); 
 		return statement;
 	}

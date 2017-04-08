@@ -26,4 +26,9 @@ public class LabeledStatement extends StatementNode {
             }
         }
     }
+
+    public String getLabel() {
+        return this.label;
+    }
+
 }

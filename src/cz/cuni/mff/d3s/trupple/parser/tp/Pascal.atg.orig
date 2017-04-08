@@ -95,22 +95,18 @@ Declaration
 LabelDefinitions
 =
 "label"
-Label
+Label<out Token labelToken>                     (. factory.registerLabel(labelToken); .)
 {
     ","
-    Label
+    Label<out labelToken>                       (. factory.registerLabel(labelToken); .)
 }
 ";"
 .
 
 
-Label
+Label<out Token labelToken>
 =
-(
-    identifier
-|
-    integerLiteral
-)                                               (. factory.registerLabel(t); .)
+integerLiteral                                  (. labelToken = t; .)
 .
 
 
@@ -494,7 +490,12 @@ Statement<out StatementNode statement>          (. body.add(statement); .)
 
 
 Statement<out StatementNode statement>
-=                                               (. statement = null; .)
+=                                               (. statement = null; Token label = null;.)
+[
+    Label<out label>
+    ":"
+]
+
 (
                                                 (. statement = factory.createNopStatement(); .)
 |
@@ -512,10 +513,13 @@ Statement<out StatementNode statement>
 |
     WithStatement<out statement>
 |
+    GotoStatement<out statement>
+|
     Block<out statement>
 |
     IdentifierBeginningStatement<out statement>
 )
+                                                (. if (label != null) statement = factory.createLabeledStatement(statement, label); .)
 .
 
 
@@ -661,6 +665,13 @@ IfStatement<out StatementNode statement>
 "else"                                          
     Statement<out elseStatement>
 ]                                               (. statement = factory.createIfStatement(condition, thenStatement, elseStatement); .)
+.
+
+
+GotoStatement<out StatementNode statement>
+=
+"goto"
+integerLiteral                                  (. statement = factory.createGotoStatement(t); .)
 .
 
 
