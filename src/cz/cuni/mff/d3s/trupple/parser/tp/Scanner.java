@@ -243,8 +243,8 @@ class StartStates {
 public class Scanner {
 	static final char EOL = '\n';
 	static final int  eofSym = 0;
-	static final int maxT = 68;
-	static final int noSym = 68;
+	static final int maxT = 69;
+	static final int noSym = 69;
 	char valCh;       // current input character (for token.val)
 
 	public Buffer buffer; // scanner buffer
@@ -320,17 +320,18 @@ public class Scanner {
 		literals.put("while", new Integer(46));
 		literals.put("if", new Integer(47));
 		literals.put("then", new Integer(48));
-		literals.put("or", new Integer(49));
-		literals.put("and", new Integer(50));
-		literals.put("not", new Integer(51));
-		literals.put("in", new Integer(57));
-		literals.put("div", new Integer(61));
-		literals.put("mod", new Integer(62));
-		literals.put("true", new Integer(63));
-		literals.put("false", new Integer(64));
-		literals.put("unit", new Integer(65));
-		literals.put("interface", new Integer(66));
-		literals.put("implementation", new Integer(67));
+		literals.put("goto", new Integer(49));
+		literals.put("or", new Integer(50));
+		literals.put("and", new Integer(51));
+		literals.put("not", new Integer(52));
+		literals.put("in", new Integer(58));
+		literals.put("div", new Integer(62));
+		literals.put("mod", new Integer(63));
+		literals.put("true", new Integer(64));
+		literals.put("false", new Integer(65));
+		literals.put("unit", new Integer(66));
+		literals.put("interface", new Integer(67));
+		literals.put("implementation", new Integer(68));
 
 	}
 	
@@ -532,17 +533,17 @@ public class Scanner {
 				case 23:
 					{t.kind = 37; break loop;}
 				case 24:
-					{t.kind = 53; break loop;}
+					{t.kind = 54; break loop;}
 				case 25:
-					{t.kind = 55; break loop;}
-				case 26:
 					{t.kind = 56; break loop;}
+				case 26:
+					{t.kind = 57; break loop;}
 				case 27:
-					{t.kind = 58; break loop;}
-				case 28:
 					{t.kind = 59; break loop;}
-				case 29:
+				case 28:
 					{t.kind = 60; break loop;}
+				case 29:
+					{t.kind = 61; break loop;}
 				case 30:
 					recEnd = pos; recKind = 25;
 					if (ch == '=') {AddCh(); state = 23; break;}
@@ -552,15 +553,15 @@ public class Scanner {
 					if (ch == '.') {AddCh(); state = 20; break;}
 					else {t.kind = 34; break loop;}
 				case 32:
-					recEnd = pos; recKind = 52;
+					recEnd = pos; recKind = 53;
 					if (ch == '=') {AddCh(); state = 24; break;}
 					else if (ch == '<') {AddCh(); state = 27; break;}
-					else {t.kind = 52; break loop;}
+					else {t.kind = 53; break loop;}
 				case 33:
-					recEnd = pos; recKind = 54;
+					recEnd = pos; recKind = 55;
 					if (ch == '=') {AddCh(); state = 25; break;}
 					else if (ch == '>') {AddCh(); state = 26; break;}
-					else {t.kind = 54; break loop;}
+					else {t.kind = 55; break loop;}
 
 			}
 		}

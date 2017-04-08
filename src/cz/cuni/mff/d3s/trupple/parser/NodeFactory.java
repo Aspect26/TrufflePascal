@@ -10,12 +10,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.control.BreakNodeTP;
-import cz.cuni.mff.d3s.trupple.language.nodes.control.CaseNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.control.ForNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.control.IfNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.control.RepeatNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.control.WhileNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.control.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
@@ -499,6 +494,11 @@ public class NodeFactory {
         StatementNode[] statements = data.statementNodes.toArray(new StatementNode[data.statementNodes.size()]);
 
         return new CaseNode(data.caseExpression, indexes, statements, data.elseNode);
+    }
+
+    public StatementNode createGotoStatement(Token labelToken) {
+	    String labelIdentifier = this.getIdentifierFromToken(labelToken);
+	    return new GotoNode(labelIdentifier);
     }
 
     public StatementNode createNopStatement() {

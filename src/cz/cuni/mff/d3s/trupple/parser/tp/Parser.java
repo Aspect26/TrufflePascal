@@ -19,7 +19,7 @@ public class Parser implements IParser {
 	public static final int _stringLiteral = 2;
 	public static final int _integerLiteral = 3;
 	public static final int _doubleLiteral = 4;
-	public static final int maxT = 68;
+	public static final int maxT = 69;
 
 	static final boolean _T = true;
 	static final boolean _x = false;
@@ -102,9 +102,9 @@ public class Parser implements IParser {
 			}
 			Declarations();
 			MainFunction();
-		} else if (la.kind == 65) {
+		} else if (la.kind == 66) {
 			Unit();
-		} else SynErr(69);
+		} else SynErr(70);
 	}
 
 	void Program() {
@@ -177,7 +177,7 @@ public class Parser implements IParser {
 			VariableDeclarations();
 		} else if (la.kind == 31 || la.kind == 33) {
 			Subroutine();
-		} else SynErr(70);
+		} else SynErr(71);
 	}
 
 	void LabelDefinitions() {
@@ -230,7 +230,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 33) {
 			Function();
 			Expect(8);
-		} else SynErr(71);
+		} else SynErr(72);
 	}
 
 	Token  Label() {
@@ -279,7 +279,7 @@ public class Parser implements IParser {
 			typeDescriptor = RecordType();
 		} else if (la.kind == 23) {
 			typeDescriptor = PointerType();
-		} else SynErr(72);
+		} else SynErr(73);
 		return typeDescriptor;
 	}
 
@@ -336,7 +336,7 @@ public class Parser implements IParser {
 		} else if (StartOf(2)) {
 			TypeDescriptor typeDescriptor = Type();
 			ordinal = factory.castTypeToOrdinalType(typeDescriptor); 
-		} else SynErr(73);
+		} else SynErr(74);
 		return ordinal;
 	}
 
@@ -377,7 +377,7 @@ public class Parser implements IParser {
 			}
 		} else if (la.kind == 24) {
 			RecordVariantPart();
-		} else SynErr(74);
+		} else SynErr(75);
 		if (la.kind == 8) {
 			Get();
 		}
@@ -456,13 +456,13 @@ public class Parser implements IParser {
 		} else if (la.kind == 2) {
 			String value = StringLiteral();
 			constant = factory.createCharOrStringConstant(sign, value); 
-		} else if (la.kind == 63 || la.kind == 64) {
+		} else if (la.kind == 64 || la.kind == 65) {
 			boolean value = LogicLiteral();
 			constant = factory.createBooleanConstant(sign, value); 
 		} else if (la.kind == 1) {
 			Token identifier = IdentifierConstant();
 			constant = factory.createConstantFromIdentifier(sign, identifier); 
-		} else SynErr(75);
+		} else SynErr(76);
 		return constant;
 	}
 
@@ -498,13 +498,13 @@ public class Parser implements IParser {
 	boolean  LogicLiteral() {
 		boolean  result;
 		result = false; 
-		if (la.kind == 63) {
+		if (la.kind == 64) {
 			Get();
 			result = true; 
-		} else if (la.kind == 64) {
+		} else if (la.kind == 65) {
 			Get();
 			result = false; 
-		} else SynErr(76);
+		} else SynErr(77);
 		return result;
 	}
 
@@ -532,7 +532,7 @@ public class Parser implements IParser {
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishProcedureImplementation(bodyNode); 
-		} else SynErr(77);
+		} else SynErr(78);
 	}
 
 	void Function() {
@@ -555,7 +555,7 @@ public class Parser implements IParser {
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishFunctionImplementation(bodyNode); 
-		} else SynErr(78);
+		} else SynErr(79);
 	}
 
 	List<FormalParameter>  FormalParameterList() {
@@ -658,6 +658,10 @@ public class Parser implements IParser {
 			statement = WithStatement();
 			break;
 		}
+		case 49: {
+			statement = GotoStatement();
+			break;
+		}
 		case 35: {
 			statement = Block();
 			break;
@@ -666,7 +670,7 @@ public class Parser implements IParser {
 			statement = IdentifierBeginningStatement();
 			break;
 		}
-		default: SynErr(79); break;
+		default: SynErr(80); break;
 		}
 		if (label != null) statement = factory.createLabeledStatement(statement, label); 
 		return statement;
@@ -702,7 +706,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 43) {
 			Get();
 			ascending = false; 
-		} else SynErr(80);
+		} else SynErr(81);
 		ExpressionNode finalValue = Expression();
 		Expect(40);
 		StatementNode loopBody = Statement();
@@ -761,6 +765,14 @@ public class Parser implements IParser {
 		return statement;
 	}
 
+	StatementNode  GotoStatement() {
+		StatementNode  statement;
+		Expect(49);
+		Expect(3);
+		statement = factory.createGotoStatement(t); 
+		return statement;
+	}
+
 	StatementNode  IdentifierBeginningStatement() {
 		StatementNode  statement;
 		statement = null; 
@@ -775,7 +787,7 @@ public class Parser implements IParser {
 			Expect(37);
 			ExpressionNode value = Expression();
 			statement = factory.createAssignmentWithRoute(identifierToken, accessNode, value); 
-		} else SynErr(81);
+		} else SynErr(82);
 		return statement;
 	}
 
@@ -803,7 +815,7 @@ public class Parser implements IParser {
 	ExpressionNode  Expression() {
 		ExpressionNode  expression;
 		expression = LogicTerm();
-		while (la.kind == 49) {
+		while (la.kind == 50) {
 			Get();
 			Token op = t; 
 			ExpressionNode right = LogicTerm();
@@ -826,7 +838,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 23) {
 			Get();
 			accessNode = new PointerDereference(previousAccessNode); 
-		} else SynErr(82);
+		} else SynErr(83);
 		return accessNode;
 	}
 
@@ -888,7 +900,7 @@ public class Parser implements IParser {
 	ExpressionNode  LogicTerm() {
 		ExpressionNode  expression;
 		expression = SignedLogicFactor();
-		while (la.kind == 50) {
+		while (la.kind == 51) {
 			Get();
 			Token op = t; 
 			ExpressionNode right = SignedLogicFactor();
@@ -900,14 +912,14 @@ public class Parser implements IParser {
 	ExpressionNode  SignedLogicFactor() {
 		ExpressionNode  expression;
 		expression = null; 
-		if (la.kind == 51) {
+		if (la.kind == 52) {
 			Get();
 			Token op = t; 
 			ExpressionNode right = SignedLogicFactor();
 			expression = factory.createUnaryExpression(op, right); 
 		} else if (StartOf(8)) {
 			expression = LogicFactor();
-		} else SynErr(83);
+		} else SynErr(84);
 		return expression;
 	}
 
@@ -916,10 +928,6 @@ public class Parser implements IParser {
 		expression = Arithmetic();
 		if (StartOf(9)) {
 			switch (la.kind) {
-			case 52: {
-				Get();
-				break;
-			}
 			case 53: {
 				Get();
 				break;
@@ -932,11 +940,11 @@ public class Parser implements IParser {
 				Get();
 				break;
 			}
-			case 13: {
+			case 56: {
 				Get();
 				break;
 			}
-			case 56: {
+			case 13: {
 				Get();
 				break;
 			}
@@ -945,6 +953,10 @@ public class Parser implements IParser {
 				break;
 			}
 			case 58: {
+				Get();
+				break;
+			}
+			case 59: {
 				Get();
 				break;
 			}
@@ -976,11 +988,11 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		expression = SignedFactor();
 		while (StartOf(10)) {
-			if (la.kind == 59) {
-				Get();
-			} else if (la.kind == 60) {
+			if (la.kind == 60) {
 				Get();
 			} else if (la.kind == 61) {
+				Get();
+			} else if (la.kind == 62) {
 				Get();
 			} else {
 				Get();
@@ -1006,7 +1018,7 @@ public class Parser implements IParser {
 			expression = factory.createUnaryExpression(unOp, expression); 
 		} else if (StartOf(11)) {
 			expression = Factor();
-		} else SynErr(84);
+		} else SynErr(85);
 		return expression;
 	}
 
@@ -1040,7 +1052,7 @@ public class Parser implements IParser {
 			expression = factory.createNumericLiteralNode(t); 
 			break;
 		}
-		case 63: case 64: {
+		case 64: case 65: {
 			boolean val; 
 			val = LogicLiteral();
 			expression = factory.createLogicLiteralNode(val); 
@@ -1050,7 +1062,7 @@ public class Parser implements IParser {
 			expression = SetConstructor();
 			break;
 		}
-		default: SynErr(85); break;
+		default: SynErr(86); break;
 		}
 		return expression;
 	}
@@ -1063,7 +1075,7 @@ public class Parser implements IParser {
 			expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
 		} else if (StartOf(13)) {
 			expression = InnerIdentifierAccess(identifierToken);
-		} else SynErr(86);
+		} else SynErr(87);
 		return expression;
 	}
 
@@ -1083,7 +1095,7 @@ public class Parser implements IParser {
 				valueNodes.add(valueNode); 
 			}
 			expression = factory.createSetConstructorNode(valueNodes); 
-		} else SynErr(87);
+		} else SynErr(88);
 		Expect(19);
 		return expression;
 	}
@@ -1096,7 +1108,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 18 || la.kind == 23 || la.kind == 34) {
 			AccessNode accessRoute = InnerAccessRouteNonEmpty(identifierToken);
 			expression = factory.createExpressionFromIdentifierWithRoute(accessRoute); 
-		} else SynErr(88);
+		} else SynErr(89);
 		return expression;
 	}
 
@@ -1122,19 +1134,19 @@ public class Parser implements IParser {
 			parameter = factory.createReferenceNode(t); 
 		} else if (StartOf(7)) {
 			parameter = Expression();
-		} else SynErr(89);
+		} else SynErr(90);
 		return parameter;
 	}
 
 	void UnitHeader() {
-		Expect(65);
+		Expect(66);
 		Expect(1);
 		factory.startUnit(t); 
 		Expect(8);
 	}
 
 	void InterfaceSection() {
-		Expect(66);
+		Expect(67);
 		while (StartOf(14)) {
 			if (la.kind == 31) {
 				ProcedureHeading();
@@ -1149,7 +1161,7 @@ public class Parser implements IParser {
 	}
 
 	void ImplementationSection() {
-		Expect(67);
+		Expect(68);
 		while (StartOf(14)) {
 			if (la.kind == 31 || la.kind == 33) {
 				UnitSubroutineImplementation();
@@ -1201,7 +1213,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 33) {
 			UnitFunctionImplementation();
 			Expect(8);
-		} else SynErr(90);
+		} else SynErr(91);
 	}
 
 	void UnitProcedureImplementation() {
@@ -1250,21 +1262,21 @@ public class Parser implements IParser {
 	}
 
 	private static final boolean[][] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _T,_T,_x,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_T, _x,_T,_x,_x, _T,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_T, _x,_x,_T,_x, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_T,_T, _x,_T,_x,_x, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
+		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _T,_T,_x,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_T, _x,_T,_x,_x, _T,_x,_T,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_T, _x,_x,_T,_x, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_T,_T, _x,_T,_x,_x, _T,_x,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
 
 	};
 
@@ -1407,48 +1419,49 @@ class Errors {
 			case 46: s = "\"while\" expected"; break;
 			case 47: s = "\"if\" expected"; break;
 			case 48: s = "\"then\" expected"; break;
-			case 49: s = "\"or\" expected"; break;
-			case 50: s = "\"and\" expected"; break;
-			case 51: s = "\"not\" expected"; break;
-			case 52: s = "\">\" expected"; break;
-			case 53: s = "\">=\" expected"; break;
-			case 54: s = "\"<\" expected"; break;
-			case 55: s = "\"<=\" expected"; break;
-			case 56: s = "\"<>\" expected"; break;
-			case 57: s = "\"in\" expected"; break;
-			case 58: s = "\"><\" expected"; break;
-			case 59: s = "\"*\" expected"; break;
-			case 60: s = "\"/\" expected"; break;
-			case 61: s = "\"div\" expected"; break;
-			case 62: s = "\"mod\" expected"; break;
-			case 63: s = "\"true\" expected"; break;
-			case 64: s = "\"false\" expected"; break;
-			case 65: s = "\"unit\" expected"; break;
-			case 66: s = "\"interface\" expected"; break;
-			case 67: s = "\"implementation\" expected"; break;
-			case 68: s = "??? expected"; break;
-			case 69: s = "invalid Pascal"; break;
-			case 70: s = "invalid Declaration"; break;
-			case 71: s = "invalid Subroutine"; break;
-			case 72: s = "invalid Type"; break;
-			case 73: s = "invalid Ordinal"; break;
-			case 74: s = "invalid RecordFieldList"; break;
-			case 75: s = "invalid Constant"; break;
-			case 76: s = "invalid LogicLiteral"; break;
-			case 77: s = "invalid Procedure"; break;
-			case 78: s = "invalid Function"; break;
-			case 79: s = "invalid Statement"; break;
-			case 80: s = "invalid ForLoop"; break;
-			case 81: s = "invalid IdentifierBeginningStatement"; break;
-			case 82: s = "invalid InnerAccessRouteElement"; break;
-			case 83: s = "invalid SignedLogicFactor"; break;
-			case 84: s = "invalid SignedFactor"; break;
-			case 85: s = "invalid Factor"; break;
-			case 86: s = "invalid IdentifierAccess"; break;
-			case 87: s = "invalid SetConstructor"; break;
-			case 88: s = "invalid InnerIdentifierAccess"; break;
-			case 89: s = "invalid ActualParameter"; break;
-			case 90: s = "invalid UnitSubroutineImplementation"; break;
+			case 49: s = "\"goto\" expected"; break;
+			case 50: s = "\"or\" expected"; break;
+			case 51: s = "\"and\" expected"; break;
+			case 52: s = "\"not\" expected"; break;
+			case 53: s = "\">\" expected"; break;
+			case 54: s = "\">=\" expected"; break;
+			case 55: s = "\"<\" expected"; break;
+			case 56: s = "\"<=\" expected"; break;
+			case 57: s = "\"<>\" expected"; break;
+			case 58: s = "\"in\" expected"; break;
+			case 59: s = "\"><\" expected"; break;
+			case 60: s = "\"*\" expected"; break;
+			case 61: s = "\"/\" expected"; break;
+			case 62: s = "\"div\" expected"; break;
+			case 63: s = "\"mod\" expected"; break;
+			case 64: s = "\"true\" expected"; break;
+			case 65: s = "\"false\" expected"; break;
+			case 66: s = "\"unit\" expected"; break;
+			case 67: s = "\"interface\" expected"; break;
+			case 68: s = "\"implementation\" expected"; break;
+			case 69: s = "??? expected"; break;
+			case 70: s = "invalid Pascal"; break;
+			case 71: s = "invalid Declaration"; break;
+			case 72: s = "invalid Subroutine"; break;
+			case 73: s = "invalid Type"; break;
+			case 74: s = "invalid Ordinal"; break;
+			case 75: s = "invalid RecordFieldList"; break;
+			case 76: s = "invalid Constant"; break;
+			case 77: s = "invalid LogicLiteral"; break;
+			case 78: s = "invalid Procedure"; break;
+			case 79: s = "invalid Function"; break;
+			case 80: s = "invalid Statement"; break;
+			case 81: s = "invalid ForLoop"; break;
+			case 82: s = "invalid IdentifierBeginningStatement"; break;
+			case 83: s = "invalid InnerAccessRouteElement"; break;
+			case 84: s = "invalid SignedLogicFactor"; break;
+			case 85: s = "invalid SignedFactor"; break;
+			case 86: s = "invalid Factor"; break;
+			case 87: s = "invalid IdentifierAccess"; break;
+			case 88: s = "invalid SetConstructor"; break;
+			case 89: s = "invalid InnerIdentifierAccess"; break;
+			case 90: s = "invalid ActualParameter"; break;
+			case 91: s = "invalid UnitSubroutineImplementation"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

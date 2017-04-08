@@ -474,6 +474,8 @@ Statement<out StatementNode statement>
 |
     WithStatement<out statement>
 |
+    GotoStatement<out statement>
+|
     Block<out statement>
 |
     IdentifierBeginningStatement<out statement>
@@ -625,6 +627,13 @@ IfStatement<out StatementNode statement>
 "else"
     Statement<out elseStatement>
 ]                                               (. statement = factory.createIfStatement(condition, thenStatement, elseStatement); .)
+.
+
+
+GotoStatement<out StatementNode statement>
+=
+"goto"
+integerLiteral                                  (. statement = factory.createGotoStatement(t); .)
 .
 
 
