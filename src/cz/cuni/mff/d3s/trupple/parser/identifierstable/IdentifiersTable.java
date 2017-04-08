@@ -147,6 +147,10 @@ public class IdentifiersTable {
         return descriptor instanceof SubroutineDescriptor && !((SubroutineDescriptor) descriptor).hasParameters();
     }
 
+    public boolean isLabel(String identifier) {
+        return this.identifiersMap.get(identifier) instanceof LabelDescriptor;
+    }
+
     public void verifyPassedArgumentsToSubroutine(String identifier, List<ExpressionNode> params) throws LexicalException {
         SubroutineDescriptor subroutineDescriptor = (SubroutineDescriptor) this.identifiersMap.get(identifier);
         subroutineDescriptor.verifyArguments(params);

@@ -6,11 +6,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.sun.istack.internal.NotNull;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
@@ -427,6 +423,15 @@ public class NodeFactory {
 
     public void startLoop() {
         lexicalScope.increaseLoopDepth();
+    }
+
+    public StatementNode createLabeledStatement(StatementNode statement, Token labelToken) {
+	    String labelIdentifier = this.getIdentifierFromToken(labelToken);
+	    if (!lexicalScope.labelExists(labelIdentifier)) {
+	        parser.SemErr("Label " + labelIdentifier + " is not defined");
+	        return statement;
+        }
+	    return new LabeledStatement(statement, labelIdentifier);
     }
 
     public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {

@@ -79,6 +79,8 @@ Declarations
 Declaration
 =
 (
+    LabelDefinitions
+|
     ConstantDefinitions
 |
     TypeDefinitions
@@ -89,6 +91,27 @@ Declaration
 )
 .
 
+
+LabelDefinitions
+=
+"label"
+Label
+{
+    ","
+    Label
+}
+";"
+.
+
+
+Label
+=
+(
+    identifier
+|
+    integerLiteral
+)                                               (. factory.registerLabel(t); .)
+.
 
 
 TypeDefinitions

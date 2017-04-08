@@ -62,20 +62,20 @@ Declarations
 
 
 LabelDefinitions
-=
+=                                               (. Token labelToken = null; .)
 "label"
-Label
+Label<out labelToken>                           (. factory.registerLabel(labelToken); .)
 {
     ","
-    Label
+    Label<out labelToken>                       (. factory.registerLabel(labelToken); .)
 }
 ";"
 .
 
 
-Label
+Label<out Token labelToken>
 =
-integerLiteral                                  (. factory.registerLabel(t); .)
+integerLiteral                                  (. labelToken = t; .)
 .
 
 
@@ -453,7 +453,12 @@ Statement<out StatementNode statement>          (. body.add(statement); .)
 
 
 Statement<out StatementNode statement>
-=                                               (. statement = null; .)
+=                                               (. statement = null; Token label = null;.)
+[
+    Label<out label>
+    ":"
+]
+
 (
                                                 (. statement = factory.createNopStatement(); .)
 |
@@ -473,6 +478,7 @@ Statement<out StatementNode statement>
 |
     IdentifierBeginningStatement<out statement>
 )
+                                                (. if (label != null) statement = factory.createLabeledStatement(statement, label); .)
 .
 
 
