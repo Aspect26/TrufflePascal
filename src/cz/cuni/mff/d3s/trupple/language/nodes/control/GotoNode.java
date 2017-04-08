@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.control;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.GotoException;
 
 public class GotoNode extends StatementNode {
 
@@ -13,6 +14,6 @@ public class GotoNode extends StatementNode {
 
     @Override
     public void executeVoid(VirtualFrame frame) {
-        // TODO: implement in later phases of goto implementation
+        throw new GotoException(this.labelIdentifier);
     }
 }
