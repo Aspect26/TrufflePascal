@@ -16,6 +16,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.label.LabelDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
@@ -151,7 +152,12 @@ public class IdentifiersTable {
         subroutineDescriptor.verifyArguments(params);
     }
 
+    public void addLabel(String identifier) throws LexicalException {
+        this.registerNewIdentifier(identifier, new LabelDescriptor(identifier));
+    }
+
     public void addType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        // TODO: this is a duplicit -> call registerNewIdentifier()
         if (this.identifiersMap.containsKey(identifier)) {
             throw new DuplicitIdentifierException(identifier);
         } else {

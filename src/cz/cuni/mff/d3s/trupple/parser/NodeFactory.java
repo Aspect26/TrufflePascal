@@ -124,6 +124,15 @@ public class NodeFactory {
         }
     }
 
+    public void registerLabel(Token labelToken) {
+	    String labelIdentifier = this.getIdentifierFromToken(labelToken);
+	    try {
+            this.lexicalScope.registerLabel(labelIdentifier);
+        } catch (LexicalException e) {
+	        parser.SemErr(e.getMessage());
+        }
+    }
+
     public void registerNewType(Token identifierToken, TypeDescriptor typeDescriptor) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 

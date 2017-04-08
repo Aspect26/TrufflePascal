@@ -95,6 +95,10 @@ public class LexicalScope {
         this.name = identifier;
     }
 
+    void registerLabel(String identifier) throws LexicalException {
+        this.localIdentifiers.addLabel(identifier);
+    }
+
     void registerNewType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         this.localIdentifiers.addType(identifier, typeDescriptor);
     }

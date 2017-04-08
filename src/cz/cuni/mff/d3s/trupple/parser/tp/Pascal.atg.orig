@@ -487,6 +487,8 @@ Statement<out StatementNode statement>
 |
 	"break"										(. statement = factory.createBreak(); .)
 |
+    WithStatement<out statement>
+|
     Block<out statement>
 |
     IdentifierBeginningStatement<out statement>
@@ -572,6 +574,18 @@ Statement<out StatementNode caseStatement>		(. data.statementNodes.add(caseState
 [ ";" ]
 .
 
+
+WithStatement<out StatementNode statement>
+=
+"with"
+IdentifiersList<. out List<String> recordIdentifiers .>
+                                                (. LexicalScope initialScope = factory.getScope(); .)
+                                                (. List<FrameSlot> recordSlots = factory.stepIntoRecordsScope(recordIdentifiers); .)
+"do"
+Statement<out StatementNode innerStatement>
+                                                (. factory.setScope(initialScope); .)
+                                                (. statement = factory.createWithStatement(recordSlots, innerStatement); .)
+.
 
 
 ForLoop<out StatementNode statement>

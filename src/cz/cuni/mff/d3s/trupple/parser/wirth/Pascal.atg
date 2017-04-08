@@ -53,12 +53,30 @@ Program
 
 Declarations
 =
+[ LabelDefinitions ]
 [ ConstantDefinitions ]
 [ TypeDefinitions ]
 [ VariableDeclarations ]
 { Subroutine }
 .
 
+
+LabelDefinitions
+=
+"label"
+Label
+{
+    ","
+    Label
+}
+";"
+.
+
+
+Label
+=
+integerLiteral                                  (. factory.registerLabel(t); .)
+.
 
 
 TypeDefinitions
