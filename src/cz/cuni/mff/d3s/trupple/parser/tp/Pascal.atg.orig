@@ -221,6 +221,7 @@ RecordFieldList<out TypeDescriptor typeDescriptor>
     ]
 |
     RecordVariantPart
+|
 )
 [ ";" ]                                         (. typeDescriptor = factory.createRecordType(); .)
 .
@@ -253,16 +254,28 @@ RecordVariants
 
 
 RecordVariantSelector
-=
+=                                               (. Token tagToken = null; .)
 [
-IF(isVariantSelectorTag())
-identifier ":"
+    IF(isVariantSelectorTag())
+    identifier                                  (. tagToken = t; .)
+    ":"
 ]
-identifier                                      (. /* ordinal */ .)
+identifier                                      (. if (tagToken != null) factory.registerRecordVariantTagVariable(tagToken, t); .)
 .
 
 
 RecordVariants
+=
+RecordVariant
+{
+    IF(!recordVariantsEnd())
+    ";"
+    RecordVariant
+}
+.
+
+
+RecordVariant
 =
 CaseConstantList
 ":"
@@ -464,18 +477,18 @@ identifier										(. formalParameter = factory.createFormalParametersList(iden
 
 MainFunction 
 =
-Block<out BlockNode blockNode>                  (. mainNode = factory.finishMainFunction(blockNode); .)
+Block<out StatementNode blockNode>              (. mainNode = factory.finishMainFunction(blockNode); .)
 "."
 .
 
 
-Block<out BlockNode blockNode>
+Block<out StatementNode blockNode>
 =                                               
     "begin"                                     (. List<StatementNode> bodyNodes = new ArrayList<>(); .)
     [ 
         StatementSequence<bodyNodes>
     ]
-    "end"                                       (. blockNode = factory.createBlockNode(bodyNodes); .)
+    "end"                                       (. blockNode = factory.createBlockNode(bodyNodes, this.extendedGotoSupport); .)
 .
 
 
@@ -638,7 +651,7 @@ RepeatLoop<out StatementNode statement>
 "repeat"										(. List<StatementNode> bodyNodes = new ArrayList<>(); .)
 StatementSequence<bodyNodes>					
 "until"
-Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes)); .)
+Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes, this.extendedGotoSupport)); .)
                                                 (. factory.finishLoop(); .)
 .
 

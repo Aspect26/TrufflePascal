@@ -351,6 +351,7 @@ public class Parser implements IParser {
 			}
 		} else if (la.kind == 23) {
 			RecordVariantPart();
+		} else if (la.kind == 7 || la.kind == 8 || la.kind == 21) {
 		} else SynErr(67);
 		if (la.kind == 8) {
 			Get();
@@ -369,9 +370,10 @@ public class Parser implements IParser {
 
 	void RecordVariantPart() {
 		Expect(23);
-		RecordVariantSelector();
+		OrdinalDescriptor selectorType = RecordVariantSelector();
 		Expect(13);
-		RecordVariants();
+		List<ConstantDescriptor> caseConstants  = RecordVariants();
+		factory.assertLegalsCaseValues(selectorType, caseConstants); 
 	}
 
 	void RecordFixedSection() {
@@ -385,29 +387,54 @@ public class Parser implements IParser {
 		factory.registerVariables(identifiers, typeDescriptor); 
 	}
 
-	void RecordVariantSelector() {
+	OrdinalDescriptor  RecordVariantSelector() {
+		OrdinalDescriptor  selectorDescriptor;
+		Token tagToken = null; 
 		if (isVariantSelectorTag()) {
 			Expect(1);
+			tagToken = t; 
 			Expect(24);
 		}
 		Expect(1);
-		
+		if (tagToken != null) factory.registerRecordVariantTagVariable(tagToken, t); 
+		selectorDescriptor = factory.castTypeToOrdinalType(factory.getTypeDescriptor(t)); 
+		return selectorDescriptor;
 	}
 
-	void RecordVariants() {
-		CaseConstantList();
+	List<ConstantDescriptor>  RecordVariants() {
+		List<ConstantDescriptor>  caseConstants;
+		caseConstants = new ArrayList<>(); 
+		List<ConstantDescriptor> newCaseConstants  = RecordVariant();
+		caseConstants.addAll(newCaseConstants); 
+		while (!recordVariantsEnd()) {
+			Expect(8);
+			newCaseConstants = RecordVariant();
+			caseConstants.addAll(newCaseConstants); 
+		}
+		return caseConstants;
+	}
+
+	List<ConstantDescriptor>  RecordVariant() {
+		List<ConstantDescriptor>  caseConstants;
+		caseConstants = CaseConstantList();
 		Expect(24);
 		Expect(6);
 		TypeDescriptor type = RecordFieldList();
 		Expect(7);
+		return caseConstants;
 	}
 
-	void CaseConstantList() {
+	List<ConstantDescriptor>  CaseConstantList() {
+		List<ConstantDescriptor>  caseConstants;
+		caseConstants = new ArrayList<>(); 
 		ConstantDescriptor constant = Constant();
+		caseConstants.add(constant); 
 		while (la.kind == 10) {
 			Get();
 			constant = Constant();
+			caseConstants.add(constant); 
 		}
+		return caseConstants;
 	}
 
 	ConstantDescriptor  Constant() {
@@ -1136,7 +1163,7 @@ public class Parser implements IParser {
         return this.mainNode;
     }
 
-    public boolean caseEnds(){
+    boolean caseEnds(){
     	if(la.val.toLowerCase().equals("end") && !t.val.toLowerCase().equals(":"))
     		return true;
     		
@@ -1152,7 +1179,7 @@ public class Parser implements IParser {
     	return false;
     }
     
-    public boolean continuesArray() {
+    boolean continuesArray() {
     	Token next = scanner.Peek();
     	scanner.ResetPeek();
     	if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
@@ -1161,13 +1188,13 @@ public class Parser implements IParser {
     	return false;
     }
 
-    public boolean isSubrange() {
+    boolean isSubrange() {
         Token next = scanner.Peek();
         scanner.ResetPeek();
         return next.val.toLowerCase().equals("..");
     }
 
-    public  boolean recordFixedPartContinues() {
+     boolean recordFixedPartContinues() {
         String actual = la.val.toLowerCase();
         String next = scanner.Peek().val.toLowerCase();
         scanner.ResetPeek();
@@ -1179,18 +1206,28 @@ public class Parser implements IParser {
         return !variantPartStarts && !recordsEnds && !innerFieldListEnds;
     }
 
-    public boolean isVariantSelectorTag() {
+    boolean isVariantSelectorTag() {
         Token next = scanner.Peek();
         scanner.ResetPeek();
 
         return next.val.equals(":");
     }
 
-    public boolean recordVariantPartStarts() {
+    boolean recordVariantPartStarts() {
         Token next = scanner.Peek();
-        scanner.ResetPeek();
+                scanner.ResetPeek();
 
         return next.val.equals("case");
+    }
+
+    boolean recordVariantsEnd() {
+        Token nextToken = scanner.Peek();
+        scanner.ResetPeek();
+
+        String lookAhead = la.val.toLowerCase();
+        String next = nextToken.val.toLowerCase();
+
+        return lookAhead.equals("end") || (lookAhead.equals(";") && next.equals("end"));
     }
 
 } // end Parser

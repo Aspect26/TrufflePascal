@@ -21,6 +21,11 @@ public class CharDescriptor extends PrimitiveDescriptor implements OrdinalDescri
     }
 
     @Override
+    public boolean containsValue(Object value) {
+        return value instanceof Character;
+    }
+
+    @Override
     public int getFirstIndex() {
         return Character.MIN_VALUE;
     }

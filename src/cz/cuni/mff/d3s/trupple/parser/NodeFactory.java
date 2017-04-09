@@ -199,6 +199,21 @@ public class NodeFactory {
         }
     }
 
+    public void registerRecordVariantTagVariable(Token identifierToken, Token typeToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        TypeDescriptor type = this.getTypeDescriptor(typeToken);
+
+        if (!(type instanceof OrdinalDescriptor)) {
+            parser.SemErr("Record variant selector must be of ordinal type");
+        }
+
+        try {
+            lexicalScope.registerLocalVariable(identifier, type);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
 	    String typeIdentifier = this.getTypeNameFromToken(returnTypeToken);
 	    TypeDescriptor returnTypeDescriptor = this.doLookup(typeIdentifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(typeIdentifier));
@@ -315,7 +330,7 @@ public class NodeFactory {
     public ConstantDescriptor createConstantFromIdentifier(String sign, Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    try {
-            ConstantDescriptor constant = this.lexicalScope.getConstant(identifier);
+	        ConstantDescriptor constant = this.doLookup(identifier, LexicalScope::getConstant, new UnknownIdentifierException(identifier));
             if (sign.isEmpty()) {
                 return constant;
             } else {
@@ -754,6 +769,29 @@ public class NodeFactory {
         String subroutineIdentifier = lexicalScope.getName();
         lexicalScope = lexicalScope.getOuterScope();
         lexicalScope.getContext().setSubroutineRootNode(subroutineIdentifier, rootNode);
+    }
+
+    public void assertLegalsCaseValues(OrdinalDescriptor ordinal, List<ConstantDescriptor> constants) {
+	    if (!this.usingTPExtension) {
+            if (ordinal.getSize() != constants.size()) {
+                parser.SemErr("Constants list of variant part of record type must contain all values of varant's selector type");
+                return;
+            }
+        }
+
+	    List<Object> values = new ArrayList<>();
+	    for (ConstantDescriptor constant : constants) {
+	        Object value = constant.getValue();
+	        if (values.contains(value)) {
+                parser.SemErr("Duplicit case constant value");
+                return;
+            }
+            if (!ordinal.containsValue(value)) {
+                parser.SemErr("Case constant " + value + " has wrong type");
+                return;
+            }
+	        values.add(constant.getValue());
+        }
     }
 
     public long getLongFromToken(Token token) {
