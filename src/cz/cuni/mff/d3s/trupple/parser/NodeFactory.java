@@ -315,7 +315,7 @@ public class NodeFactory {
     public ConstantDescriptor createConstantFromIdentifier(String sign, Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    try {
-            ConstantDescriptor constant = this.lexicalScope.getConstant(identifier);
+	        ConstantDescriptor constant = this.doLookup(identifier, LexicalScope::getConstant, new UnknownIdentifierException(identifier));
             if (sign.isEmpty()) {
                 return constant;
             } else {

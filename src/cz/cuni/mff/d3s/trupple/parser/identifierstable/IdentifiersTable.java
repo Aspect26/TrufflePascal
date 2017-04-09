@@ -263,7 +263,7 @@ public class IdentifiersTable {
     }
 
     public ConstantDescriptor getConstant(String identifier) throws LexicalException {
-        TypeDescriptor descriptor = this.getTypeDescriptor(identifier);
+        TypeDescriptor descriptor = this.identifiersMap.get(identifier);
         if (descriptor == null) {
             throw new UnknownIdentifierException(identifier);
         } else if (! (descriptor instanceof ConstantDescriptor)) {

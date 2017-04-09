@@ -379,6 +379,7 @@ public class Parser implements IParser {
 			}
 		} else if (la.kind == 24) {
 			RecordVariantPart();
+		} else if (la.kind == 7 || la.kind == 8 || la.kind == 22) {
 		} else SynErr(75);
 		if (la.kind == 8) {
 			Get();
@@ -423,6 +424,14 @@ public class Parser implements IParser {
 	}
 
 	void RecordVariants() {
+		RecordVariant();
+		while (!recordVariantsEnd()) {
+			Expect(8);
+			RecordVariant();
+		}
+	}
+
+	void RecordVariant() {
 		CaseConstantList();
 		Expect(25);
 		Expect(6);
@@ -1294,7 +1303,7 @@ public class Parser implements IParser {
         return this.mainNode;
     }
     
-    public boolean caseEnds(){
+    boolean caseEnds(){
         if(la.val.toLowerCase().equals("end") && !t.val.toLowerCase().equals(":"))
             return true;
 
@@ -1310,7 +1319,7 @@ public class Parser implements IParser {
         return false;
     }
 
-    public boolean continuesArray() {
+    boolean continuesArray() {
         Token next = scanner.Peek();
         scanner.ResetPeek();
         if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
@@ -1319,13 +1328,13 @@ public class Parser implements IParser {
         return false;
     }
 
-    public boolean isSubrange() {
+    boolean isSubrange() {
         Token next = scanner.Peek();
         scanner.ResetPeek();
         return next.val.toLowerCase().equals("..");
     }
 
-    public  boolean recordFixedPartContinues() {
+     boolean recordFixedPartContinues() {
         String actual = la.val.toLowerCase();
         String next = scanner.Peek().val.toLowerCase();
         scanner.ResetPeek();
@@ -1337,18 +1346,28 @@ public class Parser implements IParser {
         return !variantPartStarts && !recordsEnds && !innerFieldListEnds;
     }
 
-    public boolean isVariantSelectorTag() {
+    boolean isVariantSelectorTag() {
         Token next = scanner.Peek();
         scanner.ResetPeek();
 
         return next.val.equals(":");
     }
 
-    public boolean recordVariantPartStarts() {
+    boolean recordVariantPartStarts() {
         Token next = scanner.Peek();
-        scanner.ResetPeek();
+                scanner.ResetPeek();
 
         return next.val.equals("case");
+    }
+
+    boolean recordVariantsEnd() {
+        Token nextToken = scanner.Peek();
+        scanner.ResetPeek();
+
+        String lookAhead = la.val.toLowerCase();
+        String next = nextToken.val.toLowerCase();
+
+        return lookAhead.equals("end") || (lookAhead.equals(";") && next.equals("end"));
     }
 
 } // end Parser
