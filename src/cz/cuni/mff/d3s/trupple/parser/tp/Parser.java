@@ -398,9 +398,10 @@ public class Parser implements IParser {
 
 	void RecordVariantPart() {
 		Expect(24);
-		RecordVariantSelector();
+		OrdinalDescriptor selectorType = RecordVariantSelector();
 		Expect(14);
-		RecordVariants();
+		List<ConstantDescriptor> caseConstants  = RecordVariants();
+		factory.assertLegalsCaseValues(selectorType, caseConstants); 
 	}
 
 	void RecordFixedSection() {
@@ -414,7 +415,8 @@ public class Parser implements IParser {
 		factory.registerVariables(identifiers, typeDescriptor); 
 	}
 
-	void RecordVariantSelector() {
+	OrdinalDescriptor  RecordVariantSelector() {
+		OrdinalDescriptor  selectorDescriptor;
 		Token tagToken = null; 
 		if (isVariantSelectorTag()) {
 			Expect(1);
@@ -423,30 +425,44 @@ public class Parser implements IParser {
 		}
 		Expect(1);
 		if (tagToken != null) factory.registerRecordVariantTagVariable(tagToken, t); 
+		selectorDescriptor = factory.castTypeToOrdinalType(factory.getTypeDescriptor(t)); 
+		return selectorDescriptor;
 	}
 
-	void RecordVariants() {
-		RecordVariant();
+	List<ConstantDescriptor>  RecordVariants() {
+		List<ConstantDescriptor>  caseConstants;
+		caseConstants = new ArrayList<>(); 
+		List<ConstantDescriptor> newCaseConstants  = RecordVariant();
+		caseConstants.addAll(newCaseConstants); 
 		while (!recordVariantsEnd()) {
 			Expect(8);
-			RecordVariant();
+			newCaseConstants = RecordVariant();
+			caseConstants.addAll(newCaseConstants); 
 		}
+		return caseConstants;
 	}
 
-	void RecordVariant() {
-		CaseConstantList();
+	List<ConstantDescriptor>  RecordVariant() {
+		List<ConstantDescriptor>  caseConstants;
+		caseConstants = CaseConstantList();
 		Expect(25);
 		Expect(6);
 		TypeDescriptor type = RecordFieldList();
 		Expect(7);
+		return caseConstants;
 	}
 
-	void CaseConstantList() {
+	List<ConstantDescriptor>  CaseConstantList() {
+		List<ConstantDescriptor>  caseConstants;
+		caseConstants = new ArrayList<>(); 
 		ConstantDescriptor constant = Constant();
+		caseConstants.add(constant); 
 		while (la.kind == 10) {
 			Get();
 			constant = Constant();
+			caseConstants.add(constant); 
 		}
+		return caseConstants;
 	}
 
 	ConstantDescriptor  Constant() {

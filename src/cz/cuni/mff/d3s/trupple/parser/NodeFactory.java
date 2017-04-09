@@ -771,6 +771,29 @@ public class NodeFactory {
         lexicalScope.getContext().setSubroutineRootNode(subroutineIdentifier, rootNode);
     }
 
+    public void assertLegalsCaseValues(OrdinalDescriptor ordinal, List<ConstantDescriptor> constants) {
+	    if (!this.usingTPExtension) {
+            if (ordinal.getSize() != constants.size()) {
+                parser.SemErr("Constants list of variant part of record type must contain all values of varant's selector type");
+                return;
+            }
+        }
+
+	    List<Object> values = new ArrayList<>();
+	    for (ConstantDescriptor constant : constants) {
+	        Object value = constant.getValue();
+	        if (values.contains(value)) {
+                parser.SemErr("Duplicit case constant value");
+                return;
+            }
+            if (!ordinal.containsValue(value)) {
+                parser.SemErr("Case constant " + value + " has wrong type");
+                return;
+            }
+	        values.add(constant.getValue());
+        }
+    }
+
     public long getLongFromToken(Token token) {
         try {
             return Long.parseLong(token.val);
