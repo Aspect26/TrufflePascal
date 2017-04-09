@@ -502,6 +502,7 @@ public class Parser implements IParser {
 
 	void Procedure() {
 		ProcedureHeading procedureHeading = ProcedureHeading();
+		Expect(8);
 		if (la.kind == 30) {
 			Get();
 			factory.forwardProcedure(procedureHeading); 
@@ -515,6 +516,7 @@ public class Parser implements IParser {
 
 	void Function() {
 		FunctionHeading functionHeading = FunctionHeading();
+		Expect(8);
 		if (la.kind == 30) {
 			Get();
 			factory.forwardFunction(functionHeading); 
@@ -535,7 +537,6 @@ public class Parser implements IParser {
 		if (la.kind == 6) {
 			formalParameters = FormalParameterList();
 		}
-		Expect(8);
 		procedureHeading = new ProcedureHeading(identifierToken, formalParameters); 
 		return procedureHeading;
 	}
@@ -564,7 +565,6 @@ public class Parser implements IParser {
 		Expect(24);
 		Expect(1);
 		Token returnTypeToken = t; 
-		Expect(8);
 		functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); 
 		return functionHeading;
 	}
@@ -575,11 +575,11 @@ public class Parser implements IParser {
 		formalParameters = new ArrayList<>(); 
 		List<FormalParameter> newParameters = new ArrayList<>(); 
 		newParameters = FormalParameter();
-		factory.appendFormalParameter(newParameters, formalParameters); 
+		formalParameters.addAll(newParameters); 
 		while (la.kind == 8) {
 			Get();
 			newParameters = FormalParameter();
-			factory.appendFormalParameter(newParameters, formalParameters); 
+			formalParameters.addAll(newParameters); 
 		}
 		Expect(7);
 		return formalParameters;
@@ -626,15 +626,15 @@ public class Parser implements IParser {
 
 	FormalParameter  ProcedureFormalParameter() {
 		FormalParameter  formalParameter;
-		formalParameter = null; 
-		Expect(32);
+		ProcedureHeading heading = ProcedureHeading();
+		formalParameter = factory.createProcedureFormalParameter(heading); 
 		return formalParameter;
 	}
 
 	FormalParameter  FunctionFormalParameter() {
 		FormalParameter  formalParameter;
-		formalParameter = null; 
-		Expect(31);
+		FunctionHeading heading = FunctionHeading();
+		formalParameter = factory.createFunctionFormalParameter(heading); 
 		return formalParameter;
 	}
 

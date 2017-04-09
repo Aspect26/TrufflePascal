@@ -463,10 +463,10 @@ FormalParameterList<. out List<FormalParameter> formalParameters .>
 =
 "("												(. formalParameters = new ArrayList<>(); .)
 												(. List<FormalParameter> newParameters = new ArrayList<>(); .)
-FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParameters, formalParameters); .)
+FormalParameter<out newParameters>				(. formalParameters.addAll(newParameters); .)
 { 
 	";" 
-	FormalParameter<out newParameters> 			(. factory.appendFormalParameter(newParameters, formalParameters); .)
+	FormalParameter<out newParameters> 			(. formalParameters.addAll(newParameters); .)
 }
 ")"
 .

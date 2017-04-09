@@ -380,7 +380,7 @@ Subroutine
 
 Procedure
 =
-ProcedureHeading<out ProcedureHeading procedureHeading>
+ProcedureHeading<out ProcedureHeading procedureHeading> ";"
 (
     "forward"                                   (. factory.forwardProcedure(procedureHeading); .)
 |
@@ -393,7 +393,7 @@ ProcedureHeading<out ProcedureHeading procedureHeading>
 
 Function
 =
-FunctionHeading<out FunctionHeading functionHeading>
+FunctionHeading<out FunctionHeading functionHeading> ";"
 (
     "forward"                                   (. factory.forwardFunction(functionHeading); .)
 |
@@ -412,7 +412,7 @@ identifier                                      (. Token identifierToken = t; .)
 [ FormalParameterList<out formalParameters> ]
 ":"
 identifier                                      (. Token returnTypeToken = t; .)
-";"                                             (. functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); .)
+                                                (. functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); .)
 .
 
 
@@ -422,7 +422,7 @@ ProcedureHeading<out ProcedureHeading procedureHeading>
 identifier                                      (. Token identifierToken = t; .)
                                                 (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ]
-";"                                             (. procedureHeading = new ProcedureHeading(identifierToken, formalParameters); .)
+                                                (. procedureHeading = new ProcedureHeading(identifierToken, formalParameters); .)
 .
 
 
@@ -430,10 +430,10 @@ FormalParameterList<. out List<FormalParameter> formalParameters .>
 =
 "("												(. formalParameters = new ArrayList<>(); .)
 												(. List<FormalParameter> newParameters = new ArrayList<>(); .)
-FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParameters, formalParameters); .)
+FormalParameter<out newParameters>				(. formalParameters.addAll(newParameters); .)
 { 
 	";" 
-	FormalParameter<out newParameters> 			(. factory.appendFormalParameter(newParameters, formalParameters); .)
+	FormalParameter<out newParameters> 			(. formalParameters.addAll(newParameters); .)
 }
 ")"
 .
@@ -461,14 +461,14 @@ SubroutineFormalParameter<out FormalParameter formalParameter>
 
 
 ProcedureFormalParameter<out FormalParameter formalParameter>
-=                                               (. formalParameter = null; .)
-"procedure"
+=
+ProcedureHeading<out ProcedureHeading heading>  (. formalParameter = factory.createProcedureFormalParameter(heading); .)
 .
 
 
 FunctionFormalParameter<out FormalParameter formalParameter>
-=                                               (. formalParameter = null; .)
-"function"
+=
+FunctionHeading<out FunctionHeading heading>    (. formalParameter = factory.createFunctionFormalParameter(heading); .)
 .
 
 

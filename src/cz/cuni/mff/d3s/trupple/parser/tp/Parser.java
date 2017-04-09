@@ -619,11 +619,11 @@ public class Parser implements IParser {
 		formalParameters = new ArrayList<>(); 
 		List<FormalParameter> newParameters = new ArrayList<>(); 
 		newParameters = FormalParameter();
-		factory.appendFormalParameter(newParameters, formalParameters); 
+		formalParameters.addAll(newParameters); 
 		while (la.kind == 8) {
 			Get();
 			newParameters = FormalParameter();
-			factory.appendFormalParameter(newParameters, formalParameters); 
+			formalParameters.addAll(newParameters); 
 		}
 		Expect(7);
 		return formalParameters;

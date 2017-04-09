@@ -27,6 +27,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDesc
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 
 public class NodeFactory {
 
@@ -406,10 +408,6 @@ public class NodeFactory {
         }
     }
 
-    public void appendFormalParameter(List<FormalParameter> parameter, List<FormalParameter> params) {
-        params.addAll(parameter);
-    }
-
     public List<FormalParameter> createFormalParametersList(List<String> identifiers, Token typeDescriptor, boolean isOutput) {
         List<FormalParameter> paramList = new ArrayList<>();
         for (String identifier : identifiers) {
@@ -417,6 +415,21 @@ public class NodeFactory {
         }
 
         return paramList;
+    }
+
+    public FormalParameter createProcedureFormalParameter(ProcedureHeading heading) {
+        String identifier = this.getIdentifierFromToken(heading.identifierToken);
+        ProcedureDescriptor descriptor = new ProcedureDescriptor(heading.formalParameters);
+
+        return new FormalParameter(identifier, descriptor, false);
+    }
+
+    public FormalParameter createFunctionFormalParameter(FunctionHeading heading) {
+        String identifier = this.getIdentifierFromToken(heading.identifierToken);
+        TypeDescriptor returnTypeDescriptor = this.lexicalScope.getTypeDescriptor(this.getTypeNameFromToken(heading.returnTypeToken));
+        FunctionDescriptor descriptor = new FunctionDescriptor(heading.formalParameters, returnTypeDescriptor);
+
+        return new FormalParameter(identifier, descriptor, false);
     }
 
     public void finishProcedureImplementation(StatementNode bodyNode) {
