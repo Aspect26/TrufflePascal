@@ -221,6 +221,7 @@ RecordFieldList<out TypeDescriptor typeDescriptor>
     ]
 |
     RecordVariantPart
+|
 )
 [ ";" ]                                         (. typeDescriptor = factory.createRecordType(); .)
 .
@@ -255,14 +256,25 @@ RecordVariants
 RecordVariantSelector
 =
 [
-IF(isVariantSelectorTag())
-identifier ":"
+    IF(isVariantSelectorTag())
+    identifier ":"
 ]
 identifier                                      (. /* ordinal */ .)
 .
 
 
 RecordVariants
+=
+RecordVariant
+{
+    IF(!recordVariantsEnd())
+    ";"
+    RecordVariant
+}
+.
+
+
+RecordVariant
 =
 CaseConstantList
 ":"

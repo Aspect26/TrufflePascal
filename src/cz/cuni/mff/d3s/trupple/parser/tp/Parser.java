@@ -415,12 +415,14 @@ public class Parser implements IParser {
 	}
 
 	void RecordVariantSelector() {
+		Token tagToken = null; 
 		if (isVariantSelectorTag()) {
 			Expect(1);
+			tagToken = t; 
 			Expect(25);
 		}
 		Expect(1);
-		
+		if (tagToken != null) factory.registerRecordVariantTagVariable(tagToken, t); 
 	}
 
 	void RecordVariants() {

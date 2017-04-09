@@ -199,6 +199,21 @@ public class NodeFactory {
         }
     }
 
+    public void registerRecordVariantTagVariable(Token identifierToken, Token typeToken) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        TypeDescriptor type = this.getTypeDescriptor(typeToken);
+
+        if (!(type instanceof OrdinalDescriptor)) {
+            parser.SemErr("Record variant selector must be of ordinal type");
+        }
+
+        try {
+            lexicalScope.registerLocalVariable(identifier, type);
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
 	    String typeIdentifier = this.getTypeNameFromToken(returnTypeToken);
 	    TypeDescriptor returnTypeDescriptor = this.doLookup(typeIdentifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(typeIdentifier));

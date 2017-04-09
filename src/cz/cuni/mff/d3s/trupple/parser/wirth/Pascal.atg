@@ -223,12 +223,13 @@ RecordVariants
 
 
 RecordVariantSelector
-=
+=                                               (. Token tagToken = null; .)
 [
     IF(isVariantSelectorTag())
-    identifier ":"
+    identifier                                  (. tagToken = t; .)
+    ":"
 ]
-identifier                                      (. /* ordinal */ .)
+identifier                                      (. if (tagToken != null) factory.registerRecordVariantTagVariable(tagToken, t); .)
 .
 
 
