@@ -380,15 +380,11 @@ Subroutine
 
 Procedure
 =
-"procedure"
-identifier                                      (. Token identifierToken = t; .)
-                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ]
-";"
+ProcedureHeading<out ProcedureHeading procedureHeading>
 (
-    "forward"                                   (. factory.forwardProcedure(identifierToken, formalParameters); .)
+    "forward"                                   (. factory.forwardProcedure(procedureHeading); .)
 |
-                                                (. factory.startProcedureImplementation(identifierToken, formalParameters); .)
+                                                (. factory.startProcedureImplementation(procedureHeading); .)
     Declarations
     Block<out StatementNode bodyNode>           (. factory.finishProcedureImplementation(bodyNode); .)
 )
@@ -397,20 +393,36 @@ identifier                                      (. Token identifierToken = t; .)
 
 Function
 =
+FunctionHeading<out FunctionHeading functionHeading>
+(
+    "forward"                                   (. factory.forwardFunction(functionHeading); .)
+|
+                                                (. factory.startFunctionImplementation(functionHeading); .)
+    Declarations
+    Block<out StatementNode bodyNode>           (. factory.finishFunctionImplementation(bodyNode); .)
+)
+.
+
+
+FunctionHeading<out FunctionHeading functionHeading>
+=
 "function"
 identifier                                      (. Token identifierToken = t; .)
                                                 (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ]
 ":"
 identifier                                      (. Token returnTypeToken = t; .)
-";"
-(
-    "forward"                                   (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
-|
-                                                (. factory.startFunctionImplementation(identifierToken, formalParameters, returnTypeToken); .)
-    Declarations
-    Block<out StatementNode bodyNode>           (. factory.finishFunctionImplementation(bodyNode); .)
-)
+";"                                             (. functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); .)
+.
+
+
+ProcedureHeading<out ProcedureHeading procedureHeading>
+=
+"procedure"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+";"                                             (. procedureHeading = new ProcedureHeading(identifierToken, formalParameters); .)
 .
 
 
@@ -427,18 +439,50 @@ FormalParameter<out newParameters>				(. factory.appendFormalParameter(newParame
 .
 
 
+FormalParameter<. out List<FormalParameter> formalParameters .>
+=                                               (. formalParameters = new ArrayList<>(); .)
+(
+    SubroutineFormalParameter<out FormalParameter parameter>
+                                                (. formalParameters.add(parameter); .)
+|
+    VariableFormalParameter<out formalParameters>
+)
+.
 
-FormalParameter<. out List<FormalParameter> formalParameter .>
-=												(. List<String> identifiers = new ArrayList<>(); .)
+
+SubroutineFormalParameter<out FormalParameter formalParameter>
+=                                               (. formalParameter = null; .)
+(
+    ProcedureFormalParameter<out formalParameter>
+|
+    FunctionFormalParameter<out formalParameter>
+)
+.
+
+
+ProcedureFormalParameter<out FormalParameter formalParameter>
+=                                               (. formalParameter = null; .)
+"procedure"
+.
+
+
+FunctionFormalParameter<out FormalParameter formalParameter>
+=                                               (. formalParameter = null; .)
+"function"
+.
+
+
+VariableFormalParameter<. out List<FormalParameter> formalParameters .>
+=
+												(. List<String> identifiers = new ArrayList<>(); .)
 identifier										(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 {
 	","
 	identifier									(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 }
 ":"
-identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t, false); .)
+identifier										(. formalParameters = factory.createFormalParametersList(identifiers, t, false); .)
 .
-
 
 
 MainFunction 

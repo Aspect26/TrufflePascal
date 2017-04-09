@@ -304,9 +304,9 @@ public class Scanner {
 		literals.put("case", new Integer(24));
 		literals.put("const", new Integer(27));
 		literals.put("var", new Integer(30));
-		literals.put("procedure", new Integer(31));
-		literals.put("forward", new Integer(32));
-		literals.put("function", new Integer(33));
+		literals.put("forward", new Integer(31));
+		literals.put("function", new Integer(32));
+		literals.put("procedure", new Integer(33));
 		literals.put("begin", new Integer(35));
 		literals.put("break", new Integer(36));
 		literals.put("else", new Integer(38));

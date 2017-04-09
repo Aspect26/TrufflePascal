@@ -363,44 +363,44 @@ public class NodeFactory {
         }
     }
 
-    public void forwardProcedure(Token identifierToken, List<FormalParameter> formalParameters) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
+    public void forwardProcedure(ProcedureHeading heading) {
+        String identifier = this.getIdentifierFromToken(heading.identifierToken);
         try {
-            lexicalScope.registerProcedureInterface(identifier, formalParameters);
+            lexicalScope.registerProcedureInterface(identifier, heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
     }
 
-    public void forwardFunction(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-        String returnType = this.getIdentifierFromToken(returnTypeToken);
+    public void forwardFunction(FunctionHeading heading) {
+        String identifier = this.getIdentifierFromToken(heading.identifierToken);
+        String returnType = this.getIdentifierFromToken(heading.returnTypeToken);
         try {
-            lexicalScope.registerFunctionInterface(identifier, formalParameters, returnType);
+            lexicalScope.registerFunctionInterface(identifier, heading.formalParameters, returnType);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
     }
 
-    public void startProcedureImplementation(Token identifierToken, List<FormalParameter> formalParameters) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
+    public void startProcedureImplementation(ProcedureHeading heading) {
+        String identifier = this.getIdentifierFromToken(heading.identifierToken);
         try {
-            lexicalScope.tryRegisterProcedureInterface(identifier, formalParameters);
+            lexicalScope.tryRegisterProcedureInterface(identifier, heading.formalParameters);
             lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
-            this.addParameterIdentifiersToLexicalScope(formalParameters);
+            this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
 	}
 
-    public void startFunctionImplementation(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
-        String identifier = this.getIdentifierFromToken(identifierToken);
-        String returnType = this.getIdentifierFromToken(returnTypeToken);
+    public void startFunctionImplementation(FunctionHeading heading) {
+        String identifier = this.getIdentifierFromToken(heading.identifierToken);
+        String returnType = this.getIdentifierFromToken(heading.returnTypeToken);
         try {
-            lexicalScope.tryRegisterFunctionInterface(identifier, formalParameters, returnType);
+            lexicalScope.tryRegisterFunctionInterface(identifier, heading.formalParameters, returnType);
             lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
-            lexicalScope.registerReturnType(formalParameters, returnType);
-            this.addParameterIdentifiersToLexicalScope(formalParameters);
+            lexicalScope.registerReturnType(heading.formalParameters, returnType);
+            this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }

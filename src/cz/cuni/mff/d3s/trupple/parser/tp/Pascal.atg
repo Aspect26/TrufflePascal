@@ -413,15 +413,11 @@ Subroutine
 
 Procedure
 =
-"procedure"
-identifier                                      (. Token identifierToken = t; .)
-                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ]
-";"
+ProcedureHeading<out ProcedureHeading procedureHeading>
 (
-    "forward"                                   (. factory.forwardProcedure(identifierToken, formalParameters); .)
+    "forward"                                   (. factory.forwardProcedure(procedureHeading); .)
 |
-                                                (. factory.startProcedureImplementation(identifierToken, formalParameters); .)
+                                                (. factory.startProcedureImplementation(procedureHeading); .)
     Declarations
     Block<out StatementNode bodyNode>           (. factory.finishProcedureImplementation(bodyNode); .)
 )
@@ -430,20 +426,36 @@ identifier                                      (. Token identifierToken = t; .)
 
 Function
 =
+FunctionHeading<out FunctionHeading functionHeading>
+(
+    "forward"                                   (. factory.forwardFunction(functionHeading); .)
+|
+                                                (. factory.startFunctionImplementation(functionHeading); .)
+    Declarations
+    Block<out StatementNode bodyNode>           (. factory.finishFunctionImplementation(bodyNode); .)
+)
+.
+
+
+FunctionHeading<out FunctionHeading functionHeading>
+=
 "function"
 identifier                                      (. Token identifierToken = t; .)
                                                 (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ]
 ":"
 identifier                                      (. Token returnTypeToken = t; .)
-";"
-(
-    "forward"                                   (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
-|
-                                                (. factory.startFunctionImplementation(identifierToken, formalParameters, returnTypeToken); .)
-    Declarations
-    Block<out StatementNode bodyNode>           (. factory.finishFunctionImplementation(bodyNode); .)
-)
+";"                                             (. functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); .)
+.
+
+
+ProcedureHeading<out ProcedureHeading procedureHeading>
+=
+"procedure"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+";"                                             (. procedureHeading = new ProcedureHeading(identifierToken, formalParameters); .)
 .
 
 
@@ -928,9 +940,9 @@ InterfaceSection
 "interface"
 {
 	(
-		ProcedureHeading
+		UnitProcedureHeading
 	|
-		FunctionHeading
+		UnitFunctionHeading
 	|
 	    TypeDefinitions
 	|
@@ -941,7 +953,7 @@ InterfaceSection
 
 
 
-ProcedureHeading
+UnitProcedureHeading
 =
 "procedure"
 identifier										(. Token name = t; .)
@@ -953,7 +965,7 @@ identifier										(. Token name = t; .)
 
 
 
-FunctionHeading
+UnitFunctionHeading
 =
 "function"
 identifier										(. Token name = t; .)
