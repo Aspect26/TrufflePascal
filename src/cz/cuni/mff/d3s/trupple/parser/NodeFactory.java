@@ -410,10 +410,10 @@ public class NodeFactory {
         params.addAll(parameter);
     }
 
-    public List<FormalParameter> createFormalParametersList(List<String> identifiers, String typeName, boolean isOutput) {
+    public List<FormalParameter> createFormalParametersList(List<String> identifiers, Token typeDescriptor, boolean isOutput) {
         List<FormalParameter> paramList = new ArrayList<>();
         for (String identifier : identifiers) {
-            paramList.add(new FormalParameter(identifier, typeName, isOutput));
+            paramList.add(new FormalParameter(identifier, this.getTypeDescriptor(typeDescriptor), isOutput));
         }
 
         return paramList;
@@ -738,8 +738,7 @@ public class NodeFactory {
         try {
             int count = 0;
             for (FormalParameter parameter : parameters) {
-                TypeDescriptor typeDescriptor = this.doLookup(parameter.type, LexicalScope::getTypeTypeDescriptor,
-                        new UnknownTypeException(parameter.identifier));
+                TypeDescriptor typeDescriptor = parameter.type;
 
                 if (typeDescriptor == null)
                     return;

@@ -583,7 +583,7 @@ public class Parser implements IParser {
 		}
 		Expect(24);
 		Expect(1);
-		formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), false); 
+		formalParameter = factory.createFormalParametersList(identifiers, t, false); 
 		return formalParameter;
 	}
 

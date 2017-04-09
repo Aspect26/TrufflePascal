@@ -247,13 +247,14 @@ VariableLineDeclaration
 RecordVariantPart
 =
 "case"
-RecordVariantSelector
+RecordVariantSelector<out OrdinalDescriptor selectorType>
 "of"
-RecordVariants
+RecordVariants<. out List<ConstantDescriptor> caseConstants .>
+                                                (. factory.assertLegalsCaseValues(selectorType, caseConstants); .)
 .
 
 
-RecordVariantSelector
+RecordVariantSelector<out OrdinalDescriptor selectorDescriptor>
 =                                               (. Token tagToken = null; .)
 [
     IF(isVariantSelectorTag())
@@ -261,23 +262,25 @@ RecordVariantSelector
     ":"
 ]
 identifier                                      (. if (tagToken != null) factory.registerRecordVariantTagVariable(tagToken, t); .)
+                                                (. selectorDescriptor = factory.castTypeToOrdinalType(factory.getTypeDescriptor(t)); .)
 .
 
 
-RecordVariants
-=
-RecordVariant
+RecordVariants<. out List<ConstantDescriptor> caseConstants .>
+=                                               (. caseConstants = new ArrayList<>(); .)
+RecordVariant<. out List<ConstantDescriptor> newCaseConstants .>
+                                                (. caseConstants.addAll(newCaseConstants); .)
 {
     IF(!recordVariantsEnd())
     ";"
-    RecordVariant
+    RecordVariant<out newCaseConstants>         (. caseConstants.addAll(newCaseConstants); .)
 }
 .
 
 
-RecordVariant
+RecordVariant<. out List<ConstantDescriptor> caseConstants .>
 =
-CaseConstantList
+CaseConstantList<out caseConstants>
 ":"
 "("
 RecordFieldList<out TypeDescriptor type>
@@ -285,12 +288,12 @@ RecordFieldList<out TypeDescriptor type>
 .
 
 
-CaseConstantList
-=
-Constant<out ConstantDescriptor constant>
+CaseConstantList<. out List<ConstantDescriptor> caseConstants .>
+=                                               (. caseConstants = new ArrayList<>(); .)
+Constant<out ConstantDescriptor constant>       (. caseConstants.add(constant); .)
 {
     ","
-    Constant<out constant>
+    Constant<out constant>                      (. caseConstants.add(constant); .)
 }
 .
 
