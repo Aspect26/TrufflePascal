@@ -412,7 +412,7 @@ identifier                                      (. Token identifierToken = t; .)
 [ FormalParameterList<out formalParameters> ]
 ":"
 identifier                                      (. Token returnTypeToken = t; .)
-                                                (. functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); .)
+                                                (. functionHeading = new FunctionHeading(identifierToken, formalParameters, factory.getTypeDescriptor(returnTypeToken)); .)
 .
 
 
@@ -882,13 +882,14 @@ ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token s
                                                 (. parameter = null; .)
 (
     IF(factory.shouldBeReference(subroutineToken, currentParameterIndex))
-    identifier                                  (. parameter = factory.createReferenceNode(t); .)
-    // read is implemented with references
+    identifier                                  (. parameter = factory.createReferencePassNode(t); .)
+|
+    IF(factory.shouldBeSubroutine(subroutineToken, currentParameterIndex))
+    identifier                                  (. parameter = factory.createSubroutineParameterPassNode(t); .)
 |
     Expression<out parameter>
 )
 .
-
 
 
 ArrayIndex<. out List<ExpressionNode> indexNodes .>

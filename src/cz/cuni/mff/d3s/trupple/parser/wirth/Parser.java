@@ -565,7 +565,7 @@ public class Parser implements IParser {
 		Expect(24);
 		Expect(1);
 		Token returnTypeToken = t; 
-		functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); 
+		functionHeading = new FunctionHeading(identifierToken, formalParameters, factory.getTypeDescriptor(returnTypeToken)); 
 		return functionHeading;
 	}
 
@@ -1166,7 +1166,10 @@ public class Parser implements IParser {
 		parameter = null; 
 		if (factory.shouldBeReference(subroutineToken, currentParameterIndex)) {
 			Expect(1);
-			parameter = factory.createReferenceNode(t); 
+			parameter = factory.createReferencePassNode(t); 
+		} else if (factory.shouldBeSubroutine(subroutineToken, currentParameterIndex)) {
+			Expect(1);
+			parameter = factory.createSubroutineParameterPassNode(t); 
 		} else if (StartOf(6)) {
 			parameter = Expression();
 		} else SynErr(84);

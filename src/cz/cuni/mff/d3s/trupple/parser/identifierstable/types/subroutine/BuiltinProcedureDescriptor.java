@@ -13,6 +13,12 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
         super(Collections.emptyList());
     }
 
+    @Override
+    public boolean isSubroutineParameter(int index) {
+        // NOTE: no builtin subroutine takes subroutine as an argument
+        return false;
+    }
+
 
     public static class NoReferenceParameterBuiltin extends BuiltinProcedureDescriptor {
 

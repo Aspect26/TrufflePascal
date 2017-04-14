@@ -445,7 +445,7 @@ identifier                                      (. Token identifierToken = t; .)
 [ FormalParameterList<out formalParameters> ]
 ":"
 identifier                                      (. Token returnTypeToken = t; .)
-";"                                             (. functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); .)
+";"                                             (. functionHeading = new FunctionHeading(identifierToken, formalParameters, factory.getTypeDescriptor(returnTypeToken)); .)
 .
 
 
@@ -888,12 +888,14 @@ ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token s
                                                 (. parameter = null; .)
 (
     IF(factory.shouldBeReference(subroutineToken, currentParameterIndex))
-    identifier                                  (. parameter = factory.createReferenceNode(t); .)
+    identifier                                  (. parameter = factory.createReferencePassNode(t); .)
+|
+    IF(factory.shouldBeSubroutine(subroutineToken, currentParameterIndex))
+    identifier                                  (. parameter = factory.createSubroutineParameterPassNode(t); .)
 |
     Expression<out parameter>
 )
 .
-
 
 
 ArrayIndex<. out List<ExpressionNode> indexNodes .>
@@ -973,7 +975,7 @@ identifier										(. Token name = t; .)
 [ FormalParameterList<out formalParameters> ]
 ":"
 identifier										(. String returnTypeName = factory.getTypeNameFromToken(t); .)
-												(. factory.addUnitFunctionInterface(name, formalParameters, returnTypeName); .)
+												(. factory.addUnitFunctionInterface(name, formalParameters, t); .)
 ";"
 .
 

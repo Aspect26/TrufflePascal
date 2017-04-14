@@ -29,6 +29,10 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
         return this.formalParameters.get(parameterIndex).isReference;
     }
 
+    public boolean isSubroutineParameter(int parameterIndex) {
+        return this.formalParameters.get(parameterIndex).isSubroutine;
+    }
+
     public void verifyArguments(List<ExpressionNode> passedArguments) throws LexicalException {
 
     }

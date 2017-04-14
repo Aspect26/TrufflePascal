@@ -10,6 +10,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.call.SubroutineArgumentInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
@@ -18,6 +19,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.SimpleAccessNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownTypeException;
@@ -376,9 +378,8 @@ public class NodeFactory {
 
     public void forwardFunction(FunctionHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
-        String returnType = this.getIdentifierFromToken(heading.returnTypeToken);
         try {
-            lexicalScope.registerFunctionInterface(identifier, heading.formalParameters, returnType);
+            lexicalScope.registerFunctionInterface(identifier, heading.formalParameters, heading.returnTypeDescriptor);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
@@ -397,11 +398,10 @@ public class NodeFactory {
 
     public void startFunctionImplementation(FunctionHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
-        String returnType = this.getIdentifierFromToken(heading.returnTypeToken);
         try {
-            lexicalScope.tryRegisterFunctionInterface(identifier, heading.formalParameters, returnType);
+            lexicalScope.tryRegisterFunctionInterface(identifier, heading.formalParameters, heading.returnTypeDescriptor);
             lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
-            lexicalScope.registerReturnType(heading.formalParameters, returnType);
+            lexicalScope.registerReturnType(heading.formalParameters, heading.returnTypeDescriptor);
             this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
@@ -421,15 +421,14 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
         ProcedureDescriptor descriptor = new ProcedureDescriptor(heading.formalParameters);
 
-        return new FormalParameter(identifier, descriptor, false);
+        return new FormalParameter(identifier, descriptor, false, heading.descriptor);
     }
 
     public FormalParameter createFunctionFormalParameter(FunctionHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
-        TypeDescriptor returnTypeDescriptor = this.lexicalScope.getTypeDescriptor(this.getTypeNameFromToken(heading.returnTypeToken));
-        FunctionDescriptor descriptor = new FunctionDescriptor(heading.formalParameters, returnTypeDescriptor);
+        FunctionDescriptor descriptor = new FunctionDescriptor(heading.formalParameters, heading.returnTypeDescriptor);
 
-        return new FormalParameter(identifier, descriptor, false);
+        return new FormalParameter(identifier, descriptor, false, heading.descriptor);
     }
 
     public void finishProcedureImplementation(StatementNode bodyNode) {
@@ -627,20 +626,17 @@ public class NodeFactory {
     }
 
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
-	    String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
-	    try {
-	        LexicalScope ls = this.lexicalScope;
-	        while(ls != null) {
-	            if (ls.containsLocalIdentifier(subroutineIdentifier)) {
-                    return ls.isReferenceParameter(subroutineIdentifier, parameterIndex);
-                }
-                ls = ls.getOuterScope();
-            }
-            return false;
-        } catch(LexicalException e) {
-	        parser.SemErr(e.getMessage());
-	        return false;
-        }
+        String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
+        return this.doLookup(subroutineIdentifier,
+                (LexicalScope foundInScope, String foundIdentifier) -> foundInScope.isReferenceParameter(subroutineIdentifier, parameterIndex),
+                new UnknownIdentifierException(subroutineIdentifier));
+    }
+
+    public boolean shouldBeSubroutine(Token subroutineToken, int parameterIndex) {
+        String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
+        return this.doLookup(subroutineIdentifier,
+                (LexicalScope foundInScope, String foundIdentifier) -> foundInScope.isSubroutineParameter(subroutineIdentifier, parameterIndex),
+                new UnknownIdentifierException(subroutineIdentifier));
     }
 
     public ExpressionNode createSubroutineCall(Token identifierToken, List<ExpressionNode> params) {
@@ -661,10 +657,20 @@ public class NodeFactory {
         return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), literal);
     }
 
-    public ExpressionNode createReferenceNode(Token variableToken) {
-	    String variableIdentifier = this.getIdentifierFromToken(variableToken);
-	    FrameSlot slot = this.lexicalScope.getLocalSlot(variableIdentifier);
-        return new ReadReferencePassNode(slot);
+    public ExpressionNode createReferencePassNode(Token variableToken) {
+        String variableIdentifier = this.getIdentifierFromToken(variableToken);
+        FrameSlot slot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot,
+                new UnknownIdentifierException(variableIdentifier));
+
+        return new StoreReferenceArgumentNode(slot);
+    }
+
+    public ExpressionNode createSubroutineParameterPassNode(Token variableToken) {
+        String variableIdentifier = this.getIdentifierFromToken(variableToken);
+        PascalFunction function = this.doLookup(variableIdentifier, LexicalScope::getSubroutineFromContext,
+                new UnknownIdentifierException(variableIdentifier));
+
+        return new StoreSubroutineArgumentNode(function);
     }
 
     public ExpressionNode createLogicLiteralNode(boolean value) {
@@ -760,6 +766,11 @@ public class NodeFactory {
                     FrameSlot frameSlot = this.lexicalScope.registerReferenceVariable(parameter.identifier, typeDescriptor);
                     final ReferenceInitializationNode initializationNode = new ReferenceInitializationNode(frameSlot, count++);
 
+                    this.lexicalScope.addScopeArgument(initializationNode);
+                } else if (parameter.isSubroutine) {
+                    this.lexicalScope.registerSubroutine(parameter.identifier, parameter.subroutine);
+                    final SubroutineArgumentInitializationNode initializationNode =
+                            new SubroutineArgumentInitializationNode(count++, parameter.identifier, this.lexicalScope.getContext());
                     this.lexicalScope.addScopeArgument(initializationNode);
                 } else {
                     FrameSlot frameSlot = this.lexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
@@ -857,10 +868,12 @@ public class NodeFactory {
         }
     }
 
-    public void addUnitFunctionInterface(Token identifierToken, List<FormalParameter> formalParameters, String returnTypeName) {
+    public void addUnitFunctionInterface(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
+	    TypeDescriptor returnTypeDescriptor = this.getTypeDescriptor(returnTypeToken);
+
 	    try {
-            lexicalScope.registerFunctionInterface(identifier, formalParameters, returnTypeName);
+            lexicalScope.registerFunctionInterface(identifier, formalParameters, returnTypeDescriptor);
         } catch (LexicalException e) {
 	        parser.SemErr(e.getMessage());
         }
@@ -891,16 +904,16 @@ public class NodeFactory {
 
     public void startUnitFunctionImplementation(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
-        String returnTypeName = this.getTypeNameFromToken(returnTypeToken);
+        TypeDescriptor returnTypeDescriptor = this.getTypeDescriptor(returnTypeToken);
 
         try {
             if (lexicalScope.containsLocalIdentifier(identifier) && !lexicalScope.isSubroutine(identifier)) {
                 parser.SemErr("Cannot implement. Not a function: " + identifier);
             } else if (!lexicalScope.containsLocalIdentifier(identifier)) {
-                lexicalScope.registerFunctionInterface(identifier, formalParameters, returnTypeName);
+                lexicalScope.registerFunctionInterface(identifier, formalParameters, returnTypeDescriptor);
             }
             lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
-            lexicalScope.registerReturnType(formalParameters, returnTypeName);
+            lexicalScope.registerReturnType(formalParameters, returnTypeDescriptor);
             this.addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
