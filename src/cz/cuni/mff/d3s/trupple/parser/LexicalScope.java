@@ -117,8 +117,8 @@ public class LexicalScope {
         return this.localIdentifiers.isSubroutine(identifier);
     }
 
-    boolean isIdentifierPublic(String identifier) {
-        return this.publicIdentifiers.contains(identifier);
+    void importUnitScope(LexicalScope unitScope) {
+
     }
 
     void verifyPassedArgumentsToSubroutine(String identifier, List<ExpressionNode> params) throws LexicalException {

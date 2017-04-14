@@ -109,8 +109,8 @@ public class NodeFactory {
         if (this.builtinUnits.containsKey(unitIdentifier)) {
             BuiltinUnit builtinUnit = this.builtinUnits.get(unitIdentifier);
             builtinUnit.importTo(this.currentLexicalScope);
-        } else if (!this.containsUnit(unitIdentifier)) {
-            parser.SemErr("Unknown unit: " + unitIdentifier + ". Did you forget to include it?");
+        } else {
+            this.importUnitScope(unitIdentifier);
         }
     }
 
@@ -132,6 +132,26 @@ public class NodeFactory {
         }
 
         return false;
+    }
+
+    private void importUnitScope(String identifier) {
+	    LexicalScope scope = this.getUnitScope(identifier);
+	    if (scope == null) {
+            parser.SemErr("Unknown unit: " + identifier + ". Did you forget to include it?");
+            return;
+        }
+
+        this.currentLexicalScope.importUnitScope(scope);
+    }
+
+    private LexicalScope getUnitScope(String identifier) {
+	    for (LexicalScope unitScope : this.units) {
+	        if (unitScope.getName().equals(identifier)) {
+	            return unitScope;
+            }
+        }
+
+        return null;
     }
 
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException, T notFoundReturnValue) {
