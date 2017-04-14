@@ -250,13 +250,11 @@ public class LexicalScope {
         return new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
     }
 
-    void markAllIdentifiersFromUnitPublic(String unitName) {
+    void markAllIdentifiersPublic() {
         Map<String, TypeDescriptor> allIdentifiers = this.localIdentifiers.getAll();
         for (Map.Entry<String, TypeDescriptor> entry : allIdentifiers.entrySet()) {
             String currentIdentifier = entry.getKey();
-            if (currentIdentifier.startsWith(unitName + ".")) {
-                this.publicIdentifiers.add(currentIdentifier);
-            }
+            this.publicIdentifiers.add(currentIdentifier);
         }
     }
 
