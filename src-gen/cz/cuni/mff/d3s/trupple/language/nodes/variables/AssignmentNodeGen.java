@@ -16,6 +16,7 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
@@ -155,6 +156,9 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             }
             if (valueNodeValue instanceof SetTypeValue) {
                 return AssignSetNode_.create(root);
+            }
+            if (valueNodeValue instanceof RecordValue) {
+                return AssignRecordNode_.create(root);
             }
             if (valueNodeValue instanceof Reference) {
                 return AssignReferenceNode_.create(root);
@@ -460,11 +464,32 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         }
 
     }
+    @GeneratedBy(methodName = "assignRecord(VirtualFrame, RecordValue)", value = AssignmentNode.class)
+    private static final class AssignRecordNode_ extends BaseNode_ {
+
+        AssignRecordNode_(AssignmentNodeGen root) {
+            super(root, 8);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof RecordValue) {
+                RecordValue valueNodeValue_ = (RecordValue) valueNodeValue;
+                return root.assignRecord(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignRecordNode_(root);
+        }
+
+    }
     @GeneratedBy(methodName = "assignReference(VirtualFrame, Reference)", value = AssignmentNode.class)
     private static final class AssignReferenceNode_ extends BaseNode_ {
 
         AssignReferenceNode_(AssignmentNodeGen root) {
-            super(root, 8);
+            super(root, 9);
         }
 
         @Override
@@ -485,7 +510,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
     private static final class AssignPointersNode_ extends BaseNode_ {
 
         AssignPointersNode_(AssignmentNodeGen root) {
-            super(root, 9);
+            super(root, 10);
         }
 
         @Override
@@ -506,7 +531,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
     private static final class AssignStringNode_ extends BaseNode_ {
 
         AssignStringNode_(AssignmentNodeGen root) {
-            super(root, 10);
+            super(root, 11);
         }
 
         @Override

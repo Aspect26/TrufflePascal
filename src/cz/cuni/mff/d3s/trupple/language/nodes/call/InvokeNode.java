@@ -9,7 +9,7 @@ import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @NodeInfo(shortName = "invoke")
 @NodeChildren({ @NodeChild(value = "functionNode", type = ExpressionNode.class) })
@@ -26,7 +26,7 @@ public abstract class InvokeNode extends ExpressionNode {
 
 	@Specialization
 	@ExplodeLoop
-	public Object executeGeneric(VirtualFrame frame, PascalFunction function) {
+	public Object executeGeneric(VirtualFrame frame, PascalSubroutine function) {
 		CompilerAsserts.compilationConstant(argumentNodes.length);
 
 		Object[] argumentValues = new Object[argumentNodes.length + 1];

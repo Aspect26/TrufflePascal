@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.parser;
 
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.IdentifiersTable;
@@ -14,15 +15,21 @@ import java.util.Map;
 class InitializationNodeGenerator {
 
     private final IdentifiersTable identifiersTable;
+    private final VirtualFrame initializationFrame;
+
+    InitializationNodeGenerator(IdentifiersTable identifiersTable, VirtualFrame initializationFrame) {
+        this.identifiersTable = identifiersTable;
+        this.initializationFrame = initializationFrame;
+    }
 
     InitializationNodeGenerator(IdentifiersTable identifiersTable) {
-        this.identifiersTable = identifiersTable;
+        this(identifiersTable, null);
     }
 
     List<StatementNode> generate()  {
         List<StatementNode> initializationNodes = new ArrayList<>();
 
-        for (Map.Entry<String, TypeDescriptor> entry : this.identifiersTable.getAll().entrySet()) {
+        for (Map.Entry<String, TypeDescriptor> entry : this.identifiersTable.getAllIdentifiers().entrySet()) {
             String identifier = entry.getKey();
             TypeDescriptor typeDescriptor = entry.getValue();
 
@@ -42,7 +49,7 @@ class InitializationNodeGenerator {
         }
 
         FrameSlot frameSlot = this.identifiersTable.getFrameSlot(identifier);
-        return InitializationNodeFactory.create(frameSlot, typeDescriptor.getDefaultValue());
+        return InitializationNodeFactory.create(frameSlot, typeDescriptor.getDefaultValue(), this.initializationFrame);
     }
 
 }

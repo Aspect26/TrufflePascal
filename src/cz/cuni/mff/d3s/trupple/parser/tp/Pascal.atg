@@ -79,6 +79,8 @@ Declarations
 Declaration
 =
 (
+    LabelDefinitions
+|
     ConstantDefinitions
 |
     TypeDefinitions
@@ -89,6 +91,23 @@ Declaration
 )
 .
 
+
+LabelDefinitions
+=
+"label"
+Label<out Token labelToken>                     (. factory.registerLabel(labelToken); .)
+{
+    ","
+    Label<out labelToken>                       (. factory.registerLabel(labelToken); .)
+}
+";"
+.
+
+
+Label<out Token labelToken>
+=
+integerLiteral                                  (. labelToken = t; .)
+.
 
 
 TypeDefinitions
@@ -202,6 +221,7 @@ RecordFieldList<out TypeDescriptor typeDescriptor>
     ]
 |
     RecordVariantPart
+|
 )
 [ ";" ]                                         (. typeDescriptor = factory.createRecordType(); .)
 .
@@ -227,25 +247,40 @@ VariableLineDeclaration
 RecordVariantPart
 =
 "case"
-RecordVariantSelector
+RecordVariantSelector<out OrdinalDescriptor selectorType>
 "of"
-RecordVariants
+RecordVariants<. out List<ConstantDescriptor> caseConstants .>
+                                                (. factory.assertLegalsCaseValues(selectorType, caseConstants); .)
 .
 
 
-RecordVariantSelector
-=
+RecordVariantSelector<out OrdinalDescriptor selectorDescriptor>
+=                                               (. Token tagToken = null; .)
 [
-IF(isVariantSelectorTag())
-identifier ":"
+    IF(isVariantSelectorTag())
+    identifier                                  (. tagToken = t; .)
+    ":"
 ]
-identifier                                      (. /* ordinal */ .)
+identifier                                      (. if (tagToken != null) factory.registerRecordVariantTagVariable(tagToken, t); .)
+                                                (. selectorDescriptor = factory.castTypeToOrdinalType(factory.getTypeDescriptor(t)); .)
 .
 
 
-RecordVariants
+RecordVariants<. out List<ConstantDescriptor> caseConstants .>
+=                                               (. caseConstants = new ArrayList<>(); .)
+RecordVariant<. out List<ConstantDescriptor> newCaseConstants .>
+                                                (. caseConstants.addAll(newCaseConstants); .)
+{
+    IF(!recordVariantsEnd())
+    ";"
+    RecordVariant<out newCaseConstants>         (. caseConstants.addAll(newCaseConstants); .)
+}
+.
+
+
+RecordVariant<. out List<ConstantDescriptor> caseConstants .>
 =
-CaseConstantList
+CaseConstantList<out caseConstants>
 ":"
 "("
 RecordFieldList<out TypeDescriptor type>
@@ -253,12 +288,12 @@ RecordFieldList<out TypeDescriptor type>
 .
 
 
-CaseConstantList
-=
-Constant<out ConstantDescriptor constant>
+CaseConstantList<. out List<ConstantDescriptor> caseConstants .>
+=                                               (. caseConstants = new ArrayList<>(); .)
+Constant<out ConstantDescriptor constant>       (. caseConstants.add(constant); .)
 {
     ","
-    Constant<out constant>
+    Constant<out constant>                      (. caseConstants.add(constant); .)
 }
 .
 
@@ -438,25 +473,25 @@ identifier										(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 	identifier									(. identifiers.add(factory.getIdentifierFromToken(t)); .)
 }
 ":"
-identifier										(. formalParameter = factory.createFormalParametersList(identifiers, factory.getTypeNameFromToken(t), isReference); .)
+identifier										(. formalParameter = factory.createFormalParametersList(identifiers, t, isReference); .)
 .
 
 
 
 MainFunction 
 =
-Block<out BlockNode blockNode>                  (. mainNode = factory.finishMainFunction(blockNode); .)
+Block<out StatementNode blockNode>              (. mainNode = factory.finishMainFunction(blockNode); .)
 "."
 .
 
 
-Block<out BlockNode blockNode>
+Block<out StatementNode blockNode>
 =                                               
     "begin"                                     (. List<StatementNode> bodyNodes = new ArrayList<>(); .)
     [ 
         StatementSequence<bodyNodes>
     ]
-    "end"                                       (. blockNode = factory.createBlockNode(bodyNodes); .)
+    "end"                                       (. blockNode = factory.createBlockNode(bodyNodes, this.extendedGotoSupport); .)
 .
 
 
@@ -471,7 +506,12 @@ Statement<out StatementNode statement>          (. body.add(statement); .)
 
 
 Statement<out StatementNode statement>
-=                                               (. statement = null; .)
+=                                               (. statement = null; Token label = null;.)
+[
+    Label<out label>
+    ":"
+]
+
 (
                                                 (. statement = factory.createNopStatement(); .)
 |
@@ -489,10 +529,13 @@ Statement<out StatementNode statement>
 |
     WithStatement<out statement>
 |
+    GotoStatement<out statement>
+|
     Block<out statement>
 |
     IdentifierBeginningStatement<out statement>
 )
+                                                (. if (label != null) statement = factory.createLabeledStatement(statement, label); .)
 .
 
 
@@ -611,7 +654,7 @@ RepeatLoop<out StatementNode statement>
 "repeat"										(. List<StatementNode> bodyNodes = new ArrayList<>(); .)
 StatementSequence<bodyNodes>					
 "until"
-Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes)); .)
+Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes, this.extendedGotoSupport)); .)
                                                 (. factory.finishLoop(); .)
 .
 
@@ -638,6 +681,13 @@ IfStatement<out StatementNode statement>
 "else"                                          
     Statement<out elseStatement>
 ]                                               (. statement = factory.createIfStatement(condition, thenStatement, elseStatement); .)
+.
+
+
+GotoStatement<out StatementNode statement>
+=
+"goto"
+integerLiteral                                  (. statement = factory.createGotoStatement(t); .)
 .
 
 
@@ -852,6 +902,7 @@ ArrayIndex<. out List<ExpressionNode> indexNodes .>
 Unit
 =
 UnitHeader
+[ ImportsSection ]
 InterfaceSection                                (. factory.finishUnitInterfaceSection(); .)
 ImplementationSection
 UnitFooter
@@ -910,8 +961,7 @@ identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ]
 ":"
-identifier										(. String returnTypeName = factory.getTypeNameFromToken(t); .)
-												(. factory.addUnitFunctionInterface(name, formalParameters, returnTypeName); .)
+identifier										(. factory.addUnitFunctionInterface(name, formalParameters, t); .)
 ";"
 .
 

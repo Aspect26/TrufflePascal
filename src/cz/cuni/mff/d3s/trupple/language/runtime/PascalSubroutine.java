@@ -4,17 +4,17 @@ import com.oracle.truffle.api.RootCallTarget;
 import com.oracle.truffle.api.interop.ForeignAccess;
 import com.oracle.truffle.api.interop.TruffleObject;
 
-public class PascalFunction implements TruffleObject {
+public class PascalSubroutine implements TruffleObject {
 
 	private RootCallTarget callTarget;
 	private String identifier;
 
-	public PascalFunction(String identifier, RootCallTarget rootCallTarget) {
+	public PascalSubroutine(String identifier, RootCallTarget rootCallTarget) {
 		this.identifier = identifier;
 		this.callTarget = rootCallTarget;
 	}
 
-	public PascalFunction(String identifier) {
+	public PascalSubroutine(String identifier) {
 		this(identifier, null);
 	}
 
@@ -39,8 +39,8 @@ public class PascalFunction implements TruffleObject {
 		return "Function: " + identifier;
 	}
 
-	static PascalFunction createUnimplementedFunction() {
-        return new PascalFunction("_UnimplementedFunction");
+	static PascalSubroutine createUnimplementedFunction() {
+        return new PascalSubroutine("_UnimplementedFunction");
     }
 
 	@Override

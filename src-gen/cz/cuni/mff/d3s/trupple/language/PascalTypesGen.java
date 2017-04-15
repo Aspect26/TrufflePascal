@@ -10,7 +10,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @GeneratedBy(PascalTypes.class)
 public final class PascalTypesGen extends PascalTypes {
@@ -84,18 +84,18 @@ public final class PascalTypesGen extends PascalTypes {
         throw new UnexpectedResultException(value);
     }
 
-    public static boolean isPascalFunction(Object value) {
-        return value instanceof PascalFunction;
+    public static boolean isPascalSubroutine(Object value) {
+        return value instanceof PascalSubroutine;
     }
 
-    public static PascalFunction asPascalFunction(Object value) {
-        assert value instanceof PascalFunction : "PascalTypesGen.asPascalFunction: PascalFunction expected";
-        return (PascalFunction) value;
+    public static PascalSubroutine asPascalSubroutine(Object value) {
+        assert value instanceof PascalSubroutine : "PascalTypesGen.asPascalSubroutine: PascalSubroutine expected";
+        return (PascalSubroutine) value;
     }
 
-    public static PascalFunction expectPascalFunction(Object value) throws UnexpectedResultException {
-        if (value instanceof PascalFunction) {
-            return (PascalFunction) value;
+    public static PascalSubroutine expectPascalSubroutine(Object value) throws UnexpectedResultException {
+        if (value instanceof PascalSubroutine) {
+            return (PascalSubroutine) value;
         }
         throw new UnexpectedResultException(value);
     }

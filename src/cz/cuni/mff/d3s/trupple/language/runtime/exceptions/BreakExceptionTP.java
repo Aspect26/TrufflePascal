@@ -6,7 +6,7 @@ public class BreakExceptionTP extends ControlFlowException {
 
 	private static final long serialVersionUID = 1461738434684232542L;
 
-	protected BreakExceptionTP() {
+	private BreakExceptionTP() {
 
 	}
 

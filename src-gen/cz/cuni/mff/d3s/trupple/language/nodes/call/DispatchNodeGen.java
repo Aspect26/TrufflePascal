@@ -10,7 +10,7 @@ import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @GeneratedBy(DispatchNode.class)
 @SuppressFBWarnings("SA_LOCAL_SELF_COMPARISON")
@@ -28,7 +28,7 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
     }
 
     @Override
-    public Object executeDispatch(VirtualFrame frameValue, PascalFunction arg0Value, Object[] arg1Value) {
+    public Object executeDispatch(VirtualFrame frameValue, PascalSubroutine arg0Value, Object[] arg1Value) {
         return specialization_.execute(frameValue, arg0Value, arg1Value);
     }
 
@@ -68,15 +68,15 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
 
         @Override
         public final Object acceptAndExecute(Frame frameValue, Object arg0Value, Object arg1Value) {
-            return this.execute((VirtualFrame) frameValue, (PascalFunction) arg0Value, (Object[]) arg1Value);
+            return this.execute((VirtualFrame) frameValue, (PascalSubroutine) arg0Value, (Object[]) arg1Value);
         }
 
-        public abstract Object execute(VirtualFrame frameValue, PascalFunction arg0Value, Object[] arg1Value);
+        public abstract Object execute(VirtualFrame frameValue, PascalSubroutine arg0Value, Object[] arg1Value);
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object arg0Value, Object arg1Value) {
-            if (arg0Value instanceof PascalFunction && arg1Value instanceof Object[]) {
-                PascalFunction arg0Value_ = (PascalFunction) arg0Value;
+            if (arg0Value instanceof PascalSubroutine && arg1Value instanceof Object[]) {
+                PascalSubroutine arg0Value_ = (PascalSubroutine) arg0Value;
                 if ((arg0Value_.getCallTarget() == null)) {
                     return UndefinedFunctionNode_.create(root);
                 }
@@ -98,7 +98,7 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue, PascalFunction arg0Value, Object[] arg1Value) {
+        public Object execute(VirtualFrame frameValue, PascalSubroutine arg0Value, Object[] arg1Value) {
             return uninitialized(frameValue, arg0Value, arg1Value);
         }
 
@@ -107,7 +107,7 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
         }
 
     }
-    @GeneratedBy(methodName = "doundefinedFunction(PascalFunction, Object[])", value = DispatchNode.class)
+    @GeneratedBy(methodName = "doundefinedFunction(PascalSubroutine, Object[])", value = DispatchNode.class)
     private static final class UndefinedFunctionNode_ extends BaseNode_ {
 
         UndefinedFunctionNode_(DispatchNodeGen root) {
@@ -115,7 +115,7 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue, PascalFunction arg0Value, Object[] arg1Value) {
+        public Object execute(VirtualFrame frameValue, PascalSubroutine arg0Value, Object[] arg1Value) {
             if ((arg0Value.getCallTarget() == null)) {
                 return root.doundefinedFunction(arg0Value, arg1Value);
             }
@@ -127,7 +127,7 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
         }
 
     }
-    @GeneratedBy(methodName = "doDirect(VirtualFrame, PascalFunction, Object[])", value = DispatchNode.class)
+    @GeneratedBy(methodName = "doDirect(VirtualFrame, PascalSubroutine, Object[])", value = DispatchNode.class)
     private static final class DirectNode_ extends BaseNode_ {
 
         DirectNode_(DispatchNodeGen root) {
@@ -135,7 +135,7 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue, PascalFunction arg0Value, Object[] arg1Value) {
+        public Object execute(VirtualFrame frameValue, PascalSubroutine arg0Value, Object[] arg1Value) {
             return DispatchNode.doDirect(frameValue, arg0Value, arg1Value);
         }
 
