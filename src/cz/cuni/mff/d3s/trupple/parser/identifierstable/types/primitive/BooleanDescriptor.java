@@ -25,4 +25,9 @@ public class BooleanDescriptor extends PrimitiveDescriptor implements OrdinalDes
         return 2;
     }
 
+    @Override
+    public boolean containsValue(Object value) {
+        return value instanceof Boolean;
+    }
+
 }

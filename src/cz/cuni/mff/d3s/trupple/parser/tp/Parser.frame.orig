@@ -28,6 +28,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -->begin
 package cz.cuni.mff.d3s.trupple.parser.tp;
 
+import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
@@ -53,11 +54,13 @@ public class Parser implements IParser {
 	public Errors errors;
 	private final NodeFactory factory;
     public PascalRootNode mainNode;
+    private boolean extendedGotoSupport;
 
 	-->declarations
 
-	public Parser() {
+	public Parser(boolean extendedGotoSupport) {
 		this.factory = new NodeFactory(this, true);
+		this.extendedGotoSupport = extendedGotoSupport;
 		errors = new Errors();
 	}
 

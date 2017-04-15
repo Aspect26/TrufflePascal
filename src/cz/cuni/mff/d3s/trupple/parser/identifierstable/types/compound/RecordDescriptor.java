@@ -21,7 +21,7 @@ public class RecordDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return new RecordValue(this.innerScope.getFrameDescriptor(), innerScope.getIdentifiersTable().getAll());
+        return new RecordValue(this.innerScope.getFrameDescriptor(), innerScope.getIdentifiersTable().getAllIdentifiers());
     }
 
     public LexicalScope getLexicalScope() {

@@ -21,8 +21,15 @@ public class Settings {
     @Option(name="-std", usage="sets the standard to be used")
     public String standard = STANDARD_WIRTH;
 
+    @Option(name="-g", usage="sets extended goto support")
+    public boolean extendedGotoSupport;
+
     @Argument
     public List<String> arguments = new ArrayList<>();
+
+    public Settings() {
+        this.imports.add("builtinunits");
+    }
 
     public String getSourcePath() {
         return this.arguments.get(0);

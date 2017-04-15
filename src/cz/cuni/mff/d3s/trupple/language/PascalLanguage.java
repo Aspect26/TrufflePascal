@@ -2,6 +2,8 @@ package cz.cuni.mff.d3s.trupple.language;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.oracle.truffle.api.CallTarget;
@@ -11,9 +13,9 @@ import com.oracle.truffle.api.frame.MaterializedFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.source.Source;
 
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.IParser;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 import cz.cuni.mff.d3s.trupple.parser.tp.Parser;
 
 @TruffleLanguage.Registration(name = "Pascal", version = "1.0", mimeType = PascalLanguage.MIME_TYPE)
@@ -41,7 +43,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 
 	@Override
 	protected boolean isObjectOfLanguage(Object object) {
-		return object instanceof PascalFunction;
+		return object instanceof PascalSubroutine;
 	}
 
 	@Override
@@ -55,8 +57,10 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	    return null;
     }
 
-	public static void start(String sourcePath, String[] arguments, List<String> imports, boolean useTPExtension) throws IOException {
-		IParser parser = (useTPExtension)? new Parser() : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
+	public static void start(String sourcePath, String[] programArguments, List<String> imports, boolean useTPExtension,
+        boolean extendedGotoSupport) throws IOException {
+            IParser parser = (useTPExtension)? new Parser(extendedGotoSupport) :
+                    new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
 
 		if (useTPExtension && !imports.isEmpty()) {
             if (!parseImports(imports, parser)) {
@@ -68,11 +72,14 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		    return;
         }
 
+        Object[] arguments = createArguments(programArguments, parser);
 		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call(arguments);
 	}
 
-	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension) {
-        IParser parser = (useTPExtension)? new Parser() : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
+	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension,
+                                      boolean extendedGotoSupport) {
+        IParser parser = (useTPExtension)? new Parser(extendedGotoSupport) :
+                new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
 
         if (useTPExtension) {
             int i = 0;
@@ -87,7 +94,9 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
             return;
         }
 
-		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call();
+        // TODO: arguments may be passed here
+        Object[] arguments = createArguments(new Object[0], parser);
+		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call(arguments);
 	}
 
 	private static boolean parseImports(List<String> imports, IParser parser) {
@@ -106,6 +115,8 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	    if (filesInDirectory == null) {
 	        return true;
         }
+
+        Arrays.sort(filesInDirectory); // TODO: this does not need to be here -> only for testing purposes
 
 	    for (File fileImport : filesInDirectory) {
 	        if (fileImport.isFile() && fileImport.getAbsolutePath().endsWith(".pas")) {
@@ -158,4 +169,12 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
         InputStream is = new FileInputStream(file);
         return Source.newBuilder(new InputStreamReader(is)).name(file.getName()).mimeType(PascalLanguage.MIME_TYPE).build();
     }
+
+    private static Object[] createArguments(Object[] programArguments, IParser parser) {
+	    List<Object> arguments = new ArrayList<>(Arrays.asList(programArguments));
+        arguments.add(0, parser.getUnitsFrame());
+
+        return arguments.toArray();
+    }
+
 }

@@ -33,6 +33,11 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
     }
 
     @Override
+    public boolean containsValue(Object value) {
+        return (value instanceof String) && this.identifiers.contains(value);
+    }
+
+    @Override
     public int getFirstIndex() {
         return 0;
     }

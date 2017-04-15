@@ -46,7 +46,7 @@ public class DosBuiltinUnit extends BuiltinUnitAbstr {
     }
 
     @Override
-    protected List<UnitFunctionData> getSubroutines() {
+    protected List<UnitFunctionData> getIdentifiers() {
         return this.data;
     }
 

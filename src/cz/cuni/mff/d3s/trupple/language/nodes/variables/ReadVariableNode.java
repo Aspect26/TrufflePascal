@@ -55,7 +55,7 @@ public abstract class ReadVariableNode extends ExpressionNode {
         }
 	}
 
-    @Specialization(guards = "isObjectKindOrObjectReference(frame, getSlot())")
+    @Specialization
 	Object readObject(VirtualFrame frame) {
         VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
         try {

@@ -16,7 +16,6 @@ public class StringBuiltinUnit extends BuiltinUnitAbstr {
     private final Map<String, TypeDescriptor> typesData = new HashMap<>();
 
     public StringBuiltinUnit() {
-        super("strings");
         this.initialize();
     }
 
@@ -25,13 +24,8 @@ public class StringBuiltinUnit extends BuiltinUnitAbstr {
     }
 
     @Override
-    protected List<UnitFunctionData> getSubroutines() {
+    protected List<UnitFunctionData> getIdentifiers() {
         return this.data;
-    }
-
-    @Override
-    protected Map<String, TypeDescriptor> getTypes() {
-        return this.typesData;
     }
 
 }

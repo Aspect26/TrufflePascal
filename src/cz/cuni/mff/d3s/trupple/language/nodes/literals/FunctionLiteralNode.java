@@ -5,7 +5,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @NodeInfo(shortName = "func")
 public final class FunctionLiteralNode extends ExpressionNode {
@@ -18,9 +18,9 @@ public final class FunctionLiteralNode extends ExpressionNode {
 	}
 
 	@Override
-	public PascalFunction executeGeneric(VirtualFrame frame) {
+	public PascalSubroutine executeGeneric(VirtualFrame frame) {
 		PascalContext context = this.context;
-		PascalFunction function = null;
+		PascalSubroutine function = null;
 		while(context != null){
 			function = context.getFunctionRegistry().lookup(value);
 

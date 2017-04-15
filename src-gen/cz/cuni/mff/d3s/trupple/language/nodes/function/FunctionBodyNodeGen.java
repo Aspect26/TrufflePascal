@@ -131,7 +131,7 @@ public final class FunctionBodyNodeGen extends FunctionBodyNode implements Speci
             if ((root.isCharKind())) {
                 return ExecCharNode_.create(root);
             }
-            return null;
+            return ExecGenericNode_.create(root);
         }
 
     }
@@ -230,6 +230,23 @@ public final class FunctionBodyNodeGen extends FunctionBodyNode implements Speci
 
         static BaseNode_ create(FunctionBodyNodeGen root) {
             return new ExecCharNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "execGeneric(VirtualFrame)", value = FunctionBodyNode.class)
+    private static final class ExecGenericNode_ extends BaseNode_ {
+
+        ExecGenericNode_(FunctionBodyNodeGen root) {
+            super(root, 4);
+        }
+
+        @Override
+        public Object execute(VirtualFrame frameValue) {
+            return root.execGeneric(frameValue);
+        }
+
+        static BaseNode_ create(FunctionBodyNodeGen root) {
+            return new ExecGenericNode_(root);
         }
 
     }

@@ -55,6 +55,17 @@ public abstract class FunctionBodyNode extends ExpressionNode {
 		}
 	}
 
+	@Specialization
+    public Object execGeneric(VirtualFrame frame) {
+        bodyNode.executeVoid(frame);
+
+        try {
+            return frame.getObject(getSlot());
+        } catch (FrameSlotTypeException e) {
+            return null;
+        }
+    }
+
 	protected boolean isLongKind() {
 		return getSlot().getKind() == FrameSlotKind.Long;
 	}

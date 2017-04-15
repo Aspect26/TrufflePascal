@@ -1,10 +1,12 @@
 package cz.cuni.mff.d3s.trupple;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class StringUnitTest extends JUnitTest {
 
     @Test
+    @Ignore
     public void strupperTest(){
         String code = "program main;\n"+
                 "uses string;\n"+

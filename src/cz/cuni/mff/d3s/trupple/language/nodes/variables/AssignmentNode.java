@@ -102,6 +102,13 @@ public abstract class AssignmentNode extends ExpressionNode {
     }
 
     @Specialization
+    Object assignRecord(VirtualFrame frame, RecordValue record) {
+        RecordValue recordCopy = record.getCopy();
+        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, recordCopy);
+        return recordCopy;
+    }
+
+    @Specialization
     Object assignReference(VirtualFrame frame, Reference reference) {
         // TODO: this if is so wrong, refactor it somehow
         Object referenceValue = this.getValueFromSlot(reference.getFromFrame(), reference.getFrameSlot());

@@ -21,6 +21,11 @@ public class LongDescriptor extends PrimitiveDescriptor implements OrdinalDescri
     }
 
     @Override
+    public boolean containsValue(Object value) {
+        return value instanceof Integer || value instanceof Long;
+    }
+
+    @Override
     public int getFirstIndex() {
         return Integer.MIN_VALUE;
     }

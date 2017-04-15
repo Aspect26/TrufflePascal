@@ -8,7 +8,7 @@ public class CrtBuiltinUnit extends BuiltinUnitAbstr {
     private final List<UnitFunctionData> data = new ArrayList<>();
 
     @Override
-    protected List<UnitFunctionData> getSubroutines() {
+    protected List<UnitFunctionData> getIdentifiers() {
         return this.data;
     }
 

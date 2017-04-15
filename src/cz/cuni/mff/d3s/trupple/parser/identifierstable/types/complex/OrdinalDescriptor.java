@@ -30,12 +30,19 @@ public interface OrdinalDescriptor extends TypeDescriptor {
             this.upperBound = upperBound;
         }
 
+        @Override
         public int getFirstIndex() {
             return this.lowerBound.getOrdinalValue();
         }
 
+        @Override
         public int getSize() {
             return this.upperBound.getOrdinalValue() - this.lowerBound.getOrdinalValue() + 1;
+        }
+
+        @Override
+        public boolean containsValue(Object value) {
+            return (value instanceof Integer) && (getFirstIndex() <= (Integer)value  && (Integer) value < getFirstIndex() + getSize());
         }
 
     }
@@ -43,4 +50,7 @@ public interface OrdinalDescriptor extends TypeDescriptor {
     int getFirstIndex();
 
     int getSize();
+
+    boolean containsValue(Object value);
+
 }

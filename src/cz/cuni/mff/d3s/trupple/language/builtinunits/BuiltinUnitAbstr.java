@@ -9,44 +9,19 @@ import java.util.Map;
 
 public abstract class BuiltinUnitAbstr implements BuiltinUnit {
 
-    protected abstract List<UnitFunctionData> getSubroutines();
-
-    protected abstract Map<String, TypeDescriptor> getTypes();
-
-    private String unitName;
-
-    public BuiltinUnitAbstr(String unitName) {
-        this.unitName = unitName;
-    }
+    protected abstract List<UnitFunctionData> getIdentifiers();
 
     @Override
     public void importTo(LexicalScope lexicalScope) {
-        this.importSubroutines(lexicalScope);
-        this.importTypes(lexicalScope);
-    }
-
-    private void importSubroutines(LexicalScope lexicalScope) {
-        List<UnitFunctionData> unitFunctions = this.getSubroutines();
+        List<UnitFunctionData> unitFunctions = this.getIdentifiers();
         for (UnitFunctionData unitFunction : unitFunctions) {
             String identifier = unitFunction.identifier.toLowerCase();
             SubroutineDescriptor descriptor = unitFunction.descriptor;
             ExpressionNode bodyNode = unitFunction.bodyNode;
 
             // register to identifiers table and function registry
-            lexicalScope.registerSubroutine(this.getIdentifier(identifier), bodyNode, descriptor);
+            lexicalScope.registerSubroutine(identifier, bodyNode, descriptor);
         }
-    }
-
-    private void importTypes(LexicalScope lexicalScope) {
-        for (Map.Entry<String, TypeDescriptor> entry : this.getTypes().entrySet()) {
-            String identifier = entry.getKey();
-            TypeDescriptor typeDescriptor = entry.getValue();
-            lexicalScope.registerType(this.getIdentifier(identifier), typeDescriptor);
-        }
-    }
-
-    private String getIdentifier(String identifier) {
-        return unitName + "." + identifier;
     }
 
 }
