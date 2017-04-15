@@ -28,7 +28,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 
 public class PascalSubroutineRegistry {
-	private final Map<String, PascalFunction> functions = new HashMap<>();
+	private final Map<String, PascalFunction> subroutines = new HashMap<>();
 	protected final PascalContext context;
 
 	PascalSubroutineRegistry(PascalContext context, boolean installBuiltins) {
@@ -38,16 +38,26 @@ public class PascalSubroutineRegistry {
 		}
 	}
 
+	public void importSubroutines(PascalSubroutineRegistry subroutineRegistry) {
+	    for (Map.Entry<String, PascalFunction> subroutineEntry : subroutineRegistry.subroutines.entrySet()) {
+	        String identifier = subroutineEntry.getKey();
+	        PascalFunction subroutine = subroutineEntry.getValue();
+	        if (!this.subroutines.containsKey(identifier)) {
+	            this.subroutines.put(identifier, subroutine);
+            }
+        }
+    }
+
 	void registerSubroutineName(String identifier) {
-		functions.put(identifier, PascalFunction.createUnimplementedFunction());
+		subroutines.put(identifier, PascalFunction.createUnimplementedFunction());
 	}
 
 	public PascalFunction lookup(String identifier) {
-		return functions.get(identifier);
+		return subroutines.get(identifier);
 	}
 
 	void setFunctionRootNode(String identifier, PascalRootNode rootNode) {
-        PascalFunction function = functions.get(identifier);
+        PascalFunction function = subroutines.get(identifier);
 		assert function != null;
 		
 		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
@@ -118,7 +128,7 @@ public class PascalSubroutineRegistry {
 		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
 		PascalFunction pascalFunction = new PascalFunction(identifier, callTarget);
 
-		functions.put(identifier, pascalFunction);
+		subroutines.put(identifier, pascalFunction);
 	}
 
 	private static NodeInfo lookupNodeInfo(Class<?> clazz) {

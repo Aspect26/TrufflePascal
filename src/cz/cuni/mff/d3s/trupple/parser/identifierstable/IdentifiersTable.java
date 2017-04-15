@@ -9,10 +9,8 @@ import cz.cuni.mff.d3s.trupple.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownIdentifierException;
-import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeTypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
@@ -125,8 +123,12 @@ public class IdentifiersTable {
         return this.typeDescriptors.get(typeIdentifier);
     }
 
-    public Map<String, TypeDescriptor> getAll() {
+    public Map<String, TypeDescriptor> getAllIdentifiers() {
         return this.identifiersMap;
+    }
+
+    public Map<String, TypeDescriptor> getAllTypes() {
+        return this.typeDescriptors;
     }
 
     public boolean containsIdentifier(String identifier) {
@@ -185,12 +187,7 @@ public class IdentifiersTable {
         return this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
-    public void addReturnVariable(String identifier, List<FormalParameter> formalParameters, String typeName) throws LexicalException {
-        TypeDescriptor typeDescriptor = typeDescriptors.get(typeName);
-        if (typeDescriptor == null) {
-            throw new UnknownTypeException(typeName);
-        }
-
+    public void addReturnVariable(String identifier, List<FormalParameter> formalParameters, TypeDescriptor typeDescriptor) throws LexicalException {
         TypeDescriptor returnDescriptor = new FunctionReturnDescriptor(formalParameters, typeDescriptor);
         this.registerNewIdentifier(identifier, returnDescriptor);
     }
@@ -238,14 +235,9 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
-    public void addFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
-        TypeDescriptor returnTypeDescriptor = typeDescriptors.get(returnType);
+    public void addFunctionInterface(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
         TypeDescriptor typeDescriptor = new FunctionDescriptor(formalParameters, returnTypeDescriptor);
         this.registerNewIdentifier(identifier, typeDescriptor);
-
-        if (returnTypeDescriptor == UnknownDescriptor.SINGLETON) {
-            throw new UnknownTypeException(returnType);
-        }
     }
 
     public void addSubroutine(String identifier, SubroutineDescriptor descriptor) throws LexicalException {

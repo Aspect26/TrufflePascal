@@ -2,20 +2,17 @@ package cz.cuni.mff.d3s.trupple.language.nodes;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.sun.javaws.exceptions.InvalidArgumentException;
-
-import java.util.List;
 
 public class InitializationNodeFactory{
 
-	public static StatementNode create(FrameSlot frameSlot, Object value) {
+	public static StatementNode create(FrameSlot frameSlot, Object value, VirtualFrame frame) {
 	    // TODO: this is a duplicity
         switch (frameSlot.getKind()) {
-            case Long: return new LongInitializationNode(frameSlot, (long) value);
-            case Double: return new DoubleInitializationNode(frameSlot, (double) value);
-            case Boolean: return new BooleanInitializationNode(frameSlot, (boolean) value);
-            case Byte: return new CharInitializationNode(frameSlot, (char) value);
-            default: return new ObjectInitializationNode(frameSlot, value);
+            case Long: return new LongInitializationNode(frameSlot, (long) value, frame);
+            case Double: return new DoubleInitializationNode(frameSlot, (double) value, frame);
+            case Boolean: return new BooleanInitializationNode(frameSlot, (boolean) value, frame);
+            case Byte: return new CharInitializationNode(frameSlot, (char) value, frame);
+            default: return new ObjectInitializationNode(frameSlot, value, frame);
         }
 	}
 }
@@ -23,9 +20,11 @@ public class InitializationNodeFactory{
 abstract class InitializationNode extends StatementNode {
 	
 	protected final FrameSlot slot;
+	protected final VirtualFrame frame;
 	
-	public InitializationNode(FrameSlot slot) {
+	InitializationNode(FrameSlot slot, VirtualFrame frame) {
 		this.slot = slot;
+		this.frame = frame;
 	}
 	
 	@Override
@@ -36,73 +35,98 @@ class LongInitializationNode extends InitializationNode {
 
 	private final long value;
 	
-	public LongInitializationNode(FrameSlot slot, long value) {
-		super(slot);
+	LongInitializationNode(FrameSlot slot, long value, VirtualFrame frame) {
+		super(slot, frame);
 		this.value = value;
 	}
 	
 	@Override
 	public void executeVoid(VirtualFrame frame) {
-		frame.setLong(slot, value);
+	    if (this.frame != null) {
+            this.frame.setLong(slot, value);
+        } else {
+            frame.setLong(slot, value);
+        }
 	}
+
 }
 
 class CharInitializationNode extends InitializationNode {
 
 	private final char value;
 	
-	public CharInitializationNode(FrameSlot slot, char value) {
-		super(slot);
+	CharInitializationNode(FrameSlot slot, char value, VirtualFrame frame) {
+		super(slot, frame);
 		this.value = value;
 	}
-	
-	@Override
-	public void executeVoid(VirtualFrame frame) {
-		frame.setByte(slot, (byte)value);
-	}
+
+    @Override
+    public void executeVoid(VirtualFrame frame) {
+        if (this.frame != null) {
+            this.frame.setByte(slot, (byte)value);
+        } else {
+            frame.setByte(slot, (byte)value);
+        }
+    }
+
 }
 
 class DoubleInitializationNode extends InitializationNode {
 
 	private final double value;
 	
-	public DoubleInitializationNode(FrameSlot slot, double value) {
-		super(slot);
+	DoubleInitializationNode(FrameSlot slot, double value, VirtualFrame frame) {
+		super(slot, frame);
 		this.value = value;
 	}
-	
-	@Override
-	public void executeVoid(VirtualFrame frame) {
-		frame.setDouble(slot, value);
-	}
+
+    @Override
+    public void executeVoid(VirtualFrame frame) {
+        if (this.frame != null) {
+            this.frame.setDouble(slot, value);
+        } else {
+            frame.setDouble(slot, value);
+        }
+    }
+
 }
 
 class BooleanInitializationNode extends InitializationNode {
 
 	private final boolean value;
 	
-	public BooleanInitializationNode(FrameSlot slot, boolean value) {
-		super(slot);
+	BooleanInitializationNode(FrameSlot slot, boolean value, VirtualFrame frame) {
+		super(slot, frame);
 		this.value = value;
 	}
-	
-	@Override
-	public void executeVoid(VirtualFrame frame) {
-		frame.setBoolean(slot, value);
-	}
+
+    @Override
+    public void executeVoid(VirtualFrame frame) {
+        if (this.frame != null) {
+            this.frame.setBoolean(slot, value);
+        } else {
+            frame.setBoolean(slot, value);
+        }
+    }
+
 }
 
 class ObjectInitializationNode extends InitializationNode {
 
 	private final Object value;
 	
-	public ObjectInitializationNode(FrameSlot slot, Object value) {
-		super(slot);
+	ObjectInitializationNode(FrameSlot slot, Object value, VirtualFrame frame) {
+		super(slot, frame);
 		this.value = value;
 	}
-	
-	@Override
-	public void executeVoid(VirtualFrame frame) {
-		frame.setObject(slot, value);
-	}
+
+    @Override
+    public void executeVoid(VirtualFrame frame) {
+        if (this.frame != null) {
+            this.frame.setObject(slot, value);
+        } else {
+            frame.setObject(slot, value);
+        }
+    }
+
 }

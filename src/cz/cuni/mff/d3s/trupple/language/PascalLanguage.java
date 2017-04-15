@@ -2,6 +2,8 @@ package cz.cuni.mff.d3s.trupple.language;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.oracle.truffle.api.CallTarget;
@@ -68,7 +70,9 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		    return;
         }
 
-		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call(arguments);
+        List<Object> argumentsList = new ArrayList<>(Arrays.asList(arguments));
+		argumentsList.add(0, parser.createUnitsFrame());
+		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call(argumentsList.toArray());
 	}
 
 	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension) {
@@ -87,7 +91,9 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
             return;
         }
 
-		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call();
+        List<Object> argumentsList = new ArrayList<>();
+        argumentsList.add(parser.createUnitsFrame());
+		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call(argumentsList.toArray());
 	}
 
 	private static boolean parseImports(List<String> imports, IParser parser) {
@@ -106,6 +112,8 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 	    if (filesInDirectory == null) {
 	        return true;
         }
+
+        Arrays.sort(filesInDirectory); // TODO: this does not need to be here -> only for testing purposes
 
 	    for (File fileImport : filesInDirectory) {
 	        if (fileImport.isFile() && fileImport.getAbsolutePath().endsWith(".pas")) {

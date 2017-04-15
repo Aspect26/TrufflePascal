@@ -852,6 +852,7 @@ ArrayIndex<. out List<ExpressionNode> indexNodes .>
 Unit
 =
 UnitHeader
+[ ImportsSection ]
 InterfaceSection                                (. factory.finishUnitInterfaceSection(); .)
 ImplementationSection
 UnitFooter
@@ -910,8 +911,7 @@ identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ]
 ":"
-identifier										(. String returnTypeName = factory.getTypeNameFromToken(t); .)
-												(. factory.addUnitFunctionInterface(name, formalParameters, returnTypeName); .)
+identifier										(. factory.addUnitFunctionInterface(name, formalParameters, t); .)
 ";"
 .
 
