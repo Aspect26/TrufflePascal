@@ -17,7 +17,7 @@ stringChar = ANY - "'" - cr - lf.
 TOKENS
 
 identifier = letter {letter | digit}.
-stringLiteral = "'" { stringChar } "'".
+stringLiteral = "'" { stringChar | "''" } "'".
 integerLiteral = "0" | nonZeroDigit { digit }.
 doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] { digit } | ("0" | nonZeroDigit { digit }) "." digit { digit } ["e" ["-"|"+"] { digit }].
 

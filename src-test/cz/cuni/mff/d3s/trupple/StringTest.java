@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.trupple;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class StringTest extends JUnitTest {
@@ -10,21 +9,23 @@ public class StringTest extends JUnitTest {
         test("program main; begin write('For the Lich King!'); end.", "For the Lich King!");
     }
 
-    @Ignore
     @Test
-    public void stringDoubleQuotes() {
+    public void stringDoubleQuotesTest() {
         test("program main; begin write('Don''t Panic!'); end.", "Don't Panic!");
     }
 
-    @Ignore
     @Test
-    public void stringDoubleQuotes2() {
+    public void stringDoubleQuotes2Test() {
         test("program main; begin write(''''); end.", "'");
     }
 
-    @Ignore
     @Test
-    public void stringDoubleQuotes3() {
+    public void stringDoubleQuotes3Test() {
         test("program main; begin write('''So it begin.'''); end.", "'So it begin.'");
+    }
+
+    @Test
+    public void stringDoubleQuotes4Test() {
+        test("program main; begin write('N''Zoth', ' is an old god.'); end.", "N'Zoth is an old god.");
     }
 }
