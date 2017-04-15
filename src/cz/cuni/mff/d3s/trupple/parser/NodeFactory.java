@@ -18,6 +18,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
@@ -763,8 +764,7 @@ public class NodeFactory {
                     this.currentLexicalScope.addScopeInitializationNode(initializationNode);
                 } else {
                     FrameSlot frameSlot = this.currentLexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
-                    FrameSlotKind slotKind = this.currentLexicalScope.getSlotKind(parameter.identifier);
-                    final ExpressionNode readNode = ReadSubroutineArgumentNodeGen.create(count++, slotKind);
+                    final ExpressionNode readNode = new ReadArgumentNode(count++);
                     final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);
 
                     this.currentLexicalScope.addScopeInitializationNode(assignment);

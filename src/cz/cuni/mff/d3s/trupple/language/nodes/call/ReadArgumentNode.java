@@ -5,7 +5,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 
-@Deprecated
 public class ReadArgumentNode extends ExpressionNode {
 
 	private final int index;
