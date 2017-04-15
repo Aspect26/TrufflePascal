@@ -11,7 +11,7 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @GeneratedBy(InvokeNode.class)
 public final class InvokeNodeGen extends InvokeNode {
@@ -31,9 +31,9 @@ public final class InvokeNodeGen extends InvokeNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frameValue) {
-        PascalFunction functionNodeValue_;
+        PascalSubroutine functionNodeValue_;
         try {
-            functionNodeValue_ = PascalTypesGen.expectPascalFunction(functionNode_.executeGeneric(frameValue));
+            functionNodeValue_ = PascalTypesGen.expectPascalSubroutine(functionNode_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             throw unsupported(ex.getResult());
         }

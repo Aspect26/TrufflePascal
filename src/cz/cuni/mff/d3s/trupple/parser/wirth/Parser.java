@@ -2,6 +2,7 @@
 package cz.cuni.mff.d3s.trupple.parser.wirth;
 
 import com.oracle.truffle.api.frame.FrameSlot;
+import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
@@ -1157,6 +1158,10 @@ public class Parser implements IParser {
 	
     public boolean hadErrors() {
         return errors.count > 0;
+    }
+
+    public VirtualFrame getUnitsFrame() {
+        return this.factory.getUnitsFrame();
     }
 
     public RootNode getRootNode() {

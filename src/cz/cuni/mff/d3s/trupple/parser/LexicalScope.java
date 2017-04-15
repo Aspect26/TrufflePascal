@@ -27,13 +27,12 @@ public class LexicalScope {
 
     private String name;
     private final LexicalScope outer;
-    private final IdentifiersTable localIdentifiers;
     private int loopDepth;
     private final PascalContext context;
     private final Set<String> publicIdentifiers;
 
-    // TODO: this should not be here
-    private final List<StatementNode> readArgumentNodes = new ArrayList<>();
+    final IdentifiersTable localIdentifiers;
+    final List<StatementNode> scopeInitializationNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
         this.name = name;
@@ -83,10 +82,6 @@ public class LexicalScope {
         return this.localIdentifiers.getTypeDescriptor(identifier);
     }
 
-    TypeDescriptor getTypeTypeDescriptor(String typeIdentifier) {
-        return this.localIdentifiers.getTypeTypeDescriptor(typeIdentifier);
-    }
-
     ConstantDescriptor getConstant(String identifier) throws LexicalException {
         return this.localIdentifiers.getConstant(identifier);
     }
@@ -104,7 +99,7 @@ public class LexicalScope {
     }
 
     boolean isReferenceParameter(String identifier, int parameterIndex) throws LexicalException {
-        TypeDescriptor subroutineDescriptor = this.localIdentifiers.getAll().get(identifier);
+        TypeDescriptor subroutineDescriptor = this.localIdentifiers.getAllIdentifiers().get(identifier);
         if (!(subroutineDescriptor instanceof SubroutineDescriptor)) {
             throw new LexicalException("Not a subroutine: " + identifier);
         }
@@ -119,10 +114,6 @@ public class LexicalScope {
 
     boolean isSubroutine(String identifier) {
         return this.localIdentifiers.isSubroutine(identifier);
-    }
-
-    boolean isIdentifierPublic(String identifier) {
-        return this.publicIdentifiers.contains(identifier);
     }
 
     boolean labelExists(String identifier) {
@@ -141,16 +132,16 @@ public class LexicalScope {
         return this.localIdentifiers.addReference(identifier, typeDescriptor);
     }
 
-    void registerReturnType(List<FormalParameter> formalParameters, String typeName) throws LexicalException {
-        this.localIdentifiers.addReturnVariable(this.getName(), formalParameters, typeName);
+    void registerReturnType(List<FormalParameter> formalParameters, TypeDescriptor typeDescriptor) throws LexicalException {
+        this.localIdentifiers.addReturnVariable(this.getName(), formalParameters, typeDescriptor);
     }
 
     FrameSlot registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         return this.localIdentifiers.addVariable(identifier, typeDescriptor);
     }
 
-    void addScopeArgument(StatementNode initializationNode) {
-        this.readArgumentNodes.add(initializationNode);
+    void addScopeInitializationNode(StatementNode initializationNode) {
+        this.scopeInitializationNodes.add(initializationNode);
     }
 
     TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {
@@ -194,9 +185,9 @@ public class LexicalScope {
     }
 
     // NOTE: the function could have been forwarded
-    void tryRegisterFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnType) throws LexicalException {
+    void tryRegisterFunctionInterface(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
         try {
-            this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnType);
+            this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnTypeDescriptor);
         } catch (DuplicitIdentifierException e) {
             if (this.context.isImplemented(identifier)) {
                 throw e;
@@ -210,8 +201,8 @@ public class LexicalScope {
         this.context.registerSubroutineName(identifier);
     }
 
-    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, String returnTypeName) throws LexicalException {
-        this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnTypeName);
+    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, TypeDescriptor typeDescriptor) throws LexicalException {
+        this.localIdentifiers.addFunctionInterface(identifier, formalParameters, typeDescriptor);
         this.context.registerSubroutineName(identifier);
     }
 
@@ -251,20 +242,17 @@ public class LexicalScope {
 
     BlockNode createInitializationNode() {
         InitializationNodeGenerator initNodeGenerator = new InitializationNodeGenerator(this.localIdentifiers);
-
         List<StatementNode> initializationNodes = initNodeGenerator.generate();
-        initializationNodes.addAll(this.readArgumentNodes);
+        initializationNodes.addAll(this.scopeInitializationNodes);
 
         return new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
     }
 
-    void markAllIdentifiersFromUnitPublic(String unitName) {
-        Map<String, TypeDescriptor> allIdentifiers = this.localIdentifiers.getAll();
+    void markAllIdentifiersPublic() {
+        Map<String, TypeDescriptor> allIdentifiers = this.localIdentifiers.getAllIdentifiers();
         for (Map.Entry<String, TypeDescriptor> entry : allIdentifiers.entrySet()) {
             String currentIdentifier = entry.getKey();
-            if (currentIdentifier.startsWith(unitName + ".")) {
-                this.publicIdentifiers.add(currentIdentifier);
-            }
+            this.publicIdentifiers.add(currentIdentifier);
         }
     }
 

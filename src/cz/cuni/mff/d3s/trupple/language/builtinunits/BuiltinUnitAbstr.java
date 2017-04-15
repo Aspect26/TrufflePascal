@@ -5,7 +5,7 @@ import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
 import java.util.List;
 
-abstract class BuiltinUnitAbstr implements BuiltinUnit {
+public abstract class BuiltinUnitAbstr implements BuiltinUnit {
 
     protected abstract List<UnitFunctionData> getIdentifiers();
 
