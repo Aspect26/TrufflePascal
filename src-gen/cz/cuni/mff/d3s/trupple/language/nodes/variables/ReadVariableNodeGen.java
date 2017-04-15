@@ -137,11 +137,8 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
                 CompilerDirectives.transferToInterpreterAndInvalidate();
                 return ReadDoubleNode_.create(root);
             }
-            if ((root.isObjectKindOrObjectReference((VirtualFrame) frameValue, root.getSlot()))) {
-                CompilerDirectives.transferToInterpreterAndInvalidate();
-                return ReadObjectNode_.create(root);
-            }
-            return null;
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            return ReadObjectNode_.create(root);
         }
 
         protected final BaseNode_ getNext() {
@@ -282,10 +279,7 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
 
         @Override
         public Object execute(VirtualFrame frameValue) {
-            if ((root.isObjectKindOrObjectReference(frameValue, root.getSlot()))) {
-                return root.readObject(frameValue);
-            }
-            return getNext().execute(frameValue);
+            return root.readObject(frameValue);
         }
 
         static BaseNode_ create(ReadVariableNodeGen root) {

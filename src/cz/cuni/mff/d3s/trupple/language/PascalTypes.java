@@ -7,9 +7,9 @@ import com.oracle.truffle.api.dsl.internal.DSLOptions;
 
 import cz.cuni.mff.d3s.trupple.language.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
-@TypeSystem({ long.class, boolean.class, char.class, double.class, PascalFunction.class, String.class, EnumValue.class,
+@TypeSystem({ long.class, boolean.class, char.class, double.class, PascalSubroutine.class, String.class, EnumValue.class,
         PascalArray.class, Reference.class, PointerValue.class, SetTypeValue.class, FileValue.class, Null.class })
 @DSLOptions
 public class PascalTypes {
