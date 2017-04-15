@@ -1253,8 +1253,8 @@ public class Parser implements IParser {
     	return errors.count > 0;
     }
 
-    public VirtualFrame createUnitsFrame() {
-        return this.factory.createUnitsFrame();
+    public VirtualFrame getUnitsFrame() {
+        return this.factory.getUnitsFrame();
     }
 
     public RootNode getRootNode() {

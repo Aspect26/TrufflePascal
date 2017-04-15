@@ -25,9 +25,7 @@ public class UnitLexicalScope extends LexicalScope {
             this.frame = Truffle.getRuntime().createVirtualFrame(frameArguments, this.getFrameDescriptor());
         }
 
-        // TODO: resolve this duplicity below with LexicalScope
         InitializationNodeGenerator initNodeGenerator = new InitializationNodeGenerator(this.localIdentifiers, this.frame);
-
         List<StatementNode> initializationNodes = initNodeGenerator.generate();
         initializationNodes.addAll(this.scopeInitializationNodes);
 

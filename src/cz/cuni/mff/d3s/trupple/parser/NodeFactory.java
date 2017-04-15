@@ -2,7 +2,6 @@ package cz.cuni.mff.d3s.trupple.parser;
 
 import java.util.*;
 
-import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -65,7 +64,7 @@ public class NodeFactory {
 	private LexicalScope currentLexicalScope;
 
     /**
-     * List of parsed units
+     * List of all parsed units
      */
 	private List<UnitLexicalScope> units = new ArrayList<>();
 
@@ -106,12 +105,12 @@ public class NodeFactory {
     }
 
     public void registerUnit(Token unitIdentifierToken) {
-        String unitIdentifier = unitIdentifierToken.val.toLowerCase();  // TODO: can't use getIdentifierFromToken() here
+        String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);  // TODO: can't use getIdentifierFromToken() here
         if (this.builtinUnits.containsKey(unitIdentifier)) {
             BuiltinUnit builtinUnit = this.builtinUnits.get(unitIdentifier);
             builtinUnit.importTo(this.currentLexicalScope);
-        } else {
-            this.importUnitScope(unitIdentifier);
+        } else if (!this.containsUnitScope(unitIdentifier)) {
+            parser.SemErr("Unknown unit: " + unitIdentifier + ". Did you forget to include it?");
         }
     }
 
@@ -135,21 +134,14 @@ public class NodeFactory {
         return false;
     }
 
-    private void importUnitScope(String identifier) {
-	    LexicalScope scope = this.getUnitScope(identifier);
-	    if (scope == null) {
-            parser.SemErr("Unknown unit: " + identifier + ". Did you forget to include it?");
-        }
-    }
-
-    private LexicalScope getUnitScope(String identifier) {
+    private boolean containsUnitScope(String identifier) {
 	    for (LexicalScope unitScope : this.units) {
 	        if (unitScope.getName().equals(identifier)) {
-	            return unitScope;
+	            return true;
             }
         }
 
-        return null;
+        return false;
     }
 
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException, T notFoundReturnValue) {
@@ -859,7 +851,7 @@ public class NodeFactory {
 	    this.currentLexicalScope = this.mainLexicalScope;
     }
 
-    public VirtualFrame createUnitsFrame() {
+    public VirtualFrame getUnitsFrame() {
 	    VirtualFrame unitsFrame = null;
 	    if (this.units.size() > 0) {
 	        unitsFrame = this.units.get(this.units.size() - 1).getFrame();

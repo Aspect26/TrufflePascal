@@ -16,5 +16,5 @@ public interface IParser {
 
     RootNode getRootNode();
 
-    VirtualFrame createUnitsFrame();
+    VirtualFrame getUnitsFrame();
 }

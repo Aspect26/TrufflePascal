@@ -67,7 +67,7 @@ public final class PascalContext extends ExecutionContext {
 	}
 
 	public boolean isImplemented(String identifier) {
-        PascalFunction global = functionRegistry.lookup(identifier);
+        PascalSubroutine global = functionRegistry.lookup(identifier);
 		return global.isImplemented();
 	}
 }

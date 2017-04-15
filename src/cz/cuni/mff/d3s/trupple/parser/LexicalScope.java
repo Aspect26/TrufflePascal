@@ -238,7 +238,6 @@ public class LexicalScope {
 
     BlockNode createInitializationNode() {
         InitializationNodeGenerator initNodeGenerator = new InitializationNodeGenerator(this.localIdentifiers);
-
         List<StatementNode> initializationNodes = initNodeGenerator.generate();
         initializationNodes.addAll(this.scopeInitializationNodes);
 

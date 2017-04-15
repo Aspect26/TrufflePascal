@@ -58,9 +58,6 @@ public abstract class ReadVariableNode extends ExpressionNode {
     @Specialization
 	Object readObject(VirtualFrame frame) {
         VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-        if (slotsFrame == null) {
-            throw new PascalRuntimeException("Could not find frame where this slot belongs");
-        }
         try {
             return slotsFrame.getObject(getSlot());
         } catch (FrameSlotTypeException e) {

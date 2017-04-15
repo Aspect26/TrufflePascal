@@ -28,7 +28,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 
 public class PascalSubroutineRegistry {
-	private final Map<String, PascalFunction> subroutines = new HashMap<>();
+	private final Map<String, PascalSubroutine> subroutines = new HashMap<>();
 	protected final PascalContext context;
 
 	PascalSubroutineRegistry(PascalContext context, boolean installBuiltins) {
@@ -38,26 +38,16 @@ public class PascalSubroutineRegistry {
 		}
 	}
 
-	public void importSubroutines(PascalSubroutineRegistry subroutineRegistry) {
-	    for (Map.Entry<String, PascalFunction> subroutineEntry : subroutineRegistry.subroutines.entrySet()) {
-	        String identifier = subroutineEntry.getKey();
-	        PascalFunction subroutine = subroutineEntry.getValue();
-	        if (!this.subroutines.containsKey(identifier)) {
-	            this.subroutines.put(identifier, subroutine);
-            }
-        }
-    }
-
 	void registerSubroutineName(String identifier) {
-		subroutines.put(identifier, PascalFunction.createUnimplementedFunction());
+		subroutines.put(identifier, PascalSubroutine.createUnimplementedFunction());
 	}
 
-	public PascalFunction lookup(String identifier) {
+	public PascalSubroutine lookup(String identifier) {
 		return subroutines.get(identifier);
 	}
 
 	void setFunctionRootNode(String identifier, PascalRootNode rootNode) {
-        PascalFunction function = subroutines.get(identifier);
+        PascalSubroutine function = subroutines.get(identifier);
 		assert function != null;
 		
 		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
@@ -126,9 +116,9 @@ public class PascalSubroutineRegistry {
 	
 	private void register(String identifier, PascalRootNode rootNode){
 		RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
-		PascalFunction pascalFunction = new PascalFunction(identifier, callTarget);
+		PascalSubroutine pascalSubroutine = new PascalSubroutine(identifier, callTarget);
 
-		subroutines.put(identifier, pascalFunction);
+		subroutines.put(identifier, pascalSubroutine);
 	}
 
 	private static NodeInfo lookupNodeInfo(Class<?> clazz) {
