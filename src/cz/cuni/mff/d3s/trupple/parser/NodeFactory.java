@@ -7,6 +7,8 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.sun.istack.internal.NotNull;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.*;
+import cz.cuni.mff.d3s.trupple.language.builtinunits.DosBuiltinUnit;
+import cz.cuni.mff.d3s.trupple.language.builtinunits.crt.CrtBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.graph.GraphBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
@@ -732,7 +734,7 @@ public class NodeFactory {
         return literal;
     }
 
-    String getTypeNameFromToken(Token typeNameToken) {
+    private String getTypeNameFromToken(Token typeNameToken) {
         return typeNameToken.val.toLowerCase();
     }
 

@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 public class PascalGraphMode {
 
     private static PascalGraphFrame frame;
+    private static boolean frameOpened = false;
 
     public static long init() {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -26,10 +27,12 @@ public class PascalGraphMode {
         frame = new PascalGraphFrame();
         frame.setVisible(true);
         frame.setBackground();
+        frameOpened = true;
     }
 
     public static long close() {
         frame.dispose();
+        frameOpened = false;
         return 0;
     }
 
@@ -40,6 +43,18 @@ public class PascalGraphMode {
         Color color = new Color(colorNumber);
         Pixel pixel = new Pixel(x, y, color);
         return frame.putGeometry(pixel);
+    }
+
+    public static boolean keyPressed() {
+        return frameOpened && frame.keyPressed();
+    }
+
+    public static char readKey() {
+        if (!frameOpened) {
+            return '\0';
+        }
+
+        return frame.readKey();
     }
 
 }

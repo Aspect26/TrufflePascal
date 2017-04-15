@@ -4,7 +4,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos.ExecNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos.GetDateNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos.GetMsCountNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos.GetTimeNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.string.StrupperNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.BuiltinProcedureDescriptor;
 
