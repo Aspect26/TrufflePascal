@@ -1,7 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.graphics;
 
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
-import cz.cuni.mff.d3s.trupple.language.runtime.graphics.geometry.PascalGraphFrame;
 import cz.cuni.mff.d3s.trupple.language.runtime.graphics.geometry.Pixel;
 
 import javax.swing.*;
@@ -26,7 +25,7 @@ public class PascalGraphMode {
     private static void openFrame() {
         frame = new PascalGraphFrame();
         frame.setVisible(true);
-        frame.getContentPane().setBackground(Color.black);
+        frame.setBackground();
     }
 
     public static long close() {

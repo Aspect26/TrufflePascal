@@ -75,7 +75,7 @@ public class NodeFactory {
         put("crt", new CrtBuiltinUnit());
         put("dos", new DosBuiltinUnit());
         put("string", new StringBuiltinUnit());
-        put("graph", new GraphBuiltinUnit());
+        put("graphcorejava", new GraphBuiltinUnit());
     }};
 
     /**
@@ -696,7 +696,6 @@ public class NodeFactory {
     }
 
     public String getTypeNameFromToken(Token typeNameToken) {
-	    // TODO: wtf
         return typeNameToken.val.toLowerCase();
     }
 

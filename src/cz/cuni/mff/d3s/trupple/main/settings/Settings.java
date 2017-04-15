@@ -24,6 +24,10 @@ public class Settings {
     @Argument
     public List<String> arguments = new ArrayList<>();
 
+    public Settings() {
+        this.imports.add("builtinunits");
+    }
+
     public String getSourcePath() {
         return this.arguments.get(0);
     }
