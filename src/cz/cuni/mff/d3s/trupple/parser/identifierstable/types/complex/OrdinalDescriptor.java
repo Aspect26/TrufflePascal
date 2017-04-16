@@ -6,21 +6,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.OrdinalCon
 
 public interface OrdinalDescriptor extends TypeDescriptor {
 
-    abstract class OrdinalDescriptorAbstract implements OrdinalDescriptor {
-
-        @Override
-        public FrameSlotKind getSlotKind() {
-            return FrameSlotKind.Object;
-        }
-
-        @Override
-        public Object getDefaultValue() {
-            return null;
-        }
-
-    }
-
-    class RangeDescriptor extends OrdinalDescriptorAbstract {
+    class RangeDescriptor implements OrdinalDescriptor {
 
         private final OrdinalConstantDescriptor lowerBound;
         private final OrdinalConstantDescriptor upperBound;
@@ -43,6 +29,16 @@ public interface OrdinalDescriptor extends TypeDescriptor {
         @Override
         public boolean containsValue(Object value) {
             return (value instanceof Integer) && (getFirstIndex() <= (Integer)value  && (Integer) value < getFirstIndex() + getSize());
+        }
+
+        @Override
+        public FrameSlotKind getSlotKind() {
+            return lowerBound.getSlotKind();
+        }
+
+        @Override
+        public Object getDefaultValue() {
+            return this.lowerBound.getDefaultValue();
         }
 
     }
