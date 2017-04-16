@@ -22,7 +22,7 @@ public class FileDescriptor implements TypeDescriptor {
     @Override
     public Object getDefaultValue() {
         if (contentTypeDescriptor instanceof CharDescriptor) {
-            return new TextFileValue(this.contentTypeDescriptor);
+            return new TextFileValue();
         } else {
             return new PrimitiveFileValue(this.contentTypeDescriptor);
         }
