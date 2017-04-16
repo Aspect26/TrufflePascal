@@ -28,4 +28,5 @@ public class StringTest extends JUnitTest {
     public void stringDoubleQuotes4Test() {
         test("program main; begin write('N''Zoth', ' is an old god.'); end.", "N'Zoth is an old god.");
     }
+
 }
