@@ -26,7 +26,7 @@ public abstract class EofBuiltinNode extends BuiltinNode {
     }
 
     private boolean eof(FileValue file) {
-        return file.isEof();
+        return file.eof();
     }
 
 }
