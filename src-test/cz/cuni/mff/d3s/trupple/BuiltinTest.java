@@ -108,7 +108,7 @@ public class BuiltinTest extends JUnitTest {
 
 
     @Test
-    public void eofTest() {
+    public void eofInStdInputTest() {
         String code = "program main;\n"+
                 "\n"+
                 "var c: char;\n"+
@@ -121,8 +121,19 @@ public class BuiltinTest extends JUnitTest {
                 "end.";
 
         String input = "Barrel rider!";
-        String output = input;
-        this.testWithInput(code, input, output);
+        this.testWithInput(code, input, input);
+    }
+
+    @Test
+    public void oddTest() {
+        String code = "program test;\n"+
+                "\n"+
+                "begin\n"+
+                " write(odd(3), odd(-12), odd(0), odd(26));\n"+
+                "end.";
+
+        String output = "truefalsefalsefalse";
+        this.test(code, output);
     }
 
 }

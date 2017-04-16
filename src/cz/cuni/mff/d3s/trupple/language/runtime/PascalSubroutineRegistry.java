@@ -76,8 +76,10 @@ public class PascalSubroutineRegistry {
         installBuiltinOneArgument(RewriteBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(ResetBuiltinNodeFactory.getInstance());
         installBuiltinWithVariableArgumentsCount(EofBuiltinNodeFactory.getInstance());
+        installBuiltinWithVariableArgumentsCount(EolBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(ChrBuiltinNodeFactory.getInstance());
         installBuiltinOneArgument(OrdBuiltinNodeFactory.getInstance());
+        installBuiltinOneArgument(OddBuiltinNodeFactory.getInstance());
 	}
 
 	void installBuiltinNoArgument(BuiltinNode builtinNode) {

@@ -8,25 +8,25 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
-@NodeInfo(shortName = "eof")
+@NodeInfo(shortName = "eol")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
-public abstract class EofBuiltinNode extends BuiltinNode {
+public abstract class EolBuiltinNode extends BuiltinNode {
 
-    public EofBuiltinNode(PascalContext context) {
+    public EolBuiltinNode(PascalContext context) {
         super(context);
     }
 
     @Specialization
-    boolean isEof(Object... arguments) {
-        return (arguments.length == 0)? eof() : eof((FileValue) arguments[0]);
+    boolean isEol(Object... arguments) {
+        return (arguments.length == 0)? eol() : eol((FileValue) arguments[0]);
     }
 
-    private boolean eof() {
+    private boolean eol() {
         return !this.context.getInput().hasNext();
     }
 
-    private boolean eof(FileValue file) {
-        return file.eof();
+    private boolean eol(FileValue file) {
+        return file.eol();
     }
 
 }
