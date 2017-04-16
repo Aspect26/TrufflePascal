@@ -1257,10 +1257,15 @@ public class Parser implements IParser {
 			formalParameters = FormalParameterList();
 		}
 		Expect(8);
-		factory.startUnitProcedureImplementation(identifierToken, formalParameters); 
-		Declarations();
-		StatementNode bodyNode = Block();
-		factory.finishProcedureImplementation(bodyNode); 
+		if (la.kind == 32) {
+			Get();
+			factory.forwardProcedure(identifierToken, formalParameters); 
+		} else if (StartOf(3)) {
+			factory.startUnitProcedureImplementation(identifierToken, formalParameters); 
+			Declarations();
+			StatementNode bodyNode = Block();
+			factory.finishProcedureImplementation(bodyNode); 
+		} else SynErr(92);
 	}
 
 	void UnitFunctionImplementation() {
@@ -1275,10 +1280,15 @@ public class Parser implements IParser {
 		Expect(1);
 		Token returnTypeToken = t; 
 		Expect(8);
-		factory.startUnitFunctionImplementation(identifierToken, formalParameters, returnTypeToken); 
-		Declarations();
-		StatementNode bodyNode = Block();
-		factory.finishFunctionImplementation(bodyNode); 
+		if (la.kind == 32) {
+			Get();
+			factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); 
+		} else if (StartOf(3)) {
+			factory.startUnitFunctionImplementation(identifierToken, formalParameters, returnTypeToken); 
+			Declarations();
+			StatementNode bodyNode = Block();
+			factory.finishFunctionImplementation(bodyNode); 
+		} else SynErr(93);
 	}
 
 
@@ -1508,6 +1518,8 @@ class Errors {
 			case 89: s = "invalid InnerIdentifierAccess"; break;
 			case 90: s = "invalid ActualParameter"; break;
 			case 91: s = "invalid UnitSubroutineImplementation"; break;
+			case 92: s = "invalid UnitProcedureImplementation"; break;
+			case 93: s = "invalid UnitFunctionImplementation"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

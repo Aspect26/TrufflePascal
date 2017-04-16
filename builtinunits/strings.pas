@@ -24,15 +24,7 @@ function strupper(str: PChar): PChar;
 
 IMPLEMENTATION
 
-function getPCharSize(str: PChar): integer;
-var size: integer;
-begin
-    size := 0;
-    while str^[size] <> '\0' do
-        size := size + 1;
-
-    getPCharSize := size + 1;
-end;
+function getPCharSize(str: PChar): integer; forward;
 
 function strcat(destination, source: PChar): PChar;
 begin
@@ -75,6 +67,16 @@ begin
         end;
     end;
     strupper := res;
+end;
+
+function getPCharSize(str: PChar): integer;
+var size: integer;
+begin
+    size := 0;
+    while str^[size] <> '\0' do
+        size := size + 1;
+
+    getPCharSize := size + 1;
 end;
 
 END.

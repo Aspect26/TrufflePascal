@@ -999,9 +999,13 @@ identifier                                      (. Token identifierToken = t; .)
                                                 (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ]
 ";"
+(
+"forward"                                       (. factory.forwardProcedure(identifierToken, formalParameters); .)
+|
                                                 (. factory.startUnitProcedureImplementation(identifierToken, formalParameters); .)
 Declarations
 Block<out StatementNode bodyNode>               (. factory.finishProcedureImplementation(bodyNode); .)
+)
 .
 
 
@@ -1014,9 +1018,13 @@ identifier                                      (. Token identifierToken = t; .)
 ":"
 identifier                                      (. Token returnTypeToken = t; .)
 ";"
+(
+"forward"                                       (. factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); .)
+|
                                                 (. factory.startUnitFunctionImplementation(identifierToken, formalParameters, returnTypeToken); .)
 Declarations
 Block<out StatementNode bodyNode>               (. factory.finishFunctionImplementation(bodyNode); .)
+)
 .
 
 END Pascal.
