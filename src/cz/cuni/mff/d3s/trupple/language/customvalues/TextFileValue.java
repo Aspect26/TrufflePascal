@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.EndOfFileException;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.FileNotAssignedPathException;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.NotOpenedToReadException;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.NotOpenedToWriteException;
@@ -8,11 +9,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class TextFileValue implements FileValue {
 
     private Scanner input;
+    private Scanner inputLine;
     private PrintStream output;
     private String filePath;
 
@@ -20,8 +23,16 @@ public class TextFileValue implements FileValue {
     public Object read() {
         if (this.input == null) {
             throw new NotOpenedToReadException();
+        } else if (this.inputLine == null) {
+            throw new EndOfFileException();
+        } else if (!this.inputLine.hasNext()) {
+            this.bufferLine();
+        }
+
+        if (this.inputLine == null) {
+            throw new EndOfFileException();
         } else {
-            return (char) this.input.nextByte();
+            return this.inputLine.next().charAt(0);
         }
     }
 
@@ -48,7 +59,20 @@ public class TextFileValue implements FileValue {
 
     @Override
     public boolean eof() {
-        return !this.input.hasNext();
+        if (this.inputLine == null) {
+            return true;
+        }
+        if (this.inputLine.hasNext()) {
+            return false;
+        } else {
+            this.bufferLine();
+            return this.inputLine == null;
+        }
+    }
+
+    @Override
+    public boolean eol() {
+        return !this.inputLine.hasNext();
     }
 
     @Override
@@ -58,6 +82,8 @@ public class TextFileValue implements FileValue {
         }
         try {
             this.input = new Scanner(new File(this.filePath));
+            this.input.useDelimiter("(?<=.)");
+            this.bufferLine();
         } catch (FileNotFoundException e) {
             throw new cz.cuni.mff.d3s.trupple.language.runtime.exceptions.FileNotFoundException(this.filePath);
         }
@@ -72,6 +98,16 @@ public class TextFileValue implements FileValue {
             this.output = new PrintStream(new FileOutputStream(this.filePath));
         } catch (FileNotFoundException e) {
             throw new cz.cuni.mff.d3s.trupple.language.runtime.exceptions.FileNotFoundException(this.filePath);
+        }
+    }
+
+    private void bufferLine() {
+        try {
+            String newLine = this.input.nextLine();
+            this.inputLine = new Scanner(newLine);
+            this.inputLine.useDelimiter("(?<=.)");
+        } catch (NoSuchElementException e) {
+            this.inputLine = null;
         }
     }
 }

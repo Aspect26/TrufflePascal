@@ -83,6 +83,11 @@ public class PrimitiveFileValue implements FileValue {
         return false;
     }
 
+    @Override
+    public boolean eol() {
+        return false;
+    }
+
     private void verifyPathSet() {
         if (filePath == null) {
             // TODO: custom exception

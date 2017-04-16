@@ -12,6 +12,8 @@ public interface FileValue {
 
     boolean eof();
 
+    boolean eol();
+
     void openToRead();
 
     void openToWrite();
