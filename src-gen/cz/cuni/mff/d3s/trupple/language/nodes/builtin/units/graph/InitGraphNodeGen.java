@@ -10,6 +10,7 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(InitGraphNode.class)
@@ -59,9 +60,9 @@ public final class InitGraphNodeGen extends InitGraphNode {
             Object child2Value = child2_.executeGeneric(frameValue);
             throw unsupported(child0Value_, ex.getResult(), child2Value);
         }
-        String child2Value_;
+        PascalString child2Value_;
         try {
-            child2Value_ = PascalTypesGen.expectString(child2_.executeGeneric(frameValue));
+            child2Value_ = PascalTypesGen.expectPascalString(child2_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             throw unsupported(child0Value_, child1Value_, ex.getResult());
         }
