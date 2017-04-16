@@ -15,6 +15,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
@@ -151,9 +152,6 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             if (valueNodeValue instanceof EnumValue) {
                 return WriteEnumNode_.create(root);
             }
-            if (valueNodeValue instanceof PascalArray) {
-                return AssignArrayNode_.create(root);
-            }
             if (valueNodeValue instanceof SetTypeValue) {
                 return AssignSetNode_.create(root);
             }
@@ -166,8 +164,11 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             if (valueNodeValue instanceof PointerValue) {
                 return AssignPointersNode_.create(root);
             }
-            if (valueNodeValue instanceof String) {
+            if (valueNodeValue instanceof PascalString) {
                 return AssignStringNode_.create(root);
+            }
+            if (valueNodeValue instanceof PascalArray) {
+                return AssignArrayNode_.create(root);
             }
             return null;
         }
@@ -422,32 +423,11 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         }
 
     }
-    @GeneratedBy(methodName = "assignArray(VirtualFrame, PascalArray)", value = AssignmentNode.class)
-    private static final class AssignArrayNode_ extends BaseNode_ {
-
-        AssignArrayNode_(AssignmentNodeGen root) {
-            super(root, 6);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
-            if (valueNodeValue instanceof PascalArray) {
-                PascalArray valueNodeValue_ = (PascalArray) valueNodeValue;
-                return root.assignArray(frameValue, valueNodeValue_);
-            }
-            return getNext().execute_(frameValue, valueNodeValue);
-        }
-
-        static BaseNode_ create(AssignmentNodeGen root) {
-            return new AssignArrayNode_(root);
-        }
-
-    }
     @GeneratedBy(methodName = "assignSet(VirtualFrame, SetTypeValue)", value = AssignmentNode.class)
     private static final class AssignSetNode_ extends BaseNode_ {
 
         AssignSetNode_(AssignmentNodeGen root) {
-            super(root, 7);
+            super(root, 6);
         }
 
         @Override
@@ -468,7 +448,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
     private static final class AssignRecordNode_ extends BaseNode_ {
 
         AssignRecordNode_(AssignmentNodeGen root) {
-            super(root, 8);
+            super(root, 7);
         }
 
         @Override
@@ -489,7 +469,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
     private static final class AssignReferenceNode_ extends BaseNode_ {
 
         AssignReferenceNode_(AssignmentNodeGen root) {
-            super(root, 9);
+            super(root, 8);
         }
 
         @Override
@@ -510,7 +490,7 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
     private static final class AssignPointersNode_ extends BaseNode_ {
 
         AssignPointersNode_(AssignmentNodeGen root) {
-            super(root, 10);
+            super(root, 9);
         }
 
         @Override
@@ -527,17 +507,17 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         }
 
     }
-    @GeneratedBy(methodName = "assignString(VirtualFrame, String)", value = AssignmentNode.class)
+    @GeneratedBy(methodName = "assignString(VirtualFrame, PascalString)", value = AssignmentNode.class)
     private static final class AssignStringNode_ extends BaseNode_ {
 
         AssignStringNode_(AssignmentNodeGen root) {
-            super(root, 11);
+            super(root, 10);
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
-            if (valueNodeValue instanceof String) {
-                String valueNodeValue_ = (String) valueNodeValue;
+            if (valueNodeValue instanceof PascalString) {
+                PascalString valueNodeValue_ = (PascalString) valueNodeValue;
                 return root.assignString(frameValue, valueNodeValue_);
             }
             return getNext().execute_(frameValue, valueNodeValue);
@@ -545,6 +525,27 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
 
         static BaseNode_ create(AssignmentNodeGen root) {
             return new AssignStringNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "assignArray(VirtualFrame, PascalArray)", value = AssignmentNode.class)
+    private static final class AssignArrayNode_ extends BaseNode_ {
+
+        AssignArrayNode_(AssignmentNodeGen root) {
+            super(root, 11);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof PascalArray) {
+                PascalArray valueNodeValue_ = (PascalArray) valueNodeValue;
+                return root.assignArray(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignArrayNode_(root);
         }
 
     }

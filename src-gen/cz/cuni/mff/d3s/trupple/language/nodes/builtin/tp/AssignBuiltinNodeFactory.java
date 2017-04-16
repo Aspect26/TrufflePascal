@@ -12,6 +12,7 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
@@ -88,9 +89,9 @@ public final class AssignBuiltinNodeFactory implements NodeFactory<AssignBuiltin
                 Object pathValue = path_.executeGeneric(frameValue);
                 throw unsupported(ex.getResult(), pathValue);
             }
-            String pathValue_;
+            PascalString pathValue_;
             try {
-                pathValue_ = PascalTypesGen.expectString(path_.executeGeneric(frameValue));
+                pathValue_ = PascalTypesGen.expectPascalString(path_.executeGeneric(frameValue));
             } catch (UnexpectedResultException ex) {
                 throw unsupported(fileValue_, ex.getResult());
             }

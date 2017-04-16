@@ -13,6 +13,7 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PCharValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -60,6 +61,13 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
     @Override
     public Node deepCopy() {
         return SpecializationNode.updateRoot(super.deepCopy());
+    }
+
+    private static String expectString(Object value) throws UnexpectedResultException {
+        if (value instanceof String) {
+            return (String) value;
+        }
+        throw new UnexpectedResultException(value);
     }
 
     public static AddNodeTP create(ExpressionNode leftNode, ExpressionNode rightNode) {
@@ -137,11 +145,11 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
                     return Add6Node_.create(root);
                 }
             }
-            if (leftNodeValue instanceof String) {
+            if (leftNodeValue instanceof PascalString) {
                 if (rightNodeValue instanceof Character) {
                     return Add7Node_.create(root);
                 }
-                if (rightNodeValue instanceof String) {
+                if (rightNodeValue instanceof PascalString) {
                     return Add8Node_.create(root);
                 }
             }
@@ -495,7 +503,7 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
             }
             String rightNodeValue_;
             try {
-                rightNodeValue_ = PascalTypesGen.expectString(root.rightNode_.executeGeneric(frameValue));
+                rightNodeValue_ = expectString(root.rightNode_.executeGeneric(frameValue));
             } catch (UnexpectedResultException ex) {
                 return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
             }
@@ -517,7 +525,7 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
         }
 
     }
-    @GeneratedBy(methodName = "add(String, char)", value = AddNodeTP.class)
+    @GeneratedBy(methodName = "add(PascalString, char)", value = AddNodeTP.class)
     private static final class Add7Node_ extends BaseNode_ {
 
         Add7Node_(AddNodeTPNodeGen root) {
@@ -526,9 +534,9 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
 
         @Override
         public Object execute(VirtualFrame frameValue) {
-            String leftNodeValue_;
+            PascalString leftNodeValue_;
             try {
-                leftNodeValue_ = PascalTypesGen.expectString(root.leftNode_.executeGeneric(frameValue));
+                leftNodeValue_ = PascalTypesGen.expectPascalString(root.leftNode_.executeGeneric(frameValue));
             } catch (UnexpectedResultException ex) {
                 Object rightNodeValue = executeRightNode_(frameValue);
                 return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
@@ -544,8 +552,8 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof String && rightNodeValue instanceof Character) {
-                String leftNodeValue_ = (String) leftNodeValue;
+            if (leftNodeValue instanceof PascalString && rightNodeValue instanceof Character) {
+                PascalString leftNodeValue_ = (PascalString) leftNodeValue;
                 char rightNodeValue_ = (char) rightNodeValue;
                 return root.add(leftNodeValue_, rightNodeValue_);
             }
@@ -557,7 +565,7 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
         }
 
     }
-    @GeneratedBy(methodName = "add(String, String)", value = AddNodeTP.class)
+    @GeneratedBy(methodName = "add(PascalString, PascalString)", value = AddNodeTP.class)
     private static final class Add8Node_ extends BaseNode_ {
 
         Add8Node_(AddNodeTPNodeGen root) {
@@ -566,9 +574,9 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof String && rightNodeValue instanceof String) {
-                String leftNodeValue_ = (String) leftNodeValue;
-                String rightNodeValue_ = (String) rightNodeValue;
+            if (leftNodeValue instanceof PascalString && rightNodeValue instanceof PascalString) {
+                PascalString leftNodeValue_ = (PascalString) leftNodeValue;
+                PascalString rightNodeValue_ = (PascalString) rightNodeValue;
                 return root.add(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);

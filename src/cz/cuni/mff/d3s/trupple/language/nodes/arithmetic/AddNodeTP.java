@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.arithmetic;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PCharValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 
 @NodeInfo(shortName = "+")
 public abstract class AddNodeTP extends AddNode {
@@ -19,13 +20,13 @@ public abstract class AddNodeTP extends AddNode {
 	}
 
 	@Specialization
-	protected String add(String left, char right) {
-		return left.concat(new String(new char[] {right}));
+	protected PascalString add(PascalString left, char right) {
+		return left.concatenate(right);
 	}
 
     @Specialization
-    protected String add(String left, String right) {
-        return left.concat(right);
+    protected PascalString add(PascalString left, PascalString right) {
+        return left.concatenate(right);
     }
 
     @Specialization

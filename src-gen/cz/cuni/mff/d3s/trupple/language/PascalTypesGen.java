@@ -6,6 +6,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
@@ -100,18 +101,18 @@ public final class PascalTypesGen extends PascalTypes {
         throw new UnexpectedResultException(value);
     }
 
-    public static boolean isString(Object value) {
-        return value instanceof String;
+    public static boolean isPascalString(Object value) {
+        return value instanceof PascalString;
     }
 
-    public static String asString(Object value) {
-        assert value instanceof String : "PascalTypesGen.asString: String expected";
-        return (String) value;
+    public static PascalString asPascalString(Object value) {
+        assert value instanceof PascalString : "PascalTypesGen.asPascalString: PascalString expected";
+        return (PascalString) value;
     }
 
-    public static String expectString(Object value) throws UnexpectedResultException {
-        if (value instanceof String) {
-            return (String) value;
+    public static PascalString expectPascalString(Object value) throws UnexpectedResultException {
+        if (value instanceof PascalString) {
+            return (PascalString) value;
         }
         throw new UnexpectedResultException(value);
     }

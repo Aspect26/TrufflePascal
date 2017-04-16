@@ -89,13 +89,6 @@ public abstract class AssignmentNode extends ExpressionNode {
     }
 
     @Specialization
-    Object assignArray(VirtualFrame frame, PascalArray array) {
-        PascalArray arrayCopy = (PascalArray) array.createDeepCopy();
-        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, arrayCopy);
-        return arrayCopy;
-    }
-
-    @Specialization
     Object assignSet(VirtualFrame frame, SetTypeValue set) {
         SetTypeValue setCopy = set.createDeepCopy();
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, setCopy);
@@ -134,14 +127,14 @@ public abstract class AssignmentNode extends ExpressionNode {
     }
 
     @Specialization
-    String assignString(VirtualFrame frame, String value) {
+    PascalString assignString(VirtualFrame frame, PascalString value) {
         Object targetObject;
         try {
             targetObject = frame.getObject(getSlot());
         } catch (FrameSlotTypeException e) {
             throw new PascalRuntimeException("Unexpected error");
         }
-        if (targetObject instanceof String) {
+        if (targetObject instanceof PascalString) {
             this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, value);
         } else if (targetObject instanceof PointerValue) {
             PointerValue pointerValue = (PointerValue) targetObject;
@@ -153,9 +146,16 @@ public abstract class AssignmentNode extends ExpressionNode {
         return value;
     }
 
-    private void assignPChar(PointerValue pcharPointer, String value) {
+    @Specialization
+    Object assignArray(VirtualFrame frame, PascalArray array) {
+        PascalArray arrayCopy = (PascalArray) array.createDeepCopy();
+        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, arrayCopy);
+        return arrayCopy;
+    }
+
+    private void assignPChar(PointerValue pcharPointer, PascalString value) {
         PCharValue pchar = (PCharValue) pcharPointer.getDereferenceValue();
-        pchar.assignString(value);
+        pchar.assignString(value.toString());
     }
 
 }

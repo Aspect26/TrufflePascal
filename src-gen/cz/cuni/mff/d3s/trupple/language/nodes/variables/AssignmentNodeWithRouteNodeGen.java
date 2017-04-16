@@ -15,6 +15,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
@@ -153,9 +154,6 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
             if (valueNodeValue instanceof EnumValue) {
                 return WriteEnumNode_.create(root);
             }
-            if (valueNodeValue instanceof PascalArray) {
-                return AssignArrayNode_.create(root);
-            }
             if (valueNodeValue instanceof SetTypeValue) {
                 return AssignSetNode_.create(root);
             }
@@ -168,8 +166,11 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
             if (valueNodeValue instanceof PointerValue) {
                 return AssignPointersNode_.create(root);
             }
-            if (valueNodeValue instanceof String) {
+            if (valueNodeValue instanceof PascalString) {
                 return AssignStringNode_.create(root);
+            }
+            if (valueNodeValue instanceof PascalArray) {
+                return AssignArrayNode_.create(root);
             }
             if (valueNodeValue instanceof VirtualFrame) {
                 return TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_.create(root);
@@ -427,32 +428,11 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
     }
-    @GeneratedBy(methodName = "assignArray(VirtualFrame, PascalArray)", value = AssignmentNodeWithRoute.class)
-    private static final class AssignArrayNode_ extends BaseNode_ {
-
-        AssignArrayNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 6);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
-            if (valueNodeValue instanceof PascalArray) {
-                PascalArray valueNodeValue_ = (PascalArray) valueNodeValue;
-                return root.assignArray(frameValue, valueNodeValue_);
-            }
-            return getNext().execute_(frameValue, valueNodeValue);
-        }
-
-        static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
-            return new AssignArrayNode_(root);
-        }
-
-    }
     @GeneratedBy(methodName = "assignSet(VirtualFrame, SetTypeValue)", value = AssignmentNodeWithRoute.class)
     private static final class AssignSetNode_ extends BaseNode_ {
 
         AssignSetNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 7);
+            super(root, 6);
         }
 
         @Override
@@ -473,7 +453,7 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
     private static final class AssignRecordNode_ extends BaseNode_ {
 
         AssignRecordNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 8);
+            super(root, 7);
         }
 
         @Override
@@ -494,7 +474,7 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
     private static final class AssignReferenceNode_ extends BaseNode_ {
 
         AssignReferenceNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 9);
+            super(root, 8);
         }
 
         @Override
@@ -515,7 +495,7 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
     private static final class AssignPointersNode_ extends BaseNode_ {
 
         AssignPointersNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 10);
+            super(root, 9);
         }
 
         @Override
@@ -532,17 +512,17 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
     }
-    @GeneratedBy(methodName = "assignString(VirtualFrame, String)", value = AssignmentNodeWithRoute.class)
+    @GeneratedBy(methodName = "assignString(VirtualFrame, PascalString)", value = AssignmentNodeWithRoute.class)
     private static final class AssignStringNode_ extends BaseNode_ {
 
         AssignStringNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 11);
+            super(root, 10);
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
-            if (valueNodeValue instanceof String) {
-                String valueNodeValue_ = (String) valueNodeValue;
+            if (valueNodeValue instanceof PascalString) {
+                PascalString valueNodeValue_ = (PascalString) valueNodeValue;
                 return root.assignString(frameValue, valueNodeValue_);
             }
             return getNext().execute_(frameValue, valueNodeValue);
@@ -550,6 +530,27 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
             return new AssignStringNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "assignArray(VirtualFrame, PascalArray)", value = AssignmentNodeWithRoute.class)
+    private static final class AssignArrayNode_ extends BaseNode_ {
+
+        AssignArrayNode_(AssignmentNodeWithRouteNodeGen root) {
+            super(root, 11);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof PascalArray) {
+                PascalArray valueNodeValue_ = (PascalArray) valueNodeValue;
+                return root.assignArray(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
+            return new AssignArrayNode_(root);
         }
 
     }

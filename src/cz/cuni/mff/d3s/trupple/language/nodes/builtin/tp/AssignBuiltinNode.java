@@ -5,6 +5,7 @@ import com.oracle.truffle.api.dsl.NodeChildren;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
@@ -18,8 +19,8 @@ public abstract class AssignBuiltinNode extends BuiltinNode {
     }
 
     @Specialization
-    Object assignFile(FileValue file, String filePath) {
-        file.assignFilePath(filePath);
+    Object assignFile(FileValue file, PascalString filePath) {
+        file.assignFilePath(filePath.toString());
         return file;
     }
 }
