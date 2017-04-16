@@ -66,7 +66,7 @@ public class NodeFactory {
     private final Map<String, BuiltinUnit> builtinUnits = new HashMap<String, BuiltinUnit>(){{
         put("crt", new CrtBuiltinUnit());
         put("dos", new DosBuiltinUnit());
-        put("string", new StringBuiltinUnit());
+        put("stringscorejava", new StringBuiltinUnit());
         put("graphcorejava", new GraphBuiltinUnit());
     }};
 

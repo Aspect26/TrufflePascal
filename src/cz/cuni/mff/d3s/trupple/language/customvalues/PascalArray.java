@@ -1,57 +1,15 @@
 package cz.cuni.mff.d3s.trupple.language.customvalues;
 
-public class PascalArray {
-	private final Object[] data;
-	private final PascalOrdinal ordinalSource;
-	
-	public PascalArray(PascalOrdinal ordinalSource, Object[] data) {
-		this.ordinalSource = ordinalSource;
-		this.data = data;
-	}
-	
-	private Object getValueAt(Object index) {
-        // TODO: throw custom exception at array index out of range
-		int realIndex = ordinalSource.getRealIndex(index);
-		return data[realIndex];
-	}
+public interface PascalArray {
 
-	public Object getValueAt(Object[] indexes) {
-        Object value = this;
+    Object getValueAt(Object index);
 
-        for (Object index : indexes) {
-            value = ((PascalArray) value).getValueAt(index);
-        }
+    Object getValueAt(Object[] indexes);
 
-        return value;
-    }
-	
-	private void setValueAt(Object index, Object value) {
-		// TODO: throw custom exception at array index out of range
-        this.data[ordinalSource.getRealIndex(index)] = value;
-	}
+    void setValueAt(Object index, Object value);
 
-	public void setValueAt(Object[] indexes, Object value) {
-        PascalArray innerArray = this;
+    void setValueAt(Object[] indexes, Object value);
 
-        for (int i = 0; i < indexes.length - 1; ++i) {
-            Object index = indexes[i];
-            innerArray = (PascalArray) innerArray.getValueAt(index);
-        }
+    Object createDeepCopy();
 
-        innerArray.setValueAt(indexes[indexes.length - 1], value);
-    }
-	
-	public PascalArray createDeepCopy() {
-		Object[] dataCopy = new Object[this.data.length];
-
-        if (this.data[0] instanceof PascalArray) {
-            for (int i = 0; i < dataCopy.length; ++i) {
-                dataCopy[i] = ((PascalArray)this.data[i]).createDeepCopy();
-            }
-        } else {
-            System.arraycopy(this.data, 0, dataCopy, 0, this.data.length);
-        }
-
-		return new PascalArray(this.ordinalSource, dataCopy);
-	}
 }
