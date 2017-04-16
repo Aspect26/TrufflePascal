@@ -8,13 +8,9 @@ import com.sun.istack.internal.NotNull;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.*;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.DosBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.crt.CrtBuiltinUnit;
+import cz.cuni.mff.d3s.trupple.language.builtinunits.strings.StringBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.graph.GraphBuiltinUnit;
-import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.NopNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
@@ -72,7 +68,7 @@ public class NodeFactory {
     private final Map<String, BuiltinUnit> builtinUnits = new HashMap<String, BuiltinUnit>(){{
         put("crt", new CrtBuiltinUnit());
         put("dos", new DosBuiltinUnit());
-        put("string", new StringBuiltinUnit());
+        put("stringscorejava", new StringBuiltinUnit());
         put("graphcorejava", new GraphBuiltinUnit());
     }};
 
@@ -730,7 +726,7 @@ public class NodeFactory {
     public String createStringFromToken(Token t) {
         String literal = t.val;
         literal = literal.substring(1, literal.length() - 1);
-        literal = literal.replaceAll("''", "'");
+        literal = this.getPascalUnescapedString(literal);
         return literal;
     }
 
@@ -828,6 +824,15 @@ public class NodeFactory {
 
     public void setScope(LexicalScope scope) {
 	    this.currentLexicalScope = scope;
+    }
+
+    private String getPascalUnescapedString(String str) {
+	    String result = str;
+        result = result.replaceAll("''", "'");
+        result = result.replaceAll("\\\\0", String.valueOf('\0'));
+        result = result.replaceAll("\\\\n", String.valueOf('\n'));
+
+        return result;
     }
 
 

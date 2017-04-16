@@ -4,7 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +62,21 @@ public abstract class JUnitTest {
 
 	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
                         boolean extendedGotoSupport) {
+	    List<String> importsWithBuiltin = new ArrayList<>();
+        importsWithBuiltin.add(getStringsUnit());
+        importsWithBuiltin.addAll(imports);
 		setUpStreams();
-		PascalLanguage.startFromCodes(sourceCode, imports, useTPExtension, extendedGotoSupport);
+		PascalLanguage.startFromCodes(sourceCode, importsWithBuiltin, useTPExtension, extendedGotoSupport);
 		assertEquals(expectedOutput, output.toString() + error.toString());
 	}
+
+	private String getStringsUnit() {
+        byte[] encoded;
+        try {
+            encoded = Files.readAllBytes(Paths.get("./builtinunits/strings.pas"));
+        } catch (IOException e) {
+            throw new RuntimeException("Could not read strings unit");
+        }
+        return new String(encoded);
+    }
 }

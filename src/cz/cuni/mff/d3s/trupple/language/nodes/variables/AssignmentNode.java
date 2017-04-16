@@ -10,6 +10,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 
 @NodeChild("valueNode")
 @NodeField(name = "slot", type = FrameSlot.class)
@@ -89,7 +90,7 @@ public abstract class AssignmentNode extends ExpressionNode {
 
     @Specialization
     Object assignArray(VirtualFrame frame, PascalArray array) {
-        PascalArray arrayCopy = array.createDeepCopy();
+        PascalArray arrayCopy = (PascalArray) array.createDeepCopy();
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, arrayCopy);
         return arrayCopy;
     }
@@ -134,8 +135,27 @@ public abstract class AssignmentNode extends ExpressionNode {
 
     @Specialization
     String assignString(VirtualFrame frame, String value) {
-        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, value);
+        Object targetObject;
+        try {
+            targetObject = frame.getObject(getSlot());
+        } catch (FrameSlotTypeException e) {
+            throw new PascalRuntimeException("Unexpected error");
+        }
+        if (targetObject instanceof String) {
+            this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, value);
+        } else if (targetObject instanceof PointerValue) {
+            PointerValue pointerValue = (PointerValue) targetObject;
+            if (pointerValue.getType() instanceof PCharDesriptor) {
+                assignPChar(pointerValue, value);
+            }
+        }
+
         return value;
+    }
+
+    private void assignPChar(PointerValue pcharPointer, String value) {
+        PCharValue pchar = (PCharValue) pcharPointer.getDereferenceValue();
+        pchar.assignString(value);
     }
 
 }

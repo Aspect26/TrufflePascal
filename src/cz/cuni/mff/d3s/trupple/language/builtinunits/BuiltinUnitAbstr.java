@@ -2,8 +2,10 @@ package cz.cuni.mff.d3s.trupple.language.builtinunits;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
 import java.util.List;
+import java.util.Map;
 
 public abstract class BuiltinUnitAbstr implements BuiltinUnit {
 
