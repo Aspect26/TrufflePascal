@@ -10,6 +10,15 @@ public class PCharValue implements PascalArray {
         data = "\0";
     }
 
+    public PCharValue(long size) {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < size - 1; ++i) {
+            str.append(' ');
+        }
+        str.append('\0');
+        this.data = str.toString();
+    }
+
     private PCharValue(PCharValue source) {
         this.data = source.data;
     }
