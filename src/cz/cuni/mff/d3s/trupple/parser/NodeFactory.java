@@ -724,7 +724,7 @@ public class NodeFactory {
     public String createStringFromToken(Token t) {
         String literal = t.val;
         literal = literal.substring(1, literal.length() - 1);
-        literal = literal.replaceAll("''", "'");
+        literal = this.getPascalUnescapedString(literal);
         return literal;
     }
 
@@ -823,6 +823,15 @@ public class NodeFactory {
 
     public void setScope(LexicalScope scope) {
 	    this.currentLexicalScope = scope;
+    }
+
+    private String getPascalUnescapedString(String str) {
+	    String result = str;
+        result = result.replaceAll("''", "'");
+        result = result.replaceAll("\\\\0", String.valueOf('\0'));
+        result = result.replaceAll("\\\\n", String.valueOf('\n'));
+
+        return result;
     }
 
 
