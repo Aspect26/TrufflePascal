@@ -12,6 +12,7 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PCharValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -143,6 +144,9 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
                 if (rightNodeValue instanceof String) {
                     return Add8Node_.create(root);
                 }
+            }
+            if (leftNodeValue instanceof PCharValue && rightNodeValue instanceof PCharValue) {
+                return Add9Node_.create(root);
             }
             return null;
         }
@@ -572,6 +576,28 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
 
         static BaseNode_ create(AddNodeTPNodeGen root) {
             return new Add8Node_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "add(PCharValue, PCharValue)", value = AddNodeTP.class)
+    private static final class Add9Node_ extends BaseNode_ {
+
+        Add9Node_(AddNodeTPNodeGen root) {
+            super(root, 10);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
+            if (leftNodeValue instanceof PCharValue && rightNodeValue instanceof PCharValue) {
+                PCharValue leftNodeValue_ = (PCharValue) leftNodeValue;
+                PCharValue rightNodeValue_ = (PCharValue) rightNodeValue;
+                return root.add(leftNodeValue_, rightNodeValue_);
+            }
+            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
+        }
+
+        static BaseNode_ create(AddNodeTPNodeGen root) {
+            return new Add9Node_(root);
         }
 
     }

@@ -23,6 +23,10 @@ public class PCharValue implements PascalArray {
         this.data = source.data;
     }
 
+    private PCharValue(String data) {
+        this.data = data;
+    }
+
     public void assignString(String value) {
         this.data = value + "\0";
     }
@@ -65,6 +69,15 @@ public class PCharValue implements PascalArray {
         if (index >= this.data.length()) {
             throw new IndexOutOfBoundsException();
         }
+    }
+
+    public static PCharValue concat(PCharValue left, PCharValue right) {
+        StringBuilder newData = new StringBuilder();
+        newData.append(left.data);
+        newData.deleteCharAt(newData.length() - 1);
+        newData.append(right.data);
+
+        return new PCharValue(newData.toString());
     }
 
 }

@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.arithmetic;
 
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
+import cz.cuni.mff.d3s.trupple.language.customvalues.PCharValue;
 
 @NodeInfo(shortName = "+")
 public abstract class AddNodeTP extends AddNode {
@@ -25,6 +26,11 @@ public abstract class AddNodeTP extends AddNode {
     @Specialization
     protected String add(String left, String right) {
         return left.concat(right);
+    }
+
+    @Specialization
+    protected PCharValue add(PCharValue left, PCharValue right) {
+	    return PCharValue.concat(left, right);
     }
 
 }
