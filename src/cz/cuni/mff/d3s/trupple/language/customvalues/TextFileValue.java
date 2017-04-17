@@ -92,7 +92,7 @@ public class TextFileValue implements FileValue {
         try {
             this.input = new Scanner(new File(this.filePath));
             this.input.useDelimiter("(?<=.)");
-            this.bufferLine();
+            this.bufferLine(false);
         } catch (FileNotFoundException e) {
             throw new cz.cuni.mff.d3s.trupple.language.runtime.exceptions.FileNotFoundException(this.filePath);
         }
@@ -111,10 +111,17 @@ public class TextFileValue implements FileValue {
     }
 
     private void bufferLine() {
+        this.bufferLine(true);
+    }
+
+    private void bufferLine(boolean prependNewline) {
         try {
             String newLine = this.input.nextLine();
+            if (prependNewline) {
+                newLine = String.format("%n" + newLine);
+            }
             this.inputLine = new Scanner(newLine);
-            this.inputLine.useDelimiter("(?<=.)");
+            this.inputLine.useDelimiter("");
         } catch (NoSuchElementException e) {
             this.inputLine = null;
         }

@@ -76,8 +76,8 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call(arguments);
 	}
 
-	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension,
-                                      boolean extendedGotoSupport) {
+	public static void startFromCodes(String sourceCode, String[] programArguments, List<String> imports,
+                                      boolean useTPExtension, boolean extendedGotoSupport) {
         IParser parser = (useTPExtension)? new Parser(extendedGotoSupport) :
                 new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
 
@@ -95,7 +95,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
         }
 
         // TODO: arguments may be passed here
-        Object[] arguments = createArguments(new Object[0], parser);
+        Object[] arguments = createArguments(programArguments, parser);
 		Truffle.getRuntime().createCallTarget(parser.getRootNode()).call(arguments);
 	}
 

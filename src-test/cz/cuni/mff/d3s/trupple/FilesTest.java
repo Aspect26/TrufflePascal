@@ -2,10 +2,6 @@ package cz.cuni.mff.d3s.trupple;
 
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 public class FilesTest extends JUnitTest {
 
     @Test
@@ -132,14 +128,6 @@ public class FilesTest extends JUnitTest {
         String output = "Not dead which eternal lie";
         test(code, output, true);
         this.cleanupFile("out.txt");
-    }
-
-    private void cleanupFile(String filePath) {
-        try {
-            Files.delete(Paths.get(filePath));
-        } catch (IOException e) {
-            System.out.println("Could not cleanup test file: " + filePath);
-        }
     }
 
 }

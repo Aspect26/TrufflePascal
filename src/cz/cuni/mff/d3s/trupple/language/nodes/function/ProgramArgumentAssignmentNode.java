@@ -29,7 +29,7 @@ public class ProgramArgumentAssignmentNode extends StatementNode{
     public ProgramArgumentAssignmentNode(FrameSlot targetSlot, TypeDescriptor variableType, int argumentNumber) {
         this.targetSlot = targetSlot;
         this.variableType = variableType;
-        this.argumentNumber = argumentNumber;
+        this.argumentNumber = argumentNumber + 1; // NOTE: the +1 is because first argument is always parent's frame
     }
 
     public static boolean supportsType(TypeDescriptor type) {

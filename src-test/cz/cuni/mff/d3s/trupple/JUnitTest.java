@@ -62,13 +62,18 @@ public abstract class JUnitTest {
 
 	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
                         boolean extendedGotoSupport) {
-	    List<String> importsWithBuiltin = new ArrayList<>();
+	    this.test(sourceCode, imports, expectedOutput, useTPExtension, extendedGotoSupport, new String[0]);
+	}
+
+	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
+                        boolean extendedGotoSupport, String[] arguments) {
+        List<String> importsWithBuiltin = new ArrayList<>();
         importsWithBuiltin.add(getStringsUnit());
         importsWithBuiltin.addAll(imports);
-		setUpStreams();
-		PascalLanguage.startFromCodes(sourceCode, importsWithBuiltin, useTPExtension, extendedGotoSupport);
-		assertEquals(expectedOutput, output.toString() + error.toString());
-	}
+        setUpStreams();
+        PascalLanguage.startFromCodes(sourceCode, arguments, importsWithBuiltin, useTPExtension, extendedGotoSupport);
+        assertEquals(expectedOutput, output.toString() + error.toString());
+    }
 
 	private String getStringsUnit() {
         byte[] encoded;
@@ -79,4 +84,13 @@ public abstract class JUnitTest {
         }
         return new String(encoded);
     }
+
+    void cleanupFile(String filePath) {
+        try {
+            Files.delete(Paths.get(filePath));
+        } catch (IOException e) {
+            System.out.println("Could not cleanup test file: " + filePath);
+        }
+    }
+
 }
