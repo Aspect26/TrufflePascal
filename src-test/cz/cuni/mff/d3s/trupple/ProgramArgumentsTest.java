@@ -56,4 +56,25 @@ public class ProgramArgumentsTest extends JUnitTest {
 
     }
 
+    @Test
+    public void stringProgramArgumentsTest() {
+        String arg1 = "I've got a jar of dirt!";
+        String arg2 = "Did everyone see that? Because I will not be doing it again.";
+        String arg3 = "Not all treasure’s silver and gold, mate.";
+
+        String source = "program copy(str1, str2, str3);\n"+
+                "var str1, str2, str3: string;\n"+
+                "\n"+
+                "begin\n"+
+                " writeln(str1);\n"+
+                " writeln(str2);\n"+
+                " writeln(str3);\n"+
+                "end.";
+
+        String output = String.format(arg1 + "%n" + arg2 + "%n" + arg3 + "%n");
+
+        this.test(source, Collections.emptyList(), output, true, false,
+                new String[] {arg1, arg2, arg3});
+    }
+
 }
