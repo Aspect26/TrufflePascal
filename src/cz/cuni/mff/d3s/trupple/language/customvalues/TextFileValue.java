@@ -4,6 +4,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.EndOfFileException;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.FileNotAssignedPathException;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.NotOpenedToReadException;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.NotOpenedToWriteException;
+import org.omg.CORBA.Environment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,6 +54,14 @@ public class TextFileValue implements FileValue {
     }
 
     @Override
+    public void writeln(Object[] values) {
+        for (Object value : values) {
+            this.write(value);
+        }
+        this.write(String.format("%n"));
+    }
+
+    @Override
     public void assignFilePath(String path) {
         filePath = path;
     }
@@ -72,7 +81,7 @@ public class TextFileValue implements FileValue {
 
     @Override
     public boolean eol() {
-        return !this.inputLine.hasNext();
+        return inputLine == null || !this.inputLine.hasNext();
     }
 
     @Override

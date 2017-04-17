@@ -8,6 +8,8 @@ public interface FileValue {
 
     void write(Object[] values);
 
+    void writeln(Object[] values);
+
     void assignFilePath(String path);
 
     boolean eof();

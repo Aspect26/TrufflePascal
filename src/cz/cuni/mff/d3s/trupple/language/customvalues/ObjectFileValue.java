@@ -40,6 +40,11 @@ public class ObjectFileValue implements FileValue {
     }
 
     @Override
+    public void writeln(Object[] values) {
+        this.write(values);
+    }
+
+    @Override
     public void assignFilePath(String filePath) {
         this.filePath = filePath;
     }

@@ -1,11 +1,13 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.builtin.io;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
+import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
@@ -22,41 +24,19 @@ public abstract class WritelnBuiltinNode extends BuiltinNode {
         return this.context;
     }
 
-	// TODO: specializations
+    @Specialization
+    public Object writeln(Object[] values) {
+        if (values[0] instanceof FileValue) {
+            FileValue file = (FileValue) values[0];
+            Object[] arguments = Arrays.copyOfRange(values, 1, values.length);
+            file.writeln(arguments);
+        } else {
+            doWriteln(getContext().getOutput(), values);
+        }
 
-	@Specialization
-	public String writeln(String... arguments) {
-		doWriteln(getContext().getOutput(), arguments);
-        return "";
-	}
-
-	@TruffleBoundary
-	private static void doWriteln(PrintStream out, String[] arguments) {
-		for (String agument : arguments)
-			out.print(agument);
-
-		out.println();
-	}
-
-	@Specialization
-	public long writeln(long... arguments) {
-		doWriteln(getContext().getOutput(), arguments);
-        return 0;
-	}
-
-	@TruffleBoundary
-	private static void doWriteln(PrintStream out, long... arguments) {
-		for (long agument : arguments)
-			out.print(agument);
-
-		out.println();
-	}
-
-	@Specialization
-	public Object writeln(Object... arguments) {
-		doWriteln(getContext().getOutput(), arguments);
-        return new Object();
-	}
+        // TODO: this return value
+        return values[0];
+    }
 
 	@TruffleBoundary
 	private static void doWriteln(PrintStream out, Object... arguments) {
@@ -65,4 +45,5 @@ public abstract class WritelnBuiltinNode extends BuiltinNode {
 
 		out.println();
 	}
+
 }
