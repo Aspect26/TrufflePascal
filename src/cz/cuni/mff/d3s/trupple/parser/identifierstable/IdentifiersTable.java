@@ -215,6 +215,10 @@ public class IdentifiersTable {
         return this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
+    public FrameSlot addReturnVariable(String identifier, TypeDescriptor returnTypeDescriptor) throws LexicalException {
+        return this.registerNewIdentifier(identifier, new ReturnTypeDescriptor(returnTypeDescriptor));
+    }
+
     public void addConstant(String identifier, ConstantDescriptor descriptor) throws LexicalException {
         this.registerNewIdentifier(identifier, descriptor);
     }

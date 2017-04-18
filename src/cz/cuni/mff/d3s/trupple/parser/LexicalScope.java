@@ -20,6 +20,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDesc
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ReturnTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
 import java.util.*;
 
@@ -143,7 +144,11 @@ public class LexicalScope {
     }
 
     boolean containsLocalIdentifier(String identifier) {
-        return this.localIdentifiers.containsIdentifier(identifier);
+        return this.localIdentifiers.containsIdentifier(identifier) && !(this.localIdentifiers.getIdentifierDescriptor(identifier) instanceof ReturnTypeDescriptor);
+    }
+
+    boolean containsReturnType(String identifier) {
+        return this.localIdentifiers.containsIdentifier(identifier) && (this.localIdentifiers.getIdentifierDescriptor(identifier) instanceof ReturnTypeDescriptor);
     }
 
     FrameSlot registerReferenceVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
@@ -152,6 +157,10 @@ public class LexicalScope {
 
     FrameSlot registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         return this.localIdentifiers.addVariable(identifier, typeDescriptor);
+    }
+
+    FrameSlot registerReturnVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        return this.localIdentifiers.addReturnVariable(identifier, typeDescriptor);
     }
 
     void addScopeArgument(StatementNode initializationNode) {

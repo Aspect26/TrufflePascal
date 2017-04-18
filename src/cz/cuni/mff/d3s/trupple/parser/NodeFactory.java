@@ -136,11 +136,12 @@ public class NodeFactory {
         }
     }
 
-    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException, T notFoundReturnValue) {
+    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException,
+                           T notFoundReturnValue, boolean withReturnType) {
 	    assert notFoundException != null;
 
 	    try {
-            T result = lookupToParentScope(identifier, lookupFunction);
+            T result = lookupToParentScope(identifier, lookupFunction, withReturnType);
             if (result == null) {
                 result = lookupInUnits(identifier, lookupFunction);
             }
@@ -154,18 +155,27 @@ public class NodeFactory {
         }
     }
 
+    // TODO: remove this notfoundexception -> it is always unknown identifier exception
+    // TODO: remove not found return value -> always null
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException) {
-	    return this.doLookup(identifier, lookupFunction, notFoundException, null);
+	    return this.doLookup(identifier, lookupFunction, notFoundException, null, false);
     }
 
-    private <T> T lookupToParentScope(String identifier, GlobalObjectLookup<T> lookupFunction) throws LexicalException {
+    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException, boolean withReturnType) {
+        return this.doLookup(identifier, lookupFunction, notFoundException, null, withReturnType);
+    }
+
+    private <T> T lookupToParentScope(String identifier, GlobalObjectLookup<T> lookupFunction, boolean withReturnType) throws LexicalException {
         LexicalScope currentLexicalScope = this.lexicalScope;
         while (currentLexicalScope != null) {
             if (currentLexicalScope.containsLocalIdentifier(identifier)){
                 return lookupFunction.onFound(currentLexicalScope, identifier);
+            } else if (withReturnType && currentLexicalScope.containsReturnType(identifier)) {
+                return lookupFunction.onFound(currentLexicalScope, identifier);
             } else {
                 currentLexicalScope = currentLexicalScope.getOuterScope();
             }
+            withReturnType = false; // NOTE: return variable may be only in current scope
         }
 
         return null;
@@ -188,7 +198,7 @@ public class NodeFactory {
 
     public TypeDescriptor getTypeDescriptor(Token identifierToken) {
         String identifier = this.getTypeNameFromToken(identifierToken);
-        return this.doLookup(identifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(identifier), UnknownDescriptor.SINGLETON);
+        return this.doLookup(identifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(identifier));
     }
 
     public void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
@@ -399,7 +409,7 @@ public class NodeFactory {
         try {
             lexicalScope.registerFunctionInterfaceIfNotForwarded(identifier, heading.formalParameters, heading.returnTypeDescriptor);
             lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
-            lexicalScope.registerLocalVariable(lexicalScope.getName(), heading.returnTypeDescriptor);
+            lexicalScope.registerReturnVariable(lexicalScope.getName(), heading.returnTypeDescriptor);
             this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
@@ -592,14 +602,14 @@ public class NodeFactory {
 
     public AccessNode createSimpleAccessNode(Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
-	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(identifier));
+	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(identifier), true);
 
 	    return new SimpleAccessNode(frameSlot);
     }
 
     public ExpressionNode createAssignmentWithRoute(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
-        FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier));
+        FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier), true);
 
         // TODO: check if it is assignable
         return AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
@@ -909,7 +919,7 @@ public class NodeFactory {
                 lexicalScope.forwardFunction(identifier, formalParameters, returnTypeDescriptor);
             }
             lexicalScope = new LexicalScope(lexicalScope, identifier, parser.isUsingTPExtension());
-            lexicalScope.registerLocalVariable(lexicalScope.getName(), returnTypeDescriptor);
+            lexicalScope.registerReturnVariable(lexicalScope.getName(), returnTypeDescriptor);
             this.addParameterIdentifiersToLexicalScope(formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
