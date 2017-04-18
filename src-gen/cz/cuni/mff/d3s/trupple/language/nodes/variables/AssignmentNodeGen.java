@@ -19,6 +19,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 
 @GeneratedBy(AssignmentNode.class)
 public final class AssignmentNodeGen extends AssignmentNode implements SpecializedNode {
@@ -161,6 +162,9 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             }
             if (valueNodeValue instanceof PointerValue) {
                 return AssignPointersNode_.create(root);
+            }
+            if (valueNodeValue instanceof PascalFunction) {
+                return AssignSubroutineNode_.create(root);
             }
             if (valueNodeValue instanceof String) {
                 return AssignStringNode_.create(root);
@@ -502,11 +506,32 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         }
 
     }
+    @GeneratedBy(methodName = "assignSubroutine(VirtualFrame, PascalFunction)", value = AssignmentNode.class)
+    private static final class AssignSubroutineNode_ extends BaseNode_ {
+
+        AssignSubroutineNode_(AssignmentNodeGen root) {
+            super(root, 10);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof PascalFunction) {
+                PascalFunction valueNodeValue_ = (PascalFunction) valueNodeValue;
+                return root.assignSubroutine(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignSubroutineNode_(root);
+        }
+
+    }
     @GeneratedBy(methodName = "assignString(VirtualFrame, String)", value = AssignmentNode.class)
     private static final class AssignStringNode_ extends BaseNode_ {
 
         AssignStringNode_(AssignmentNodeGen root) {
-            super(root, 10);
+            super(root, 11);
         }
 
         @Override
