@@ -14,7 +14,6 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,13 +38,13 @@ public final class SqrBuiltinNodeFactory implements NodeFactory<SqrBuiltinNode> 
 
     @Override
     public List getNodeSignatures() {
-        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode.class));
+        return Arrays.asList(Arrays.asList(ExpressionNode.class));
     }
 
     @Override
     public SqrBuiltinNode createNode(Object... arguments) {
-        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
-            return create((PascalContext) arguments[0], (ExpressionNode) arguments[1]);
+        if (arguments.length == 1 && (arguments[0] == null || arguments[0] instanceof ExpressionNode)) {
+            return create((ExpressionNode) arguments[0]);
         } else {
             throw new IllegalArgumentException("Invalid create signature.");
         }
@@ -58,8 +57,8 @@ public final class SqrBuiltinNodeFactory implements NodeFactory<SqrBuiltinNode> 
         return instance;
     }
 
-    public static SqrBuiltinNode create(PascalContext context, ExpressionNode argument) {
-        return new SqrBuiltinNodeGen(context, argument);
+    public static SqrBuiltinNode create(ExpressionNode argument) {
+        return new SqrBuiltinNodeGen(argument);
     }
 
     @GeneratedBy(SqrBuiltinNode.class)
@@ -69,8 +68,7 @@ public final class SqrBuiltinNodeFactory implements NodeFactory<SqrBuiltinNode> 
         @CompilationFinal private Class<?> argumentType_;
         @Child private BaseNode_ specialization_;
 
-        private SqrBuiltinNodeGen(PascalContext context, ExpressionNode argument) {
-            super(context);
+        private SqrBuiltinNodeGen(ExpressionNode argument) {
             this.argument_ = argument;
             this.specialization_ = UninitializedNode_.create(this);
         }

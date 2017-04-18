@@ -12,10 +12,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class OrdBuiltinNode extends BuiltinNode {
 
-    public OrdBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     public long ord(long value) {
         return value;

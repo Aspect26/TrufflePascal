@@ -12,10 +12,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "file", type = ExpressionNode.class)
 public abstract class RewriteBuiltinNode extends BuiltinNode {
 
-    public RewriteBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     Object rewrite(FileValue file) {
         file.openToWrite();

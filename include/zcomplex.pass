@@ -1,0 +1,23 @@
+UNIT zcomplex;
+
+uses math;
+
+INTERFACE
+
+type complexInteger = record
+    r,i: integer;
+end;
+
+function addComplex(a,b: complexInteger): complexInteger;
+
+IMPLEMENTATION
+
+function addComplex(a,b: complexInteger): complexInteger;
+var result: complexInteger;
+begin
+    result.r := add(a.r, b.r);
+    result.i := add(a.i, b.i);
+    addComplex := result;
+end;
+
+END.

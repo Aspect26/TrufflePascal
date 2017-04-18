@@ -12,10 +12,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class SuccBuiltinNode extends BuiltinNode {
 
-    public SuccBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     public long succ(long value) {
         return ++value;

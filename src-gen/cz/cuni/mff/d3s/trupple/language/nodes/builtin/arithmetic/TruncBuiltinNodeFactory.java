@@ -12,7 +12,6 @@ import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,13 +36,13 @@ public final class TruncBuiltinNodeFactory implements NodeFactory<TruncBuiltinNo
 
     @Override
     public List getNodeSignatures() {
-        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode.class));
+        return Arrays.asList(Arrays.asList(ExpressionNode.class));
     }
 
     @Override
     public TruncBuiltinNode createNode(Object... arguments) {
-        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
-            return create((PascalContext) arguments[0], (ExpressionNode) arguments[1]);
+        if (arguments.length == 1 && (arguments[0] == null || arguments[0] instanceof ExpressionNode)) {
+            return create((ExpressionNode) arguments[0]);
         } else {
             throw new IllegalArgumentException("Invalid create signature.");
         }
@@ -56,8 +55,8 @@ public final class TruncBuiltinNodeFactory implements NodeFactory<TruncBuiltinNo
         return instance;
     }
 
-    public static TruncBuiltinNode create(PascalContext context, ExpressionNode argument) {
-        return new TruncBuiltinNodeGen(context, argument);
+    public static TruncBuiltinNode create(ExpressionNode argument) {
+        return new TruncBuiltinNodeGen(argument);
     }
 
     @GeneratedBy(TruncBuiltinNode.class)
@@ -66,8 +65,7 @@ public final class TruncBuiltinNodeFactory implements NodeFactory<TruncBuiltinNo
         @Child private ExpressionNode argument_;
         @CompilationFinal private boolean seenUnsupported0;
 
-        private TruncBuiltinNodeGen(PascalContext context, ExpressionNode argument) {
-            super(context);
+        private TruncBuiltinNodeGen(ExpressionNode argument) {
             this.argument_ = argument;
         }
 

@@ -11,10 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class CosBuiltinNode extends BuiltinNode {
 
-    public CosBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     double integerCosValue(long value) {
         return Math.cos(value);

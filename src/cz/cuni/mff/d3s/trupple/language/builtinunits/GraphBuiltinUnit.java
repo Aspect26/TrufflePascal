@@ -5,10 +5,10 @@ import java.util.List;
 
 public class GraphBuiltinUnit extends BuiltinUnitAbstr {
 
-    private final List<UnitFunctionData> data = new ArrayList<>();
+    private final List<UnitSubroutineData> data = new ArrayList<>();
 
     @Override
-    protected List<UnitFunctionData> getIdentifiers() {
+    protected List<UnitSubroutineData> getIdentifiers() {
         return this.data;
     }
 

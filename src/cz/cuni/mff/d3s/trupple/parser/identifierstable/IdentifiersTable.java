@@ -4,6 +4,8 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
@@ -20,6 +22,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.*;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -74,30 +77,34 @@ public class IdentifiersTable {
     }
 
     protected void addBuiltinFunctions() {
-        identifiersMap.put("write", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
-        identifiersMap.put("read", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
-        identifiersMap.put("writeln", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
-        identifiersMap.put("readln", new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin());
-        identifiersMap.put("put", new BuiltinProcedureDescriptor.NotSupportedSubroutine());
-        identifiersMap.put("succ", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
-        identifiersMap.put("pred", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
-        identifiersMap.put("abs", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("sqr", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("sin", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("cos", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("exp", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("ln", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("sqrt", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("arctan", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("trunc", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("round", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("new", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("dispose", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("rewrite", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("reset", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("eof", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("chr", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
-        identifiersMap.put("ord", new BuiltinProcedureDescriptor.OneArgumentBuiltin());
+        try {
+            this.registerNewIdentifier("write", new WriteSubroutineDescriptor());
+            this.registerNewIdentifier("writeln", new WritelnSubroutineDescriptor());
+            this.registerNewIdentifier("read", new ReadSubroutineDescriptor());
+            this.registerNewIdentifier("readln", new ReadlnSubroutineDescriptor());
+            this.registerNewIdentifier("abs", new AbsSubroutineDescriptor());
+            this.registerNewIdentifier("sqr", new SqrSubroutineDescriptor());
+            this.registerNewIdentifier("sin", new SinSubroutineDescriptor());
+            this.registerNewIdentifier("cos", new CosSubroutineDescriptor());
+            this.registerNewIdentifier("exp", new ExpSubroutineDescriptor());
+            this.registerNewIdentifier("sqrt", new SqrtSubroutineDescriptor());
+            this.registerNewIdentifier("ln", new LnSubroutineDescriptor());
+            this.registerNewIdentifier("arctan", new ArctanSubroutineDescriptor());
+            this.registerNewIdentifier("trunc", new TruncSubroutineDescriptor());
+            this.registerNewIdentifier("round", new RoundSubroutineDescriptor());
+            this.registerNewIdentifier("new", new NewSubroutineDescriptor());
+            this.registerNewIdentifier("dispose", new DisposeSubroutineDescriptor());
+            this.registerNewIdentifier("succ", new SuccSubroutineDescriptor());
+            this.registerNewIdentifier("pred", new PredSubroutineDescriptor());
+            this.registerNewIdentifier("rewrite", new RewriteSubroutineDescriptor());
+            this.registerNewIdentifier("reset", new ResetSubroutineDescriptor());
+            this.registerNewIdentifier("chr", new ChrSubroutineDescriptor());
+            this.registerNewIdentifier("ord", new OrdSubroutineDescriptor());
+            this.registerNewIdentifier("eof", new EofSubroutineDescriptor());
+            this.registerNewIdentifier("put", new BuiltinProcedureDescriptor.NotSupportedSubroutine());
+        } catch (LexicalException e) {
+            // TODO: inform
+        }
     }
 
     public FrameSlot getFrameSlot(String identifier) {
@@ -122,6 +129,25 @@ public class IdentifiersTable {
 
     public Map<String, TypeDescriptor> getAll() {
         return this.identifiersMap;
+    }
+
+    public PascalFunction getSubroutine(String identifier) throws LexicalException {
+        TypeDescriptor subroutineDescriptor = this.identifiersMap.get(identifier);
+        if (subroutineDescriptor == null) {
+            throw new UnknownIdentifierException(identifier);
+        } else if (!(subroutineDescriptor instanceof SubroutineDescriptor)) {
+            throw new LexicalException("Not a subroutine: " + identifier);
+        } else {
+            return ((SubroutineDescriptor) subroutineDescriptor).getSubroutine();
+        }
+    }
+
+    public void setSubroutineRootNode(String identifier, PascalRootNode rootNode) throws LexicalException {
+        TypeDescriptor descriptor = this.identifiersMap.get(identifier);
+        if (descriptor == null) {
+            throw new UnknownIdentifierException(identifier);
+        }
+        ((SubroutineDescriptor)descriptor).setRootNode(rootNode);
     }
 
     public boolean containsIdentifier(String identifier) {
@@ -189,11 +215,6 @@ public class IdentifiersTable {
         return this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
-    public void addReturnVariable(String identifier, List<FormalParameter> formalParameters, TypeDescriptor typeDescriptor) throws LexicalException {
-        TypeDescriptor returnDescriptor = new FunctionReturnDescriptor(formalParameters, typeDescriptor);
-        this.registerNewIdentifier(identifier, returnDescriptor);
-    }
-
     public void addConstant(String identifier, ConstantDescriptor descriptor) throws LexicalException {
         this.registerNewIdentifier(identifier, descriptor);
     }
@@ -232,18 +253,37 @@ public class IdentifiersTable {
         return new SetDescriptor(base);
     }
 
-    public void addProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+    public void addProcedureInterfaceIfNotForwarded(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+        TypeDescriptor descriptor = this.identifiersMap.get(identifier);
+        if (descriptor != null) {
+            return;
+        }
+
+        this.forwardProcedure(identifier, formalParameters);
+    }
+
+    public void addFunctionInterfaceIfNotForwarded(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnType) throws LexicalException {
+        // TODO: duplicity with the function above
+        TypeDescriptor descriptor = this.identifiersMap.get(identifier);
+        if (descriptor != null) {
+            return;
+        }
+
+        this.forwardFunction(identifier, formalParameters, returnType);
+    }
+
+    public void forwardProcedure(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
         TypeDescriptor typeDescriptor = new ProcedureDescriptor(formalParameters);
         this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
-    public void addFunctionInterface(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnType) throws LexicalException {
+    public void forwardFunction(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnType) throws LexicalException {
         TypeDescriptor typeDescriptor = new FunctionDescriptor(formalParameters, returnType);
         this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
-    public void addSubroutine(String identifier, SubroutineDescriptor descriptor) throws LexicalException {
-        this.registerNewIdentifier(identifier, descriptor);
+    public FrameSlot addSubroutine(String identifier, SubroutineDescriptor descriptor) throws LexicalException {
+        return this.registerNewIdentifier(identifier, descriptor);
     }
 
     public ConstantDescriptor getConstant(String identifier) throws LexicalException {
@@ -257,7 +297,7 @@ public class IdentifiersTable {
         }
     }
 
-    private FrameSlot registerNewIdentifier(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+    FrameSlot registerNewIdentifier(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         if (this.identifiersMap.containsKey(identifier)){
             throw new DuplicitIdentifierException(identifier);
         } else {
@@ -265,4 +305,5 @@ public class IdentifiersTable {
             return this.frameDescriptor.addFrameSlot(identifier, typeDescriptor.getSlotKind());
         }
     }
+
 }

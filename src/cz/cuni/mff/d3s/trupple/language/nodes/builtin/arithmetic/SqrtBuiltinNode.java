@@ -12,10 +12,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class SqrtBuiltinNode extends BuiltinNode {
 
-    public SqrtBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     double integerSquareRootValue(long value) {
         return computeSquareRoot(value);

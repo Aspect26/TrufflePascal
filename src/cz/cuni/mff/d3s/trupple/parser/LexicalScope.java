@@ -8,7 +8,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalFunction;
-import cz.cuni.mff.d3s.trupple.parser.exceptions.DuplicitIdentifierException;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.IdentifiersTable;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.IdentifiersTableTP;
@@ -21,7 +21,6 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDe
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.*;
 
 public class LexicalScope {
@@ -30,7 +29,6 @@ public class LexicalScope {
     private final LexicalScope outer;
     private final IdentifiersTable localIdentifiers;
     private int loopDepth;
-    private final PascalContext context;
     private final Set<String> publicIdentifiers;
 
     // TODO: this should not be here
@@ -41,7 +39,6 @@ public class LexicalScope {
         this.outer = outer;
         this.publicIdentifiers = new HashSet<>();
         this.localIdentifiers = (usingTPExtension)? new IdentifiersTableTP() : new IdentifiersTable();
-        this.context = (outer != null)? new PascalContext(outer.context, usingTPExtension) : new PascalContext(null, usingTPExtension);
     }
 
     String getName() {
@@ -52,9 +49,6 @@ public class LexicalScope {
         return this.outer;
     }
 
-    public PascalContext getContext() {
-        return this.context;
-    }
 
     public IdentifiersTable getIdentifiersTable() {
         return this.localIdentifiers;
@@ -68,13 +62,8 @@ public class LexicalScope {
         return this.localIdentifiers.getFrameSlot(identifier);
     }
 
-    PascalFunction getSubroutineFromContext(String identifier) throws LexicalException {
-        PascalFunction subroutine = this.context.getFunctionRegistry().lookup(identifier);
-        if (subroutine == null) {
-            throw new LexicalException("A subroutine with this name does not exists in this context");
-        } else {
-            return subroutine;
-        }
+    PascalFunction getSubroutine(String identifier) throws LexicalException {
+        return this.localIdentifiers.getSubroutine(identifier);
     }
 
     FrameSlotKind getSlotKind(String identifier) {
@@ -101,6 +90,10 @@ public class LexicalScope {
         this.name = identifier;
     }
 
+    void setSubroutineRootNode(String identifier, PascalRootNode rootNode) throws LexicalException {
+        this.localIdentifiers.setSubroutineRootNode(identifier, rootNode);
+    }
+
     void registerLabel(String identifier) throws LexicalException {
         this.localIdentifiers.addLabel(identifier);
     }
@@ -110,7 +103,7 @@ public class LexicalScope {
     }
 
     boolean isReferenceParameter(String identifier, int parameterIndex) throws LexicalException {
-        TypeDescriptor subroutineDescriptor = this.localIdentifiers.getAll().get(identifier);
+        TypeDescriptor subroutineDescriptor = this.localIdentifiers.getIdentifierDescriptor(identifier);
         if (!(subroutineDescriptor instanceof SubroutineDescriptor)) {
             throw new LexicalException("Not a subroutine: " + identifier);
         }
@@ -157,10 +150,6 @@ public class LexicalScope {
         return this.localIdentifiers.addReference(identifier, typeDescriptor);
     }
 
-    void registerReturnType(List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
-        this.localIdentifiers.addReturnVariable(this.getName(), formalParameters, returnTypeDescriptor);
-    }
-
     FrameSlot registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
         return this.localIdentifiers.addVariable(identifier, typeDescriptor);
     }
@@ -197,53 +186,28 @@ public class LexicalScope {
         this.localIdentifiers.initializeAllUninitializedPointerDescriptors();
     }
 
-    // NOTE: the procedure could have been forwarded
-    void tryRegisterProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
-        try {
-            this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
-        } catch (DuplicitIdentifierException e) {
-            if (this.context.isImplemented(identifier)) {
-                throw e;
-            }
-        }
-        this.context.registerSubroutineName(identifier);
+    void registerProcedureInterfaceIfNotForwarded(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+        this.localIdentifiers.addProcedureInterfaceIfNotForwarded(identifier, formalParameters);
     }
 
-    // NOTE: the function could have been forwarded
-    void tryRegisterFunctionInterface(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
-        try {
-            this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnTypeDescriptor);
-        } catch (DuplicitIdentifierException e) {
-            if (this.context.isImplemented(identifier)) {
-                throw e;
-            }
-        }
-        this.context.registerSubroutineName(identifier);
+    void registerFunctionInterfaceIfNotForwarded(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
+        this.localIdentifiers.addFunctionInterfaceIfNotForwarded(identifier, formalParameters, returnTypeDescriptor);
     }
 
-    void registerProcedureInterface(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
-        this.localIdentifiers.addProcedureInterface(identifier, formalParameters);
-        this.context.registerSubroutineName(identifier);
+    void forwardProcedure(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
+        this.localIdentifiers.forwardProcedure(identifier, formalParameters);
     }
 
-    void registerFunctionInterface(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
-        this.localIdentifiers.addFunctionInterface(identifier, formalParameters, returnTypeDescriptor);
-        this.context.registerSubroutineName(identifier);
+    void forwardFunction(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
+        this.localIdentifiers.forwardFunction(identifier, formalParameters, returnTypeDescriptor);
     }
 
-    public void registerSubroutine(String identifier, ExpressionNode bodyNode, SubroutineDescriptor descriptor) {
+    public void registerBuiltinSubroutine(String identifier, SubroutineDescriptor descriptor) {
         try {
             this.localIdentifiers.addSubroutine(identifier, descriptor);
-            final PascalRootNode rootNode = new PascalRootNode(this.getFrameDescriptor(), bodyNode);
-            this.context.registerSubroutineName(identifier);
-            this.context.setSubroutineRootNode(identifier, rootNode);
         } catch (LexicalException e) {
-            // TODO: this is called from BuiltinUnitAbstr only
+            throw new PascalRuntimeException("Could not register builtin subroutine: " + identifier);
         }
-    }
-
-    void registerSubroutine(String identifier, SubroutineDescriptor descriptor) throws LexicalException {
-        this.localIdentifiers.addSubroutine(identifier, descriptor);
     }
 
     void registerConstant(String identifier, ConstantDescriptor constant) throws LexicalException {

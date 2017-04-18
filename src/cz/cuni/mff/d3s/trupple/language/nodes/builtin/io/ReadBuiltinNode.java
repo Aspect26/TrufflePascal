@@ -22,14 +22,6 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
 
     private static final String NEW_LINE = System.getProperty("line.separator");
 
-    public ReadBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
-    protected PascalContext getContext() {
-        return this.context;
-    }
-
 	@Specialization
     public Object read(Object[] arguments) {
         if (arguments.length == 0) {
@@ -109,10 +101,10 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
 
     private char readChar(FileValue file) throws IOException {
         if (file == null) {
-            Pattern delimiterPattern = this.getContext().getInput().delimiter();
-            this.getContext().getInput().useDelimiter("");
-            char value = this.getContext().getInput().next().charAt(0);
-            this.getContext().getInput().useDelimiter(delimiterPattern);
+            Pattern delimiterPattern = PascalContext.getInstance().getInput().delimiter();
+            PascalContext.getInstance().getInput().useDelimiter("");
+            char value = PascalContext.getInstance().getInput().next().charAt(0);
+            PascalContext.getInstance().getInput().useDelimiter(delimiterPattern);
 
             return value;
         } else {
@@ -128,7 +120,7 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
 
     private double readDouble(FileValue file) throws IOException {
         if (file == null) {
-            return this.getContext().getInput().nextDouble();
+            return PascalContext.getInstance().getInput().nextDouble();
         } else {
             try {
                 Object obj = file.read();
@@ -142,7 +134,7 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
 
     private long readLong(FileValue file) throws IOException {
         if (file == null) {
-            return this.getContext().getInput().nextLong();
+            return PascalContext.getInstance().getInput().nextLong();
         } else {
             try {
                 Object obj = file.read();
@@ -193,7 +185,7 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
     }
 
     private String readUntilNewline() {
-	    return this.getContext().getInput().next("[^" + NEW_LINE + "]");
+	    return PascalContext.getInstance().getInput().next("[^" + NEW_LINE + "]");
     }
 
 }

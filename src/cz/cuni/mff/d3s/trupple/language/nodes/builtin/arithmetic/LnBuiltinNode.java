@@ -12,10 +12,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class LnBuiltinNode extends BuiltinNode {
 
-    public LnBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     double integerNaturalLogarithmValue(long value) {
         return computeLogarithm(value);

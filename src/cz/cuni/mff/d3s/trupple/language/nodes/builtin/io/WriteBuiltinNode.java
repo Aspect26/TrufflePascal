@@ -16,14 +16,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class WriteBuiltinNode extends BuiltinNode {
 
-    public WriteBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
-    private PascalContext getContext() {
-        return this.context;
-    }
-
 	// TODO specializations
 
 	@Specialization
@@ -33,7 +25,7 @@ public abstract class WriteBuiltinNode extends BuiltinNode {
             Object[] arguments = Arrays.copyOfRange(values, 1, values.length);
             file.write(arguments);
         } else {
-            doWrite(getContext().getOutput(), values);
+            doWrite(PascalContext.getInstance().getOutput(), values);
         }
 
 		// TODO: this return value

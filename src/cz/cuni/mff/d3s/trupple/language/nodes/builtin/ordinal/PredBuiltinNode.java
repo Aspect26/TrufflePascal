@@ -12,10 +12,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class PredBuiltinNode extends BuiltinNode {
 
-    public PredBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     public long pred(long value) {
         return --value;

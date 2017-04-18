@@ -13,10 +13,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.heap.PascalHeap;
 @NodeChild(type = ExpressionNode.class)
 public abstract class DisposeBuiltinNode extends BuiltinNode {
 
-    public DisposeBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     Object dispose(PointerValue pointerValue) {
         PascalHeap.getInstance().disposeObject(pointerValue.getHeapSlot());

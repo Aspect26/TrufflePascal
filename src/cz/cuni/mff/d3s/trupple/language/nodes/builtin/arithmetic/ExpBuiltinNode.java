@@ -11,10 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class ExpBuiltinNode extends BuiltinNode {
 
-    public ExpBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     double integerExponentialValue(long value) {
         return Math.exp(value);

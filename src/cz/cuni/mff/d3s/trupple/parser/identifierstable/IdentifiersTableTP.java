@@ -1,7 +1,11 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable;
 
+import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.BuiltinProcedureDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.AssignSubroutineDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.BuiltinProcedureDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.RandomSubroutineDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.RandomizeSubroutineDescriptor;
 
 public class IdentifiersTableTP extends IdentifiersTable {
 
@@ -15,10 +19,13 @@ public class IdentifiersTableTP extends IdentifiersTable {
     @Override
     protected void addBuiltinFunctions() {
         super.addBuiltinFunctions();
-
-        this.identifiersMap.put("random", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
-        this.identifiersMap.put("randomize", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
-        this.identifiersMap.put("assign", new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin());
+        try {
+            this.registerNewIdentifier("random", new RandomSubroutineDescriptor());
+            this.registerNewIdentifier("randomize", new RandomizeSubroutineDescriptor());
+            this.registerNewIdentifier("assign", new AssignSubroutineDescriptor());
+        } catch (LexicalException e) {
+            // TODO: inform
+        }
     }
 
 }

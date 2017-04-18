@@ -14,10 +14,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.heap.PascalHeap;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class NewBuiltinNode extends BuiltinNode {
 
-    public NewBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     Object allocate(PointerValue pointerValue) {
         Object newObject = pointerValue.getType().getDefaultValue();

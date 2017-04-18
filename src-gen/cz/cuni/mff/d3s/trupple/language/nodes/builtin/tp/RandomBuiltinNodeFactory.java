@@ -11,7 +11,6 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,13 +35,13 @@ public final class RandomBuiltinNodeFactory implements NodeFactory<RandomBuiltin
 
     @Override
     public List getNodeSignatures() {
-        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode.class));
+        return Arrays.asList(Arrays.asList(ExpressionNode.class));
     }
 
     @Override
     public RandomBuiltinNode createNode(Object... arguments) {
-        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
-            return create((PascalContext) arguments[0], (ExpressionNode) arguments[1]);
+        if (arguments.length == 1 && (arguments[0] == null || arguments[0] instanceof ExpressionNode)) {
+            return create((ExpressionNode) arguments[0]);
         } else {
             throw new IllegalArgumentException("Invalid create signature.");
         }
@@ -55,8 +54,8 @@ public final class RandomBuiltinNodeFactory implements NodeFactory<RandomBuiltin
         return instance;
     }
 
-    public static RandomBuiltinNode create(PascalContext context, ExpressionNode argument) {
-        return new RandomBuiltinNodeGen(context, argument);
+    public static RandomBuiltinNode create(ExpressionNode argument) {
+        return new RandomBuiltinNodeGen(argument);
     }
 
     @GeneratedBy(RandomBuiltinNode.class)
@@ -65,8 +64,7 @@ public final class RandomBuiltinNodeFactory implements NodeFactory<RandomBuiltin
         @Child private ExpressionNode argument_;
         @CompilationFinal private boolean seenUnsupported0;
 
-        private RandomBuiltinNodeGen(PascalContext context, ExpressionNode argument) {
-            super(context);
+        private RandomBuiltinNodeGen(ExpressionNode argument) {
             this.argument_ = argument;
         }
 

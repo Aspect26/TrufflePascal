@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.language;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Scanner;
 
 import com.oracle.truffle.api.CallTarget;
 import com.oracle.truffle.api.Truffle;
@@ -22,16 +23,24 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
     public static final PascalLanguage INSTANCE = new PascalLanguage();
 	static final String MIME_TYPE = "text/x-pascal";
 
+	public static PascalContext createContext() {
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        PrintStream output = new PrintStream(System.out, true);
+
+        PascalContext.getInstance().setInput(new Scanner(input));
+        PascalContext.getInstance().setOutput(output);
+
+        return PascalContext.getInstance();
+    }
+
 	@Override
 	protected PascalContext createContext(com.oracle.truffle.api.TruffleLanguage.Env environment) {
-        BufferedReader input = new BufferedReader(new InputStreamReader(environment.in()));
-        PrintStream output = new PrintStream(environment.out(), true);
-
-		return new PascalContext(null, environment, input, output, true);
+        return createContext();
 	}
 
+	@Override
 	protected Object findExportedSymbol(PascalContext context, String globalName, boolean onlyExplicit) {
-		return context.getFunctionRegistry().lookup(globalName);
+		return null;
 	}
 
 	@Override
@@ -57,6 +66,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 
 	public static void start(String sourcePath, String[] arguments, List<String> imports, boolean useTPExtension,
                              boolean extendedGotoSupport) throws IOException {
+	    createContext();
 		IParser parser = (useTPExtension)? new Parser(extendedGotoSupport) :
                 new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
 
@@ -75,6 +85,7 @@ public final class PascalLanguage extends TruffleLanguage<PascalContext> {
 
 	public static void startFromCodes(String sourceCode, List<String> imports, boolean useTPExtension,
                                       boolean extendedGotoSupport) {
+	    createContext();
         IParser parser = (useTPExtension)? new Parser(extendedGotoSupport) :
                 new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
 
