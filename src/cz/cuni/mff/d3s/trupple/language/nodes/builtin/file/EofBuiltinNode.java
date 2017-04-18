@@ -12,17 +12,13 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class EofBuiltinNode extends BuiltinNode {
 
-    public EofBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     boolean isEof(Object... arguments) {
         return (arguments.length == 0)? eof() : eof((FileValue) arguments[0]);
     }
 
     private boolean eof() {
-        return !this.context.getInput().hasNext();
+        return !PascalContext.getInstance().getInput().hasNext();
     }
 
     private boolean eof(FileValue file) {

@@ -11,10 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class OddBuiltinNode extends BuiltinNode {
 
-    public OddBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     boolean odd(long value) {
         return (Math.abs(value) % 2) == 1;

@@ -5,11 +5,11 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
-public class ReadReferencePassNode extends ExpressionNode {
+public class StoreReferenceArgumentNode extends ExpressionNode {
 
 	private final FrameSlot variableSlot;
 
-	public ReadReferencePassNode(FrameSlot variableSlot) {
+	public StoreReferenceArgumentNode(FrameSlot variableSlot) {
 		this.variableSlot = variableSlot;
 	}
 

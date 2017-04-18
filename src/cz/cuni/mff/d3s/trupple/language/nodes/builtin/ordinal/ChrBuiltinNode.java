@@ -11,10 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class ChrBuiltinNode extends BuiltinNode {
 
-    public ChrBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     public char chr(long value) {
         return (char) (value % 256);

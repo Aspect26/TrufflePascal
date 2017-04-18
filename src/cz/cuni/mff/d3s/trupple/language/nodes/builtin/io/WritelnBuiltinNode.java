@@ -16,22 +16,14 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class WritelnBuiltinNode extends BuiltinNode {
 
-    public WritelnBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
-    private PascalContext getContext() {
-        return this.context;
-    }
-
     @Specialization
-    public Object writeln(Object[] values) {
+    public Object writeln(Object... values) {
         if (values[0] instanceof FileValue) {
             FileValue file = (FileValue) values[0];
             Object[] arguments = Arrays.copyOfRange(values, 1, values.length);
             file.writeln(arguments);
         } else {
-            doWriteln(getContext().getOutput(), values);
+            doWriteln(PascalContext.getInstance().getOutput(), values);
         }
 
         // TODO: this return value

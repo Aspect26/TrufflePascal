@@ -1,0 +1,78 @@
+package cz.cuni.mff.d3s.trupple.language.builtinunits.dos;
+
+import cz.cuni.mff.d3s.trupple.language.builtinunits.BuiltinUnitAbstr;
+import cz.cuni.mff.d3s.trupple.language.builtinunits.UnitSubroutineData;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos.ExecNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos.GetDateNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos.GetMsCountNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos.GetTimeNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
+import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.BuiltinFunctionDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.BuiltinProcedureDescriptor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DosBuiltinUnit extends BuiltinUnitAbstr {
+
+    private final List<UnitSubroutineData> data = new ArrayList<>();
+
+    public DosBuiltinUnit() {
+        this.initialize();
+    }
+
+    private void initialize() {
+        // TODO: the subroutine name can be directly in the node
+        data.add(new UnitSubroutineData(
+                "exec",
+                new BuiltinProcedureDescriptor.OneArgumentBuiltin(
+                        ExecNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1)),
+                        new FormalParameter("i", new StringDescriptor(), false))
+                )
+        );
+        data.add(new UnitSubroutineData(
+                "getDate",
+                new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin(
+                        GetDateNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1),
+                                new ReadArgumentNode(2), new ReadArgumentNode(3)),
+                        new ArrayList<FormalParameter>(){{
+                            add(new FormalParameter("y", new LongDescriptor(), true));
+                            add(new FormalParameter("m", new LongDescriptor(), true));
+                            add(new FormalParameter("d", new LongDescriptor(), true));
+                            add(new FormalParameter("wd", new LongDescriptor(), true));
+                        }}
+                        )
+                )
+
+        );
+        data.add(new UnitSubroutineData(
+                "getMsCount",
+                new BuiltinProcedureDescriptor.NoArgumentBuiltin(GetMsCountNodeGen.create())
+                )
+        );
+        data.add(new UnitSubroutineData(
+                        "getTime",
+                        new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin(
+                                GetTimeNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1),
+                                        new ReadArgumentNode(2), new ReadArgumentNode(3)),
+                                new ArrayList<FormalParameter>(){{
+                                    add(new FormalParameter("h", new LongDescriptor(), true));
+                                    add(new FormalParameter("m", new LongDescriptor(), true));
+                                    add(new FormalParameter("s", new LongDescriptor(), true));
+                                    add(new FormalParameter("n", new LongDescriptor(), true));
+                                }}
+                        )
+                )
+
+        );
+    }
+
+    @Override
+    protected List<UnitSubroutineData> getIdentifiers() {
+        return this.data;
+    }
+
+}

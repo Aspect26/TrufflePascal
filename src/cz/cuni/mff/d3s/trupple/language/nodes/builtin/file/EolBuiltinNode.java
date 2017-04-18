@@ -12,17 +12,13 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
 public abstract class EolBuiltinNode extends BuiltinNode {
 
-    public EolBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     boolean isEol(Object... arguments) {
         return (arguments.length == 0)? eol() : eol((FileValue) arguments[0]);
     }
 
     private boolean eol() {
-        return !this.context.getInput().hasNext();
+        return !PascalContext.getInstance().getInput().hasNext();
     }
 
     private boolean eol(FileValue file) {

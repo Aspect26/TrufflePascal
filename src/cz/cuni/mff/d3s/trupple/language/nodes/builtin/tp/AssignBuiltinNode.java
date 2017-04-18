@@ -14,10 +14,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChildren({@NodeChild(value = "file", type = ExpressionNode.class), @NodeChild(value="path", type = ExpressionNode.class)})
 public abstract class AssignBuiltinNode extends BuiltinNode {
 
-    public AssignBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     Object assignFile(FileValue file, PascalString filePath) {
         file.assignFilePath(filePath.toString());

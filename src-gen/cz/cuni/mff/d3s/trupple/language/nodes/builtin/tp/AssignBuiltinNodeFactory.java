@@ -14,7 +14,6 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,13 +38,13 @@ public final class AssignBuiltinNodeFactory implements NodeFactory<AssignBuiltin
 
     @Override
     public List getNodeSignatures() {
-        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode.class, ExpressionNode.class));
+        return Arrays.asList(Arrays.asList(ExpressionNode.class, ExpressionNode.class));
     }
 
     @Override
     public AssignBuiltinNode createNode(Object... arguments) {
-        if (arguments.length == 3 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode) && (arguments[2] == null || arguments[2] instanceof ExpressionNode)) {
-            return create((PascalContext) arguments[0], (ExpressionNode) arguments[1], (ExpressionNode) arguments[2]);
+        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof ExpressionNode) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
+            return create((ExpressionNode) arguments[0], (ExpressionNode) arguments[1]);
         } else {
             throw new IllegalArgumentException("Invalid create signature.");
         }
@@ -58,8 +57,8 @@ public final class AssignBuiltinNodeFactory implements NodeFactory<AssignBuiltin
         return instance;
     }
 
-    public static AssignBuiltinNode create(PascalContext context, ExpressionNode file, ExpressionNode path) {
-        return new AssignBuiltinNodeGen(context, file, path);
+    public static AssignBuiltinNode create(ExpressionNode file, ExpressionNode path) {
+        return new AssignBuiltinNodeGen(file, path);
     }
 
     @GeneratedBy(AssignBuiltinNode.class)
@@ -69,8 +68,7 @@ public final class AssignBuiltinNodeFactory implements NodeFactory<AssignBuiltin
         @Child private ExpressionNode path_;
         @CompilationFinal private boolean seenUnsupported0;
 
-        private AssignBuiltinNodeGen(PascalContext context, ExpressionNode file, ExpressionNode path) {
-            super(context);
+        private AssignBuiltinNodeGen(ExpressionNode file, ExpressionNode path) {
             this.file_ = file;
             this.path_ = path;
         }

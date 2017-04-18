@@ -11,10 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class ArctanBuiltinNode extends BuiltinNode {
 
-    public ArctanBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     double integerArctanValue(long value) {
         return Math.atan(value);

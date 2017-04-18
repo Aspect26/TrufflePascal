@@ -13,7 +13,6 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,13 +37,13 @@ public final class ResetBuiltinNodeFactory implements NodeFactory<ResetBuiltinNo
 
     @Override
     public List getNodeSignatures() {
-        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode.class));
+        return Arrays.asList(Arrays.asList(ExpressionNode.class));
     }
 
     @Override
     public ResetBuiltinNode createNode(Object... arguments) {
-        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
-            return create((PascalContext) arguments[0], (ExpressionNode) arguments[1]);
+        if (arguments.length == 1 && (arguments[0] == null || arguments[0] instanceof ExpressionNode)) {
+            return create((ExpressionNode) arguments[0]);
         } else {
             throw new IllegalArgumentException("Invalid create signature.");
         }
@@ -57,8 +56,8 @@ public final class ResetBuiltinNodeFactory implements NodeFactory<ResetBuiltinNo
         return instance;
     }
 
-    public static ResetBuiltinNode create(PascalContext context, ExpressionNode file) {
-        return new ResetBuiltinNodeGen(context, file);
+    public static ResetBuiltinNode create(ExpressionNode file) {
+        return new ResetBuiltinNodeGen(file);
     }
 
     @GeneratedBy(ResetBuiltinNode.class)
@@ -67,8 +66,7 @@ public final class ResetBuiltinNodeFactory implements NodeFactory<ResetBuiltinNo
         @Child private ExpressionNode file_;
         @CompilationFinal private boolean seenUnsupported0;
 
-        private ResetBuiltinNodeGen(PascalContext context, ExpressionNode file) {
-            super(context);
+        private ResetBuiltinNodeGen(ExpressionNode file) {
             this.file_ = file;
         }
 

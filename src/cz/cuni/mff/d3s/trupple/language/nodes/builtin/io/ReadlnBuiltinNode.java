@@ -7,10 +7,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeInfo(shortName = "readln")
 public abstract class ReadlnBuiltinNode extends ReadBuiltinNode {
 
-    public ReadlnBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     public Object read(Object[] arguments) {
 	    if (arguments.length == 0) {
@@ -24,6 +20,6 @@ public abstract class ReadlnBuiltinNode extends ReadBuiltinNode {
     }
 
     private String consumeNewLine() {
-        return this.getContext().getInput().nextLine();
+        return PascalContext.getInstance().getInput().nextLine();
     }
 }

@@ -11,10 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class SinBuiltinNode extends BuiltinNode {
 
-    public SinBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     double integerSinValue(long value) {
         return Math.sin(value);

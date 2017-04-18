@@ -21,6 +21,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @GeneratedBy(AssignmentNode.class)
 public final class AssignmentNodeGen extends AssignmentNode implements SpecializedNode {
@@ -166,6 +167,9 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             }
             if (valueNodeValue instanceof PascalString) {
                 return AssignStringNode_.create(root);
+            }
+            if (valueNodeValue instanceof PascalSubroutine) {
+                return AssignSubroutineNode_.create(root);
             }
             if (valueNodeValue instanceof PascalArray) {
                 return AssignArrayNode_.create(root);
@@ -528,11 +532,32 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
         }
 
     }
+    @GeneratedBy(methodName = "assignSubroutine(VirtualFrame, PascalSubroutine)", value = AssignmentNode.class)
+    private static final class AssignSubroutineNode_ extends BaseNode_ {
+
+        AssignSubroutineNode_(AssignmentNodeGen root) {
+            super(root, 11);
+        }
+
+        @Override
+        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof PascalSubroutine) {
+                PascalSubroutine valueNodeValue_ = (PascalSubroutine) valueNodeValue;
+                return root.assignSubroutine(frameValue, valueNodeValue_);
+            }
+            return getNext().execute_(frameValue, valueNodeValue);
+        }
+
+        static BaseNode_ create(AssignmentNodeGen root) {
+            return new AssignSubroutineNode_(root);
+        }
+
+    }
     @GeneratedBy(methodName = "assignArray(VirtualFrame, PascalArray)", value = AssignmentNode.class)
     private static final class AssignArrayNode_ extends BaseNode_ {
 
         AssignArrayNode_(AssignmentNodeGen root) {
-            super(root, 11);
+            super(root, 12);
         }
 
         @Override

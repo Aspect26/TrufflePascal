@@ -9,7 +9,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(ExecNode.class)
@@ -33,14 +32,14 @@ public final class ExecNodeGen extends ExecNode {
     public Object executeGeneric(VirtualFrame frameValue) {
         String child0Value_;
         try {
-            child0Value_ = PascalTypesGen.expectString(child0_.executeGeneric(frameValue));
+            child0Value_ = expectString(child0_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             Object child1Value = child1_.executeGeneric(frameValue);
             throw unsupported(ex.getResult(), child1Value);
         }
         String child1Value_;
         try {
-            child1Value_ = PascalTypesGen.expectString(child1_.executeGeneric(frameValue));
+            child1Value_ = expectString(child1_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             throw unsupported(child0Value_, ex.getResult());
         }
@@ -59,6 +58,13 @@ public final class ExecNodeGen extends ExecNode {
             seenUnsupported0 = true;
         }
         return new UnsupportedSpecializationException(this, new Node[] {child0_, child1_}, child0Value, child1Value);
+    }
+
+    private static String expectString(Object value) throws UnexpectedResultException {
+        if (value instanceof String) {
+            return (String) value;
+        }
+        throw new UnexpectedResultException(value);
     }
 
     public static ExecNode create(ExpressionNode child0, ExpressionNode child1) {

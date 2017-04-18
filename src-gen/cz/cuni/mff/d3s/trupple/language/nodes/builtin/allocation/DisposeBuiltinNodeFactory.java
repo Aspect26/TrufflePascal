@@ -13,7 +13,6 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,13 +37,13 @@ public final class DisposeBuiltinNodeFactory implements NodeFactory<DisposeBuilt
 
     @Override
     public List getNodeSignatures() {
-        return Arrays.asList(Arrays.asList(PascalContext.class, ExpressionNode.class));
+        return Arrays.asList(Arrays.asList(ExpressionNode.class));
     }
 
     @Override
     public DisposeBuiltinNode createNode(Object... arguments) {
-        if (arguments.length == 2 && (arguments[0] == null || arguments[0] instanceof PascalContext) && (arguments[1] == null || arguments[1] instanceof ExpressionNode)) {
-            return create((PascalContext) arguments[0], (ExpressionNode) arguments[1]);
+        if (arguments.length == 1 && (arguments[0] == null || arguments[0] instanceof ExpressionNode)) {
+            return create((ExpressionNode) arguments[0]);
         } else {
             throw new IllegalArgumentException("Invalid create signature.");
         }
@@ -57,8 +56,8 @@ public final class DisposeBuiltinNodeFactory implements NodeFactory<DisposeBuilt
         return instance;
     }
 
-    public static DisposeBuiltinNode create(PascalContext context, ExpressionNode child0) {
-        return new DisposeBuiltinNodeGen(context, child0);
+    public static DisposeBuiltinNode create(ExpressionNode child0) {
+        return new DisposeBuiltinNodeGen(child0);
     }
 
     @GeneratedBy(DisposeBuiltinNode.class)
@@ -67,8 +66,7 @@ public final class DisposeBuiltinNodeFactory implements NodeFactory<DisposeBuilt
         @Child private ExpressionNode child0_;
         @CompilationFinal private boolean seenUnsupported0;
 
-        private DisposeBuiltinNodeGen(PascalContext context, ExpressionNode child0) {
-            super(context);
+        private DisposeBuiltinNodeGen(ExpressionNode child0) {
             this.child0_ = child0;
         }
 

@@ -12,10 +12,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "file", type = ExpressionNode.class)
 public abstract class ResetBuiltinNode extends BuiltinNode {
 
-    public ResetBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     Object reset(FileValue file) {
         file.openToRead();

@@ -7,6 +7,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
@@ -144,6 +145,12 @@ public abstract class AssignmentNode extends ExpressionNode {
         }
 
         return value;
+    }
+
+    @Specialization
+    PascalSubroutine assignSubroutine(VirtualFrame frame, PascalSubroutine subroutine) {
+        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, subroutine);
+        return subroutine;
     }
 
     @Specialization

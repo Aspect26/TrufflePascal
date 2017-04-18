@@ -11,10 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class  TruncBuiltinNode extends BuiltinNode {
 
-    public TruncBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     long truncate(double value) {
         return (long) value;

@@ -181,7 +181,7 @@ public class Parser implements IParser {
 			TypeDefinitions();
 		} else if (la.kind == 30) {
 			VariableDeclarations();
-		} else if (la.kind == 31 || la.kind == 33) {
+		} else if (la.kind == 32 || la.kind == 33) {
 			Subroutine();
 		} else SynErr(71);
 	}
@@ -230,10 +230,10 @@ public class Parser implements IParser {
 	}
 
 	void Subroutine() {
-		if (la.kind == 31) {
+		if (la.kind == 33) {
 			Procedure();
 			Expect(8);
-		} else if (la.kind == 33) {
+		} else if (la.kind == 32) {
 			Function();
 			Expect(8);
 		} else SynErr(72);
@@ -549,19 +549,12 @@ public class Parser implements IParser {
 	}
 
 	void Procedure() {
-		Expect(31);
-		Expect(1);
-		Token identifierToken = t; 
-		List<FormalParameter> formalParameters = new ArrayList<>(); 
-		if (la.kind == 6) {
-			formalParameters = FormalParameterList();
-		}
-		Expect(8);
-		if (la.kind == 32) {
+		ProcedureHeading procedureHeading = ProcedureHeading();
+		if (la.kind == 31) {
 			Get();
-			factory.forwardProcedure(identifierToken, formalParameters); 
+			factory.forwardProcedure(procedureHeading); 
 		} else if (StartOf(3)) {
-			factory.startProcedureImplementation(identifierToken, formalParameters); 
+			factory.startProcedureImplementation(procedureHeading); 
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishProcedureImplementation(bodyNode); 
@@ -569,6 +562,20 @@ public class Parser implements IParser {
 	}
 
 	void Function() {
+		FunctionHeading functionHeading = FunctionHeading();
+		if (la.kind == 31) {
+			Get();
+			factory.forwardFunction(functionHeading); 
+		} else if (StartOf(3)) {
+			factory.startFunctionImplementation(functionHeading); 
+			Declarations();
+			StatementNode bodyNode = Block();
+			factory.finishFunctionImplementation(bodyNode); 
+		} else SynErr(79);
+	}
+
+	ProcedureHeading  ProcedureHeading() {
+		ProcedureHeading  procedureHeading;
 		Expect(33);
 		Expect(1);
 		Token identifierToken = t; 
@@ -576,35 +583,9 @@ public class Parser implements IParser {
 		if (la.kind == 6) {
 			formalParameters = FormalParameterList();
 		}
-		Expect(25);
-		Expect(1);
-		Token returnTypeToken = t; 
 		Expect(8);
-		if (la.kind == 32) {
-			Get();
-			factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); 
-		} else if (StartOf(3)) {
-			factory.startFunctionImplementation(identifierToken, formalParameters, returnTypeToken); 
-			Declarations();
-			StatementNode bodyNode = Block();
-			factory.finishFunctionImplementation(bodyNode); 
-		} else SynErr(79);
-	}
-
-	List<FormalParameter>  FormalParameterList() {
-		List<FormalParameter>  formalParameters;
-		Expect(6);
-		formalParameters = new ArrayList<>(); 
-		List<FormalParameter> newParameters = new ArrayList<>(); 
-		newParameters = FormalParameter();
-		factory.appendFormalParameter(newParameters, formalParameters); 
-		while (la.kind == 8) {
-			Get();
-			newParameters = FormalParameter();
-			factory.appendFormalParameter(newParameters, formalParameters); 
-		}
-		Expect(7);
-		return formalParameters;
+		procedureHeading = new ProcedureHeading(identifierToken, formalParameters); 
+		return procedureHeading;
 	}
 
 	StatementNode  Block() {
@@ -617,6 +598,39 @@ public class Parser implements IParser {
 		Expect(22);
 		blockNode = factory.createBlockNode(bodyNodes, this.extendedGotoSupport); 
 		return blockNode;
+	}
+
+	FunctionHeading  FunctionHeading() {
+		FunctionHeading  functionHeading;
+		Expect(32);
+		Expect(1);
+		Token identifierToken = t; 
+		List<FormalParameter> formalParameters = new ArrayList<>(); 
+		if (la.kind == 6) {
+			formalParameters = FormalParameterList();
+		}
+		Expect(25);
+		Expect(1);
+		Token returnTypeToken = t; 
+		Expect(8);
+		functionHeading = new FunctionHeading(identifierToken, formalParameters, factory.getTypeDescriptor(returnTypeToken)); 
+		return functionHeading;
+	}
+
+	List<FormalParameter>  FormalParameterList() {
+		List<FormalParameter>  formalParameters;
+		Expect(6);
+		formalParameters = new ArrayList<>(); 
+		List<FormalParameter> newParameters = new ArrayList<>(); 
+		newParameters = FormalParameter();
+		formalParameters.addAll(newParameters); 
+		while (la.kind == 8) {
+			Get();
+			newParameters = FormalParameter();
+			formalParameters.addAll(newParameters); 
+		}
+		Expect(7);
+		return formalParameters;
 	}
 
 	List<FormalParameter>  FormalParameter() {
@@ -1164,7 +1178,10 @@ public class Parser implements IParser {
 		parameter = null; 
 		if (factory.shouldBeReference(subroutineToken, currentParameterIndex)) {
 			Expect(1);
-			parameter = factory.createReferenceNode(t); 
+			parameter = factory.createReferencePassNode(t); 
+		} else if (factory.shouldBeSubroutine(subroutineToken, currentParameterIndex)) {
+			Expect(1);
+			parameter = factory.createSubroutineParameterPassNode(t); 
 		} else if (StartOf(7)) {
 			parameter = Expression();
 		} else SynErr(90);
@@ -1181,10 +1198,10 @@ public class Parser implements IParser {
 	void InterfaceSection() {
 		Expect(67);
 		while (StartOf(14)) {
-			if (la.kind == 31) {
-				ProcedureHeading();
-			} else if (la.kind == 33) {
-				FunctionHeading();
+			if (la.kind == 33) {
+				UnitProcedureHeading();
+			} else if (la.kind == 32) {
+				UnitFunctionHeading();
 			} else if (la.kind == 12) {
 				TypeDefinitions();
 			} else {
@@ -1196,7 +1213,7 @@ public class Parser implements IParser {
 	void ImplementationSection() {
 		Expect(68);
 		while (StartOf(14)) {
-			if (la.kind == 31 || la.kind == 33) {
+			if (la.kind == 32 || la.kind == 33) {
 				UnitSubroutineImplementation();
 			} else if (la.kind == 30) {
 				VariableDeclarations();
@@ -1212,8 +1229,8 @@ public class Parser implements IParser {
 		Expect(34);
 	}
 
-	void ProcedureHeading() {
-		Expect(31);
+	void UnitProcedureHeading() {
+		Expect(33);
 		Expect(1);
 		Token name = t; 
 		List<FormalParameter> formalParameters = new ArrayList<>(); 
@@ -1224,8 +1241,8 @@ public class Parser implements IParser {
 		Expect(8);
 	}
 
-	void FunctionHeading() {
-		Expect(33);
+	void UnitFunctionHeading() {
+		Expect(32);
 		Expect(1);
 		Token name = t; 
 		List<FormalParameter> formalParameters = new ArrayList<>(); 
@@ -1239,29 +1256,22 @@ public class Parser implements IParser {
 	}
 
 	void UnitSubroutineImplementation() {
-		if (la.kind == 31) {
+		if (la.kind == 33) {
 			UnitProcedureImplementation();
 			Expect(8);
-		} else if (la.kind == 33) {
+		} else if (la.kind == 32) {
 			UnitFunctionImplementation();
 			Expect(8);
 		} else SynErr(91);
 	}
 
 	void UnitProcedureImplementation() {
-		Expect(31);
-		Expect(1);
-		Token identifierToken = t; 
-		List<FormalParameter> formalParameters = new ArrayList<>(); 
-		if (la.kind == 6) {
-			formalParameters = FormalParameterList();
-		}
-		Expect(8);
-		if (la.kind == 32) {
+		ProcedureHeading heading = ProcedureHeading();
+		if (la.kind == 31) {
 			Get();
-			factory.forwardProcedure(identifierToken, formalParameters); 
+			factory.forwardProcedure(heading); 
 		} else if (StartOf(3)) {
-			factory.startUnitProcedureImplementation(identifierToken, formalParameters); 
+			factory.startUnitProcedureImplementation(heading); 
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishProcedureImplementation(bodyNode); 
@@ -1269,22 +1279,12 @@ public class Parser implements IParser {
 	}
 
 	void UnitFunctionImplementation() {
-		Expect(33);
-		Expect(1);
-		Token identifierToken = t; 
-		List<FormalParameter> formalParameters = new ArrayList<>(); 
-		if (la.kind == 6) {
-			formalParameters = FormalParameterList();
-		}
-		Expect(25);
-		Expect(1);
-		Token returnTypeToken = t; 
-		Expect(8);
-		if (la.kind == 32) {
+		FunctionHeading heading = FunctionHeading();
+		if (la.kind == 31) {
 			Get();
-			factory.forwardFunction(identifierToken, formalParameters, returnTypeToken); 
+			factory.forwardFunction(heading); 
 		} else if (StartOf(3)) {
-			factory.startUnitFunctionImplementation(identifierToken, formalParameters, returnTypeToken); 
+			factory.startUnitFunctionImplementation(heading); 
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishFunctionImplementation(bodyNode); 
@@ -1305,9 +1305,9 @@ public class Parser implements IParser {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _T,_T,_x,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_x, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_T, _x,_T,_x,_x, _T,_x,_T,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
@@ -1318,7 +1318,7 @@ public class Parser implements IParser {
 		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_T,_x, _x,_T,_T,_x, _x,_x,_x,_T, _x,_x,_T,_x, _x,_T,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_x,_T,_T, _x,_T,_x,_x, _T,_x,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
 
 	};
 
@@ -1457,9 +1457,9 @@ class Errors {
 			case 28: s = "\"+\" expected"; break;
 			case 29: s = "\"-\" expected"; break;
 			case 30: s = "\"var\" expected"; break;
-			case 31: s = "\"procedure\" expected"; break;
-			case 32: s = "\"forward\" expected"; break;
-			case 33: s = "\"function\" expected"; break;
+			case 31: s = "\"forward\" expected"; break;
+			case 32: s = "\"function\" expected"; break;
+			case 33: s = "\"procedure\" expected"; break;
 			case 34: s = "\".\" expected"; break;
 			case 35: s = "\"begin\" expected"; break;
 			case 36: s = "\"break\" expected"; break;

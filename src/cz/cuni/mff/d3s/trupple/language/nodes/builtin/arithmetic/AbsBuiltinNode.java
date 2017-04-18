@@ -11,10 +11,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class AbsBuiltinNode extends BuiltinNode {
 
-    public AbsBuiltinNode(PascalContext context) {
-        super(context);
-    }
-
     @Specialization
     long integerAbsoluteValue(long value) {
         return Math.abs(value);

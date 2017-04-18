@@ -1,17 +1,13 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
-import java.util.List;
-
-public class FunctionReturnDescriptor extends SubroutineDescriptor {
+public class ReturnTypeDescriptor implements TypeDescriptor {
 
     private final TypeDescriptor returnTypeDescriptor;
 
-    public FunctionReturnDescriptor(List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) {
-        super(formalParameters);
+    public ReturnTypeDescriptor(TypeDescriptor returnTypeDescriptor) {
         this.returnTypeDescriptor = returnTypeDescriptor;
     }
 
