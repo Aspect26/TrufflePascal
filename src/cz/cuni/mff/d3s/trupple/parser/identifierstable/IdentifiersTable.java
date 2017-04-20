@@ -6,6 +6,7 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
@@ -72,7 +73,7 @@ public class IdentifiersTable {
         try {
             this.registerNewIdentifier("nil", new NilPointerDescriptor());
         } catch (LexicalException e) {
-            // TODO: could not initialize exception
+            throw new PascalRuntimeException("Could not initialize builtin constants");
         }
     }
 
@@ -183,13 +184,8 @@ public class IdentifiersTable {
     }
 
     public void addType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        // TODO: this is a duplicit -> call registerNewIdentifier()
-        if (this.identifiersMap.containsKey(identifier)) {
-            throw new DuplicitIdentifierException(identifier);
-        } else {
-            this.typeDescriptors.put(identifier, typeDescriptor);
-            this.identifiersMap.put(identifier, new TypeTypeDescriptor(typeDescriptor));
-        }
+        this.registerNewIdentifier(identifier, new TypeTypeDescriptor(typeDescriptor));
+        this.typeDescriptors.put(identifier, typeDescriptor);
     }
 
     public void initializeAllUninitializedPointerDescriptors() throws LexicalException {
@@ -269,7 +265,6 @@ public class IdentifiersTable {
     }
 
     public void addFunctionInterfaceIfNotForwarded(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnType) throws LexicalException {
-        // TODO: duplicity with the function above
         TypeDescriptor descriptor = this.identifiersMap.get(identifier);
         if (descriptor != null) {
             return;
@@ -284,7 +279,7 @@ public class IdentifiersTable {
     }
 
     public void forwardFunction(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
-        TypeDescriptor typeDescriptor = new FunctionDescriptor(formalParameters);
+        TypeDescriptor typeDescriptor = new FunctionDescriptor(formalParameters, returnTypeDescriptor);
         this.registerNewIdentifier(identifier, typeDescriptor);
     }
 

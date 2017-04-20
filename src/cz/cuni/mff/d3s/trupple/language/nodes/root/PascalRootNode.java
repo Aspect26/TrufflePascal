@@ -6,8 +6,6 @@ import com.oracle.truffle.api.nodes.RootNode;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.function.ProcedureWrapExpressionNode;
 
 public abstract class PascalRootNode extends RootNode {
 

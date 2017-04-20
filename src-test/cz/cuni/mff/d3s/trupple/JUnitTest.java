@@ -68,7 +68,10 @@ public abstract class JUnitTest {
 	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
                         boolean extendedGotoSupport, String[] arguments) {
         List<String> importsWithBuiltin = new ArrayList<>();
-        importsWithBuiltin.add(getStringsUnit());
+        String stringsUnit = getStringsUnit();
+        if (stringsUnit != null) {
+            importsWithBuiltin.add(stringsUnit);
+        }
         importsWithBuiltin.addAll(imports);
         setUpStreams();
         PascalLanguage.startFromCodes(sourceCode, arguments, importsWithBuiltin, useTPExtension, extendedGotoSupport);
@@ -80,7 +83,8 @@ public abstract class JUnitTest {
         try {
             encoded = Files.readAllBytes(Paths.get("./builtinunits/strings.pas"));
         } catch (IOException e) {
-            throw new RuntimeException("Could not read strings unit");
+            System.err.print("Could not read strings unit");
+            return null;
         }
         return new String(encoded);
     }

@@ -11,9 +11,8 @@ import java.util.List;
 
 public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
 
-    // TOOD: now this can be merged with procedure descriptor together
     BuiltinFunctionDescriptor(ExpressionNode bodyNode, List<FormalParameter> parameters) {
-        super(parameters);
+        super(parameters, bodyNode.getType());
         this.setRootNode(new FunctionPascalRootNode(new FrameDescriptor(), bodyNode));
     }
 

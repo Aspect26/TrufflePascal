@@ -4,8 +4,10 @@ import cz.cuni.mff.d3s.trupple.language.builtinunits.BuiltinUnitAbstr;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.UnitSubroutineData;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.string.StrAllocNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
@@ -36,7 +38,11 @@ public class StringBuiltinUnit extends BuiltinUnitAbstr {
     @Override
     public void importTo(LexicalScope scope) {
         super.importTo(scope);
-        scope.registerType("pchar", new PointerDescriptor(new PCharDesriptor()));
+        try {
+            scope.registerType("pchar", new PointerDescriptor(new PCharDesriptor()));
+        } catch (LexicalException e) {
+            throw new PascalRuntimeException("Could not import string unit: " + e.getMessage());
+        }
     }
 
 }

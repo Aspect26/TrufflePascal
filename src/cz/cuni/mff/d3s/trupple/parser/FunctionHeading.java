@@ -16,6 +16,6 @@ public class FunctionHeading {
         this.identifierToken = identifierToken;
         this.formalParameters = formalParameters;
         this.returnTypeDescriptor = returnTypeDescriptor;
-        this.descriptor = new FunctionDescriptor(this.formalParameters);
+        this.descriptor = new FunctionDescriptor(this.formalParameters, returnTypeDescriptor);
     }
 }

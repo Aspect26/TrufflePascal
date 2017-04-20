@@ -2,7 +2,6 @@ package cz.cuni.mff.d3s.trupple.parser;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
@@ -32,8 +31,7 @@ public class LexicalScope {
     private final LexicalScope outer;
     private int loopDepth;
     private final Set<String> publicIdentifiers;
-
-    final IdentifiersTable localIdentifiers;
+    private final IdentifiersTable localIdentifiers;
     final List<StatementNode> scopeInitializationNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
@@ -66,10 +64,6 @@ public class LexicalScope {
 
     PascalSubroutine getSubroutine(String identifier) throws LexicalException {
         return this.localIdentifiers.getSubroutine(identifier);
-    }
-
-    FrameSlotKind getSlotKind(String identifier) {
-        return this.localIdentifiers.getFrameSlotKind(identifier);
     }
 
     FrameSlot getReturnSlot() {
@@ -216,12 +210,8 @@ public class LexicalScope {
         }
     }
 
-    public void registerType(String identifier, TypeDescriptor type) {
-        try {
-            this.localIdentifiers.addType(identifier, type);
-        } catch (LexicalException e) {
-            // TODO: this is called from BuiltinUnitAbstr only, so this should not happen
-        }
+    public void registerType(String identifier, TypeDescriptor type) throws LexicalException{
+        this.localIdentifiers.addType(identifier, type);
     }
 
     void registerConstant(String identifier, ConstantDescriptor constant) throws LexicalException {
@@ -254,7 +244,7 @@ public class LexicalScope {
         return new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
     }
 
-    protected List<StatementNode> generateInitializationNodes(VirtualFrame frame)  {
+    List<StatementNode> generateInitializationNodes(VirtualFrame frame)  {
         List<StatementNode> initializationNodes = new ArrayList<>();
 
         for (Map.Entry<String, TypeDescriptor> entry : this.localIdentifiers.getAllIdentifiers().entrySet()) {

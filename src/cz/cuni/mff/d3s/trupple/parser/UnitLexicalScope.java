@@ -7,7 +7,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 
 import java.util.List;
 
-public class UnitLexicalScope extends LexicalScope {
+class UnitLexicalScope extends LexicalScope {
 
     private VirtualFrame frame;
 
