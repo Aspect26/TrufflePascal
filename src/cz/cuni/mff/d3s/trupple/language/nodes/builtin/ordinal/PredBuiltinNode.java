@@ -7,10 +7,13 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @NodeInfo(shortName = "pred")
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class PredBuiltinNode extends BuiltinNode {
+
+    protected abstract ExpressionNode getArgument();
 
     @Specialization
     public long pred(long value) {
@@ -36,4 +39,10 @@ public abstract class PredBuiltinNode extends BuiltinNode {
     public EnumValue pred(EnumValue value) {
         return value.getPrevious();
     }
+
+    @Override
+    public TypeDescriptor getType() {
+        return getArgument().getType();
+    }
+
 }

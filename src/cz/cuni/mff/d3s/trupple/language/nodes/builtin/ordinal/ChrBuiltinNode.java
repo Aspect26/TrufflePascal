@@ -6,14 +6,21 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 
 @NodeInfo(shortName = "chr")
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class ChrBuiltinNode extends BuiltinNode {
 
     @Specialization
-    public char chr(long value) {
+    char chr(long value) {
         return (char) (value % 256);
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return CharDescriptor.getInstance();
     }
 
 }

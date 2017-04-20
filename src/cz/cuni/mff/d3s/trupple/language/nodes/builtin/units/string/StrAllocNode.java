@@ -7,6 +7,8 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.HeapSlot;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.PascalHeap;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 
 @NodeChild(type = ExpressionNode.class)
@@ -20,6 +22,11 @@ public abstract class StrAllocNode extends ExpressionNode {
         pointer.setHeapSlot(heapSlot);
 
         return pointer;
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return new PointerDescriptor(PCharDesriptor.getInstance());
     }
 
 }

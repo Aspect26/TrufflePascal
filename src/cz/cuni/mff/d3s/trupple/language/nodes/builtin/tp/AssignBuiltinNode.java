@@ -7,16 +7,15 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 
 @NodeInfo(shortName = "assign")
 @NodeChildren({@NodeChild(value = "file", type = ExpressionNode.class), @NodeChild(value="path", type = ExpressionNode.class)})
-public abstract class AssignBuiltinNode extends BuiltinNode {
+public abstract class AssignBuiltinNode extends StatementNode {
 
     @Specialization
-    Object assignFile(FileValue file, PascalString filePath) {
+    void assignFile(FileValue file, PascalString filePath) {
         file.assignFilePath(filePath.toString());
-        return file;
     }
+
 }

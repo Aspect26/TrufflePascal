@@ -5,6 +5,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 public class ReadVariableWithRouteNode extends ExpressionNode {
 
@@ -22,6 +23,11 @@ public class ReadVariableWithRouteNode extends ExpressionNode {
         } catch (FrameSlotTypeException e) {
             throw new PascalRuntimeException("Unexpected error");
         }
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+	    return this.accessNode.getType();
     }
 
 }

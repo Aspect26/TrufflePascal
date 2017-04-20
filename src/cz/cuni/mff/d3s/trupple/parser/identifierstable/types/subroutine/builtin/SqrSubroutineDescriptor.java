@@ -10,8 +10,7 @@ public class SqrSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgume
     public SqrSubroutineDescriptor() {
         super(
                 SqrBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", LongDescriptor.getInstance(), false),
-                LongDescriptor.getInstance());
+                new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 
 }

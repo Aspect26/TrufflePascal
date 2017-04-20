@@ -5,7 +5,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;

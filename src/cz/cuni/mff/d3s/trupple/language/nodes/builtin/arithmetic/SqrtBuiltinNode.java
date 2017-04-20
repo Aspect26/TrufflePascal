@@ -7,6 +7,8 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.SqrtInvalidArgumentEx
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 @NodeInfo(shortName = "sqrt")
 @NodeChild(value = "argument", type = ExpressionNode.class)
@@ -28,6 +30,11 @@ public abstract class SqrtBuiltinNode extends BuiltinNode {
         } else {
             throw new SqrtInvalidArgumentException(value);
         }
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return RealDescriptor.getInstance();
     }
 
 }

@@ -8,6 +8,12 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.Primitive
 
 public class PCharDesriptor implements TypeDescriptor {
 
+    private static PCharDesriptor instance = new PCharDesriptor();
+
+    public static PCharDesriptor getInstance() {
+        return instance;
+    }
+
     @Override
     public FrameSlotKind getSlotKind() {
         return FrameSlotKind.Object;

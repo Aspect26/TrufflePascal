@@ -6,6 +6,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeExceptio
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 public class PointerDereference extends AccessNode {
 
@@ -14,8 +15,20 @@ public class PointerDereference extends AccessNode {
     }
 
     @Override
+    public Object executeGeneric(VirtualFrame frame) {
+        this.applyToNode.executeVoid(frame);
+        return null;
+    }
+
+    @Override
     public void executeVoid(VirtualFrame frame) {
         this.applyToNode.executeVoid(frame);
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        // TODO: implement this
+        return null;
     }
 
     @Override

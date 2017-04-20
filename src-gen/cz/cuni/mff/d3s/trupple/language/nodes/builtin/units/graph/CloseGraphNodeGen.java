@@ -17,19 +17,9 @@ public final class CloseGraphNodeGen extends CloseGraphNode {
     }
 
     @Override
-    public Object executeGeneric(VirtualFrame frameValue) {
-        return executeLong(frameValue);
-    }
-
-    @Override
     public void executeVoid(VirtualFrame frameValue) {
-        executeLong(frameValue);
+        this.closeGraph(frameValue);
         return;
-    }
-
-    @Override
-    public long executeLong(VirtualFrame frameValue) {
-        return this.closeGraph(frameValue);
     }
 
     public static CloseGraphNode create() {

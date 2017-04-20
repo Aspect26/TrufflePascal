@@ -24,6 +24,16 @@ public final class OrNodeGen extends OrNode {
     }
 
     @Override
+    protected ExpressionNode getLeftNode() {
+        return this.leftNode_;
+    }
+
+    @Override
+    protected ExpressionNode getRightNode() {
+        return this.rightNode_;
+    }
+
+    @Override
     public NodeCost getCost() {
         return NodeCost.MONOMORPHIC;
     }

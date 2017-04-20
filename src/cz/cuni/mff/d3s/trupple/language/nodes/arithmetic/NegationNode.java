@@ -4,15 +4,16 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 @NodeInfo(shortName = "neg")
-public abstract class NegationNode extends UnaryNode {
+public abstract class NegationNode extends UnaryNode {;
 
 	@Specialization
-	protected long neg(long val) {
-		return -val;
+	protected long neg(long argument) {
+		return -argument;
 	}
 
 	@Specialization
-	protected double neg(double val) {
-		return -val;
+	protected double neg(double argument) {
+		return -argument;
 	}
+
 }

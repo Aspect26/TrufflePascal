@@ -31,18 +31,7 @@ public final class PutPixelNodeGen extends PutPixelNode {
     }
 
     @Override
-    public Object executeGeneric(VirtualFrame frameValue) {
-        return executeLong(frameValue);
-    }
-
-    @Override
     public void executeVoid(VirtualFrame frameValue) {
-        executeLong(frameValue);
-        return;
-    }
-
-    @Override
-    public long executeLong(VirtualFrame frameValue) {
         long child0Value_;
         try {
             child0Value_ = child0_.executeLong(frameValue);
@@ -64,7 +53,8 @@ public final class PutPixelNodeGen extends PutPixelNode {
         } catch (UnexpectedResultException ex) {
             throw unsupported(child0Value_, child1Value_, ex.getResult());
         }
-        return this.putPixel(child0Value_, child1Value_, child2Value_);
+        this.putPixel(child0Value_, child1Value_, child2Value_);
+        return;
     }
 
     private UnsupportedSpecializationException unsupported(Object child0Value, Object child1Value, Object child2Value) {

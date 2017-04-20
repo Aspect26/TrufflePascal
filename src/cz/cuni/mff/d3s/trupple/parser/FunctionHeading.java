@@ -9,13 +9,13 @@ public class FunctionHeading {
 
     public final Token identifierToken;
     public final List<FormalParameter> formalParameters;
-    public final TypeDescriptor returnTypeDescriptor;
+    final TypeDescriptor returnTypeDescriptor;
     public final FunctionDescriptor descriptor;
 
     public FunctionHeading(Token identifierToken, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) {
         this.identifierToken = identifierToken;
         this.formalParameters = formalParameters;
         this.returnTypeDescriptor = returnTypeDescriptor;
-        this.descriptor = new FunctionDescriptor(this.formalParameters, returnTypeDescriptor);
+        this.descriptor = new FunctionDescriptor(this.formalParameters);
     }
 }

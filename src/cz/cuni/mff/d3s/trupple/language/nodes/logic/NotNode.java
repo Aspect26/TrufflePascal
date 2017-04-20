@@ -5,6 +5,8 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.UnaryNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 
 @NodeInfo(shortName = "!")
 public abstract class NotNode extends UnaryNode {
@@ -16,4 +18,10 @@ public abstract class NotNode extends UnaryNode {
 	protected boolean logicalNot(boolean child) {
 		return !child;
 	}
+
+    @Override
+    public TypeDescriptor getType() {
+        return BooleanDescriptor.getInstance();
+    }
+
 }

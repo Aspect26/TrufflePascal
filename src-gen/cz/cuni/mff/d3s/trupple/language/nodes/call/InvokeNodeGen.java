@@ -1,27 +1,26 @@
 // CheckStyle: start generated
 package cz.cuni.mff.d3s.trupple.language.nodes.call;
 
-import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.dsl.GeneratedBy;
-import com.oracle.truffle.api.dsl.UnsupportedSpecializationException;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
-import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @GeneratedBy(InvokeNode.class)
 public final class InvokeNodeGen extends InvokeNode {
 
-    @Child private ExpressionNode functionNode_;
-    @CompilationFinal private boolean seenUnsupported0;
+    @Child private FunctionLiteralNode functionNode_;
 
-    private InvokeNodeGen(ExpressionNode[] argumentNodes, ExpressionNode functionNode) {
+    private InvokeNodeGen(ExpressionNode[] argumentNodes, FunctionLiteralNode functionNode) {
         super(argumentNodes);
         this.functionNode_ = functionNode;
+    }
+
+    @Override
+    protected FunctionLiteralNode getFunctionNode() {
+        return this.functionNode_;
     }
 
     @Override
@@ -31,12 +30,7 @@ public final class InvokeNodeGen extends InvokeNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frameValue) {
-        PascalSubroutine functionNodeValue_;
-        try {
-            functionNodeValue_ = PascalTypesGen.expectPascalSubroutine(functionNode_.executeGeneric(frameValue));
-        } catch (UnexpectedResultException ex) {
-            throw unsupported(ex.getResult());
-        }
+        PascalSubroutine functionNodeValue_ = functionNode_.executeGeneric(frameValue);
         return this.executeGeneric(frameValue, functionNodeValue_);
     }
 
@@ -46,15 +40,7 @@ public final class InvokeNodeGen extends InvokeNode {
         return;
     }
 
-    private UnsupportedSpecializationException unsupported(Object functionNodeValue) {
-        if (!seenUnsupported0) {
-            CompilerDirectives.transferToInterpreterAndInvalidate();
-            seenUnsupported0 = true;
-        }
-        return new UnsupportedSpecializationException(this, new Node[] {functionNode_}, functionNodeValue);
-    }
-
-    public static InvokeNode create(ExpressionNode[] argumentNodes, ExpressionNode functionNode) {
+    public static InvokeNode create(ExpressionNode[] argumentNodes, FunctionLiteralNode functionNode) {
         return new InvokeNodeGen(argumentNodes, functionNode);
     }
 

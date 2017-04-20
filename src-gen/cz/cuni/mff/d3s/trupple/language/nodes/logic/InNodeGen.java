@@ -26,6 +26,16 @@ public final class InNodeGen extends InNode {
     }
 
     @Override
+    protected ExpressionNode getLeftNode() {
+        return this.leftNode_;
+    }
+
+    @Override
+    protected ExpressionNode getRightNode() {
+        return this.rightNode_;
+    }
+
+    @Override
     public NodeCost getCost() {
         return NodeCost.MONOMORPHIC;
     }

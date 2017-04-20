@@ -74,19 +74,14 @@ public final class ReadBuiltinNodeFactory implements NodeFactory<ReadBuiltinNode
         }
 
         @Override
-        public Object executeGeneric(VirtualFrame frameValue) {
+        public void executeVoid(VirtualFrame frameValue) {
             Object[] arguments0Value_;
             try {
                 arguments0Value_ = expectObjectArray(arguments0_.executeGeneric(frameValue));
             } catch (UnexpectedResultException ex) {
                 throw unsupported(ex.getResult());
             }
-            return this.read(arguments0Value_);
-        }
-
-        @Override
-        public void executeVoid(VirtualFrame frameValue) {
-            executeGeneric(frameValue);
+            this.read(arguments0Value_);
             return;
         }
 

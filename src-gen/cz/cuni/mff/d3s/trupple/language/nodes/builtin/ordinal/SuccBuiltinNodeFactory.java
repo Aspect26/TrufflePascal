@@ -75,6 +75,11 @@ public final class SuccBuiltinNodeFactory implements NodeFactory<SuccBuiltinNode
         }
 
         @Override
+        protected ExpressionNode getArgument() {
+            return this.argument_;
+        }
+
+        @Override
         public NodeCost getCost() {
             return specialization_.getNodeCost();
         }

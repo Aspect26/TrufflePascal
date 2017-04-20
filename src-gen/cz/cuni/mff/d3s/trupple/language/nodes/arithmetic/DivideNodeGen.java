@@ -30,6 +30,16 @@ public final class DivideNodeGen extends DivideNode implements SpecializedNode {
     }
 
     @Override
+    protected ExpressionNode getLeftNode() {
+        return this.leftNode_;
+    }
+
+    @Override
+    protected ExpressionNode getRightNode() {
+        return this.rightNode_;
+    }
+
+    @Override
     public NodeCost getCost() {
         return specialization_.getNodeCost();
     }

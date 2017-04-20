@@ -8,14 +8,12 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 public abstract class ReadlnBuiltinNode extends ReadBuiltinNode {
 
     @Specialization
-    public Object read(Object[] arguments) {
+    public void read(Object[] arguments) {
 	    if (arguments.length == 0) {
-	        return this.consumeNewLine();
+	        this.consumeNewLine();
         } else {
-            Object returnValue = super.read(arguments);
+            super.read(arguments);
             this.consumeNewLine();
-
-            return returnValue;
         }
     }
 

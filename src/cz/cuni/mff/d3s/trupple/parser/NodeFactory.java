@@ -19,6 +19,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.FunctionPascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.ProcedurePascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
@@ -447,7 +450,7 @@ public class NodeFactory {
 
     public FormalParameter createFunctionFormalParameter(FunctionHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
-        FunctionDescriptor descriptor = new FunctionDescriptor(heading.formalParameters, heading.returnTypeDescriptor);
+        FunctionDescriptor descriptor = new FunctionDescriptor(heading.formalParameters);
 
         return new FormalParameter(identifier, descriptor, false, heading.descriptor);
     }
@@ -455,13 +458,18 @@ public class NodeFactory {
     public void finishProcedureImplementation(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
-        finishSubroutine(procedureBodyNode);
+        final PascalRootNode rootNode = new ProcedurePascalRootNode(currentLexicalScope.getFrameDescriptor(), procedureBodyNode);
+        finishSubroutine(rootNode);
     }
 
     public void finishFunctionImplementation(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
-        final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(subroutineNode, currentLexicalScope.getReturnSlot());
-        finishSubroutine(functionBodyNode);
+        final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(
+                subroutineNode,
+                currentLexicalScope.getReturnSlot(),
+                currentLexicalScope.getIdentifierDescriptor(currentLexicalScope.getName()));
+        final PascalRootNode rootNode = new FunctionPascalRootNode(currentLexicalScope.getFrameDescriptor(), functionBodyNode);
+        finishSubroutine(rootNode);
     }
 
     public void startLoop() {
@@ -479,11 +487,12 @@ public class NodeFactory {
 
     public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
         String iteratingIdentifier = this.getIdentifierFromToken(variableToken);
-        FrameSlot iteratingSlot = currentLexicalScope.getLocalSlot(iteratingIdentifier);
-        if (iteratingSlot == null) {
+        FrameSlot controlSlot = currentLexicalScope.getLocalSlot(iteratingIdentifier);
+        TypeDescriptor controlSlotType = currentLexicalScope.getIdentifierDescriptor(iteratingIdentifier);
+        if (controlSlot == null) {
             parser.SemErr("Unknown identifier: " + iteratingIdentifier);
         }
-        return new ForNode(ascending, iteratingSlot, startValue, finalValue, loopBody);
+        return new ForNode(ascending, controlSlot, controlSlotType, finalValue, startValue, loopBody);
     }
 
     public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
@@ -616,11 +625,12 @@ public class NodeFactory {
     public AccessNode createSimpleAccessNode(Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(identifier), true);
+        TypeDescriptor typeDescriptor = this.doLookup(identifier, LexicalScope::getIdentifierDescriptor, new UnknownIdentifierException(identifier));
 
-	    return new SimpleAccessNode(frameSlot);
+	    return new SimpleAccessNode(frameSlot, typeDescriptor);
     }
 
-    public ExpressionNode createAssignmentWithRoute(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
+    public StatementNode createAssignmentWithRoute(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier), true);
 
@@ -637,7 +647,7 @@ public class NodeFactory {
             }
             else {
                 // TODO: check if it is a constant or a variable
-                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier));
+                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier), foundInLexicalScope.getIdentifierDescriptor(foundIdentifier));
             }
         }, new UnknownIdentifierException(identifier));
     }
@@ -673,7 +683,8 @@ public class NodeFactory {
     }
 
     private ExpressionNode createInvokeNode(FrameSlot subroutineSlot, List<ExpressionNode> params) {
-        ExpressionNode literal = new FunctionLiteralNode(subroutineSlot);
+	    // TODO: this null
+        FunctionLiteralNode literal = new FunctionLiteralNode(subroutineSlot, null);
         return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), literal);
     }
 
@@ -681,7 +692,7 @@ public class NodeFactory {
         String variableIdentifier = this.getIdentifierFromToken(variableToken);
         FrameSlot slot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot,
                 new UnknownIdentifierException(variableIdentifier));
-        return new StoreReferenceArgumentNode(slot);
+        return new StoreReferenceArgumentNode(slot, currentLexicalScope.getIdentifierDescriptor(variableIdentifier));
     }
 
     public ExpressionNode createSubroutineParameterPassNode(Token variableToken) {
@@ -725,7 +736,7 @@ public class NodeFactory {
 	    this.addProgramArgumentsAssignmentNodes();
 
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
-        return new PascalRootNode(currentLexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
+        return new ProcedurePascalRootNode(currentLexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
     }
 
     private void addProgramArgumentsAssignmentNodes() {
@@ -796,9 +807,7 @@ public class NodeFactory {
         }
     }
 
-    private void finishSubroutine(ExpressionNode subroutineBodyNode) {
-        final PascalRootNode rootNode = new PascalRootNode(currentLexicalScope.getFrameDescriptor(), subroutineBodyNode);
-
+    private void finishSubroutine(PascalRootNode rootNode) {
         String subroutineIdentifier = currentLexicalScope.getName();
         currentLexicalScope = currentLexicalScope.getOuterScope();
         try {

@@ -7,10 +7,13 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @NodeInfo(shortName = "succ")
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class SuccBuiltinNode extends BuiltinNode {
+
+    protected abstract ExpressionNode getArgument();
 
     @Specialization
     public long succ(long value) {
@@ -36,4 +39,10 @@ public abstract class SuccBuiltinNode extends BuiltinNode {
     public EnumValue succ(EnumValue value) {
         return value.getNext();
     }
+
+    @Override
+    public TypeDescriptor getType() {
+        return getArgument().getType();
+    }
+
 }

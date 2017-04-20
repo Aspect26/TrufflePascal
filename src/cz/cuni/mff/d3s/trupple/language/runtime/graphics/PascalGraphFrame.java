@@ -57,12 +57,11 @@ public class PascalGraphFrame extends JFrame {
         this.printingPanel.setBackground(Color.black);
     }
 
-    long putGeometry(Geometry geometry) {
+    void putGeometry(Geometry geometry) {
         synchronized (drawingLock) {
             this.geometries.add(geometry);
             this.repaint();
         }
-        return 0;
     }
 
     boolean keyPressed() {

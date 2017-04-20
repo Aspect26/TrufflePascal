@@ -25,4 +25,5 @@ public abstract class DivideNode extends BinaryNode {
 	protected double div(double left, double right) {
 		return left / right;
 	}
+
 }

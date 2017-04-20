@@ -4,7 +4,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.DuplicitIdentifierException;
@@ -284,7 +284,7 @@ public class IdentifiersTable {
     }
 
     public void forwardFunction(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnTypeDescriptor) throws LexicalException {
-        TypeDescriptor typeDescriptor = new FunctionDescriptor(formalParameters, returnTypeDescriptor);
+        TypeDescriptor typeDescriptor = new FunctionDescriptor(formalParameters);
         this.registerNewIdentifier(identifier, typeDescriptor);
     }
 

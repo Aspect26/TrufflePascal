@@ -24,7 +24,7 @@ public class PointerDescriptor implements TypeDescriptor {
     /**
      * This c'tor is only used for NilPointerDescriptor
      */
-    protected PointerDescriptor() {
+    PointerDescriptor() {
         this.innerTypeInitialized = true;
         this.innerType = null;
     }
@@ -37,6 +37,11 @@ public class PointerDescriptor implements TypeDescriptor {
     @Override
     public Object getDefaultValue() {
         return new PointerValue(innerType);
+    }
+
+    @Override
+    public boolean equals(Object compareTo) {
+        return (compareTo instanceof PointerDescriptor) && ((PointerDescriptor) compareTo).getInnerTypeIdentifier().equals(this.innerTypeIdentifier);
     }
 
     public String getInnerTypeIdentifier() {

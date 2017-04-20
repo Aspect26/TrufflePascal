@@ -7,11 +7,8 @@ import java.util.List;
 
 public class FunctionDescriptor extends SubroutineDescriptor {
 
-    private final TypeDescriptor returnType;
-
-    public FunctionDescriptor(List<FormalParameter> formalParameters, TypeDescriptor returnType) {
+    public FunctionDescriptor(List<FormalParameter> formalParameters) {
         super(formalParameters);
-        this.returnType = returnType;
     }
 
 }

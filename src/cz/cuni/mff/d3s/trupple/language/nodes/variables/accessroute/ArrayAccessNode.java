@@ -7,6 +7,8 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
 
 import java.util.List;
 
@@ -21,6 +23,18 @@ public class ArrayAccessNode extends AccessNode {
     }
 
     @Override
+    public Object executeGeneric(VirtualFrame frame) {
+        indexes = new Object[this.indexExpressions.length];
+
+        for (int i = 0; i < this.indexExpressions.length; ++i) {
+            indexes[i] = this.indexExpressions[i].executeGeneric(frame);
+        }
+
+        applyToNode.executeVoid(frame);
+        return null;
+    }
+
+    @Override
     public void executeVoid(VirtualFrame frame) {
         indexes = new Object[this.indexExpressions.length];
 
@@ -29,6 +43,12 @@ public class ArrayAccessNode extends AccessNode {
         }
 
         applyToNode.executeVoid(frame);
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        // TODO: implement this
+        return null;
     }
 
     @Override

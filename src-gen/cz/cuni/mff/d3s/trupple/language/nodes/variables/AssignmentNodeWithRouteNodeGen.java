@@ -12,7 +12,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
@@ -22,6 +21,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @GeneratedBy(AssignmentNodeWithRoute.class)
 public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRoute implements SpecializedNode {
@@ -49,29 +49,9 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
     }
 
     @Override
-    public Object executeGeneric(VirtualFrame frameValue) {
-        return specialization_.execute(frameValue);
-    }
-
-    @Override
     public void executeVoid(VirtualFrame frameValue) {
         specialization_.executeVoid(frameValue);
         return;
-    }
-
-    @Override
-    public boolean executeBoolean(VirtualFrame frameValue) throws UnexpectedResultException {
-        return specialization_.executeBoolean(frameValue);
-    }
-
-    @Override
-    public char executeChar(VirtualFrame frameValue) throws UnexpectedResultException {
-        return specialization_.executeChar(frameValue);
-    }
-
-    @Override
-    public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
-        return specialization_.executeLong(frameValue);
     }
 
     @Override
@@ -110,31 +90,16 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
 
         @Override
         public final Object acceptAndExecute(Frame frameValue, Object valueNodeValue) {
-            return this.execute_((VirtualFrame) frameValue, valueNodeValue);
+            this.executeVoid_((VirtualFrame) frameValue, valueNodeValue);
+            return null;
         }
 
-        public abstract Object execute_(VirtualFrame frameValue, Object valueNodeValue);
-
-        public Object execute(VirtualFrame frameValue) {
-            Object valueNodeValue_ = executeValueNode_(frameValue);
-            return execute_(frameValue, valueNodeValue_);
-        }
+        public abstract void executeVoid_(VirtualFrame frameValue, Object valueNodeValue);
 
         public void executeVoid(VirtualFrame frameValue) {
-            execute(frameValue);
+            Object valueNodeValue_ = executeValueNode_(frameValue);
+            executeVoid_(frameValue, valueNodeValue_);
             return;
-        }
-
-        public boolean executeBoolean(VirtualFrame frameValue) throws UnexpectedResultException {
-            return PascalTypesGen.expectBoolean(execute(frameValue));
-        }
-
-        public char executeChar(VirtualFrame frameValue) throws UnexpectedResultException {
-            return PascalTypesGen.expectCharacter(execute(frameValue));
-        }
-
-        public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
-            return PascalTypesGen.expectLong(execute(frameValue));
         }
 
         @Override
@@ -168,6 +133,9 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
             }
             if (valueNodeValue instanceof PascalString) {
                 return AssignStringNode_.create(root);
+            }
+            if (valueNodeValue instanceof PascalSubroutine) {
+                return AssignSubroutineNode_.create(root);
             }
             if (valueNodeValue instanceof PascalArray) {
                 return AssignArrayNode_.create(root);
@@ -232,8 +200,9 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
-            return uninitialized(frameValue, valueNodeValue);
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
+            uninitialized(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -254,8 +223,9 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
-            return getNext().execute_(frameValue, valueNodeValue);
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -271,32 +241,27 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            try {
-                return executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return ex.getResult();
-            }
-        }
-
-        @Override
-        public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
+        public void executeVoid(VirtualFrame frameValue) {
             long valueNodeValue_;
             try {
                 valueNodeValue_ = root.valueNode_.executeLong(frameValue);
             } catch (UnexpectedResultException ex) {
-                return PascalTypesGen.expectLong(getNext().execute_(frameValue, ex.getResult()));
+                getNext().executeVoid_(frameValue, ex.getResult());
+                return;
             }
-            return root.writeLong(frameValue, valueNodeValue_);
+            root.writeLong(frameValue, valueNodeValue_);
+            return;
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Long) {
                 long valueNodeValue_ = (long) valueNodeValue;
-                return root.writeLong(frameValue, valueNodeValue_);
+                root.writeLong(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -312,32 +277,27 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            try {
-                return executeBoolean(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return ex.getResult();
-            }
-        }
-
-        @Override
-        public boolean executeBoolean(VirtualFrame frameValue) throws UnexpectedResultException {
+        public void executeVoid(VirtualFrame frameValue) {
             boolean valueNodeValue_;
             try {
                 valueNodeValue_ = root.valueNode_.executeBoolean(frameValue);
             } catch (UnexpectedResultException ex) {
-                return PascalTypesGen.expectBoolean(getNext().execute_(frameValue, ex.getResult()));
+                getNext().executeVoid_(frameValue, ex.getResult());
+                return;
             }
-            return root.writeBoolean(frameValue, valueNodeValue_);
+            root.writeBoolean(frameValue, valueNodeValue_);
+            return;
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Boolean) {
                 boolean valueNodeValue_ = (boolean) valueNodeValue;
-                return root.writeBoolean(frameValue, valueNodeValue_);
+                root.writeBoolean(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -353,32 +313,27 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            try {
-                return executeChar(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return ex.getResult();
-            }
-        }
-
-        @Override
-        public char executeChar(VirtualFrame frameValue) throws UnexpectedResultException {
+        public void executeVoid(VirtualFrame frameValue) {
             char valueNodeValue_;
             try {
                 valueNodeValue_ = root.valueNode_.executeChar(frameValue);
             } catch (UnexpectedResultException ex) {
-                return PascalTypesGen.expectCharacter(getNext().execute_(frameValue, ex.getResult()));
+                getNext().executeVoid_(frameValue, ex.getResult());
+                return;
             }
-            return root.writeChar(frameValue, valueNodeValue_);
+            root.writeChar(frameValue, valueNodeValue_);
+            return;
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Character) {
                 char valueNodeValue_ = (char) valueNodeValue;
-                return root.writeChar(frameValue, valueNodeValue_);
+                root.writeChar(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -394,12 +349,14 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Double) {
                 double valueNodeValue_ = (double) valueNodeValue;
-                return root.writeDouble(frameValue, valueNodeValue_);
+                root.writeDouble(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -415,12 +372,14 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof EnumValue) {
                 EnumValue valueNodeValue_ = (EnumValue) valueNodeValue;
-                return root.writeEnum(frameValue, valueNodeValue_);
+                root.writeEnum(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -436,12 +395,14 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof SetTypeValue) {
                 SetTypeValue valueNodeValue_ = (SetTypeValue) valueNodeValue;
-                return root.assignSet(frameValue, valueNodeValue_);
+                root.assignSet(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -457,12 +418,14 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof RecordValue) {
                 RecordValue valueNodeValue_ = (RecordValue) valueNodeValue;
-                return root.assignRecord(frameValue, valueNodeValue_);
+                root.assignRecord(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -478,12 +441,14 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof Reference) {
                 Reference valueNodeValue_ = (Reference) valueNodeValue;
-                return root.assignReference(frameValue, valueNodeValue_);
+                root.assignReference(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -499,12 +464,14 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof PointerValue) {
                 PointerValue valueNodeValue_ = (PointerValue) valueNodeValue;
-                return root.assignPointers(frameValue, valueNodeValue_);
+                root.assignPointers(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -520,12 +487,14 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof PascalString) {
                 PascalString valueNodeValue_ = (PascalString) valueNodeValue;
-                return root.assignString(frameValue, valueNodeValue_);
+                root.assignString(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -533,20 +502,45 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
         }
 
     }
-    @GeneratedBy(methodName = "assignArray(VirtualFrame, PascalArray)", value = AssignmentNodeWithRoute.class)
-    private static final class AssignArrayNode_ extends BaseNode_ {
+    @GeneratedBy(methodName = "assignSubroutine(VirtualFrame, PascalSubroutine)", value = AssignmentNodeWithRoute.class)
+    private static final class AssignSubroutineNode_ extends BaseNode_ {
 
-        AssignArrayNode_(AssignmentNodeWithRouteNodeGen root) {
+        AssignSubroutineNode_(AssignmentNodeWithRouteNodeGen root) {
             super(root, 11);
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
+            if (valueNodeValue instanceof PascalSubroutine) {
+                PascalSubroutine valueNodeValue_ = (PascalSubroutine) valueNodeValue;
+                root.assignSubroutine(frameValue, valueNodeValue_);
+                return;
+            }
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
+        }
+
+        static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
+            return new AssignSubroutineNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "assignArray(VirtualFrame, PascalArray)", value = AssignmentNodeWithRoute.class)
+    private static final class AssignArrayNode_ extends BaseNode_ {
+
+        AssignArrayNode_(AssignmentNodeWithRouteNodeGen root) {
+            super(root, 12);
+        }
+
+        @Override
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof PascalArray) {
                 PascalArray valueNodeValue_ = (PascalArray) valueNodeValue;
-                return root.assignArray(frameValue, valueNodeValue_);
+                root.assignArray(frameValue, valueNodeValue_);
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {
@@ -558,17 +552,18 @@ public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRout
     private static final class TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_ extends BaseNode_ {
 
         TotallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLifeNode_(AssignmentNodeWithRouteNodeGen root) {
-            super(root, 12);
+            super(root, 13);
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object valueNodeValue) {
+        public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
             if (valueNodeValue instanceof VirtualFrame) {
                 VirtualFrame valueNodeValue_ = (VirtualFrame) valueNodeValue;
                 root.totallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLife(valueNodeValue_);
-                return null;
+                return;
             }
-            return getNext().execute_(frameValue, valueNodeValue);
+            getNext().executeVoid_(frameValue, valueNodeValue);
+            return;
         }
 
         static BaseNode_ create(AssignmentNodeWithRouteNodeGen root) {

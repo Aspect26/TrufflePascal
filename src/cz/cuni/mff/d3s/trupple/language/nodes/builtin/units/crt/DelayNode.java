@@ -4,6 +4,7 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.sun.media.jfxmedia.logging.Logger;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 
 /**
  * Official specification:
@@ -14,18 +15,15 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
  * None. Note that the implementation is also not precise.
  */
 @NodeChild(type = ExpressionNode.class)
-public abstract class DelayNode extends ExpressionNode {
+public abstract class DelayNode extends StatementNode {
 
     @Specialization
-    long delay(long miliSeconds) {
+    void delay(long miliSeconds) {
         try {
             Thread.sleep(miliSeconds);
         } catch (InterruptedException e) {
             Logger.logMsg(Logger.INFO, "Delay was interrupted.");
         }
-
-        // Note that this is a procedure, so it doesn't depend on what it returns
-        return miliSeconds;
     }
 
 }

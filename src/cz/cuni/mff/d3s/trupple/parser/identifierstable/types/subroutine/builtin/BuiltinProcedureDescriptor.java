@@ -2,23 +2,21 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.WriteBuiltinNodeFactory;
-import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.ProcedurePascalRootNode;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.BuiltinNotSupportedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 
-    BuiltinProcedureDescriptor(ExpressionNode bodyNode, List<FormalParameter> parameters) {
+    BuiltinProcedureDescriptor(StatementNode bodyNode, List<FormalParameter> parameters) {
         super(parameters);
-        this.setRootNode(new PascalRootNode(new FrameDescriptor(), bodyNode));
+        this.setRootNode(new ProcedurePascalRootNode(new FrameDescriptor(), bodyNode));
     }
 
     @Override
@@ -29,7 +27,7 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 
     public static class NoReferenceParameterBuiltin extends BuiltinProcedureDescriptor {
 
-        public NoReferenceParameterBuiltin(ExpressionNode bodyNode, List<FormalParameter> parameters) {
+        public NoReferenceParameterBuiltin(StatementNode bodyNode, List<FormalParameter> parameters) {
             super(bodyNode, parameters);
         }
 
@@ -42,7 +40,7 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 
     public static class FullReferenceParameterBuiltin extends BuiltinProcedureDescriptor {
 
-        public FullReferenceParameterBuiltin(ExpressionNode bodyNode, List<FormalParameter> parameters) {
+        public FullReferenceParameterBuiltin(StatementNode bodyNode, List<FormalParameter> parameters) {
             super(bodyNode, parameters);
         }
 
@@ -55,7 +53,7 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 
     public static class OneArgumentBuiltin extends BuiltinProcedureDescriptor {
 
-        public OneArgumentBuiltin(ExpressionNode bodyNode, FormalParameter parameter) {
+        public OneArgumentBuiltin(StatementNode bodyNode, FormalParameter parameter) {
             super(bodyNode, Collections.singletonList(parameter));
         }
 
@@ -81,7 +79,7 @@ public abstract class BuiltinProcedureDescriptor extends ProcedureDescriptor {
 
     public static class NoArgumentBuiltin extends BuiltinProcedureDescriptor {
 
-        public NoArgumentBuiltin(ExpressionNode bodyNode) {
+        public NoArgumentBuiltin(StatementNode bodyNode) {
             super(bodyNode, Collections.emptyList());
         }
 

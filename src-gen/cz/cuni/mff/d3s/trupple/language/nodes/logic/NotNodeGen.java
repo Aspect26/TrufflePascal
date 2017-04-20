@@ -14,11 +14,16 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 @GeneratedBy(NotNode.class)
 public final class NotNodeGen extends NotNode {
 
-    @Child private ExpressionNode son_;
+    @Child private ExpressionNode argument_;
     @CompilationFinal private boolean seenUnsupported0;
 
-    private NotNodeGen(ExpressionNode son) {
-        this.son_ = son;
+    private NotNodeGen(ExpressionNode argument) {
+        this.argument_ = argument;
+    }
+
+    @Override
+    protected ExpressionNode getArgument() {
+        return this.argument_;
     }
 
     @Override
@@ -33,13 +38,13 @@ public final class NotNodeGen extends NotNode {
 
     @Override
     public boolean executeBoolean(VirtualFrame frameValue) {
-        boolean sonValue_;
+        boolean argumentValue_;
         try {
-            sonValue_ = son_.executeBoolean(frameValue);
+            argumentValue_ = argument_.executeBoolean(frameValue);
         } catch (UnexpectedResultException ex) {
             throw unsupported(ex.getResult());
         }
-        return this.logicalNot(sonValue_);
+        return this.logicalNot(argumentValue_);
     }
 
     @Override
@@ -48,16 +53,16 @@ public final class NotNodeGen extends NotNode {
         return;
     }
 
-    private UnsupportedSpecializationException unsupported(Object sonValue) {
+    private UnsupportedSpecializationException unsupported(Object argumentValue) {
         if (!seenUnsupported0) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             seenUnsupported0 = true;
         }
-        return new UnsupportedSpecializationException(this, new Node[] {son_}, sonValue);
+        return new UnsupportedSpecializationException(this, new Node[] {argument_}, argumentValue);
     }
 
-    public static NotNode create(ExpressionNode son) {
-        return new NotNodeGen(son);
+    public static NotNode create(ExpressionNode argument) {
+        return new NotNodeGen(argument);
     }
 
 }

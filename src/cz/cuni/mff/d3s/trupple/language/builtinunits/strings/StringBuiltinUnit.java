@@ -23,8 +23,7 @@ public class StringBuiltinUnit extends BuiltinUnitAbstr {
            "StrAlloc",
                 new BuiltinFunctionDescriptor.OneArgumentBuiltin(
                         StrAllocNodeGen.create(new ReadArgumentNode(0)),
-                        new FormalParameter("size", LongDescriptor.getInstance(), false),
-                        new PointerDescriptor("")
+                        new FormalParameter("size", LongDescriptor.getInstance(), false)
                 )
         ));
     }

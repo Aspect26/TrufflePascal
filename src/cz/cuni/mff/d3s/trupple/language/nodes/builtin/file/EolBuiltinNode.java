@@ -7,6 +7,8 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 
 @NodeInfo(shortName = "eol")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
@@ -23,6 +25,11 @@ public abstract class EolBuiltinNode extends BuiltinNode {
 
     private boolean eol(FileValue file) {
         return file.eol();
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return BooleanDescriptor.getInstance();
     }
 
 }

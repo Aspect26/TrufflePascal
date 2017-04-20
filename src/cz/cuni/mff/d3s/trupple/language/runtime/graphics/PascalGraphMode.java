@@ -12,15 +12,13 @@ public class PascalGraphMode {
     private static PascalGraphFrame frame;
     private static boolean frameOpened = false;
 
-    public static long init() {
+    public static void init() {
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         try {
             SwingUtilities.invokeAndWait(PascalGraphMode::openFrame);
         } catch (InterruptedException | InvocationTargetException e) {
             throw new PascalRuntimeException("Could not initialize graphics");
         }
-
-        return 0;
     }
 
     private static void openFrame() {
@@ -30,19 +28,18 @@ public class PascalGraphMode {
         frameOpened = true;
     }
 
-    public static long close() {
+    public static void close() {
         frame.dispose();
         frameOpened = false;
-        return 0;
     }
 
-    public static long drawPixel(int x, int y, int colorNumber) {
+    public static void drawPixel(int x, int y, int colorNumber) {
         if (frame == null) {
-            return -1;
+            return;
         }
         Color color = new Color(colorNumber);
         Pixel pixel = new Pixel(x, y, color);
-        return frame.putGeometry(pixel);
+        frame.putGeometry(pixel);
     }
 
     public static boolean keyPressed() {

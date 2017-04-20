@@ -16,8 +16,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
-@NodeInfo(shortName = "for", description = "The node implementing a for loop")
+@NodeInfo(shortName = "for")
 public class ForNode extends StatementNode {
 
     private interface ControlInterface {
@@ -36,15 +37,17 @@ public class ForNode extends StatementNode {
 	@Child
     private ExpressionNode hasEndedNode;
 
-	public ForNode(boolean ascending, FrameSlot controlSlot, ExpressionNode startValue, ExpressionNode finalValue,
-			StatementNode body) {
+	public ForNode(boolean ascending, FrameSlot controlSlot, TypeDescriptor controlSlotType, ExpressionNode finalValue, ExpressionNode startValue,
+                   StatementNode body) {
 
 		this.ascending = ascending;
 		this.controlSlot = controlSlot;
-		this.assignment = AssignmentNodeGen.create(startValue, controlSlot);
+        this.assignment = AssignmentNodeGen.create(startValue, controlSlot);
 		this.body = body;
-		this.hasEndedNode = (ascending)? LessThanOrEqualNodeGen.create(ReadVariableNodeGen.create(controlSlot), finalValue) :
-                NotNodeGen.create(LessThanNodeGen.create(ReadVariableNodeGen.create(controlSlot), finalValue));
+		this.hasEndedNode = (ascending)?
+                LessThanOrEqualNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType), finalValue)
+                :
+                NotNodeGen.create(LessThanNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType), finalValue));
 	}
 
 	@Override

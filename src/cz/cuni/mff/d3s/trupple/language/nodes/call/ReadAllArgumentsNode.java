@@ -5,6 +5,7 @@ import java.util.Arrays;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 public class ReadAllArgumentsNode extends ExpressionNode {
 
@@ -13,4 +14,9 @@ public class ReadAllArgumentsNode extends ExpressionNode {
 		Object[] args = frame.getArguments();
 		return Arrays.copyOfRange(args, 1, args.length);
 	}
+
+    @Override
+    public TypeDescriptor getType() {
+        return null;
+    }
 }

@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.function;
 
 import com.oracle.truffle.api.dsl.NodeField;
+import com.oracle.truffle.api.dsl.NodeFields;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
@@ -9,11 +10,18 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
-@NodeField(name = "slot", type = FrameSlot.class)
+
+@NodeFields({
+    @NodeField(name = "slot", type = FrameSlot.class),
+    @NodeField(name = "typeDescriptor", type = TypeDescriptor.class)
+})
 public abstract class FunctionBodyNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
+
+    protected abstract TypeDescriptor getTypeDescriptor();
 
 	@Child
 	private StatementNode bodyNode;
@@ -21,6 +29,8 @@ public abstract class FunctionBodyNode extends ExpressionNode {
 	public FunctionBodyNode(StatementNode bodyNode) {
 		this.bodyNode = bodyNode;
 	}
+
+	// TODO: do we need this specializations? I think not
 
 	@Specialization(guards = "isLongKind()")
 	public long execLong(VirtualFrame frame) {
@@ -64,6 +74,11 @@ public abstract class FunctionBodyNode extends ExpressionNode {
         } catch (FrameSlotTypeException e) {
             return null;
         }
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return this.getTypeDescriptor();
     }
 
 	protected boolean isLongKind() {

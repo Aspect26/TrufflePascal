@@ -6,7 +6,8 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.LogarithmInvalidArgumentException;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 @NodeInfo(shortName = "ln")
 @NodeChild(value = "argument", type = ExpressionNode.class)
@@ -28,6 +29,11 @@ public abstract class LnBuiltinNode extends BuiltinNode {
         } else {
             throw new LogarithmInvalidArgumentException(value);
         }
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return RealDescriptor.getInstance();
     }
 
 }
