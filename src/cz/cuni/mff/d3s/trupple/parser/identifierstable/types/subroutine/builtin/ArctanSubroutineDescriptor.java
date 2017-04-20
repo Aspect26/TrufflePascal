@@ -9,7 +9,7 @@ public class ArctanSubroutineDescriptor extends BuiltinProcedureDescriptor.OneAr
 
     public ArctanSubroutineDescriptor() {
         super(ArctanBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-             new FormalParameter("i", new LongDescriptor(), false));
+             new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 
 }

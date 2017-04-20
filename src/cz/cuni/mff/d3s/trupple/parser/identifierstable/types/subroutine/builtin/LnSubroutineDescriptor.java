@@ -10,8 +10,8 @@ public class LnSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumen
 
     public LnSubroutineDescriptor() {
         super(LnBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new LongDescriptor(), false),
-                new RealDescriptor());
+                new FormalParameter("i", LongDescriptor.getInstance(), false),
+                RealDescriptor.getInstance());
     }
 
 }

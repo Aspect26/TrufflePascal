@@ -9,8 +9,8 @@ public class SuccSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgum
 
     public SuccSubroutineDescriptor() {
         super(SuccBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new LongDescriptor(), false),
-                new LongDescriptor());
+                new FormalParameter("i", LongDescriptor.getInstance(), false),
+                LongDescriptor.getInstance());
     }
 
 }

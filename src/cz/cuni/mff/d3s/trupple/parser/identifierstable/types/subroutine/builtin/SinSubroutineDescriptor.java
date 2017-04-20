@@ -10,8 +10,8 @@ public class SinSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgume
 
     public SinSubroutineDescriptor() {
         super(SinBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new LongDescriptor(), false),
-                new RealDescriptor());
+                new FormalParameter("i", LongDescriptor.getInstance(), false),
+                RealDescriptor.getInstance());
     }
 
 }

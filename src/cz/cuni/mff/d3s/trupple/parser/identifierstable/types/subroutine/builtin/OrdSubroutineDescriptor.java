@@ -9,7 +9,7 @@ public class OrdSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgum
 
     public OrdSubroutineDescriptor() {
         super(OrdBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-             new FormalParameter("i", new LongDescriptor(), false));
+             new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 
 }

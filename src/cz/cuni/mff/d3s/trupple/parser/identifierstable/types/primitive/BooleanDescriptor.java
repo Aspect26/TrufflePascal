@@ -3,7 +3,17 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 
-public class BooleanDescriptor extends PrimitiveDescriptor implements OrdinalDescriptor {
+public class BooleanDescriptor implements OrdinalDescriptor, PrimitiveDescriptor {
+
+    private static BooleanDescriptor instance = new BooleanDescriptor();
+
+    public static BooleanDescriptor getInstance() {
+        return instance;
+    }
+
+    private BooleanDescriptor() {
+
+    }
 
     @Override
     public FrameSlotKind getSlotKind() {

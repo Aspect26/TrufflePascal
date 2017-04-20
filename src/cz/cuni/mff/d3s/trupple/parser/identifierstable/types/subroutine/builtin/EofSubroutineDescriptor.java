@@ -12,7 +12,7 @@ public class EofSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgume
     public EofSubroutineDescriptor() {
         super(EofBuiltinNodeFactory.create(new ExpressionNode[]{new ReadAllArgumentsNode()}),
                 new FormalParameter("p", new FileDescriptor(null), false),
-                new BooleanDescriptor());
+                BooleanDescriptor.getInstance());
     }
 
 }

@@ -14,7 +14,7 @@ public class AssignSubroutineDescriptor extends BuiltinProcedureDescriptor {
         super(AssignBuiltinNodeFactory.create(new ReadArgumentNode(0), new ReadArgumentNode(1)),
                 new ArrayList<FormalParameter>(){{
                     add(new FormalParameter("f", new FileDescriptor(null), false));
-                    add(new FormalParameter("f", new StringDescriptor(), false));
+                    add(new FormalParameter("f", StringDescriptor.getInstance(), false));
                 }});
     }
 

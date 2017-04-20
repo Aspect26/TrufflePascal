@@ -9,7 +9,7 @@ public class ChrSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgum
 
     public ChrSubroutineDescriptor() {
         super(ChrBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-             new FormalParameter("i", new CharDescriptor(), false));
+             new FormalParameter("i", CharDescriptor.getInstance(), false));
     }
 
 }

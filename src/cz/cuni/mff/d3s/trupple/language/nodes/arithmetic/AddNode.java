@@ -4,9 +4,12 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
+import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @NodeInfo(shortName = "+")
 public abstract class AddNode extends BinaryNode {
+
+    protected abstract ExpressionNode getLeftNode();
 
 	@Specialization
 	protected long add(long left, long right) {
@@ -32,4 +35,5 @@ public abstract class AddNode extends BinaryNode {
 	protected SetTypeValue add(SetTypeValue left, SetTypeValue right) {
 		return SetTypeValue.union(left, right);
 	}
+
 }

@@ -28,9 +28,9 @@ public class GraphBuiltinUnit extends BuiltinUnitAbstr {
                 new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin(
                         InitGraphNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1), new ReadArgumentNode(2)),
                         new ArrayList<FormalParameter>(){{
-                            new FormalParameter("graphMode", new LongDescriptor(), false);
-                            new FormalParameter("graphDriver", new LongDescriptor(), false);
-                            new FormalParameter("pathToDriver", new StringDescriptor(), false);
+                            new FormalParameter("graphMode", LongDescriptor.getInstance(), false);
+                            new FormalParameter("graphDriver", LongDescriptor.getInstance(), false);
+                            new FormalParameter("pathToDriver", StringDescriptor.getInstance(), false);
                         }}
                 )
         ));
@@ -45,9 +45,9 @@ public class GraphBuiltinUnit extends BuiltinUnitAbstr {
                 new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin(
                         PutPixelNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1), new ReadArgumentNode(2)),
                         new ArrayList<FormalParameter>(){{
-                            new FormalParameter("x", new LongDescriptor(), false);
-                            new FormalParameter("y", new LongDescriptor(), false);
-                            new FormalParameter("color", new LongDescriptor(), false);
+                            new FormalParameter("x", LongDescriptor.getInstance(), false);
+                            new FormalParameter("y", LongDescriptor.getInstance(), false);
+                            new FormalParameter("color", LongDescriptor.getInstance(), false);
                         }}
                 )
 

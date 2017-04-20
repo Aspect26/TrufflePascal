@@ -31,6 +31,11 @@ public final class AddNodeGen extends AddNode implements SpecializedNode {
     }
 
     @Override
+    protected ExpressionNode getLeftNode() {
+        return this.leftNode_;
+    }
+
+    @Override
     public NodeCost getCost() {
         return specialization_.getNodeCost();
     }

@@ -9,8 +9,8 @@ public class PredSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgum
 
     public PredSubroutineDescriptor() {
         super(PredBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new LongDescriptor(), false),
-                new LongDescriptor());
+                new FormalParameter("i", LongDescriptor.getInstance(), false),
+                LongDescriptor.getInstance());
     }
 
 }

@@ -10,7 +10,7 @@ public class AbsSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgum
     public AbsSubroutineDescriptor() {
         super(
                 AbsBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new LongDescriptor(), false));
+                new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 
 }

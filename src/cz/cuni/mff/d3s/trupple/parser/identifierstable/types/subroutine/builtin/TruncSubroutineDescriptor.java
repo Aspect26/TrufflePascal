@@ -9,7 +9,7 @@ public class TruncSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArg
 
     public TruncSubroutineDescriptor() {
         super(TruncBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-             new FormalParameter("i", new LongDescriptor(), false));
+             new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 
 }

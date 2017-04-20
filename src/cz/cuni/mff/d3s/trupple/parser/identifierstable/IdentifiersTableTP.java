@@ -11,7 +11,7 @@ public class IdentifiersTableTP extends IdentifiersTable {
 
     @Override
     protected void addBuiltinTypes() {
-        this.typeDescriptors.put("string", new StringDescriptor());
+        this.typeDescriptors.put("string", StringDescriptor.getInstance());
 
         super.addBuiltinTypes();
     }

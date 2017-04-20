@@ -9,7 +9,7 @@ public class RandomSubroutineDescriptor extends BuiltinProcedureDescriptor.OneAr
 
     public RandomSubroutineDescriptor() {
         super(RandomBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-             new FormalParameter("i", new LongDescriptor(), false));
+             new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 
 }

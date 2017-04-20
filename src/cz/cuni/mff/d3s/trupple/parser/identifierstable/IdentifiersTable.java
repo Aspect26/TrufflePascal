@@ -52,16 +52,16 @@ public class IdentifiersTable {
     }
 
     protected void addBuiltinTypes() {
-        typeDescriptors.put("integer", new LongDescriptor());
-        typeDescriptors.put("shortint", new LongDescriptor());
-        typeDescriptors.put("longint", new LongDescriptor());
-        typeDescriptors.put("byte", new LongDescriptor());
-        typeDescriptors.put("word", new LongDescriptor());
-        typeDescriptors.put("single", new RealDescriptor());
-        typeDescriptors.put("real", new RealDescriptor());
-        typeDescriptors.put("double", new RealDescriptor());
-        typeDescriptors.put("boolean", new BooleanDescriptor());
-        typeDescriptors.put("char", new CharDescriptor());
+        typeDescriptors.put("integer", LongDescriptor.getInstance());
+        typeDescriptors.put("shortint", LongDescriptor.getInstance());
+        typeDescriptors.put("longint", LongDescriptor.getInstance());
+        typeDescriptors.put("byte", LongDescriptor.getInstance());
+        typeDescriptors.put("word", LongDescriptor.getInstance());
+        typeDescriptors.put("single", RealDescriptor.getInstance());
+        typeDescriptors.put("real", RealDescriptor.getInstance());
+        typeDescriptors.put("double", RealDescriptor.getInstance());
+        typeDescriptors.put("boolean", BooleanDescriptor.getInstance());
+        typeDescriptors.put("char", CharDescriptor.getInstance());
 
         for (Map.Entry<String, TypeDescriptor> typeEntry : typeDescriptors.entrySet()) {
             identifiersMap.put(typeEntry.getKey(), new TypeTypeDescriptor(typeEntry.getValue()));

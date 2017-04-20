@@ -9,7 +9,7 @@ public class RoundSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArg
 
     public RoundSubroutineDescriptor() {
         super(RoundBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-             new FormalParameter("i", new LongDescriptor(), false));
+             new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 
 }

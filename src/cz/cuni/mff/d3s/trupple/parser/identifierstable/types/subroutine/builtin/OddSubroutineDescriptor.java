@@ -10,8 +10,8 @@ public class OddSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgume
     public OddSubroutineDescriptor() {
         super(
                 OddBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new LongDescriptor(), false),
-                new LongDescriptor());
+                new FormalParameter("i", LongDescriptor.getInstance(), false),
+                LongDescriptor.getInstance());
     }
 
 }
