@@ -756,7 +756,7 @@ public class NodeFactory {
 
     private void addUnitInitializationNodes() {
         for (LexicalScope unitScope : this.units) {
-            this.currentLexicalScope.addScopeInitializationNode(unitScope.createInitializationNode());
+            this.currentLexicalScope.addScopeInitializationNode(unitScope.createInitializationBlock());
         }
     }
 
@@ -774,7 +774,7 @@ public class NodeFactory {
     private StatementNode createSubroutineNode(StatementNode bodyNode) {
         List<StatementNode> subroutineNodes = new ArrayList<>();
 
-        subroutineNodes.add(currentLexicalScope.createInitializationNode());
+        subroutineNodes.add(currentLexicalScope.createInitializationBlock());
         subroutineNodes.add(bodyNode);
 
         return new BlockNode(subroutineNodes.toArray(new StatementNode[subroutineNodes.size()]));

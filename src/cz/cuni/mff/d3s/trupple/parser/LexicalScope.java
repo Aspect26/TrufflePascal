@@ -3,8 +3,10 @@ package cz.cuni.mff.d3s.trupple.parser;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
@@ -245,12 +247,37 @@ public class LexicalScope {
         return new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(1));
     }
 
-    BlockNode createInitializationNode() {
-        InitializationNodeGenerator initNodeGenerator = new InitializationNodeGenerator(this.localIdentifiers);
-        List<StatementNode> initializationNodes = initNodeGenerator.generate();
+    BlockNode createInitializationBlock() {
+        List<StatementNode> initializationNodes = this.generateInitializationNodes(null);
         initializationNodes.addAll(this.scopeInitializationNodes);
 
         return new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
+    }
+
+    protected List<StatementNode> generateInitializationNodes(VirtualFrame frame)  {
+        List<StatementNode> initializationNodes = new ArrayList<>();
+
+        for (Map.Entry<String, TypeDescriptor> entry : this.localIdentifiers.getAllIdentifiers().entrySet()) {
+            String identifier = entry.getKey();
+            TypeDescriptor typeDescriptor = entry.getValue();
+
+            StatementNode initializationNode = createInitializationNode(identifier, typeDescriptor, frame);
+            if (initializationNode != null) {
+                initializationNodes.add(initializationNode);
+            }
+        }
+
+        return initializationNodes;
+    }
+
+    private StatementNode createInitializationNode(String identifier, TypeDescriptor typeDescriptor, VirtualFrame frame) {
+        Object defaultValue = typeDescriptor.getDefaultValue();
+        if (defaultValue == null) {
+            return null;
+        }
+
+        FrameSlot frameSlot = this.localIdentifiers.getFrameSlot(identifier);
+        return InitializationNodeFactory.create(frameSlot, typeDescriptor.getDefaultValue(), frame);
     }
 
     void markAllIdentifiersPublic() {
