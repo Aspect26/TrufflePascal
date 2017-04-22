@@ -7,6 +7,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryArgumentPrimitiveTypes;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.BinaryNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
@@ -64,4 +65,16 @@ public abstract class LessThanOrEqualNode extends BinaryNode {
 	boolean lessThan(EnumValue left, EnumValue right) {
 		return left.lesserThan(right) || left.equals(right);
 	}
+
+    @Override
+    public boolean verifyNonPrimitiveArgumentTypes(TypeDescriptor leftType, TypeDescriptor rightType) {
+        return this.verifyBothCompatibleEnums(leftType, rightType) ||
+                this.verifyBothCompatibleSetTypes(leftType, rightType);
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return BooleanDescriptor.getInstance();
+    }
+    
 }
