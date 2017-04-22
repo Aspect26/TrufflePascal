@@ -5,6 +5,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import com.oracle.truffle.api.source.Source;
@@ -877,15 +878,14 @@ public class Parser implements IParser {
 		accessNode = null; 
 		if (la.kind == 18) {
 			List<ExpressionNode> indexNodes  = ArrayIndex();
-			accessNode = new ArrayAccessNode(previousAccessNode, indexNodes); 
+			accessNode = factory.createArrayAccessNode(previousAccessNode, indexNodes); 
 		} else if (la.kind == 34) {
 			Get();
 			Expect(1);
-			String variableIdentifier = factory.getIdentifierFromToken(t); 
-			accessNode = new RecordAccessNode(previousAccessNode, variableIdentifier); 
+			accessNode = factory.createRecordAccessNode(previousAccessNode, t); 
 		} else if (la.kind == 23) {
 			Get();
-			accessNode = new PointerDereference(previousAccessNode); 
+			accessNode = factory.createPointerDereferenceAccessNode(previousAccessNode); 
 		} else SynErr(83);
 		return accessNode;
 	}

@@ -36,6 +36,10 @@ public class EnumLiteralDescriptor implements TypeDescriptor, ConstantDescriptor
         return this.identifier;
     }
 
+    public EnumTypeDescriptor getEnumType() {
+        return this.enumTypeDescriptor;
+    }
+
     @Override
     public boolean isSigned() {
         return false;
@@ -45,4 +49,10 @@ public class EnumLiteralDescriptor implements TypeDescriptor, ConstantDescriptor
     public ConstantDescriptor negatedCopy() throws LexicalException {
         return null;
     }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return type == this.enumTypeDescriptor;
+    }
+
 }

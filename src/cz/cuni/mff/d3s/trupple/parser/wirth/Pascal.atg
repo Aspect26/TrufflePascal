@@ -581,13 +581,12 @@ InnerAccessRouteElement<out AccessNode accessNode, AccessNode previousAccessNode
 =                                               (. accessNode = null; .)
 (
     ArrayIndex<. out List<ExpressionNode> indexNodes .>
-                                                (. accessNode = new ArrayAccessNode(previousAccessNode, indexNodes); .)
+                                                (. accessNode = factory.createArrayAccessNode(previousAccessNode, indexNodes); .)
 |
     "."
-    identifier                                  (. String variableIdentifier = factory.getIdentifierFromToken(t); .)
-                                                (. accessNode = new RecordAccessNode(previousAccessNode, variableIdentifier); .)
+    identifier                                  (. accessNode = factory.createRecordAccessNode(previousAccessNode, t); .)
 |
-    "^"                                         (. accessNode = new PointerDereference(previousAccessNode); .)
+    "^"                                         (. accessNode = factory.createPointerDereferenceAccessNode(previousAccessNode); .)
 )
 .
 

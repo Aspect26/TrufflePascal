@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 
 import java.io.Serializable;
@@ -39,6 +40,11 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
     }
 
     @Override
+    public TypeDescriptor getInnerTypeDescriptor() {
+        return this;
+    }
+
+    @Override
     public int getFirstIndex() {
         return 0;
     }
@@ -68,4 +74,9 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
     public long getOrdinalValue(String value) {
         return this.identifiers.indexOf(value);
     }
+
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
+    }
+
 }

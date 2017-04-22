@@ -9,7 +9,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public class CosSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public CosSubroutineDescriptor() {
-        super(CosBuiltinNodeFactory.create(new ReadArgumentNode(0)),
+        super(CosBuiltinNodeFactory.create(new ReadArgumentNode(0, RealDescriptor.getInstance())),
                 new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 

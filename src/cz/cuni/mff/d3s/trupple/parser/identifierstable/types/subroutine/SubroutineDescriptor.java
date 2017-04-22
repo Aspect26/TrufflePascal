@@ -57,4 +57,9 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
         // TODO: implement this
     }
 
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
+    }
+
 }

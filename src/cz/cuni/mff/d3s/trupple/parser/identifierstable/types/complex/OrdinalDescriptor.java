@@ -32,6 +32,11 @@ public interface OrdinalDescriptor extends TypeDescriptor {
         }
 
         @Override
+        public TypeDescriptor getInnerTypeDescriptor() {
+            return lowerBound.getInnerType();
+        }
+
+        @Override
         public FrameSlotKind getSlotKind() {
             return lowerBound.getSlotKind();
         }
@@ -41,6 +46,11 @@ public interface OrdinalDescriptor extends TypeDescriptor {
             return this.lowerBound.getDefaultValue();
         }
 
+        @Override
+        public boolean convertibleTo(TypeDescriptor type) {
+            return false;
+        }
+
     }
 
     int getFirstIndex();
@@ -48,5 +58,7 @@ public interface OrdinalDescriptor extends TypeDescriptor {
     int getSize();
 
     boolean containsValue(Object value);
+
+    TypeDescriptor getInnerTypeDescriptor();
 
 }

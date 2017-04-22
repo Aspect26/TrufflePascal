@@ -10,8 +10,11 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 public class PointerDereference extends AccessNode {
 
-    public PointerDereference(AccessNode applyToNode) {
+    private final TypeDescriptor dereferenceType;
+
+    public PointerDereference(AccessNode applyToNode, TypeDescriptor dereferenceType) {
         super(applyToNode);
+        this.dereferenceType = dereferenceType;
     }
 
     @Override
@@ -27,8 +30,7 @@ public class PointerDereference extends AccessNode {
 
     @Override
     public TypeDescriptor getType() {
-        // TODO: implement this
-        return null;
+        return this.dereferenceType;
     }
 
     @Override

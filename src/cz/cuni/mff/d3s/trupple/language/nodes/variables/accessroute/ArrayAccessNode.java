@@ -8,18 +8,19 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
 
 import java.util.List;
 
 public class ArrayAccessNode extends AccessNode {
 
     @Children private final ExpressionNode[] indexExpressions;
+    private final TypeDescriptor accessedTypeDescriptor;
     private Object[] indexes;
 
-    public ArrayAccessNode(AccessNode applyToNode, List<ExpressionNode> indexExpressions) {
+    public ArrayAccessNode(AccessNode applyToNode, List<ExpressionNode> indexExpressions, TypeDescriptor accessedTypeDescriptor) {
         super(applyToNode);
         this.indexExpressions = indexExpressions.toArray(new ExpressionNode[indexExpressions.size()]);
+        this.accessedTypeDescriptor = accessedTypeDescriptor;
     }
 
     @Override
@@ -47,8 +48,7 @@ public class ArrayAccessNode extends AccessNode {
 
     @Override
     public TypeDescriptor getType() {
-        // TODO: implement this
-        return null;
+        return this.accessedTypeDescriptor;
     }
 
     @Override

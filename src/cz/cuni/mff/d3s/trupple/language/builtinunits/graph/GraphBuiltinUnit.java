@@ -26,7 +26,9 @@ public class GraphBuiltinUnit extends BuiltinUnitAbstr {
         this.data.add(new UnitSubroutineData(
                 "InitGraph",
                 new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin(
-                        InitGraphNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1), new ReadArgumentNode(2)),
+                        InitGraphNodeGen.create(new ReadArgumentNode(0, LongDescriptor.getInstance()),
+                                new ReadArgumentNode(1, LongDescriptor.getInstance()),
+                                new ReadArgumentNode(2, StringDescriptor.getInstance())),
                         new ArrayList<FormalParameter>(){{
                             new FormalParameter("graphMode", LongDescriptor.getInstance(), false);
                             new FormalParameter("graphDriver", LongDescriptor.getInstance(), false);
@@ -43,7 +45,9 @@ public class GraphBuiltinUnit extends BuiltinUnitAbstr {
         this.data.add(new UnitSubroutineData(
                 "PutPixel",
                 new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin(
-                        PutPixelNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1), new ReadArgumentNode(2)),
+                        PutPixelNodeGen.create(new ReadArgumentNode(0, LongDescriptor.getInstance()),
+                                new ReadArgumentNode(1, LongDescriptor.getInstance()),
+                                new ReadArgumentNode(2, LongDescriptor.getInstance())),
                         new ArrayList<FormalParameter>(){{
                             new FormalParameter("x", LongDescriptor.getInstance(), false);
                             new FormalParameter("y", LongDescriptor.getInstance(), false);

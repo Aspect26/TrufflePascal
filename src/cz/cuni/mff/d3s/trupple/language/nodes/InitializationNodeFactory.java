@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 public class InitializationNodeFactory{
 

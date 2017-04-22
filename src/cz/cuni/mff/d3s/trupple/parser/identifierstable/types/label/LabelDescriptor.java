@@ -20,4 +20,10 @@ public class LabelDescriptor implements TypeDescriptor {
     public Object getDefaultValue() {
         return null;
     }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
+    }
+
 }

@@ -46,6 +46,12 @@ public final class InNodeGen extends InNode {
     }
 
     @Override
+    public void executeVoid(VirtualFrame frameValue) {
+        executeBoolean(frameValue);
+        return;
+    }
+
+    @Override
     public boolean executeBoolean(VirtualFrame frameValue) {
         Object leftNodeValue_ = leftNode_.executeGeneric(frameValue);
         SetTypeValue rightNodeValue_;
@@ -55,12 +61,6 @@ public final class InNodeGen extends InNode {
             throw unsupported(leftNodeValue_, ex.getResult());
         }
         return this.inOperation(leftNodeValue_, rightNodeValue_);
-    }
-
-    @Override
-    public void executeVoid(VirtualFrame frameValue) {
-        executeBoolean(frameValue);
-        return;
     }
 
     private UnsupportedSpecializationException unsupported(Object leftNodeValue, Object rightNodeValue) {

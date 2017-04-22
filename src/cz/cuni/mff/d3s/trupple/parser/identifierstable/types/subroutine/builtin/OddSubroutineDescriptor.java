@@ -8,8 +8,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescr
 public class OddSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public OddSubroutineDescriptor() {
-        super(
-                OddBuiltinNodeFactory.create(new ReadArgumentNode(0)),
+        super(OddBuiltinNodeFactory.create(new ReadArgumentNode(0, LongDescriptor.getInstance())),
                 new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 

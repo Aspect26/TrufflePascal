@@ -13,9 +13,12 @@ public class RecordAccessNode extends AccessNode {
 
     private final String variableIdentifier;
 
-    public RecordAccessNode(AccessNode applyToNode, String variableIdentifier) {
+    private final TypeDescriptor typeDescriptor;
+
+    public RecordAccessNode(AccessNode applyToNode, String variableIdentifier, TypeDescriptor typeDescriptor) {
         super(applyToNode);
         this.variableIdentifier = variableIdentifier;
+        this.typeDescriptor = typeDescriptor;
     }
 
     @Override
@@ -31,8 +34,7 @@ public class RecordAccessNode extends AccessNode {
 
     @Override
     public TypeDescriptor getType() {
-        // TODO: implement this
-        return null;
+        return this.typeDescriptor;
     }
 
     @Override

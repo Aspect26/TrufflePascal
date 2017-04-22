@@ -44,6 +44,12 @@ public final class OrNodeGen extends OrNode {
     }
 
     @Override
+    public void executeVoid(VirtualFrame frameValue) {
+        executeBoolean(frameValue);
+        return;
+    }
+
+    @Override
     public boolean executeBoolean(VirtualFrame frameValue) {
         boolean leftNodeValue_;
         try {
@@ -59,12 +65,6 @@ public final class OrNodeGen extends OrNode {
             throw unsupported(leftNodeValue_, ex.getResult());
         }
         return this.logicalOr(leftNodeValue_, rightNodeValue_);
-    }
-
-    @Override
-    public void executeVoid(VirtualFrame frameValue) {
-        executeBoolean(frameValue);
-        return;
     }
 
     private UnsupportedSpecializationException unsupported(Object leftNodeValue, Object rightNodeValue) {

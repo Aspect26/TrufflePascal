@@ -1,6 +1,8 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 public class RealConstantDescriptor implements ConstantDescriptor {
 
@@ -33,6 +35,11 @@ public class RealConstantDescriptor implements ConstantDescriptor {
     @Override
     public boolean isSigned() {
         return true;
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return type == RealDescriptor.getInstance();
     }
 
 }

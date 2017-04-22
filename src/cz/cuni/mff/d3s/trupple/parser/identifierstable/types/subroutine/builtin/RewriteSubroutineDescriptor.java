@@ -9,7 +9,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.FileDescrip
 public class RewriteSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgumentBuiltin {
 
     public RewriteSubroutineDescriptor() {
-        super(RewriteBuiltinNodeGen.create(new ReadArgumentNode(0)),
+        super(RewriteBuiltinNodeGen.create(new ReadArgumentNode(0, new FileDescriptor(null))),
                 new FormalParameter("p", new FileDescriptor(null), false));
     }
 

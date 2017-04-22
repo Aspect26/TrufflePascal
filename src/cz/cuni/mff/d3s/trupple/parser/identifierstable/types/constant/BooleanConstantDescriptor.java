@@ -3,6 +3,8 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.CantBeNegatedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 
 public class BooleanConstantDescriptor implements OrdinalConstantDescriptor {
 
@@ -40,6 +42,16 @@ public class BooleanConstantDescriptor implements OrdinalConstantDescriptor {
     @Override
     public int getOrdinalValue() {
         return (value)? 1 : 0;
+    }
+
+    @Override
+    public TypeDescriptor getInnerType() {
+        return BooleanDescriptor.getInstance();
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return type instanceof BooleanDescriptor;
     }
 
 }

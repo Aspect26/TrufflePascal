@@ -2,8 +2,8 @@ package cz.cuni.mff.d3s.trupple.parser;
 
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.BlockNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 import java.util.List;
 

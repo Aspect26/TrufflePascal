@@ -34,13 +34,13 @@ public class LongerProgramsTest extends JUnitTest {
                 " c:= [red, blue, yellow, green, white, black, orange];\n"+
                 " displayColors(c);\n"+
                 "\n"+
-                " c:=[red, blue]+[yellow, green];\n"+
+                " c:=[red, blue] + [yellow, green];\n"+
                 " displayColors(c);\n"+
                 "\n"+
                 " c:=[red, blue, yellow, green, white, black, orange] - [green, white];\n"+
                 " displayColors(c);\n"+
                 "\n"+
-                " c:= [red, blue, yellow, green, white, black, orange] * [green, white];\n"+
+                " c:=[red, blue, yellow, green, white, black, orange] * [green, white];\n"+
                 " displayColors(c);\n"+
                 "end.\n"+
                 "";

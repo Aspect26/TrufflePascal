@@ -7,7 +7,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 @NodeInfo(shortName = "assign")
 @NodeChildren({@NodeChild(value = "file", type = ExpressionNode.class), @NodeChild(value="path", type = ExpressionNode.class)})

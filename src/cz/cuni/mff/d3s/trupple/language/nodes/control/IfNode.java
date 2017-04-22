@@ -7,7 +7,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 @NodeInfo(shortName = "if", description = "The node implementing a conditional statement")
 public final class IfNode extends StatementNode {

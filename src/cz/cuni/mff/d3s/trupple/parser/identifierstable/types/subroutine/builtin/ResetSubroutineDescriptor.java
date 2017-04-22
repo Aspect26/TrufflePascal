@@ -8,7 +8,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.FileDescrip
 public class ResetSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgumentBuiltin {
 
     public ResetSubroutineDescriptor() {
-        super(ResetBuiltinNodeGen.create(new ReadArgumentNode(0)),
+        super(ResetBuiltinNodeGen.create(new ReadArgumentNode(0, new FileDescriptor(null))),
                 new FormalParameter("p", new FileDescriptor(null), false));
     }
 

@@ -15,8 +15,8 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
-@GeneratedBy(SubstractNode.class)
-public final class SubstractNodeGen extends SubstractNode implements SpecializedNode {
+@GeneratedBy(SubtractNode.class)
+public final class SubtractNodeGen extends SubtractNode implements SpecializedNode {
 
     @Child private ExpressionNode leftNode_;
     @Child private ExpressionNode rightNode_;
@@ -24,7 +24,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
     @CompilationFinal private Class<?> rightNodeType_;
     @Child private BaseNode_ specialization_;
 
-    private SubstractNodeGen(ExpressionNode leftNode, ExpressionNode rightNode) {
+    private SubtractNodeGen(ExpressionNode leftNode, ExpressionNode rightNode) {
         this.leftNode_ = leftNode;
         this.rightNode_ = rightNode;
         this.specialization_ = UninitializedNode_.create(this);
@@ -71,23 +71,23 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
         return SpecializationNode.updateRoot(super.deepCopy());
     }
 
-    public static SubstractNode create(ExpressionNode leftNode, ExpressionNode rightNode) {
-        return new SubstractNodeGen(leftNode, rightNode);
+    public static SubtractNode create(ExpressionNode leftNode, ExpressionNode rightNode) {
+        return new SubtractNodeGen(leftNode, rightNode);
     }
 
-    @GeneratedBy(SubstractNode.class)
+    @GeneratedBy(SubtractNode.class)
     private abstract static class BaseNode_ extends SpecializationNode {
 
-        @CompilationFinal protected SubstractNodeGen root;
+        @CompilationFinal protected SubtractNodeGen root;
 
-        BaseNode_(SubstractNodeGen root, int index) {
+        BaseNode_(SubtractNodeGen root, int index) {
             super(index);
             this.root = root;
         }
 
         @Override
         protected final void setRoot(Node root) {
-            this.root = (SubstractNodeGen) root;
+            this.root = (SubtractNodeGen) root;
         }
 
         @Override
@@ -207,10 +207,10 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
         }
 
     }
-    @GeneratedBy(SubstractNode.class)
+    @GeneratedBy(SubtractNode.class)
     private static final class UninitializedNode_ extends BaseNode_ {
 
-        UninitializedNode_(SubstractNodeGen root) {
+        UninitializedNode_(SubtractNodeGen root) {
             super(root, 2147483647);
         }
 
@@ -219,15 +219,15 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             return uninitialized(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(SubstractNodeGen root) {
+        static BaseNode_ create(SubtractNodeGen root) {
             return new UninitializedNode_(root);
         }
 
     }
-    @GeneratedBy(SubstractNode.class)
+    @GeneratedBy(SubtractNode.class)
     private static final class PolymorphicNode_ extends BaseNode_ {
 
-        PolymorphicNode_(SubstractNodeGen root) {
+        PolymorphicNode_(SubtractNodeGen root) {
             super(root, 0);
         }
 
@@ -241,15 +241,15 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(SubstractNodeGen root) {
+        static BaseNode_ create(SubtractNodeGen root) {
             return new PolymorphicNode_(root);
         }
 
     }
-    @GeneratedBy(methodName = "sub(long, long)", value = SubstractNode.class)
+    @GeneratedBy(methodName = "sub(long, long)", value = SubtractNode.class)
     private static final class Sub0Node_ extends BaseNode_ {
 
-        Sub0Node_(SubstractNodeGen root) {
+        Sub0Node_(SubtractNodeGen root) {
             super(root, 1);
         }
 
@@ -290,15 +290,15 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(SubstractNodeGen root) {
+        static BaseNode_ create(SubtractNodeGen root) {
             return new Sub0Node_(root);
         }
 
     }
-    @GeneratedBy(methodName = "sub(double, long)", value = SubstractNode.class)
+    @GeneratedBy(methodName = "sub(double, long)", value = SubtractNode.class)
     private static final class Sub1Node_ extends BaseNode_ {
 
-        Sub1Node_(SubstractNodeGen root) {
+        Sub1Node_(SubtractNodeGen root) {
             super(root, 2);
         }
 
@@ -330,15 +330,15 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(SubstractNodeGen root) {
+        static BaseNode_ create(SubtractNodeGen root) {
             return new Sub1Node_(root);
         }
 
     }
-    @GeneratedBy(methodName = "sub(long, double)", value = SubstractNode.class)
+    @GeneratedBy(methodName = "sub(long, double)", value = SubtractNode.class)
     private static final class Sub2Node_ extends BaseNode_ {
 
-        Sub2Node_(SubstractNodeGen root) {
+        Sub2Node_(SubtractNodeGen root) {
             super(root, 3);
         }
 
@@ -370,15 +370,15 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(SubstractNodeGen root) {
+        static BaseNode_ create(SubtractNodeGen root) {
             return new Sub2Node_(root);
         }
 
     }
-    @GeneratedBy(methodName = "sub(double, double)", value = SubstractNode.class)
+    @GeneratedBy(methodName = "sub(double, double)", value = SubtractNode.class)
     private static final class Sub3Node_ extends BaseNode_ {
 
-        Sub3Node_(SubstractNodeGen root) {
+        Sub3Node_(SubtractNodeGen root) {
             super(root, 4);
         }
 
@@ -392,15 +392,15 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(SubstractNodeGen root) {
+        static BaseNode_ create(SubtractNodeGen root) {
             return new Sub3Node_(root);
         }
 
     }
-    @GeneratedBy(methodName = "sub(SetTypeValue, SetTypeValue)", value = SubstractNode.class)
+    @GeneratedBy(methodName = "sub(SetTypeValue, SetTypeValue)", value = SubtractNode.class)
     private static final class Sub4Node_ extends BaseNode_ {
 
-        Sub4Node_(SubstractNodeGen root) {
+        Sub4Node_(SubtractNodeGen root) {
             super(root, 5);
         }
 
@@ -414,7 +414,7 @@ public final class SubstractNodeGen extends SubstractNode implements Specialized
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(SubstractNodeGen root) {
+        static BaseNode_ create(SubtractNodeGen root) {
             return new Sub4Node_(root);
         }
 

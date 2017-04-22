@@ -4,11 +4,22 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PCharValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.PrimitiveDescriptor;
 
-public class PCharDesriptor implements TypeDescriptor {
+import java.util.ArrayList;
+import java.util.List;
+
+public class PCharDesriptor extends ArrayDescriptor {
 
     private static PCharDesriptor instance = new PCharDesriptor();
+
+    public PCharDesriptor() {
+        super(new ArrayList<OrdinalDescriptor>(){{add(LongDescriptor.getInstance());}}, CharDescriptor.getInstance());
+    }
 
     public static PCharDesriptor getInstance() {
         return instance;

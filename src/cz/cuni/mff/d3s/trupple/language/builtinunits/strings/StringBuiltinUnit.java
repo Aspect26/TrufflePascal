@@ -24,7 +24,7 @@ public class StringBuiltinUnit extends BuiltinUnitAbstr {
         this.data.add(new UnitSubroutineData(
            "StrAlloc",
                 new BuiltinFunctionDescriptor.OneArgumentBuiltin(
-                        StrAllocNodeGen.create(new ReadArgumentNode(0)),
+                        StrAllocNodeGen.create(new ReadArgumentNode(0, LongDescriptor.getInstance())),
                         new FormalParameter("size", LongDescriptor.getInstance(), false)
                 )
         ));

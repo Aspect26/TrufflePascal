@@ -28,4 +28,9 @@ public class FileDescriptor implements TypeDescriptor {
         }
     }
 
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
+    }
+
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class AssignSubroutineDescriptor extends BuiltinProcedureDescriptor {
 
     public AssignSubroutineDescriptor() {
-        super(AssignBuiltinNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1)),
+        super(AssignBuiltinNodeGen.create(new ReadArgumentNode(0, new FileDescriptor(null)), new ReadArgumentNode(1, StringDescriptor.getInstance())),
                 new ArrayList<FormalParameter>(){{
                     add(new FormalParameter("f", new FileDescriptor(null), false));
                     add(new FormalParameter("f", StringDescriptor.getInstance(), false));

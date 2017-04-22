@@ -21,7 +21,6 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
         return false;
     }
 
-
     public static class OneArgumentBuiltin extends BuiltinFunctionDescriptor {
 
         public OneArgumentBuiltin(ExpressionNode bodyNode, FormalParameter parameter) {

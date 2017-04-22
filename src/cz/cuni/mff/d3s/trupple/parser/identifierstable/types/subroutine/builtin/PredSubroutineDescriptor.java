@@ -8,7 +8,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescr
 public class PredSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public PredSubroutineDescriptor() {
-        super(PredBuiltinNodeFactory.create(new ReadArgumentNode(0)),
+        super(PredBuiltinNodeFactory.create(new ReadArgumentNode(0, LongDescriptor.getInstance())),
                 new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 

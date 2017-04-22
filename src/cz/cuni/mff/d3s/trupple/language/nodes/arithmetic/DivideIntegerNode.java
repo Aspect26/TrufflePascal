@@ -2,12 +2,16 @@ package cz.cuni.mff.d3s.trupple.language.nodes.arithmetic;
 
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
+import cz.cuni.mff.d3s.trupple.language.nodes.BinaryArgumentPrimitiveTypes;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 
 @NodeInfo(shortName = "div")
 public abstract class DivideIntegerNode extends BinaryNode {
 
-	// in the standard, there is specified that DIV operator only takes
-	// integer types as operands
+	DivideIntegerNode() {
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), LongDescriptor.getInstance());
+    }
+
 	@Specialization
 	protected long div(long left, long right) {
 		return left / right;

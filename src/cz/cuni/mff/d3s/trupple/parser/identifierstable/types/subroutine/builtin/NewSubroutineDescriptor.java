@@ -8,8 +8,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDesc
 public class NewSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgumentBuiltin {
 
     public NewSubroutineDescriptor() {
-        super(NewBuiltinNodeGen.create(new ReadArgumentNode(0)),
-                new FormalParameter("p", new PointerDescriptor(""), false));
+        super(NewBuiltinNodeGen.create(new ReadArgumentNode(0, new PointerDescriptor())),
+                new FormalParameter("p", new PointerDescriptor(), false));
     }
 
 }

@@ -8,8 +8,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDesc
 public class DisposeSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgumentBuiltin {
 
     public DisposeSubroutineDescriptor() {
-        super(DisposeBuiltinNodeGen.create(new ReadArgumentNode(0)),
-                new FormalParameter("p", new PointerDescriptor(""), false));
+        super(DisposeBuiltinNodeGen.create(new ReadArgumentNode(0, new PointerDescriptor())),
+                new FormalParameter("p", new PointerDescriptor(), false));
     }
 
 }

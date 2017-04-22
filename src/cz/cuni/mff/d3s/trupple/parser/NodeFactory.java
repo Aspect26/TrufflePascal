@@ -22,15 +22,18 @@ import cz.cuni.mff.d3s.trupple.language.nodes.root.FunctionPascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.ProcedurePascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.SimpleAccessNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.ReferenceDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
@@ -563,50 +566,56 @@ public class NodeFactory {
         return new NopNode();
     }
 
-    public ExpressionNode createBinaryExpression(Token operator, ExpressionNode leftNode, ExpressionNode rightNode) {
-        switch (operator.val.toLowerCase()) {
+    public ExpressionNode createBinaryExpression(Token operatorToken, ExpressionNode leftNode, ExpressionNode rightNode) {
+        String operator = operatorToken.val.toLowerCase();
+        ExpressionNode resultExpression;
+	    switch (operator) {
 
             // arithmetic
             case "+":
-                return (usingTPExtension)? AddNodeTPNodeGen.create(leftNode, rightNode) : AddNodeGen.create(leftNode, rightNode);
+                resultExpression = (usingTPExtension)? AddNodeTPNodeGen.create(leftNode, rightNode) : AddNodeGen.create(leftNode, rightNode); break;
             case "-":
-                return SubstractNodeGen.create(leftNode, rightNode);
+                resultExpression = SubtractNodeGen.create(leftNode, rightNode); break;
             case "*":
-                return MultiplyNodeGen.create(leftNode, rightNode);
+                resultExpression = MultiplyNodeGen.create(leftNode, rightNode); break;
             case "/":
-                return DivideNodeGen.create(leftNode, rightNode);
+                resultExpression = DivideNodeGen.create(leftNode, rightNode); break;
             case "div":
-                return DivideIntegerNodeGen.create(leftNode, rightNode);
+                resultExpression = DivideIntegerNodeGen.create(leftNode, rightNode); break;
             case "mod":
-                return ModuloNodeGen.create(leftNode, rightNode);
+                resultExpression = ModuloNodeGen.create(leftNode, rightNode); break;
 
             // logic
             case "and":
-                return AndNodeGen.create(leftNode, rightNode);
+                resultExpression = AndNodeGen.create(leftNode, rightNode); break;
             case "or":
-                return OrNodeGen.create(leftNode, rightNode);
-
+                resultExpression = OrNodeGen.create(leftNode, rightNode); break;
             case "<":
-                return LessThanNodeGen.create(leftNode, rightNode);
+                resultExpression = LessThanNodeGen.create(leftNode, rightNode); break;
             case "<=":
-                return LessThanOrEqualNodeGen.create(leftNode, rightNode);
+                resultExpression = LessThanOrEqualNodeGen.create(leftNode, rightNode); break;
             case ">":
-                return NotNodeGen.create(LessThanOrEqualNodeGen.create(leftNode, rightNode));
+                BinaryNode lessThanOrEqual = this.verifyOperandArguments(LessThanOrEqualNodeGen.create(leftNode, rightNode), operator);
+                resultExpression = NotNodeGen.create(lessThanOrEqual); break;
             case ">=":
-                return NotNodeGen.create(LessThanNodeGen.create(leftNode, rightNode));
+                BinaryNode lessThan = this.verifyOperandArguments(LessThanNodeGen.create(leftNode, rightNode), operator);
+                resultExpression = NotNodeGen.create(lessThan); break;
             case "=":
-                return EqualsNodeGen.create(leftNode, rightNode);
+                resultExpression = EqualsNodeGen.create(leftNode, rightNode); break;
             case "<>":
-                return NotNodeGen.create(EqualsNodeGen.create(leftNode, rightNode));
+                BinaryNode equals = this.verifyOperandArguments(EqualsNodeGen.create(leftNode, rightNode), operator);
+                resultExpression = NotNodeGen.create(equals); break;
             case "in":
-                return InNodeGen.create(leftNode, rightNode);
+                resultExpression = InNodeGen.create(leftNode, rightNode); break;
             case "><":
-                return SymmetricDifferenceNodeGen.create(leftNode, rightNode);
+                resultExpression = SymmetricDifferenceNodeGen.create(leftNode, rightNode); break;
 
             default:
-                parser.SemErr("Unknown binary operator: " + operator.val);
-                return null;
+                parser.SemErr("Unknown binary operator: " + operator);
+                return InvalidBinaryExpressionNodeGen.create(leftNode, rightNode);
         }
+
+        return this.verifyOperandArguments(resultExpression, operator);
     }
 
     public ExpressionNode createUnaryExpression(Token operator, ExpressionNode son) {
@@ -627,6 +636,9 @@ public class NodeFactory {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, true);
         TypeDescriptor typeDescriptor = this.doLookup(identifier, LexicalScope::getIdentifierDescriptor);
+        if (typeDescriptor instanceof ReferenceDescriptor) {
+            typeDescriptor = ((ReferenceDescriptor) typeDescriptor).getReferencedType();
+        }
 
 	    return new SimpleAccessNode(frameSlot, typeDescriptor);
     }
@@ -657,6 +669,48 @@ public class NodeFactory {
 
     public ExpressionNode createExpressionFromIdentifierWithRoute(AccessNode accessNode) {
         return new ReadVariableWithRouteNode(accessNode);
+    }
+
+    public PointerDereference createPointerDereferenceAccessNode(AccessNode previousAccessNode) {
+	    TypeDescriptor dereferencedType = previousAccessNode.getType();
+	    if (!(dereferencedType instanceof PointerDescriptor)) {
+	        parser.SemErr("Can not dereference variable of this type");
+	        return new PointerDereference(previousAccessNode, dereferencedType);
+        } else {
+            return new PointerDereference(previousAccessNode, ((PointerDescriptor) dereferencedType).getInnerTypeDescriptor());
+        }
+    }
+
+    public RecordAccessNode createRecordAccessNode(AccessNode previousAccessNode, Token accessVariableToken) {
+	    TypeDescriptor accessedVariableDescriptor = previousAccessNode.getType();
+        String variableIdentifier = this.getIdentifierFromToken(accessVariableToken);
+	    if (!(accessedVariableDescriptor instanceof RecordDescriptor)) {
+            parser.SemErr("Cannot access non record type this way");
+            return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableDescriptor);
+        } else {
+	        RecordDescriptor accessedRecordDescriptor = (RecordDescriptor) accessedVariableDescriptor;
+	        if (!accessedRecordDescriptor.containsIdentifier(variableIdentifier)) {
+                parser.SemErr("Cannot access non record type this way");
+                return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableDescriptor);
+            } else {
+	            TypeDescriptor accessedVariableType = accessedRecordDescriptor.getLexicalScope().getIdentifierDescriptor(variableIdentifier);
+                return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableType);
+            }
+        }
+    }
+
+    public ArrayAccessNode createArrayAccessNode(AccessNode previousAccessNode, List<ExpressionNode> indexNodes) {
+        TypeDescriptor accessedVariableDescriptor = previousAccessNode.getType();
+        for (ExpressionNode indexNode : indexNodes) {
+            if (!(accessedVariableDescriptor instanceof ArrayDescriptor)) {
+                parser.SemErr("Cannot index this type");
+                break;
+            } else {
+                ArrayDescriptor accessingArrayDescriptor = (ArrayDescriptor) accessedVariableDescriptor;
+                accessedVariableDescriptor = accessingArrayDescriptor.getOneStepInnerDescriptor();
+            }
+        }
+	    return new ArrayAccessNode(previousAccessNode, indexNodes, accessedVariableDescriptor);
     }
 
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
@@ -795,7 +849,7 @@ public class NodeFactory {
                     this.currentLexicalScope.addScopeInitializationNode(initializationNode);
                 } else {
                     FrameSlot frameSlot = this.currentLexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
-                    final ExpressionNode readNode = new ReadArgumentNode(count++);
+                    final ExpressionNode readNode = new ReadArgumentNode(count, parameters.get(count++).type);
                     final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);
 
                     this.currentLexicalScope.addScopeInitializationNode(assignment);
@@ -814,6 +868,18 @@ public class NodeFactory {
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
+    }
+
+    private <T extends ExpressionNode> T verifyOperandArguments(T node, String operator) {
+	    return this.verifyChildrenNodes(node, "Wrong operand types provided to " + operator + " operator");
+    }
+
+    private <T extends StatementNode> T verifyChildrenNodes(T node, String onInvalidText) {
+        if (!node.verifyChildrenNodeTypes()) {
+            parser.SemErr(onInvalidText);
+        }
+
+        return node;
     }
 
     public void assertLegalsCaseValues(OrdinalDescriptor ordinal, List<ConstantDescriptor> constants) {

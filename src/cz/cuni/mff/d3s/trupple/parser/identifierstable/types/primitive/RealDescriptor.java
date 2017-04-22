@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 public class RealDescriptor implements PrimitiveDescriptor {
 
@@ -22,6 +23,11 @@ public class RealDescriptor implements PrimitiveDescriptor {
     @Override
     public Object getDefaultValue() {
         return 0.0d;
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
     }
 
 }

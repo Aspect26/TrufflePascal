@@ -1,6 +1,9 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 public class LongConstantDescriptor implements OrdinalConstantDescriptor {
 
@@ -38,6 +41,16 @@ public class LongConstantDescriptor implements OrdinalConstantDescriptor {
     @Override
     public int getOrdinalValue() {
         return (int)this.value;
+    }
+
+    @Override
+    public TypeDescriptor getInnerType() {
+        return LongDescriptor.getInstance();
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return (type instanceof LongDescriptor) || (type instanceof RealConstantDescriptor) || (type instanceof RealDescriptor);
     }
 
 }
