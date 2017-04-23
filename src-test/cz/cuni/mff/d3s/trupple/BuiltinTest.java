@@ -57,12 +57,12 @@ public class BuiltinTest extends JUnitTest {
                 " e:=green;\n"+
                 "\n"+
                 " write(succ(i));\n"+
-                //" write(succ(c));\n"+
-                //" write(succ(e) = blue);\n"+
-                //" write(succ(e) = red);\n"+
+                " write(succ(c));\n"+
+                " write(succ(e) = blue);\n"+
+                " write(succ(e) = red);\n"+
                 "end.";
 
-        String output = "42";
+        String output = "42jtruefalse";
         test(code, output);
     }
 
@@ -80,12 +80,12 @@ public class BuiltinTest extends JUnitTest {
                 " e:=green;\n"+
                 "\n"+
                 " write(pred(i));\n"+
-                //" write(pred(c));\n"+
-                //" write(pred(e) = red);\n"+
-                //" write(pred(e) = blue);\n"+
+                " write(pred(c));\n"+
+                " write(pred(e) = red);\n"+
+                " write(pred(e) = blue);\n"+
                 "end.";
 
-        String output = "40";
+        String output = "40htruefalse";
         test(code, output);
     }
 
@@ -98,11 +98,11 @@ public class BuiltinTest extends JUnitTest {
                 "begin\n"+
                 " write(chr(113));\n"+
                 " write(ord(\'q\'));\n"+
-                //" write(ord(true));\n"+
-                //" write(ord(magenta));\n"+
+                " write(ord(true));\n"+
+                " write(ord(magenta));\n"+
                 "end.";
 
-        String output = "q113";
+        String output = "q11314";
         test(code, output);
     }
 
