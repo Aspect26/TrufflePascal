@@ -18,4 +18,9 @@ public class FunctionDescriptor extends SubroutineDescriptor {
         return this.returnTypeDescriptor;
     }
 
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return (type instanceof FunctionDescriptor) && super.convertibleTo(type);
+    }
+
 }

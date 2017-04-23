@@ -54,12 +54,40 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
     }
 
     public void verifyArguments(List<ExpressionNode> passedArguments) throws LexicalException {
-        // TODO: implement this
+        if (passedArguments.size() != this.formalParameters.size()) {
+            throw new LexicalException("Wrong number of parameters provided for the subroutine call");
+        } else {
+            for (int i = 0; i < this.formalParameters.size(); ++i) {
+                if (!this.formalParameters.get(i).type.equals(passedArguments.get(i).getType()) &&
+                        !passedArguments.get(i).getType().convertibleTo(this.formalParameters.get(i).type)) {
+                    throw new LexicalException("Argument number " + (i + 1) + " type mismatch");
+                }
+            }
+        }
     }
 
     @Override
     public boolean convertibleTo(TypeDescriptor type) {
-        return false;
+        if (!(type instanceof SubroutineDescriptor)) {
+            return false;
+        }
+
+        SubroutineDescriptor subroutine = (SubroutineDescriptor) type;
+        return compareFormalParameters(subroutine.formalParameters, this.formalParameters);
+    }
+
+    public static boolean compareFormalParameters(List<FormalParameter> left, List<FormalParameter> right) {
+        if (left.size() != right.size()) {
+            return false;
+        }
+        for (int i = 0; i < right.size(); ++i) {
+            if (!right.get(i).type.equals(left.get(i).type) &&
+                    !left.get(i).type.convertibleTo(right.get(i).type)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

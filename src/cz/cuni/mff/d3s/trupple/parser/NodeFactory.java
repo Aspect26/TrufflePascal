@@ -34,7 +34,6 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDesc
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.ReferenceDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumLiteralDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
@@ -767,8 +766,9 @@ public class NodeFactory {
     public ExpressionNode createSubroutineParameterPassNode(Token variableToken) {
         String variableIdentifier = this.getIdentifierFromToken(variableToken);
         PascalSubroutine function = this.doLookup(variableIdentifier, LexicalScope::getSubroutine);
+        TypeDescriptor descriptor = this.doLookup(variableIdentifier, LexicalScope::getIdentifierDescriptor);
 
-        return new StoreSubroutineArgumentNode(function);
+        return new StoreSubroutineArgumentNode(function, (SubroutineDescriptor) descriptor);
     }
 
     public ExpressionNode createLogicLiteralNode(boolean value) {

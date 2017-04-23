@@ -30,9 +30,9 @@ public class GraphBuiltinUnit extends BuiltinUnitAbstr {
                                 new ReadArgumentNode(1, LongDescriptor.getInstance()),
                                 new ReadArgumentNode(2, StringDescriptor.getInstance())),
                         new ArrayList<FormalParameter>(){{
-                            new FormalParameter("graphMode", LongDescriptor.getInstance(), false);
-                            new FormalParameter("graphDriver", LongDescriptor.getInstance(), false);
-                            new FormalParameter("pathToDriver", StringDescriptor.getInstance(), false);
+                            add(new FormalParameter("graphMode", LongDescriptor.getInstance(), false));
+                            add(new FormalParameter("graphDriver", LongDescriptor.getInstance(), false));
+                            add(new FormalParameter("pathToDriver", StringDescriptor.getInstance(), false));
                         }}
                 )
         ));
@@ -49,9 +49,9 @@ public class GraphBuiltinUnit extends BuiltinUnitAbstr {
                                 new ReadArgumentNode(1, LongDescriptor.getInstance()),
                                 new ReadArgumentNode(2, LongDescriptor.getInstance())),
                         new ArrayList<FormalParameter>(){{
-                            new FormalParameter("x", LongDescriptor.getInstance(), false);
-                            new FormalParameter("y", LongDescriptor.getInstance(), false);
-                            new FormalParameter("color", LongDescriptor.getInstance(), false);
+                            add(new FormalParameter("x", LongDescriptor.getInstance(), false));
+                            add(new FormalParameter("y", LongDescriptor.getInstance(), false));
+                            add(new FormalParameter("color", LongDescriptor.getInstance(), false));
                         }}
                 )
 

@@ -10,7 +10,8 @@ import org.junit.runners.Suite.SuiteClasses;
 		ArrayTest.class, NestedSubroutinesTest.class, GlobalVariablesTest.class, ReadTest.class,
 		ConstantsTest.class, StringTest.class, UnitTest.class, TypeTest.class, ReferencePassingTest.class,
 		SetTypeTest.class, SetOperationsTest.class, LongerProgramsTest.class, RecordTest.class, BuiltinTest.class,
-        PointersTest.class, FilesTest.class, StringsUnitTest.class, GotoTest.class, ProgramArgumentsTest.class })
+        PointersTest.class, FilesTest.class, StringsUnitTest.class, GotoTest.class, ProgramArgumentsTest.class,
+        SubroutineAsArgumentTest.class })
 public class TestAll {
 
 }

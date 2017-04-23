@@ -74,7 +74,13 @@ public class PointerDescriptor implements TypeDescriptor {
 
     @Override
     public boolean convertibleTo(TypeDescriptor type) {
-        return false;
+        if (!(type instanceof PointerDescriptor)) {
+            return false;
+        }
+
+        PointerDescriptor convertTo = (PointerDescriptor) type;
+        return (this.getInnerTypeDescriptor() == null) || (convertTo.getInnerTypeDescriptor() == null) ||
+                (convertTo.getInnerTypeDescriptor() == this.getInnerTypeDescriptor());
     }
 
 }

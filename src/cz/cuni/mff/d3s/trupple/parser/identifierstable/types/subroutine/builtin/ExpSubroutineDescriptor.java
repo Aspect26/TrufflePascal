@@ -10,7 +10,7 @@ public class ExpSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgume
 
     public ExpSubroutineDescriptor() {
         super(ExpBuiltinNodeFactory.create(new ReadArgumentNode(0, RealDescriptor.getInstance())),
-                new FormalParameter("i", LongDescriptor.getInstance(), false));
+                new FormalParameter("i", RealDescriptor.getInstance(), false));
     }
 
 }
