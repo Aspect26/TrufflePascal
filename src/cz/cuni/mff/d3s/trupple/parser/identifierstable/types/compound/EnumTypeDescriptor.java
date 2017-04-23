@@ -76,7 +76,7 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
     }
 
     public boolean convertibleTo(TypeDescriptor type) {
-        return false;
+        return type == GenericEnumTypeDescriptor.getInstance();
     }
 
 }

@@ -53,6 +53,7 @@ public class EnumLiteralDescriptor implements TypeDescriptor, ConstantDescriptor
     @Override
     public boolean convertibleTo(TypeDescriptor type) {
         return type == this.enumTypeDescriptor ||
+                type == GenericEnumTypeDescriptor.getInstance() ||
                 ((type instanceof EnumLiteralDescriptor) && ((EnumLiteralDescriptor) type).getEnumType() == this.enumTypeDescriptor);
     }
 

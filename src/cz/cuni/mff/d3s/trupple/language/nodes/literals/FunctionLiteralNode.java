@@ -10,7 +10,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
-// TODO: we do not need this literal node -> it is used only inside InvokeNode -> the InvokeNode can handle this itself
 @NodeInfo(shortName = "func")
 public final class FunctionLiteralNode extends ExpressionNode {
 

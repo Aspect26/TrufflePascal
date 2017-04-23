@@ -15,6 +15,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +24,10 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
     BuiltinFunctionDescriptor(ExpressionNode bodyNode, List<FormalParameter> parameters) {
         super(parameters, bodyNode.getType());
         this.setRootNode(new FunctionPascalRootNode(new FrameDescriptor(), bodyNode));
+    }
+
+    BuiltinFunctionDescriptor() {
+        super(new ArrayList<>(), null);
     }
 
     @Override

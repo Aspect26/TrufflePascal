@@ -100,9 +100,10 @@ public class BuiltinTest extends JUnitTest {
                 " write(ord(\'q\'));\n"+
                 " write(ord(true));\n"+
                 " write(ord(magenta));\n"+
+                " write(ord(magenta) + ord(magenta));\n"+
                 "end.";
 
-        String output = "q11314";
+        String output = "q113148";
         test(code, output);
     }
 

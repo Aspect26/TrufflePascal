@@ -58,16 +58,6 @@ public abstract class BinaryNode extends ExpressionNode {
         return null;
     }
 
-    protected boolean verifyBothCompatibleEnums(TypeDescriptor leftType, TypeDescriptor rightType) {
-        if (leftType instanceof EnumLiteralDescriptor) {
-            leftType = ((EnumLiteralDescriptor) leftType).getEnumType();
-        }
-        if (rightType instanceof EnumLiteralDescriptor) {
-            rightType = ((EnumLiteralDescriptor) rightType).getEnumType();
-        }
-        return  leftType instanceof EnumTypeDescriptor && leftType == rightType;
-    }
-
     protected boolean verifyBothCompatibleSetTypes(TypeDescriptor leftType, TypeDescriptor rightType) {
         return leftType instanceof SetDescriptor && rightType instanceof SetDescriptor &&
                 ((SetDescriptor) leftType).getInnerType() == ((SetDescriptor) rightType).getInnerType();

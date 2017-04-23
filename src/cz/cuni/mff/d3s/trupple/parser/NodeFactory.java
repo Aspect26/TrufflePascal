@@ -40,6 +40,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDe
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.OverloadedFunctionDescriptor;
 
 public class NodeFactory {
 
@@ -745,8 +746,9 @@ public class NodeFactory {
         String identifier = this.getIdentifierFromToken(identifierToken);
         return this.doLookup(identifier, (LexicalScope foundInScope, String foundIdentifier) -> {
             if (foundInScope.isSubroutine(foundIdentifier)) {
-                foundInScope.verifyPassedArgumentsToSubroutine(foundIdentifier, params);
-                return this.createInvokeNode(foundInScope.getLocalSlot(foundIdentifier), (SubroutineDescriptor) foundInScope.getIdentifierDescriptor(foundIdentifier), params);
+                SubroutineDescriptor subroutineDescriptor = foundInScope.getSubroutineDescriptor(foundIdentifier, params);
+                subroutineDescriptor.verifyArguments(params);
+                return this.createInvokeNode(foundInScope.getLocalSlot(foundIdentifier), subroutineDescriptor, params);
             } else {
                 throw new LexicalException(foundIdentifier + " is not a subroutine.");
             }

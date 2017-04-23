@@ -9,6 +9,7 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryArgumentPrimitiveTypes;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.BinaryNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.GenericEnumTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
@@ -20,6 +21,7 @@ public abstract class EqualsNode extends BinaryNode {
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(BooleanDescriptor.getInstance(), BooleanDescriptor.getInstance()), BooleanDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), BooleanDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(CharDescriptor.getInstance(), CharDescriptor.getInstance()), BooleanDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(GenericEnumTypeDescriptor.getInstance(), GenericEnumTypeDescriptor.getInstance()), BooleanDescriptor.getInstance());
     }
 
 	@Specialization
@@ -54,8 +56,7 @@ public abstract class EqualsNode extends BinaryNode {
 
     @Override
     public boolean verifyNonPrimitiveArgumentTypes(TypeDescriptor leftType, TypeDescriptor rightType) {
-        return this.verifyBothCompatibleEnums(leftType, rightType) ||
-                this.verifyBothCompatibleSetTypes(leftType, rightType) ||
+        return this.verifyBothCompatibleSetTypes(leftType, rightType) ||
                 this.verifyBothCompatiblePointerTypes(leftType, rightType);
     }
 

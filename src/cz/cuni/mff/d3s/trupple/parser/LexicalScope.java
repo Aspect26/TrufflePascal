@@ -23,6 +23,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConsta
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ReturnTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.OverloadedFunctionDescriptor;
+
 import java.util.*;
 
 public class LexicalScope {
@@ -64,6 +66,15 @@ public class LexicalScope {
 
     PascalSubroutine getSubroutine(String identifier) throws LexicalException {
         return this.localIdentifiers.getSubroutine(identifier);
+    }
+
+    SubroutineDescriptor getSubroutineDescriptor(String identifier, List<ExpressionNode> actualArguments) throws LexicalException {
+        SubroutineDescriptor subroutineDescriptor = (SubroutineDescriptor) this.getIdentifierDescriptor(identifier);
+        if (subroutineDescriptor instanceof OverloadedFunctionDescriptor) {
+            subroutineDescriptor = ((OverloadedFunctionDescriptor) subroutineDescriptor).getOverload(actualArguments);
+        }
+
+        return subroutineDescriptor;
     }
 
     FrameSlot getReturnSlot() {
@@ -128,10 +139,6 @@ public class LexicalScope {
 
     boolean labelExists(String identifier) {
         return this.localIdentifiers.isLabel(identifier);
-    }
-
-    void verifyPassedArgumentsToSubroutine(String identifier, List<ExpressionNode> params) throws LexicalException {
-        this.localIdentifiers.verifyPassedArgumentsToSubroutine(identifier, params);
     }
 
     boolean containsLocalIdentifier(String identifier) {
