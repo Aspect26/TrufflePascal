@@ -37,12 +37,11 @@ public class ForNode extends StatementNode {
 	@Child
     private ExpressionNode hasEndedNode;
 
-	public ForNode(boolean ascending, FrameSlot controlSlot, TypeDescriptor controlSlotType, ExpressionNode finalValue, ExpressionNode startValue,
+	public ForNode(boolean ascending, AssignmentNode assignment, FrameSlot controlSlot, TypeDescriptor controlSlotType, ExpressionNode finalValue, ExpressionNode startValue,
                    StatementNode body) {
-
 		this.ascending = ascending;
+		this.assignment = assignment;
 		this.controlSlot = controlSlot;
-        this.assignment = AssignmentNodeGen.create(startValue, controlSlot);
 		this.body = body;
 		this.hasEndedNode = (ascending)?
                 LessThanOrEqualNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType), finalValue)

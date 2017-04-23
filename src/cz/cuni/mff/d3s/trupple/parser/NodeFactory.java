@@ -490,7 +490,8 @@ public class NodeFactory {
         if (startValue.getType() != finalValue.getType() && !startValue.getType().convertibleTo(finalValue.getType())) {
             parser.SemErr("Type mismatch in beginning and last value of for loop.");
         }
-        return new ForNode(ascending, controlSlot, controlSlotType, finalValue, startValue, loopBody);
+        AssignmentNode initialAssignment = this.createCheckedAssignment(iteratingIdentifier, startValue);
+        return new ForNode(ascending, initialAssignment, controlSlot, controlSlotType, finalValue, startValue, loopBody);
     }
 
     public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
@@ -661,8 +662,8 @@ public class NodeFactory {
     public StatementNode createAssignmentWithRoute(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, true);
+        this.checkTypesAreCompatible(valueNode.getType(), accessNode.getType());
 
-        // TODO: check if it is assignable
         return AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
     }
 
@@ -672,7 +673,7 @@ public class NodeFactory {
         return this.doLookup(identifier, (LexicalScope foundInLexicalScope, String foundIdentifier) -> {
             if (foundInLexicalScope.isParameterlessSubroutine(foundIdentifier)) {
                 return this.createInvokeNode(foundInLexicalScope.getLocalSlot(foundIdentifier),
-                        (SubroutineDescriptor) foundInLexicalScope.getTypeDescriptor(foundIdentifier),
+                        (SubroutineDescriptor) foundInLexicalScope.getIdentifierDescriptor(foundIdentifier),
                         Collections.emptyList());
             }
             else {
@@ -873,9 +874,9 @@ public class NodeFactory {
 
                     this.currentLexicalScope.addScopeInitializationNode(initializationNode);
                 } else {
-                    FrameSlot frameSlot = this.currentLexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
+                    this.currentLexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
                     final ExpressionNode readNode = new ReadArgumentNode(count, parameters.get(count++).type);
-                    final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);
+                    final AssignmentNode assignment = this.createCheckedAssignment(parameter.identifier, readNode);
 
                     this.currentLexicalScope.addScopeInitializationNode(assignment);
                 }
@@ -883,6 +884,24 @@ public class NodeFactory {
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
+    }
+
+    private AssignmentNode createCheckedAssignment(String targetIdentifier, ExpressionNode valueNode) {
+        TypeDescriptor targetType = this.doLookup(targetIdentifier, LexicalScope::getIdentifierDescriptor);
+        this.checkTypesAreCompatible(valueNode.getType(), targetType);
+	    FrameSlot targetSlot = this.doLookup(targetIdentifier, LexicalScope::getLocalSlot);
+        return AssignmentNodeGen.create(valueNode, targetSlot);
+    }
+
+    private boolean checkTypesAreCompatible(TypeDescriptor leftType, TypeDescriptor rightType) {
+        if ((leftType != rightType) && !leftType.convertibleTo(rightType)) {
+            if ((rightType instanceof FunctionDescriptor) && !this.checkTypesAreCompatible(leftType, ((FunctionDescriptor) rightType).getReturnDescriptor())) {
+                parser.SemErr("Type mismatch");
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void finishSubroutine(PascalRootNode rootNode) {

@@ -19,7 +19,7 @@ public abstract class AddNodeTP extends AddNode {
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(CharDescriptor.getInstance(), StringDescriptor.getInstance()), StringDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(StringDescriptor.getInstance(), CharDescriptor.getInstance()), StringDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(StringDescriptor.getInstance(), StringDescriptor.getInstance()), StringDescriptor.getInstance());
-        this.typeTable.put(new BinaryArgumentPrimitiveTypes(new PointerDescriptor(PCharDesriptor.getInstance()), new PointerDescriptor(PCharDesriptor.getInstance())), PCharDesriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(new PointerDescriptor(PCharDesriptor.getInstance()), new PointerDescriptor(PCharDesriptor.getInstance())), new PointerDescriptor(PCharDesriptor.getInstance()));
     }
 
 	@Specialization

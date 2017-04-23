@@ -17,7 +17,7 @@ public class PCharDesriptor extends ArrayDescriptor {
 
     private static PCharDesriptor instance = new PCharDesriptor();
 
-    public PCharDesriptor() {
+    private PCharDesriptor() {
         super(new ArrayList<OrdinalDescriptor>(){{add(LongDescriptor.getInstance());}}, CharDescriptor.getInstance());
     }
 

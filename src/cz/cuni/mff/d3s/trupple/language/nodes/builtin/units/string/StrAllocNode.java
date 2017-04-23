@@ -15,10 +15,10 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesr
 public abstract class StrAllocNode extends ExpressionNode {
 
     @Specialization
-    public PointerValue strAlloc(long size) {
+    PointerValue strAlloc(long size) {
         PCharValue pchar = new PCharValue(size);
         HeapSlot heapSlot = PascalHeap.getInstance().allocateNewObject(pchar);
-        PointerValue pointer = new PointerValue(new PCharDesriptor());
+        PointerValue pointer = new PointerValue(PCharDesriptor.getInstance());
         pointer.setHeapSlot(heapSlot);
 
         return pointer;

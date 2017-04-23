@@ -80,7 +80,8 @@ public class PointerDescriptor implements TypeDescriptor {
 
         PointerDescriptor convertTo = (PointerDescriptor) type;
         return (this.getInnerTypeDescriptor() == null) || (convertTo.getInnerTypeDescriptor() == null) ||
-                (convertTo.getInnerTypeDescriptor() == this.getInnerTypeDescriptor());
+                (convertTo.getInnerTypeDescriptor() == this.getInnerTypeDescriptor()) ||
+                (this.getInnerTypeDescriptor().convertibleTo(convertTo.getInnerTypeDescriptor()));
     }
 
 }

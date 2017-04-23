@@ -39,7 +39,7 @@ public class StringBuiltinUnit extends BuiltinUnitAbstr {
     public void importTo(LexicalScope scope) {
         super.importTo(scope);
         try {
-            scope.registerType("pchar", new PointerDescriptor(new PCharDesriptor()));
+            scope.registerType("pchar", new PointerDescriptor(PCharDesriptor.getInstance()));
         } catch (LexicalException e) {
             throw new PascalRuntimeException("Could not import string unit: " + e.getMessage());
         }
