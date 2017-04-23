@@ -409,6 +409,7 @@ public class NodeFactory {
             this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
+            currentLexicalScope = new LexicalScope(currentLexicalScope, identifier, parser.isUsingTPExtension());
         }
 	}
 
@@ -422,6 +423,7 @@ public class NodeFactory {
             this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
+            currentLexicalScope = new LexicalScope(currentLexicalScope, identifier, parser.isUsingTPExtension());
         }
     }
 

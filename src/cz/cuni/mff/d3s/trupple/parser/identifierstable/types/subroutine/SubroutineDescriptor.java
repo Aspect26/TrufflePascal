@@ -32,6 +32,10 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
         return this.subroutine;
     }
 
+    public List<FormalParameter> getFormalParameters() {
+        return this.formalParameters;
+    }
+
     public PascalSubroutine getSubroutine() {
         return this.subroutine;
     }
@@ -76,13 +80,26 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
         return compareFormalParameters(subroutine.formalParameters, this.formalParameters);
     }
 
-    public static boolean compareFormalParameters(List<FormalParameter> left, List<FormalParameter> right) {
+    private static boolean compareFormalParameters(List<FormalParameter> left, List<FormalParameter> right) {
         if (left.size() != right.size()) {
             return false;
         }
         for (int i = 0; i < right.size(); ++i) {
             if (!right.get(i).type.equals(left.get(i).type) &&
                     !left.get(i).type.convertibleTo(right.get(i).type)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean compareFormalParametersExact(List<FormalParameter> left, List<FormalParameter> right) {
+        if (left.size() != right.size()) {
+            return false;
+        }
+        for (int i = 0; i < right.size(); ++i) {
+            if (!right.get(i).type.equals(left.get(i).type)) {
                 return false;
             }
         }
