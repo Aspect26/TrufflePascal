@@ -34,8 +34,10 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDesc
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.ReferenceDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumLiteralDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
@@ -87,7 +89,7 @@ public class NodeFactory {
     /**
      * Specifies identifiers of arguments of the main program
      */
-	private List<String> mainProgramArgumentsIdentifiers;
+	private List<String> mainProgramArgumentsIdentifiers = new ArrayList<>();
 
 	public NodeFactory(IParser parser, boolean usingTPExtension) {
 		this.parser = parser;
@@ -479,19 +481,28 @@ public class NodeFactory {
 
     public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
         String iteratingIdentifier = this.getIdentifierFromToken(variableToken);
-        FrameSlot controlSlot = currentLexicalScope.getLocalSlot(iteratingIdentifier);
+        FrameSlot controlSlot = this.doLookup(iteratingIdentifier, LexicalScope::getLocalSlot);
         TypeDescriptor controlSlotType = currentLexicalScope.getIdentifierDescriptor(iteratingIdentifier);
         if (controlSlot == null) {
             parser.SemErr("Unknown identifier: " + iteratingIdentifier);
+        }
+        if (startValue.getType() != finalValue.getType() && !startValue.getType().convertibleTo(finalValue.getType())) {
+            parser.SemErr("Type mismatch in beginning and last value of for loop.");
         }
         return new ForNode(ascending, controlSlot, controlSlotType, finalValue, startValue, loopBody);
     }
 
     public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
+        if (!(condition.getType() == BooleanDescriptor.getInstance())) {
+            parser.SemErr("Unless condition must be a boolean value");
+        }
         return new RepeatNode(condition, loopBody);
     }
 
     public StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody) {
+        if (!(condition.getType() == BooleanDescriptor.getInstance())) {
+            parser.SemErr("While condition must be a boolean value");
+        }
         return new WhileNode(condition, loopBody);
     }
 
@@ -511,7 +522,10 @@ public class NodeFactory {
     }
 
     public StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
-        return new IfNode(condition, thenNode, elseNode);
+        if (!(condition.getType() == BooleanDescriptor.getInstance())) {
+            parser.SemErr("If condition must be a boolean value");
+        }
+	    return new IfNode(condition, thenNode, elseNode);
     }
 
     public List<FrameSlot> stepIntoRecordsScope(List<String> recordIdentifiers) {
@@ -762,6 +776,15 @@ public class NodeFactory {
     }
 
     public ExpressionNode createSetConstructorNode(List<ExpressionNode> valueNodes) {
+	    if (valueNodes.size() > 0) {
+	        TypeDescriptor valuesType = valueNodes.get(0).getType();
+	        for (ExpressionNode expressionNode : valueNodes) {
+	            if (!expressionNode.getType().equals(valuesType) && !expressionNode.getType().convertibleTo(valuesType)) {
+	                parser.SemErr("Type mismatch in set constructor");
+	                break;
+                }
+            }
+        }
 	    return new SetConstructorNode(valueNodes);
     }
 

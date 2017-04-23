@@ -76,5 +76,5 @@ public abstract class LessThanOrEqualNode extends BinaryNode {
     public TypeDescriptor getType() {
         return BooleanDescriptor.getInstance();
     }
-    
+
 }

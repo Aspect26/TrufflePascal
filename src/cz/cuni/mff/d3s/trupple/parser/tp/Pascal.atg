@@ -32,7 +32,7 @@ PRODUCTIONS
 Pascal
 =
 (
-    Program
+    [ Program ]
 	[ ImportsSection ]
 	Declarations
 	MainFunction

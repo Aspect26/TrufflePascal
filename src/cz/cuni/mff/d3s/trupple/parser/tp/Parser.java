@@ -100,8 +100,10 @@ public class Parser implements IParser {
 	}
 	
 	void Pascal() {
-		if (la.kind == 5) {
-			Program();
+		if (StartOf(1)) {
+			if (la.kind == 5) {
+				Program();
+			}
 			if (la.kind == 9) {
 				ImportsSection();
 			}
@@ -139,7 +141,7 @@ public class Parser implements IParser {
 	}
 
 	void Declarations() {
-		while (StartOf(1)) {
+		while (StartOf(2)) {
 			Declaration();
 		}
 	}
@@ -341,7 +343,7 @@ public class Parser implements IParser {
 		ordinal = null; 
 		if (isSubrange()) {
 			ordinal = SubrangeType();
-		} else if (StartOf(2)) {
+		} else if (StartOf(3)) {
 			TypeDescriptor typeDescriptor = Type();
 			ordinal = factory.castTypeToOrdinalType(typeDescriptor); 
 		} else SynErr(74);
@@ -555,7 +557,7 @@ public class Parser implements IParser {
 		if (la.kind == 31) {
 			Get();
 			factory.forwardProcedure(procedureHeading); 
-		} else if (StartOf(3)) {
+		} else if (StartOf(4)) {
 			factory.startProcedureImplementation(procedureHeading); 
 			Declarations();
 			StatementNode bodyNode = Block();
@@ -568,7 +570,7 @@ public class Parser implements IParser {
 		if (la.kind == 31) {
 			Get();
 			factory.forwardFunction(functionHeading); 
-		} else if (StartOf(3)) {
+		} else if (StartOf(4)) {
 			factory.startFunctionImplementation(functionHeading); 
 			Declarations();
 			StatementNode bodyNode = Block();
@@ -594,7 +596,7 @@ public class Parser implements IParser {
 		StatementNode  blockNode;
 		Expect(35);
 		List<StatementNode> bodyNodes = new ArrayList<>(); 
-		if (StartOf(4)) {
+		if (StartOf(5)) {
 			StatementSequence(bodyNodes);
 		}
 		Expect(22);
@@ -827,11 +829,11 @@ public class Parser implements IParser {
 		statement = null; 
 		Expect(1);
 		Token identifierToken = t; 
-		if (StartOf(5)) {
+		if (StartOf(6)) {
 			statement = factory.createSubroutineCall(identifierToken, new ArrayList<>()); 
 		} else if (la.kind == 6) {
 			statement = SubroutineCall(identifierToken);
-		} else if (StartOf(6)) {
+		} else if (StartOf(7)) {
 			AccessNode accessNode = InnerAccessRoute(identifierToken);
 			Expect(37);
 			ExpressionNode value = Expression();
@@ -844,7 +846,7 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		Expect(6);
 		List<ExpressionNode> parameters = new ArrayList<>(); 
-		if (StartOf(7)) {
+		if (StartOf(8)) {
 			parameters = ActualParameters(identifierToken);
 		}
 		Expect(7);
@@ -965,7 +967,7 @@ public class Parser implements IParser {
 			Token op = t; 
 			ExpressionNode right = SignedLogicFactor();
 			expression = factory.createUnaryExpression(op, right); 
-		} else if (StartOf(8)) {
+		} else if (StartOf(9)) {
 			expression = LogicFactor();
 		} else SynErr(84);
 		return expression;
@@ -974,7 +976,7 @@ public class Parser implements IParser {
 	ExpressionNode  LogicFactor() {
 		ExpressionNode  expression;
 		expression = Arithmetic();
-		if (StartOf(9)) {
+		if (StartOf(10)) {
 			switch (la.kind) {
 			case 53: {
 				Get();
@@ -1035,7 +1037,7 @@ public class Parser implements IParser {
 	ExpressionNode  Term() {
 		ExpressionNode  expression;
 		expression = SignedFactor();
-		while (StartOf(10)) {
+		while (StartOf(11)) {
 			if (la.kind == 60) {
 				Get();
 			} else if (la.kind == 61) {
@@ -1064,7 +1066,7 @@ public class Parser implements IParser {
 			Token unOp = t; 
 			expression = SignedFactor();
 			expression = factory.createUnaryExpression(unOp, expression); 
-		} else if (StartOf(11)) {
+		} else if (StartOf(12)) {
 			expression = Factor();
 		} else SynErr(85);
 		return expression;
@@ -1119,9 +1121,9 @@ public class Parser implements IParser {
 		ExpressionNode  expression;
 		Expect(1);
 		Token identifierToken = t; expression = null; 
-		if (StartOf(12)) {
+		if (StartOf(13)) {
 			expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
-		} else if (StartOf(13)) {
+		} else if (StartOf(14)) {
 			expression = InnerIdentifierAccess(identifierToken);
 		} else SynErr(87);
 		return expression;
@@ -1133,7 +1135,7 @@ public class Parser implements IParser {
 		Expect(18);
 		if (la.kind == 19) {
 			expression = factory.createSetConstructorNode(new ArrayList<>()); 
-		} else if (StartOf(7)) {
+		} else if (StartOf(8)) {
 			List<ExpressionNode> valueNodes = new ArrayList<ExpressionNode>(); 
 			ExpressionNode valueNode = Expression();
 			valueNodes.add(valueNode); 
@@ -1183,7 +1185,7 @@ public class Parser implements IParser {
 		} else if (factory.shouldBeSubroutine(subroutineToken, currentParameterIndex)) {
 			Expect(1);
 			parameter = factory.createSubroutineParameterPassNode(t); 
-		} else if (StartOf(7)) {
+		} else if (StartOf(8)) {
 			parameter = Expression();
 		} else SynErr(90);
 		return parameter;
@@ -1198,7 +1200,7 @@ public class Parser implements IParser {
 
 	void InterfaceSection() {
 		Expect(67);
-		while (StartOf(14)) {
+		while (StartOf(15)) {
 			if (la.kind == 33) {
 				UnitProcedureHeading();
 			} else if (la.kind == 32) {
@@ -1213,7 +1215,7 @@ public class Parser implements IParser {
 
 	void ImplementationSection() {
 		Expect(68);
-		while (StartOf(14)) {
+		while (StartOf(15)) {
 			if (la.kind == 32 || la.kind == 33) {
 				UnitSubroutineImplementation();
 			} else if (la.kind == 30) {
@@ -1271,7 +1273,7 @@ public class Parser implements IParser {
 		if (la.kind == 31) {
 			Get();
 			factory.forwardProcedure(heading); 
-		} else if (StartOf(3)) {
+		} else if (StartOf(4)) {
 			factory.startUnitProcedureImplementation(heading); 
 			Declarations();
 			StatementNode bodyNode = Block();
@@ -1284,7 +1286,7 @@ public class Parser implements IParser {
 		if (la.kind == 31) {
 			Get();
 			factory.forwardFunction(heading); 
-		} else if (StartOf(3)) {
+		} else if (StartOf(4)) {
 			factory.startUnitFunctionImplementation(heading); 
 			Declarations();
 			StatementNode bodyNode = Block();
@@ -1306,6 +1308,7 @@ public class Parser implements IParser {
 
 	private static final boolean[][] set = {
 		{_T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_T,_x,_x, _x,_T,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_x, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _T,_T,_x,_T, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_x, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
