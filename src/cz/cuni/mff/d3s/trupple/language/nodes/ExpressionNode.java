@@ -9,6 +9,8 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @TypeSystemReference(PascalTypes.class)
 @NodeInfo(description = "Abstract class for all nodes that return value")
@@ -37,8 +39,10 @@ public abstract class ExpressionNode extends StatementNode {
 	    return PascalTypesGen.expectEnumValue(executeGeneric(frame));
     }
 
+    public abstract TypeDescriptor getType();
+
 	/**
-	 * guard functions
+	 * guard functions -> code smell :(
 	 */
 	protected boolean isLongKindOrLongReference(VirtualFrame frame, FrameSlot frameSlot) {
 	    return isKind(frame, FrameSlotKind.Long, frameSlot) || isReferenceKind(frame, FrameSlotKind.Long, frameSlot);
@@ -54,10 +58,6 @@ public abstract class ExpressionNode extends StatementNode {
 
     protected boolean isDoubleKindOrDoubleReference(VirtualFrame frame, FrameSlot frameSlot) {
         return isKind(frame, FrameSlotKind.Double, frameSlot) || isReferenceKind(frame, FrameSlotKind.Double, frameSlot);
-    }
-
-    protected boolean isObjectKindOrObjectReference(VirtualFrame frame, FrameSlot frameSlot) {
-        return isKind(frame, FrameSlotKind.Object, frameSlot) || isReferenceKind(frame, FrameSlotKind.Object, frameSlot);
     }
 
 	private boolean isReferenceKind(VirtualFrame frame, FrameSlotKind kind, FrameSlot frameSlot) {

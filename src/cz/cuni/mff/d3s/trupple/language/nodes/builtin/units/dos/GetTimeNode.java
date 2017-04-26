@@ -5,6 +5,7 @@ import com.oracle.truffle.api.dsl.NodeChildren;
 import com.oracle.truffle.api.dsl.Specialization;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 import java.time.LocalDateTime;
 
@@ -17,19 +18,16 @@ import java.time.LocalDateTime;
  */
 @NodeChildren({ @NodeChild(type = ExpressionNode.class), @NodeChild(type = ExpressionNode.class),
         @NodeChild(type = ExpressionNode.class), @NodeChild(type = ExpressionNode.class) })
-public abstract class GetTimeNode extends ExpressionNode {
+public abstract class GetTimeNode extends StatementNode {
 
     @Specialization
-    int getTime(Reference hourReference, Reference minuteReference, Reference secondReference, Reference sec100Reference) {
+    void getTime(Reference hourReference, Reference minuteReference, Reference secondReference, Reference sec100Reference) {
         LocalDateTime now = LocalDateTime.now();
 
         this.setLongValue(hourReference, now.getHour());
         this.setLongValue(minuteReference, now.getMinute());
         this.setLongValue(secondReference, now.getSecond());
         this.setLongValue(sec100Reference, now.getNano() / 1000 / 1000 / 10);  // by specification, Sunday shall be 0, not 7 in Pascal
-
-        // NOTE: it is a procedure, so it shouldn't return anything
-        return 0;
     }
 
     private void setLongValue(Reference reference, long value) {

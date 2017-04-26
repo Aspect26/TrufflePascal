@@ -4,8 +4,10 @@ import cz.cuni.mff.d3s.trupple.language.builtinunits.BuiltinUnitAbstr;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.UnitSubroutineData;
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.string.StrAllocNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
@@ -22,9 +24,8 @@ public class StringBuiltinUnit extends BuiltinUnitAbstr {
         this.data.add(new UnitSubroutineData(
            "StrAlloc",
                 new BuiltinFunctionDescriptor.OneArgumentBuiltin(
-                        StrAllocNodeGen.create(new ReadArgumentNode(0)),
-                        new FormalParameter("size", new LongDescriptor(), false),
-                        new PointerDescriptor("")
+                        StrAllocNodeGen.create(new ReadArgumentNode(0, LongDescriptor.getInstance())),
+                        new FormalParameter("size", LongDescriptor.getInstance(), false)
                 )
         ));
     }
@@ -37,7 +38,11 @@ public class StringBuiltinUnit extends BuiltinUnitAbstr {
     @Override
     public void importTo(LexicalScope scope) {
         super.importTo(scope);
-        scope.registerType("pchar", new PointerDescriptor(new PCharDesriptor()));
+        try {
+            scope.registerType("pchar", new PointerDescriptor(PCharDesriptor.getInstance()));
+        } catch (LexicalException e) {
+            throw new PascalRuntimeException("Could not import string unit: " + e.getMessage());
+        }
     }
 
 }

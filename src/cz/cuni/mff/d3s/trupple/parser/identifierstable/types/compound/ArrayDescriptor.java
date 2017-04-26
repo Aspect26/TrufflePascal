@@ -2,7 +2,6 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FixedPascalArray;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalOrdinal;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
@@ -31,6 +30,14 @@ public class ArrayDescriptor implements TypeDescriptor {
     public Object getDefaultValue() {
         Object[] data = this.createArrayData();
         return new FixedPascalArray(this.createOrdinal(dimensions.get(0)), data);
+    }
+
+    public TypeDescriptor getOneStepInnerDescriptor() {
+        if (dimensions.size() == 1) {
+            return this.finalReturnTypeDescriptor;
+        } else {
+            return new ArrayDescriptor(dimensions.subList(1, dimensions.size()), finalReturnTypeDescriptor);
+        }
     }
 
     private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) {
@@ -70,6 +77,11 @@ public class ArrayDescriptor implements TypeDescriptor {
     private TypeDescriptor createInnerArrayDescriptor() {
         List<OrdinalDescriptor> innerDimensions = this.dimensions.subList(1, this.dimensions.size());
         return new ArrayDescriptor(innerDimensions, this.finalReturnTypeDescriptor);
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
     }
 
 }

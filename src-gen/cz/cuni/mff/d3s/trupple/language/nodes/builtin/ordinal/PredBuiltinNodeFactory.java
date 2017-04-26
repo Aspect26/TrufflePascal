@@ -75,6 +75,11 @@ public final class PredBuiltinNodeFactory implements NodeFactory<PredBuiltinNode
         }
 
         @Override
+        protected ExpressionNode getArgument() {
+            return this.argument_;
+        }
+
+        @Override
         public NodeCost getCost() {
             return specialization_.getNodeCost();
         }

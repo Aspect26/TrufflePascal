@@ -17,7 +17,7 @@ stringChar = ANY - "'" - cr - lf.
 TOKENS
 
 identifier = letter {letter | digit}.
-stringLiteral = "'" { stringChar } "'".
+stringLiteral = "'" { stringChar | "''" } "'".
 integerLiteral = "0" | nonZeroDigit { digit }.
 doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] { digit } | ("0" | nonZeroDigit { digit }) "." digit { digit } ["e" ["-"|"+"] { digit }].
 
@@ -445,7 +445,7 @@ identifier                                      (. Token identifierToken = t; .)
 [ FormalParameterList<out formalParameters> ]
 ":"
 identifier                                      (. Token returnTypeToken = t; .)
-";"                                             (. functionHeading = new FunctionHeading(identifierToken, formalParameters, returnTypeToken); .)
+";"                                             (. functionHeading = new FunctionHeading(identifierToken, formalParameters, factory.getTypeDescriptor(returnTypeToken)); .)
 .
 
 
@@ -888,12 +888,14 @@ ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token s
                                                 (. parameter = null; .)
 (
     IF(factory.shouldBeReference(subroutineToken, currentParameterIndex))
-    identifier                                  (. parameter = factory.createReferenceNode(t); .)
+    identifier                                  (. parameter = factory.createReferencePassNode(t); .)
+|
+    IF(factory.shouldBeSubroutine(subroutineToken, currentParameterIndex))
+    identifier                                  (. parameter = factory.createSubroutineParameterPassNode(t); .)
 |
     Expression<out parameter>
 )
 .
-
 
 
 ArrayIndex<. out List<ExpressionNode> indexNodes .>
@@ -914,6 +916,7 @@ ArrayIndex<. out List<ExpressionNode> indexNodes .>
 Unit
 =
 UnitHeader
+[ ImportsSection ]
 InterfaceSection                                (. factory.finishUnitInterfaceSection(); .)
 ImplementationSection
 UnitFooter
@@ -972,8 +975,7 @@ identifier										(. Token name = t; .)
 												(. List<FormalParameter> formalParameters = new ArrayList<>(); .)
 [ FormalParameterList<out formalParameters> ]
 ":"
-identifier										(. String returnTypeName = factory.getTypeNameFromToken(t); .)
-												(. factory.addUnitFunctionInterface(name, formalParameters, returnTypeName); .)
+identifier										(. factory.addUnitFunctionInterface(name, formalParameters, t); .)
 ";"
 .
 
@@ -1006,29 +1008,27 @@ UnitSubroutineImplementation
 
 UnitProcedureImplementation
 =
-"procedure"
-identifier                                      (. Token identifierToken = t; .)
-                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ]
-";"
-                                                (. factory.startUnitProcedureImplementation(identifierToken, formalParameters); .)
+ProcedureHeading<out ProcedureHeading heading>
+(
+"forward"                                       (. factory.forwardProcedure(heading); .)
+|
+                                                (. factory.startUnitProcedureImplementation(heading); .)
 Declarations
 Block<out StatementNode bodyNode>               (. factory.finishProcedureImplementation(bodyNode); .)
+)
 .
 
 
 UnitFunctionImplementation
 =
-"function"
-identifier                                      (. Token identifierToken = t; .)
-                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
-[ FormalParameterList<out formalParameters> ]
-":"
-identifier                                      (. Token returnTypeToken = t; .)
-";"
-                                                (. factory.startUnitFunctionImplementation(identifierToken, formalParameters, returnTypeToken); .)
+FunctionHeading<out FunctionHeading heading>
+(
+"forward"                                       (. factory.forwardFunction(heading); .)
+|
+                                                (. factory.startUnitFunctionImplementation(heading); .)
 Declarations
 Block<out StatementNode bodyNode>               (. factory.finishFunctionImplementation(bodyNode); .)
+)
 .
 
 END Pascal.

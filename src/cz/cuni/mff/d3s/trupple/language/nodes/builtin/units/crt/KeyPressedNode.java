@@ -4,12 +4,19 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.graphics.PascalGraphMode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 
 public abstract class KeyPressedNode extends ExpressionNode {
 
     @Specialization
     boolean keyPressed(VirtualFrame frame) {
         return PascalGraphMode.keyPressed();
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return BooleanDescriptor.getInstance();
     }
 
 }

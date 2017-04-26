@@ -7,19 +7,34 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeExceptio
 import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 public class RecordAccessNode extends AccessNode {
 
     private final String variableIdentifier;
 
-    public RecordAccessNode(AccessNode applyToNode, String variableIdentifier) {
+    private final TypeDescriptor typeDescriptor;
+
+    public RecordAccessNode(AccessNode applyToNode, String variableIdentifier, TypeDescriptor typeDescriptor) {
         super(applyToNode);
         this.variableIdentifier = variableIdentifier;
+        this.typeDescriptor = typeDescriptor;
+    }
+
+    @Override
+    public Object executeGeneric(VirtualFrame frame) {
+        this.applyToNode.executeVoid(frame);
+        return null;
     }
 
     @Override
     public void executeVoid(VirtualFrame frame) {
         this.applyToNode.executeVoid(frame);
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return this.typeDescriptor;
     }
 
     @Override

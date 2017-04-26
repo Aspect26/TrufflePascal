@@ -3,37 +3,39 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin.io;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+
+import com.oracle.truffle.api.dsl.GenerateNodeFactory;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.CantReadInputException;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
 
 // TODO: refactor this class pls, this is a horrid mess
 @NodeInfo(shortName = "read")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
-public abstract class ReadBuiltinNode extends BuiltinNode {
+@GenerateNodeFactory
+public abstract class ReadBuiltinNode extends StatementNode {
 
     private static final String NEW_LINE = System.getProperty("line.separator");
 
 	@Specialization
-    public Object read(Object[] arguments) {
+    public void read(Object[] arguments) {
         if (arguments.length == 0) {
-            // TODO: wtf is this?
-            return readOne();
+            readOne();
         }
 
         FileValue file = tryGetFileValue((Reference) arguments[0]);
         if (file != null) {
-            return read(file, Arrays.copyOfRange(arguments, 1, arguments.length));
+            read(file, Arrays.copyOfRange(arguments, 1, arguments.length));
         } else {
-            return read(null, arguments);
+            read(null, arguments);
         }
     }
 
@@ -92,11 +94,6 @@ public abstract class ReadBuiltinNode extends BuiltinNode {
         } catch (IOException e) {
 	        throw new CantReadInputException(e);
         }
-    }
-
-    // TODO: TP can't read boolean but it would be a good feature
-    private boolean readBoolean() {
-        return false;
     }
 
     private char readChar(FileValue file) throws IOException {

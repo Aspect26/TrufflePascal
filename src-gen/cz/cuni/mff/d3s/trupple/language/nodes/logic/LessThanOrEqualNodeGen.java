@@ -32,6 +32,16 @@ public final class LessThanOrEqualNodeGen extends LessThanOrEqualNode implements
     }
 
     @Override
+    protected ExpressionNode getLeftNode() {
+        return this.leftNode_;
+    }
+
+    @Override
+    protected ExpressionNode getRightNode() {
+        return this.rightNode_;
+    }
+
+    @Override
     public NodeCost getCost() {
         return specialization_.getNodeCost();
     }
@@ -42,14 +52,14 @@ public final class LessThanOrEqualNodeGen extends LessThanOrEqualNode implements
     }
 
     @Override
-    public boolean executeBoolean(VirtualFrame frameValue) {
-        return specialization_.executeBoolean(frameValue);
-    }
-
-    @Override
     public void executeVoid(VirtualFrame frameValue) {
         specialization_.executeVoid(frameValue);
         return;
+    }
+
+    @Override
+    public boolean executeBoolean(VirtualFrame frameValue) {
+        return specialization_.executeBoolean(frameValue);
     }
 
     @Override
@@ -99,13 +109,13 @@ public final class LessThanOrEqualNodeGen extends LessThanOrEqualNode implements
             return executeBoolean_(frameValue, leftNodeValue_, rightNodeValue_);
         }
 
-        public boolean executeBoolean(VirtualFrame frameValue) {
-            return (boolean) execute(frameValue);
+        public void executeVoid(VirtualFrame frameValue) {
+            execute(frameValue);
+            return;
         }
 
-        public void executeVoid(VirtualFrame frameValue) {
-            executeBoolean(frameValue);
-            return;
+        public boolean executeBoolean(VirtualFrame frameValue) {
+            return (boolean) execute(frameValue);
         }
 
         @Override

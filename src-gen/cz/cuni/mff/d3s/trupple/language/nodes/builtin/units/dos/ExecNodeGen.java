@@ -29,7 +29,7 @@ public final class ExecNodeGen extends ExecNode {
     }
 
     @Override
-    public Object executeGeneric(VirtualFrame frameValue) {
+    public void executeVoid(VirtualFrame frameValue) {
         String child0Value_;
         try {
             child0Value_ = expectString(child0_.executeGeneric(frameValue));
@@ -43,12 +43,7 @@ public final class ExecNodeGen extends ExecNode {
         } catch (UnexpectedResultException ex) {
             throw unsupported(child0Value_, ex.getResult());
         }
-        return this.exec(child0Value_, child1Value_);
-    }
-
-    @Override
-    public void executeVoid(VirtualFrame frameValue) {
-        executeGeneric(frameValue);
+        this.exec(child0Value_, child1Value_);
         return;
     }
 

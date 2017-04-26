@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.nodes;
+package cz.cuni.mff.d3s.trupple.language.nodes.statement;
 
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;

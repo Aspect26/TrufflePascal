@@ -74,6 +74,11 @@ public final class AbsBuiltinNodeFactory implements NodeFactory<AbsBuiltinNode> 
         }
 
         @Override
+        protected ExpressionNode getArgument() {
+            return this.argument_;
+        }
+
+        @Override
         public NodeCost getCost() {
             return specialization_.getNodeCost();
         }

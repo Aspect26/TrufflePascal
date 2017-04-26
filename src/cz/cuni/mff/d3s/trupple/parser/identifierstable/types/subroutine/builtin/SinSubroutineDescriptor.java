@@ -9,9 +9,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public class SinSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public SinSubroutineDescriptor() {
-        super(SinBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new LongDescriptor(), false),
-                new RealDescriptor());
+        super(SinBuiltinNodeFactory.create(new ReadArgumentNode(0, RealDescriptor.getInstance())),
+                new FormalParameter("i", RealDescriptor.getInstance(), false));
     }
 
 }

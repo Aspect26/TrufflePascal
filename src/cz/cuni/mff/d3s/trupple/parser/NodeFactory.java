@@ -4,7 +4,6 @@ import java.util.*;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import com.sun.istack.internal.NotNull;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.*;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.dos.DosBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.crt.CrtBuiltinUnit;
@@ -19,21 +18,29 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.FunctionPascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.ProcedurePascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.SimpleAccessNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownIdentifierException;
-import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownTypeException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.UnknownDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.ReferenceDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.OverloadedFunctionDescriptor;
 
 public class NodeFactory {
 
@@ -82,7 +89,7 @@ public class NodeFactory {
     /**
      * Specifies identifiers of arguments of the main program
      */
-	private List<String> mainProgramArgumentsIdentifiers;
+	private List<String> mainProgramArgumentsIdentifiers = new ArrayList<>();
 
 	public NodeFactory(IParser parser, boolean usingTPExtension) {
 		this.parser = parser;
@@ -149,33 +156,24 @@ public class NodeFactory {
         return false;
     }
 
-    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException,
-                           T notFoundReturnValue, boolean withReturnType) {
-	    assert notFoundException != null;
-
+    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, boolean withReturnType) {
 	    try {
             T result = lookupToParentScope(this.currentLexicalScope, identifier, lookupFunction, withReturnType);
             if (result == null) {
                 result = lookupInUnits(identifier, lookupFunction);
             }
             if (result == null) {
-                throw notFoundException;
+                throw new UnknownIdentifierException(identifier);
             }
             return result;
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
-            return notFoundReturnValue;
+            return null;
         }
     }
 
-    // TODO: remove this notfoundexception -> it is always unknown identifier exception
-    // TODO: remove not found return value -> always null
-    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException) {
-	    return this.doLookup(identifier, lookupFunction, notFoundException, null, false);
-    }
-
-    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, @NotNull LexicalException notFoundException, boolean withReturnType) {
-        return this.doLookup(identifier, lookupFunction, notFoundException, null, withReturnType);
+    private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction) {
+	    return this.doLookup(identifier, lookupFunction, false);
     }
 
     private <T> T lookupToParentScope(LexicalScope scope, String identifier, GlobalObjectLookup<T> lookupFunction,
@@ -209,7 +207,7 @@ public class NodeFactory {
 
     public TypeDescriptor getTypeDescriptor(Token identifierToken) {
         String identifier = this.getTypeNameFromToken(identifierToken);
-        return this.doLookup(identifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(identifier));
+        return this.doLookup(identifier, LexicalScope::getTypeDescriptor);
     }
 
     public void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
@@ -239,7 +237,7 @@ public class NodeFactory {
 
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
 	    String typeIdentifier = this.getTypeNameFromToken(returnTypeToken);
-	    TypeDescriptor returnTypeDescriptor = this.doLookup(typeIdentifier, LexicalScope::getTypeDescriptor, new UnknownTypeException(typeIdentifier));
+	    TypeDescriptor returnTypeDescriptor = this.doLookup(typeIdentifier, LexicalScope::getTypeDescriptor);
 
 	    return currentLexicalScope.createArrayType(ordinalDimensions, returnTypeDescriptor);
     }
@@ -353,7 +351,7 @@ public class NodeFactory {
     public ConstantDescriptor createConstantFromIdentifier(String sign, Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    try {
-	        ConstantDescriptor constant = this.doLookup(identifier, LexicalScope::getConstant, new UnknownIdentifierException(identifier));
+	        ConstantDescriptor constant = this.doLookup(identifier, LexicalScope::getConstant);
             if (sign.isEmpty()) {
                 return constant;
             } else {
@@ -372,7 +370,6 @@ public class NodeFactory {
             }
         } catch (LexicalException e) {
 	        parser.SemErr(e.getMessage());
-	        // TODO: return some default constant
 	        return new LongConstantDescriptor(0);
         }
     }
@@ -413,6 +410,7 @@ public class NodeFactory {
             this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
+            currentLexicalScope = new LexicalScope(currentLexicalScope, identifier, parser.isUsingTPExtension());
         }
 	}
 
@@ -426,6 +424,7 @@ public class NodeFactory {
             this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
+            currentLexicalScope = new LexicalScope(currentLexicalScope, identifier, parser.isUsingTPExtension());
         }
     }
 
@@ -455,13 +454,18 @@ public class NodeFactory {
     public void finishProcedureImplementation(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
-        finishSubroutine(procedureBodyNode);
+        final PascalRootNode rootNode = new ProcedurePascalRootNode(currentLexicalScope.getFrameDescriptor(), procedureBodyNode);
+        finishSubroutine(rootNode);
     }
 
     public void finishFunctionImplementation(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
-        final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(subroutineNode, currentLexicalScope.getReturnSlot());
-        finishSubroutine(functionBodyNode);
+        final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(
+                subroutineNode,
+                currentLexicalScope.getReturnSlot(),
+                currentLexicalScope.getIdentifierDescriptor(currentLexicalScope.getName()));
+        final PascalRootNode rootNode = new FunctionPascalRootNode(currentLexicalScope.getFrameDescriptor(), functionBodyNode);
+        finishSubroutine(rootNode);
     }
 
     public void startLoop() {
@@ -479,18 +483,29 @@ public class NodeFactory {
 
     public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
         String iteratingIdentifier = this.getIdentifierFromToken(variableToken);
-        FrameSlot iteratingSlot = currentLexicalScope.getLocalSlot(iteratingIdentifier);
-        if (iteratingSlot == null) {
+        FrameSlot controlSlot = this.doLookup(iteratingIdentifier, LexicalScope::getLocalSlot);
+        TypeDescriptor controlSlotType = currentLexicalScope.getIdentifierDescriptor(iteratingIdentifier);
+        if (controlSlot == null) {
             parser.SemErr("Unknown identifier: " + iteratingIdentifier);
         }
-        return new ForNode(ascending, iteratingSlot, startValue, finalValue, loopBody);
+        if (startValue.getType() != finalValue.getType() && !startValue.getType().convertibleTo(finalValue.getType())) {
+            parser.SemErr("Type mismatch in beginning and last value of for loop.");
+        }
+        AssignmentNode initialAssignment = this.createCheckedAssignment(iteratingIdentifier, startValue);
+        return new ForNode(ascending, initialAssignment, controlSlot, controlSlotType, finalValue, startValue, loopBody);
     }
 
     public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
+        if (!(condition.getType() == BooleanDescriptor.getInstance())) {
+            parser.SemErr("Unless condition must be a boolean value");
+        }
         return new RepeatNode(condition, loopBody);
     }
 
     public StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody) {
+        if (!(condition.getType() == BooleanDescriptor.getInstance())) {
+            parser.SemErr("While condition must be a boolean value");
+        }
         return new WhileNode(condition, loopBody);
     }
 
@@ -510,27 +525,42 @@ public class NodeFactory {
     }
 
     public StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
-        return new IfNode(condition, thenNode, elseNode);
+        if (!(condition.getType() == BooleanDescriptor.getInstance())) {
+            parser.SemErr("If condition must be a boolean value");
+        }
+	    return new IfNode(condition, thenNode, elseNode);
     }
 
     public List<FrameSlot> stepIntoRecordsScope(List<String> recordIdentifiers) {
-	    LexicalScope currentScope = this.getScope();
+	    LexicalScope currentScope = this.currentLexicalScope;
         List<FrameSlot> recordsSlots = new ArrayList<>();
 
-        // TODO CRITICAL: a lookup function should be used for the first identifier
-	    for (String recordIdentifier : recordIdentifiers) {
-	        TypeDescriptor recordDescriptor = this.currentLexicalScope.getIdentifierDescriptor(recordIdentifier);
-            if (recordDescriptor == null || !(recordDescriptor instanceof RecordDescriptor)) {
-                parser.SemErr("Not a record: " + recordIdentifier);
-                this.currentLexicalScope = currentScope;
-                return Collections.emptyList();
-            } else {
-                recordsSlots.add(this.currentLexicalScope.getLocalSlot(recordIdentifier));
-                this.currentLexicalScope = ((RecordDescriptor) recordDescriptor).getLexicalScope();
+        try {
+            String firstIdentifier = this.doLookup(recordIdentifiers.get(0), (LexicalScope scope, String identifier) -> {
+                this.currentLexicalScope = scope;
+                return identifier;
+            });
+            recordsSlots.add(this.stepIntoRecordElementScope(firstIdentifier));
+            for (int i = 1; i < recordIdentifiers.size(); ++i) {
+                recordsSlots.add(this.stepIntoRecordElementScope(recordIdentifiers.get(i)));
             }
+            return recordsSlots;
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+            this.currentLexicalScope = currentScope;
+            return Collections.emptyList();
         }
+    }
 
-        return recordsSlots;
+    private FrameSlot stepIntoRecordElementScope(String recordIdentifier) throws LexicalException {
+        TypeDescriptor recordDescriptor = this.currentLexicalScope.getIdentifierDescriptor(recordIdentifier);
+        if (recordDescriptor == null || !(recordDescriptor instanceof RecordDescriptor)) {
+            throw new LexicalException("Not a record: " + recordIdentifier);
+        } else {
+            FrameSlot recordSlot = this.currentLexicalScope.getLocalSlot(recordIdentifier);
+            this.currentLexicalScope = ((RecordDescriptor) recordDescriptor).getLexicalScope();
+            return recordSlot;
+        }
     }
 
     public WithNode createWithStatement(List<FrameSlot> frameSlots, StatementNode innerStatement) {
@@ -553,50 +583,56 @@ public class NodeFactory {
         return new NopNode();
     }
 
-    public ExpressionNode createBinaryExpression(Token operator, ExpressionNode leftNode, ExpressionNode rightNode) {
-        switch (operator.val.toLowerCase()) {
+    public ExpressionNode createBinaryExpression(Token operatorToken, ExpressionNode leftNode, ExpressionNode rightNode) {
+        String operator = operatorToken.val.toLowerCase();
+        ExpressionNode resultExpression;
+	    switch (operator) {
 
             // arithmetic
             case "+":
-                return (usingTPExtension)? AddNodeTPNodeGen.create(leftNode, rightNode) : AddNodeGen.create(leftNode, rightNode);
+                resultExpression = (usingTPExtension)? AddNodeTPNodeGen.create(leftNode, rightNode) : AddNodeGen.create(leftNode, rightNode); break;
             case "-":
-                return SubstractNodeGen.create(leftNode, rightNode);
+                resultExpression = SubtractNodeGen.create(leftNode, rightNode); break;
             case "*":
-                return MultiplyNodeGen.create(leftNode, rightNode);
+                resultExpression = MultiplyNodeGen.create(leftNode, rightNode); break;
             case "/":
-                return DivideNodeGen.create(leftNode, rightNode);
+                resultExpression = DivideNodeGen.create(leftNode, rightNode); break;
             case "div":
-                return DivideIntegerNodeGen.create(leftNode, rightNode);
+                resultExpression = DivideIntegerNodeGen.create(leftNode, rightNode); break;
             case "mod":
-                return ModuloNodeGen.create(leftNode, rightNode);
+                resultExpression = ModuloNodeGen.create(leftNode, rightNode); break;
 
             // logic
             case "and":
-                return AndNodeGen.create(leftNode, rightNode);
+                resultExpression = AndNodeGen.create(leftNode, rightNode); break;
             case "or":
-                return OrNodeGen.create(leftNode, rightNode);
-
+                resultExpression = OrNodeGen.create(leftNode, rightNode); break;
             case "<":
-                return LessThanNodeGen.create(leftNode, rightNode);
+                resultExpression = LessThanNodeGen.create(leftNode, rightNode); break;
             case "<=":
-                return LessThanOrEqualNodeGen.create(leftNode, rightNode);
+                resultExpression = LessThanOrEqualNodeGen.create(leftNode, rightNode); break;
             case ">":
-                return NotNodeGen.create(LessThanOrEqualNodeGen.create(leftNode, rightNode));
+                BinaryNode lessThanOrEqual = this.verifyOperandArguments(LessThanOrEqualNodeGen.create(leftNode, rightNode), operator);
+                resultExpression = NotNodeGen.create(lessThanOrEqual); break;
             case ">=":
-                return NotNodeGen.create(LessThanNodeGen.create(leftNode, rightNode));
+                BinaryNode lessThan = this.verifyOperandArguments(LessThanNodeGen.create(leftNode, rightNode), operator);
+                resultExpression = NotNodeGen.create(lessThan); break;
             case "=":
-                return EqualsNodeGen.create(leftNode, rightNode);
+                resultExpression = EqualsNodeGen.create(leftNode, rightNode); break;
             case "<>":
-                return NotNodeGen.create(EqualsNodeGen.create(leftNode, rightNode));
+                BinaryNode equals = this.verifyOperandArguments(EqualsNodeGen.create(leftNode, rightNode), operator);
+                resultExpression = NotNodeGen.create(equals); break;
             case "in":
-                return InNodeGen.create(leftNode, rightNode);
+                resultExpression = InNodeGen.create(leftNode, rightNode); break;
             case "><":
-                return SymmetricDifferenceNodeGen.create(leftNode, rightNode);
+                resultExpression = SymmetricDifferenceNodeGen.create(leftNode, rightNode); break;
 
             default:
-                parser.SemErr("Unknown binary operator: " + operator.val);
-                return null;
+                parser.SemErr("Unknown binary operator: " + operator);
+                return InvalidBinaryExpressionNodeGen.create(leftNode, rightNode);
         }
+
+        return this.verifyOperandArguments(resultExpression, operator);
     }
 
     public ExpressionNode createUnaryExpression(Token operator, ExpressionNode son) {
@@ -615,16 +651,20 @@ public class NodeFactory {
 
     public AccessNode createSimpleAccessNode(Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
-	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(identifier), true);
+	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, true);
+        TypeDescriptor typeDescriptor = this.doLookup(identifier, LexicalScope::getIdentifierDescriptor);
+        if (typeDescriptor instanceof ReferenceDescriptor) {
+            typeDescriptor = ((ReferenceDescriptor) typeDescriptor).getReferencedType();
+        }
 
-	    return new SimpleAccessNode(frameSlot);
+	    return new SimpleAccessNode(frameSlot, typeDescriptor);
     }
 
-    public ExpressionNode createAssignmentWithRoute(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
+    public StatementNode createAssignmentWithRoute(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
-        FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, new UnknownIdentifierException(variableIdentifier), true);
+        FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, true);
+        this.checkTypesAreCompatible(valueNode.getType(), accessNode.getType());
 
-        // TODO: check if it is assignable
         return AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
     }
 
@@ -633,63 +673,107 @@ public class NodeFactory {
 
         return this.doLookup(identifier, (LexicalScope foundInLexicalScope, String foundIdentifier) -> {
             if (foundInLexicalScope.isParameterlessSubroutine(foundIdentifier)) {
-                return this.createInvokeNode(foundInLexicalScope.getLocalSlot(foundIdentifier), Collections.emptyList());
+                return this.createInvokeNode(foundInLexicalScope.getLocalSlot(foundIdentifier),
+                        (SubroutineDescriptor) foundInLexicalScope.getIdentifierDescriptor(foundIdentifier),
+                        Collections.emptyList());
             }
             else {
                 // TODO: check if it is a constant or a variable
-                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier));
+                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier), foundInLexicalScope.getIdentifierDescriptor(foundIdentifier));
             }
-        }, new UnknownIdentifierException(identifier));
+        });
     }
 
     public ExpressionNode createExpressionFromIdentifierWithRoute(AccessNode accessNode) {
         return new ReadVariableWithRouteNode(accessNode);
     }
 
+    public PointerDereference createPointerDereferenceAccessNode(AccessNode previousAccessNode) {
+	    TypeDescriptor dereferencedType = previousAccessNode.getType();
+	    if (!(dereferencedType instanceof PointerDescriptor)) {
+	        parser.SemErr("Can not dereference variable of this type");
+	        return new PointerDereference(previousAccessNode, dereferencedType);
+        } else {
+            return new PointerDereference(previousAccessNode, ((PointerDescriptor) dereferencedType).getInnerTypeDescriptor());
+        }
+    }
+
+    public RecordAccessNode createRecordAccessNode(AccessNode previousAccessNode, Token accessVariableToken) {
+	    TypeDescriptor accessedVariableDescriptor = previousAccessNode.getType();
+        String variableIdentifier = this.getIdentifierFromToken(accessVariableToken);
+	    if (!(accessedVariableDescriptor instanceof RecordDescriptor)) {
+            parser.SemErr("Cannot access non record type this way");
+            return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableDescriptor);
+        } else {
+	        RecordDescriptor accessedRecordDescriptor = (RecordDescriptor) accessedVariableDescriptor;
+	        if (!accessedRecordDescriptor.containsIdentifier(variableIdentifier)) {
+                parser.SemErr("Cannot access non record type this way");
+                return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableDescriptor);
+            } else {
+	            TypeDescriptor accessedVariableType = accessedRecordDescriptor.getLexicalScope().getIdentifierDescriptor(variableIdentifier);
+                return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableType);
+            }
+        }
+    }
+
+    public ArrayAccessNode createArrayAccessNode(AccessNode previousAccessNode, List<ExpressionNode> indexNodes) {
+        TypeDescriptor accessedVariableDescriptor = previousAccessNode.getType();
+        for (ExpressionNode indexNode : indexNodes) {
+            if (!(accessedVariableDescriptor instanceof ArrayDescriptor)) {
+                parser.SemErr("Cannot index this type");
+                break;
+            } else {
+                ArrayDescriptor accessingArrayDescriptor = (ArrayDescriptor) accessedVariableDescriptor;
+                accessedVariableDescriptor = accessingArrayDescriptor.getOneStepInnerDescriptor();
+            }
+        }
+	    return new ArrayAccessNode(previousAccessNode, indexNodes, accessedVariableDescriptor);
+    }
+
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
         String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
         return this.doLookup(subroutineIdentifier,
-                (LexicalScope foundInScope, String foundIdentifier) -> foundInScope.isReferenceParameter(foundIdentifier, parameterIndex),
-                new UnknownIdentifierException(subroutineIdentifier));
+                (LexicalScope foundInScope, String foundIdentifier) -> foundInScope.isReferenceParameter(foundIdentifier, parameterIndex));
     }
 
     public boolean shouldBeSubroutine(Token subroutineToken, int parameterIndex) {
         String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
         return this.doLookup(subroutineIdentifier,
-                (LexicalScope foundInScope, String foundIdentifier) -> foundInScope.isSubroutineParameter(foundIdentifier, parameterIndex),
-                new UnknownIdentifierException(subroutineIdentifier));
+                (LexicalScope foundInScope, String foundIdentifier) -> foundInScope.isSubroutineParameter(foundIdentifier, parameterIndex));
     }
 
     public ExpressionNode createSubroutineCall(Token identifierToken, List<ExpressionNode> params) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         return this.doLookup(identifier, (LexicalScope foundInScope, String foundIdentifier) -> {
             if (foundInScope.isSubroutine(foundIdentifier)) {
-                foundInScope.verifyPassedArgumentsToSubroutine(foundIdentifier, params);
-                return this.createInvokeNode(foundInScope.getLocalSlot(foundIdentifier), params);
+                SubroutineDescriptor subroutineDescriptor = foundInScope.getSubroutineDescriptor(foundIdentifier, params);
+                subroutineDescriptor.verifyArguments(params);
+                return this.createInvokeNode(foundInScope.getLocalSlot(foundIdentifier), subroutineDescriptor, params);
             } else {
                 throw new LexicalException(foundIdentifier + " is not a subroutine.");
             }
-        }, new UnknownIdentifierException(identifier));
+        });
     }
 
-    private ExpressionNode createInvokeNode(FrameSlot subroutineSlot, List<ExpressionNode> params) {
-        ExpressionNode literal = new FunctionLiteralNode(subroutineSlot);
+    private ExpressionNode createInvokeNode(FrameSlot subroutineSlot, SubroutineDescriptor descriptor, List<ExpressionNode> params) {
+        TypeDescriptor subroutineReturnDescriptor = (descriptor instanceof FunctionDescriptor)?
+                ((FunctionDescriptor) descriptor).getReturnDescriptor() : null;
+        FunctionLiteralNode literal = new FunctionLiteralNode(subroutineSlot, subroutineReturnDescriptor);
         return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), literal);
     }
 
     public ExpressionNode createReferencePassNode(Token variableToken) {
         String variableIdentifier = this.getIdentifierFromToken(variableToken);
-        FrameSlot slot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot,
-                new UnknownIdentifierException(variableIdentifier));
-        return new StoreReferenceArgumentNode(slot);
+        FrameSlot slot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot);
+        return new StoreReferenceArgumentNode(slot, currentLexicalScope.getIdentifierDescriptor(variableIdentifier));
     }
 
     public ExpressionNode createSubroutineParameterPassNode(Token variableToken) {
         String variableIdentifier = this.getIdentifierFromToken(variableToken);
-        PascalSubroutine function = this.doLookup(variableIdentifier, LexicalScope::getSubroutine,
-                new UnknownIdentifierException(variableIdentifier));
+        PascalSubroutine function = this.doLookup(variableIdentifier, LexicalScope::getSubroutine);
+        TypeDescriptor descriptor = this.doLookup(variableIdentifier, LexicalScope::getIdentifierDescriptor);
 
-        return new StoreSubroutineArgumentNode(function);
+        return new StoreSubroutineArgumentNode(function, (SubroutineDescriptor) descriptor);
     }
 
     public ExpressionNode createLogicLiteralNode(boolean value) {
@@ -697,6 +781,15 @@ public class NodeFactory {
     }
 
     public ExpressionNode createSetConstructorNode(List<ExpressionNode> valueNodes) {
+	    if (valueNodes.size() > 0) {
+	        TypeDescriptor valuesType = valueNodes.get(0).getType();
+	        for (ExpressionNode expressionNode : valueNodes) {
+	            if (!expressionNode.getType().equals(valuesType) && !expressionNode.getType().convertibleTo(valuesType)) {
+	                parser.SemErr("Type mismatch in set constructor");
+	                break;
+                }
+            }
+        }
 	    return new SetConstructorNode(valueNodes);
     }
 
@@ -719,13 +812,12 @@ public class NodeFactory {
                 new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
     }
 
-    // TODO: this main node can be in lexical scope instead of a parser
     public PascalRootNode finishMainFunction(StatementNode blockNode) {
         this.addUnitInitializationNodes();
 	    this.addProgramArgumentsAssignmentNodes();
 
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
-        return new PascalRootNode(currentLexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
+        return new ProcedurePascalRootNode(currentLexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
     }
 
     private void addProgramArgumentsAssignmentNodes() {
@@ -745,7 +837,7 @@ public class NodeFactory {
 
     private void addUnitInitializationNodes() {
         for (LexicalScope unitScope : this.units) {
-            this.currentLexicalScope.addScopeInitializationNode(unitScope.createInitializationNode());
+            this.currentLexicalScope.addScopeInitializationNode(unitScope.createInitializationBlock());
         }
     }
 
@@ -763,7 +855,7 @@ public class NodeFactory {
     private StatementNode createSubroutineNode(StatementNode bodyNode) {
         List<StatementNode> subroutineNodes = new ArrayList<>();
 
-        subroutineNodes.add(currentLexicalScope.createInitializationNode());
+        subroutineNodes.add(currentLexicalScope.createInitializationBlock());
         subroutineNodes.add(bodyNode);
 
         return new BlockNode(subroutineNodes.toArray(new StatementNode[subroutineNodes.size()]));
@@ -784,9 +876,9 @@ public class NodeFactory {
 
                     this.currentLexicalScope.addScopeInitializationNode(initializationNode);
                 } else {
-                    FrameSlot frameSlot = this.currentLexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
-                    final ExpressionNode readNode = new ReadArgumentNode(count++);
-                    final AssignmentNode assignment = AssignmentNodeGen.create(readNode, frameSlot);
+                    this.currentLexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
+                    final ExpressionNode readNode = new ReadArgumentNode(count, parameters.get(count++).type);
+                    final AssignmentNode assignment = this.createCheckedAssignment(parameter.identifier, readNode);
 
                     this.currentLexicalScope.addScopeInitializationNode(assignment);
                 }
@@ -796,9 +888,25 @@ public class NodeFactory {
         }
     }
 
-    private void finishSubroutine(ExpressionNode subroutineBodyNode) {
-        final PascalRootNode rootNode = new PascalRootNode(currentLexicalScope.getFrameDescriptor(), subroutineBodyNode);
+    private AssignmentNode createCheckedAssignment(String targetIdentifier, ExpressionNode valueNode) {
+        TypeDescriptor targetType = this.doLookup(targetIdentifier, LexicalScope::getIdentifierDescriptor);
+        this.checkTypesAreCompatible(valueNode.getType(), targetType);
+	    FrameSlot targetSlot = this.doLookup(targetIdentifier, LexicalScope::getLocalSlot);
+        return AssignmentNodeGen.create(valueNode, targetSlot);
+    }
 
+    private boolean checkTypesAreCompatible(TypeDescriptor leftType, TypeDescriptor rightType) {
+        if ((leftType != rightType) && !leftType.convertibleTo(rightType)) {
+            if ((rightType instanceof FunctionDescriptor) && !this.checkTypesAreCompatible(leftType, ((FunctionDescriptor) rightType).getReturnDescriptor())) {
+                parser.SemErr("Type mismatch");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void finishSubroutine(PascalRootNode rootNode) {
         String subroutineIdentifier = currentLexicalScope.getName();
         currentLexicalScope = currentLexicalScope.getOuterScope();
         try {
@@ -806,6 +914,18 @@ public class NodeFactory {
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
+    }
+
+    private <T extends ExpressionNode> T verifyOperandArguments(T node, String operator) {
+	    return this.verifyChildrenNodes(node, "Wrong operand types provided to " + operator + " operator");
+    }
+
+    private <T extends StatementNode> T verifyChildrenNodes(T node, String onInvalidText) {
+        if (!node.verifyChildrenNodeTypes()) {
+            parser.SemErr(onInvalidText);
+        }
+
+        return node;
     }
 
     public void assertLegalsCaseValues(OrdinalDescriptor ordinal, List<ConstantDescriptor> constants) {

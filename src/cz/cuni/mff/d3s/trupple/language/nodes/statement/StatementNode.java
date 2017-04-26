@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.nodes;
+package cz.cuni.mff.d3s.trupple.language.nodes.statement;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
@@ -10,6 +10,10 @@ import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 public abstract class StatementNode extends Node {
 
 	public abstract void executeVoid(VirtualFrame frame);
+
+	public boolean verifyChildrenNodeTypes() {
+	    return true;
+    }
 	
 	protected VirtualFrame getFrameContainingSlot(VirtualFrame currentFrame, FrameSlot slot) {
 		if(frameContainsSlot(currentFrame, slot)) {
@@ -30,7 +34,7 @@ public abstract class StatementNode extends Node {
 		return frame.getFrameDescriptor().getSlots().contains(slot);
 	}
 
-    Reference tryGetReference(VirtualFrame frame, FrameSlot slot) {
+    protected Reference tryGetReference(VirtualFrame frame, FrameSlot slot) {
         try {
             return (Reference)frame.getObject(slot);
         } catch (FrameSlotTypeException | ClassCastException e) {

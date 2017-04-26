@@ -5,17 +5,15 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 @NodeInfo(shortName = "rewrite")
 @NodeChild(value = "file", type = ExpressionNode.class)
-public abstract class RewriteBuiltinNode extends BuiltinNode {
+public abstract class RewriteBuiltinNode extends StatementNode {
 
     @Specialization
-    Object rewrite(FileValue file) {
+    void rewrite(FileValue file) {
         file.openToWrite();
-        return file;
     }
 
 }

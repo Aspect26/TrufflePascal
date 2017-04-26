@@ -4,8 +4,9 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.DuplicitIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
@@ -52,16 +53,16 @@ public class IdentifiersTable {
     }
 
     protected void addBuiltinTypes() {
-        typeDescriptors.put("integer", new LongDescriptor());
-        typeDescriptors.put("shortint", new LongDescriptor());
-        typeDescriptors.put("longint", new LongDescriptor());
-        typeDescriptors.put("byte", new LongDescriptor());
-        typeDescriptors.put("word", new LongDescriptor());
-        typeDescriptors.put("single", new RealDescriptor());
-        typeDescriptors.put("real", new RealDescriptor());
-        typeDescriptors.put("double", new RealDescriptor());
-        typeDescriptors.put("boolean", new BooleanDescriptor());
-        typeDescriptors.put("char", new CharDescriptor());
+        typeDescriptors.put("integer", LongDescriptor.getInstance());
+        typeDescriptors.put("shortint", LongDescriptor.getInstance());
+        typeDescriptors.put("longint", LongDescriptor.getInstance());
+        typeDescriptors.put("byte", LongDescriptor.getInstance());
+        typeDescriptors.put("word", LongDescriptor.getInstance());
+        typeDescriptors.put("single", RealDescriptor.getInstance());
+        typeDescriptors.put("real", RealDescriptor.getInstance());
+        typeDescriptors.put("double", RealDescriptor.getInstance());
+        typeDescriptors.put("boolean", BooleanDescriptor.getInstance());
+        typeDescriptors.put("char", CharDescriptor.getInstance());
 
         for (Map.Entry<String, TypeDescriptor> typeEntry : typeDescriptors.entrySet()) {
             identifiersMap.put(typeEntry.getKey(), new TypeTypeDescriptor(typeEntry.getValue()));
@@ -72,7 +73,7 @@ public class IdentifiersTable {
         try {
             this.registerNewIdentifier("nil", new NilPointerDescriptor());
         } catch (LexicalException e) {
-            // TODO: could not initialize exception
+            throw new PascalRuntimeException("Could not initialize builtin constants");
         }
     }
 
@@ -183,13 +184,8 @@ public class IdentifiersTable {
     }
 
     public void addType(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        // TODO: this is a duplicit -> call registerNewIdentifier()
-        if (this.identifiersMap.containsKey(identifier)) {
-            throw new DuplicitIdentifierException(identifier);
-        } else {
-            this.typeDescriptors.put(identifier, typeDescriptor);
-            this.identifiersMap.put(identifier, new TypeTypeDescriptor(typeDescriptor));
-        }
+        this.registerNewIdentifier(identifier, new TypeTypeDescriptor(typeDescriptor));
+        this.typeDescriptors.put(identifier, typeDescriptor);
     }
 
     public void initializeAllUninitializedPointerDescriptors() throws LexicalException {
@@ -262,6 +258,13 @@ public class IdentifiersTable {
     public void addProcedureInterfaceIfNotForwarded(String identifier, List<FormalParameter> formalParameters) throws LexicalException {
         TypeDescriptor descriptor = this.identifiersMap.get(identifier);
         if (descriptor != null) {
+            if (!(descriptor instanceof ProcedureDescriptor)) {
+                throw new LexicalException("Not a subroutine");
+            } else {
+                if (!SubroutineDescriptor.compareFormalParametersExact(((SubroutineDescriptor) descriptor).getFormalParameters(), formalParameters)) {
+                    throw new LexicalException("Argument types mismatch");
+                }
+            }
             return;
         }
 
@@ -269,12 +272,17 @@ public class IdentifiersTable {
     }
 
     public void addFunctionInterfaceIfNotForwarded(String identifier, List<FormalParameter> formalParameters, TypeDescriptor returnType) throws LexicalException {
-        // TODO: duplicity with the function above
         TypeDescriptor descriptor = this.identifiersMap.get(identifier);
         if (descriptor != null) {
+            if (!(descriptor instanceof FunctionDescriptor)) {
+                throw new LexicalException("Not a subroutine");
+            } else {
+                if (!SubroutineDescriptor.compareFormalParametersExact(((SubroutineDescriptor) descriptor).getFormalParameters(), formalParameters)) {
+                    throw new LexicalException("Argument types mismatch");
+                }
+            }
             return;
         }
-
         this.forwardFunction(identifier, formalParameters, returnType);
     }
 

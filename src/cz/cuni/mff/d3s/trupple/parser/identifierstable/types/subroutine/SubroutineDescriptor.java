@@ -7,6 +7,8 @@ import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.ArgumentTypeMismatchException;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.IncorectNumberOfArgumentsProvidedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
@@ -32,6 +34,10 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
         return this.subroutine;
     }
 
+    public List<FormalParameter> getFormalParameters() {
+        return this.formalParameters;
+    }
+
     public PascalSubroutine getSubroutine() {
         return this.subroutine;
     }
@@ -54,7 +60,53 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
     }
 
     public void verifyArguments(List<ExpressionNode> passedArguments) throws LexicalException {
-        // TODO: implement this
+        if (passedArguments.size() != this.formalParameters.size()) {
+            throw new IncorectNumberOfArgumentsProvidedException(this.formalParameters.size(), passedArguments.size());
+        } else {
+            for (int i = 0; i < this.formalParameters.size(); ++i) {
+                if (!this.formalParameters.get(i).type.equals(passedArguments.get(i).getType()) &&
+                        !passedArguments.get(i).getType().convertibleTo(this.formalParameters.get(i).type)) {
+                    throw new ArgumentTypeMismatchException(i + 1);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        if (!(type instanceof SubroutineDescriptor)) {
+            return false;
+        }
+
+        SubroutineDescriptor subroutine = (SubroutineDescriptor) type;
+        return compareFormalParameters(subroutine.formalParameters, this.formalParameters);
+    }
+
+    private static boolean compareFormalParameters(List<FormalParameter> left, List<FormalParameter> right) {
+        if (left.size() != right.size()) {
+            return false;
+        }
+        for (int i = 0; i < right.size(); ++i) {
+            if (!right.get(i).type.equals(left.get(i).type) &&
+                    !left.get(i).type.convertibleTo(right.get(i).type)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean compareFormalParametersExact(List<FormalParameter> left, List<FormalParameter> right) {
+        if (left.size() != right.size()) {
+            return false;
+        }
+        for (int i = 0; i < right.size(); ++i) {
+            if (!right.get(i).type.equals(left.get(i).type)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

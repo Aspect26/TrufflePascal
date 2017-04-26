@@ -13,21 +13,29 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @GeneratedBy(ReadVariableNode.class)
 public final class ReadVariableNodeGen extends ReadVariableNode implements SpecializedNode {
 
     private final FrameSlot slot;
+    private final TypeDescriptor typeDescriptor;
     @Child private BaseNode_ specialization_;
 
-    private ReadVariableNodeGen(FrameSlot slot) {
+    private ReadVariableNodeGen(FrameSlot slot, TypeDescriptor typeDescriptor) {
         this.slot = slot;
+        this.typeDescriptor = typeDescriptor;
         this.specialization_ = UninitializedNode_.create(this);
     }
 
     @Override
     protected FrameSlot getSlot() {
         return this.slot;
+    }
+
+    @Override
+    protected TypeDescriptor getTypeDescriptor() {
+        return this.typeDescriptor;
     }
 
     @Override
@@ -71,8 +79,8 @@ public final class ReadVariableNodeGen extends ReadVariableNode implements Speci
         return SpecializationNode.updateRoot(super.deepCopy());
     }
 
-    public static ReadVariableNode create(FrameSlot slot) {
-        return new ReadVariableNodeGen(slot);
+    public static ReadVariableNode create(FrameSlot slot, TypeDescriptor typeDescriptor) {
+        return new ReadVariableNodeGen(slot, typeDescriptor);
     }
 
     @GeneratedBy(ReadVariableNode.class)

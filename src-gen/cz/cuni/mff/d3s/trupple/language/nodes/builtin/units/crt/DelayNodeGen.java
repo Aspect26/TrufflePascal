@@ -27,25 +27,15 @@ public final class DelayNodeGen extends DelayNode {
     }
 
     @Override
-    public Object executeGeneric(VirtualFrame frameValue) {
-        return executeLong(frameValue);
-    }
-
-    @Override
     public void executeVoid(VirtualFrame frameValue) {
-        executeLong(frameValue);
-        return;
-    }
-
-    @Override
-    public long executeLong(VirtualFrame frameValue) {
         long child0Value_;
         try {
             child0Value_ = child0_.executeLong(frameValue);
         } catch (UnexpectedResultException ex) {
             throw unsupported(ex.getResult());
         }
-        return this.delay(child0Value_);
+        this.delay(child0Value_);
+        return;
     }
 
     private UnsupportedSpecializationException unsupported(Object child0Value) {

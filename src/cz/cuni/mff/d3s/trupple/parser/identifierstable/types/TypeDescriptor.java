@@ -8,5 +8,7 @@ public interface TypeDescriptor {
 
     Object getDefaultValue();
 
+    boolean convertibleTo(TypeDescriptor typeDescriptor);
+
 }
 

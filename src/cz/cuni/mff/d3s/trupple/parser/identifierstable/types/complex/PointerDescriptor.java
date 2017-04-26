@@ -24,7 +24,7 @@ public class PointerDescriptor implements TypeDescriptor {
     /**
      * This c'tor is only used for NilPointerDescriptor
      */
-    protected PointerDescriptor() {
+    public PointerDescriptor() {
         this.innerTypeInitialized = true;
         this.innerType = null;
     }
@@ -39,6 +39,26 @@ public class PointerDescriptor implements TypeDescriptor {
         return new PointerValue(innerType);
     }
 
+    public TypeDescriptor getInnerTypeDescriptor() {
+        return this.innerType;
+    }
+
+    @Override
+    public boolean equals(Object compareTo) {
+        if (!(compareTo instanceof PointerDescriptor)) {
+            return false;
+        }
+        PointerDescriptor compareToPointer = (PointerDescriptor) compareTo;
+        return (innerTypeIdentifier == null && compareToPointer.innerTypeIdentifier == null) ||
+                compareToPointer.innerTypeIdentifier.equals(this.innerTypeIdentifier);
+    }
+
+    @Override
+    public int hashCode() {
+        // NOTE: the multiplication here is needed so pointer descriptors won't have same hashes as the inner types
+        return (this.innerTypeIdentifier == null)? 0 : this.innerTypeIdentifier.hashCode() * 1245;
+    }
+
     public String getInnerTypeIdentifier() {
         return this.innerTypeIdentifier;
     }
@@ -50,6 +70,18 @@ public class PointerDescriptor implements TypeDescriptor {
 
     public boolean isInnerTypeInitialized() {
         return this.innerTypeInitialized;
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        if (!(type instanceof PointerDescriptor)) {
+            return false;
+        }
+
+        PointerDescriptor convertTo = (PointerDescriptor) type;
+        return (this.getInnerTypeDescriptor() == null) || (convertTo.getInnerTypeDescriptor() == null) ||
+                (convertTo.getInnerTypeDescriptor() == this.getInnerTypeDescriptor()) ||
+                (this.getInnerTypeDescriptor().convertibleTo(convertTo.getInnerTypeDescriptor()));
     }
 
 }

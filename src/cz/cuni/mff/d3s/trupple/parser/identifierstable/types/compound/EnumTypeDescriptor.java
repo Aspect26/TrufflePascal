@@ -2,6 +2,8 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 
 import java.io.Serializable;
@@ -38,6 +40,11 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
     }
 
     @Override
+    public TypeDescriptor getInnerTypeDescriptor() {
+        return this;
+    }
+
+    @Override
     public int getFirstIndex() {
         return 0;
     }
@@ -49,8 +56,7 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
     public EnumValue getNext(String value) {
         int index = this.identifiers.indexOf(value);
         if (index == this.identifiers.size() - 1) {
-            // TODO: throw a custom exception
-            throw new IllegalArgumentException("No next element.");
+            throw new PascalRuntimeException("No next element.");
         }
 
         return new EnumValue(this, this.identifiers.get(++index));
@@ -59,8 +65,7 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
     public EnumValue getPrevious(String value) {
         int index = this.identifiers.indexOf(value);
         if (index == 0) {
-            // TODO: throw a custom exception
-            throw new IllegalArgumentException("No previous element.");
+            throw new PascalRuntimeException("No previous element.");
         }
 
         return new EnumValue(this, this.identifiers.get(--index));
@@ -69,4 +74,9 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
     public long getOrdinalValue(String value) {
         return this.identifiers.indexOf(value);
     }
+
+    public boolean convertibleTo(TypeDescriptor type) {
+        return type == GenericEnumTypeDescriptor.getInstance();
+    }
+
 }

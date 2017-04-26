@@ -9,7 +9,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
@@ -33,18 +32,7 @@ public final class InitGraphNodeGen extends InitGraphNode {
     }
 
     @Override
-    public Object executeGeneric(VirtualFrame frameValue) {
-        return executeLong(frameValue);
-    }
-
-    @Override
     public void executeVoid(VirtualFrame frameValue) {
-        executeLong(frameValue);
-        return;
-    }
-
-    @Override
-    public long executeLong(VirtualFrame frameValue) {
         long child0Value_;
         try {
             child0Value_ = child0_.executeLong(frameValue);
@@ -62,11 +50,12 @@ public final class InitGraphNodeGen extends InitGraphNode {
         }
         PascalString child2Value_;
         try {
-            child2Value_ = PascalTypesGen.expectPascalString(child2_.executeGeneric(frameValue));
+            child2Value_ = expectPascalString(child2_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             throw unsupported(child0Value_, child1Value_, ex.getResult());
         }
-        return this.initGraph(child0Value_, child1Value_, child2Value_);
+        this.initGraph(child0Value_, child1Value_, child2Value_);
+        return;
     }
 
     private UnsupportedSpecializationException unsupported(Object child0Value, Object child1Value, Object child2Value) {
@@ -75,6 +64,13 @@ public final class InitGraphNodeGen extends InitGraphNode {
             seenUnsupported0 = true;
         }
         return new UnsupportedSpecializationException(this, new Node[] {child0_, child1_, child2_}, child0Value, child1Value, child2Value);
+    }
+
+    private static PascalString expectPascalString(Object value) throws UnexpectedResultException {
+        if (value instanceof PascalString) {
+            return (PascalString) value;
+        }
+        throw new UnexpectedResultException(value);
     }
 
     public static InitGraphNode create(ExpressionNode child0, ExpressionNode child1, ExpressionNode child2) {

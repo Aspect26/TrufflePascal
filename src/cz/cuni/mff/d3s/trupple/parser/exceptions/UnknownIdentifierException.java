@@ -6,8 +6,4 @@ public class UnknownIdentifierException extends LexicalException{
         super("Unknown identifier: " + identifier);
     }
 
-    @Override
-    public String getMessage() {
-        return "ssdf";
-    }
 }

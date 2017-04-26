@@ -25,8 +25,8 @@ public class CrtBuiltinUnit extends BuiltinUnitAbstr {
         data.add(new UnitSubroutineData(
                 "delay",
                 new BuiltinProcedureDescriptor.OneArgumentBuiltin(
-                        DelayNodeGen.create(new ReadArgumentNode(0)),
-                        new FormalParameter("m", new LongDescriptor(), false)
+                        DelayNodeGen.create(new ReadArgumentNode(0, LongDescriptor.getInstance())),
+                        new FormalParameter("m", LongDescriptor.getInstance(), false)
                 )
         ));
         data.add(new UnitSubroutineData(

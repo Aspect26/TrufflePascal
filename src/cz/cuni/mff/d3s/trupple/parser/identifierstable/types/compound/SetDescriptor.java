@@ -23,4 +23,17 @@ public class SetDescriptor implements TypeDescriptor {
         return new SetTypeValue();
     }
 
+    public OrdinalDescriptor getBaseTypeDescriptor() {
+        return this.baseTypeDescriptor;
+    }
+
+    public TypeDescriptor getInnerType() {
+        return baseTypeDescriptor.getInnerTypeDescriptor();
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
+    }
+
 }

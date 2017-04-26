@@ -17,7 +17,12 @@ public class UnknownDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        return null;
+        return new Object();
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
     }
 
 }

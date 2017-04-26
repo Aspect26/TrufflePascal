@@ -8,8 +8,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescr
 public class RandomSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgumentBuiltin {
 
     public RandomSubroutineDescriptor() {
-        super(RandomBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-             new FormalParameter("i", new LongDescriptor(), false));
+        super(RandomBuiltinNodeFactory.create(new ReadArgumentNode(0, LongDescriptor.getInstance())),
+             new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 
 }

@@ -1,19 +1,28 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.logic;
 
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
+import cz.cuni.mff.d3s.trupple.language.nodes.BinaryArgumentPrimitiveTypes;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.BinaryNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.GenericEnumTypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 
 @NodeInfo(shortName = "=")
 public abstract class EqualsNode extends BinaryNode {
 
-	@Override
-	public abstract boolean executeBoolean(VirtualFrame frame);
+    EqualsNode() {
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(BooleanDescriptor.getInstance(), BooleanDescriptor.getInstance()), BooleanDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), BooleanDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(CharDescriptor.getInstance(), CharDescriptor.getInstance()), BooleanDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(GenericEnumTypeDescriptor.getInstance(), GenericEnumTypeDescriptor.getInstance()), BooleanDescriptor.getInstance());
+    }
 
 	@Specialization
 	protected boolean equals(boolean left, boolean right) {
@@ -44,4 +53,16 @@ public abstract class EqualsNode extends BinaryNode {
     }
 
     // TODO: what about record type? file type?
+
+    @Override
+    public boolean verifyNonPrimitiveArgumentTypes(TypeDescriptor leftType, TypeDescriptor rightType) {
+        return this.verifyBothCompatibleSetTypes(leftType, rightType) ||
+                this.verifyBothCompatiblePointerTypes(leftType, rightType);
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return BooleanDescriptor.getInstance();
+    }
+
 }

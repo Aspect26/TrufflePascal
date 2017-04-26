@@ -28,4 +28,13 @@ public class RecordDescriptor implements TypeDescriptor {
         return this.innerScope;
     }
 
+    public boolean containsIdentifier(String identifier) {
+        return this.innerScope.getIdentifiersTable().containsIdentifier(identifier);
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
+    }
+
 }

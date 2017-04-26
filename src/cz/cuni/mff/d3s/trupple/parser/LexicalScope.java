@@ -2,11 +2,12 @@ package cz.cuni.mff.d3s.trupple.parser;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.nodes.BlockNode;
+import com.oracle.truffle.api.frame.VirtualFrame;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
@@ -22,6 +23,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConsta
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ReturnTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.OverloadedFunctionDescriptor;
+
 import java.util.*;
 
 public class LexicalScope {
@@ -30,8 +33,7 @@ public class LexicalScope {
     private final LexicalScope outer;
     private int loopDepth;
     private final Set<String> publicIdentifiers;
-
-    final IdentifiersTable localIdentifiers;
+    private final IdentifiersTable localIdentifiers;
     final List<StatementNode> scopeInitializationNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
@@ -66,8 +68,13 @@ public class LexicalScope {
         return this.localIdentifiers.getSubroutine(identifier);
     }
 
-    FrameSlotKind getSlotKind(String identifier) {
-        return this.localIdentifiers.getFrameSlotKind(identifier);
+    SubroutineDescriptor getSubroutineDescriptor(String identifier, List<ExpressionNode> actualArguments) throws LexicalException {
+        SubroutineDescriptor subroutineDescriptor = (SubroutineDescriptor) this.getIdentifierDescriptor(identifier);
+        if (subroutineDescriptor instanceof OverloadedFunctionDescriptor) {
+            subroutineDescriptor = ((OverloadedFunctionDescriptor) subroutineDescriptor).getOverload(actualArguments);
+        }
+
+        return subroutineDescriptor;
     }
 
     FrameSlot getReturnSlot() {
@@ -132,10 +139,6 @@ public class LexicalScope {
 
     boolean labelExists(String identifier) {
         return this.localIdentifiers.isLabel(identifier);
-    }
-
-    void verifyPassedArgumentsToSubroutine(String identifier, List<ExpressionNode> params) throws LexicalException {
-        this.localIdentifiers.verifyPassedArgumentsToSubroutine(identifier, params);
     }
 
     boolean containsLocalIdentifier(String identifier) {
@@ -214,12 +217,8 @@ public class LexicalScope {
         }
     }
 
-    public void registerType(String identifier, TypeDescriptor type) {
-        try {
-            this.localIdentifiers.addType(identifier, type);
-        } catch (LexicalException e) {
-            // TODO: this is called from BuiltinUnitAbstr only, so this should not happen
-        }
+    public void registerType(String identifier, TypeDescriptor type) throws LexicalException{
+        this.localIdentifiers.addType(identifier, type);
     }
 
     void registerConstant(String identifier, ConstantDescriptor constant) throws LexicalException {
@@ -245,12 +244,37 @@ public class LexicalScope {
         return new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(1));
     }
 
-    BlockNode createInitializationNode() {
-        InitializationNodeGenerator initNodeGenerator = new InitializationNodeGenerator(this.localIdentifiers);
-        List<StatementNode> initializationNodes = initNodeGenerator.generate();
+    BlockNode createInitializationBlock() {
+        List<StatementNode> initializationNodes = this.generateInitializationNodes(null);
         initializationNodes.addAll(this.scopeInitializationNodes);
 
         return new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
+    }
+
+    List<StatementNode> generateInitializationNodes(VirtualFrame frame)  {
+        List<StatementNode> initializationNodes = new ArrayList<>();
+
+        for (Map.Entry<String, TypeDescriptor> entry : this.localIdentifiers.getAllIdentifiers().entrySet()) {
+            String identifier = entry.getKey();
+            TypeDescriptor typeDescriptor = entry.getValue();
+
+            StatementNode initializationNode = createInitializationNode(identifier, typeDescriptor, frame);
+            if (initializationNode != null) {
+                initializationNodes.add(initializationNode);
+            }
+        }
+
+        return initializationNodes;
+    }
+
+    private StatementNode createInitializationNode(String identifier, TypeDescriptor typeDescriptor, VirtualFrame frame) {
+        Object defaultValue = typeDescriptor.getDefaultValue();
+        if (defaultValue == null) {
+            return null;
+        }
+
+        FrameSlot frameSlot = this.localIdentifiers.getFrameSlot(identifier);
+        return InitializationNodeFactory.create(frameSlot, typeDescriptor.getDefaultValue(), frame);
     }
 
     void markAllIdentifiersPublic() {

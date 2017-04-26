@@ -3,6 +3,8 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.CantBeNegatedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 
 public class CharConstantDescriptor implements OrdinalConstantDescriptor {
 
@@ -23,6 +25,11 @@ public class CharConstantDescriptor implements OrdinalConstantDescriptor {
     }
 
     @Override
+    public boolean convertibleTo(TypeDescriptor typeDescriptor) {
+        return typeDescriptor == CharDescriptor.getInstance();
+    }
+
+    @Override
     public Object getValue() {
         return this.value;
     }
@@ -40,6 +47,11 @@ public class CharConstantDescriptor implements OrdinalConstantDescriptor {
     @Override
     public int getOrdinalValue() {
         return (int)this.value;
+    }
+
+    @Override
+    public TypeDescriptor getInnerType() {
+        return CharDescriptor.getInstance();
     }
 
 }

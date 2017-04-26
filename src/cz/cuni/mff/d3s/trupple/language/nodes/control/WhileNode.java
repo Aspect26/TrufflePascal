@@ -6,7 +6,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.BreakExceptionTP;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 @NodeInfo(shortName = "while", description = "The node implementing a while loop")
 public class WhileNode extends StatementNode {

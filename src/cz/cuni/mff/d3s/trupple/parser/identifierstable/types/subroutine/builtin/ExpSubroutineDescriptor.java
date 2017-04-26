@@ -9,9 +9,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public class ExpSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public ExpSubroutineDescriptor() {
-        super(ExpBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new LongDescriptor(), false),
-                new RealDescriptor());
+        super(ExpBuiltinNodeFactory.create(new ReadArgumentNode(0, RealDescriptor.getInstance())),
+                new FormalParameter("i", RealDescriptor.getInstance(), false));
     }
 
 }

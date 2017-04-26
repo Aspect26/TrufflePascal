@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.control;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.BreakExceptionTP;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 public final class BreakNodeTP extends StatementNode {
 

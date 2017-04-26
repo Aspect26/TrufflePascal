@@ -5,6 +5,7 @@ import com.oracle.truffle.api.dsl.NodeChildren;
 import com.oracle.truffle.api.dsl.Specialization;
 import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.graphics.PascalGraphMode;
 
 @NodeChildren({
@@ -12,11 +13,11 @@ import cz.cuni.mff.d3s.trupple.language.runtime.graphics.PascalGraphMode;
         @NodeChild(type = ExpressionNode.class),
         @NodeChild(type = ExpressionNode.class)
 })
-public abstract class InitGraphNode extends ExpressionNode {
+public abstract class InitGraphNode extends StatementNode {
 
     @Specialization
-    public long initGraph(long graphDriver, long graphMode, PascalString pathToDriver) {
-        return PascalGraphMode.init();
+    public void initGraph(long graphDriver, long graphMode, PascalString pathToDriver) {
+        PascalGraphMode.init();
     }
 
 }

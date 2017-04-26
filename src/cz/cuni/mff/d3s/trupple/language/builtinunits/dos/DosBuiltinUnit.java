@@ -10,7 +10,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.BuiltinFunctionDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.BuiltinProcedureDescriptor;
 
 import java.util.ArrayList;
@@ -28,21 +27,24 @@ public class DosBuiltinUnit extends BuiltinUnitAbstr {
         // TODO: the subroutine name can be directly in the node
         data.add(new UnitSubroutineData(
                 "exec",
-                new BuiltinProcedureDescriptor.OneArgumentBuiltin(
-                        ExecNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1)),
-                        new FormalParameter("i", new StringDescriptor(), false))
+                new BuiltinProcedureDescriptor.NoReferenceParameterBuiltin(
+                        ExecNodeGen.create(new ReadArgumentNode(0, StringDescriptor.getInstance()), new ReadArgumentNode(1, StringDescriptor.getInstance())),
+                        new ArrayList<FormalParameter>() {{
+                            add(new FormalParameter("i", StringDescriptor.getInstance(), false));
+                            add(new FormalParameter("j", StringDescriptor.getInstance(), false));
+                        }})
                 )
         );
         data.add(new UnitSubroutineData(
                 "getDate",
                 new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin(
-                        GetDateNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1),
-                                new ReadArgumentNode(2), new ReadArgumentNode(3)),
+                        GetDateNodeGen.create(new ReadArgumentNode(0, LongDescriptor.getInstance()), new ReadArgumentNode(1, LongDescriptor.getInstance()),
+                                new ReadArgumentNode(2, LongDescriptor.getInstance()), new ReadArgumentNode(3, LongDescriptor.getInstance())),
                         new ArrayList<FormalParameter>(){{
-                            add(new FormalParameter("y", new LongDescriptor(), true));
-                            add(new FormalParameter("m", new LongDescriptor(), true));
-                            add(new FormalParameter("d", new LongDescriptor(), true));
-                            add(new FormalParameter("wd", new LongDescriptor(), true));
+                            add(new FormalParameter("y", LongDescriptor.getInstance(), true));
+                            add(new FormalParameter("m", LongDescriptor.getInstance(), true));
+                            add(new FormalParameter("d", LongDescriptor.getInstance(), true));
+                            add(new FormalParameter("wd", LongDescriptor.getInstance(), true));
                         }}
                         )
                 )
@@ -56,13 +58,13 @@ public class DosBuiltinUnit extends BuiltinUnitAbstr {
         data.add(new UnitSubroutineData(
                         "getTime",
                         new BuiltinProcedureDescriptor.FullReferenceParameterBuiltin(
-                                GetTimeNodeGen.create(new ReadArgumentNode(0), new ReadArgumentNode(1),
-                                        new ReadArgumentNode(2), new ReadArgumentNode(3)),
+                                GetTimeNodeGen.create(new ReadArgumentNode(0, LongDescriptor.getInstance()), new ReadArgumentNode(1, LongDescriptor.getInstance()),
+                                        new ReadArgumentNode(2, LongDescriptor.getInstance()), new ReadArgumentNode(3, LongDescriptor.getInstance())),
                                 new ArrayList<FormalParameter>(){{
-                                    add(new FormalParameter("h", new LongDescriptor(), true));
-                                    add(new FormalParameter("m", new LongDescriptor(), true));
-                                    add(new FormalParameter("s", new LongDescriptor(), true));
-                                    add(new FormalParameter("n", new LongDescriptor(), true));
+                                    add(new FormalParameter("h", LongDescriptor.getInstance(), true));
+                                    add(new FormalParameter("m", LongDescriptor.getInstance(), true));
+                                    add(new FormalParameter("s", LongDescriptor.getInstance(), true));
+                                    add(new FormalParameter("n", LongDescriptor.getInstance(), true));
                                 }}
                         )
                 )

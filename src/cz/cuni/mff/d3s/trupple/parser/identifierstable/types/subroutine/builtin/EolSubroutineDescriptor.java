@@ -11,8 +11,7 @@ public class EolSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgume
 
     public EolSubroutineDescriptor() {
         super(EolBuiltinNodeFactory.create(new ExpressionNode[]{new ReadAllArgumentsNode()}),
-                new FormalParameter("p", new FileDescriptor(null), false),
-                new BooleanDescriptor());
+                new FormalParameter("p", new FileDescriptor(null), false));
     }
 
 }

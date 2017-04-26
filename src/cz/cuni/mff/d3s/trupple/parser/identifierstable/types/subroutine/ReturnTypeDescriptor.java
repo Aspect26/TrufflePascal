@@ -20,4 +20,10 @@ public class ReturnTypeDescriptor implements TypeDescriptor {
     public Object getDefaultValue() {
         return this.returnTypeDescriptor.getDefaultValue();
     }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return false;
+    }
+
 }

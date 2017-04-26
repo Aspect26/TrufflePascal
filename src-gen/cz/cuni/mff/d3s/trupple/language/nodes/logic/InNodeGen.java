@@ -26,6 +26,16 @@ public final class InNodeGen extends InNode {
     }
 
     @Override
+    protected ExpressionNode getLeftNode() {
+        return this.leftNode_;
+    }
+
+    @Override
+    protected ExpressionNode getRightNode() {
+        return this.rightNode_;
+    }
+
+    @Override
     public NodeCost getCost() {
         return NodeCost.MONOMORPHIC;
     }
@@ -33,6 +43,12 @@ public final class InNodeGen extends InNode {
     @Override
     public Object executeGeneric(VirtualFrame frameValue) {
         return executeBoolean(frameValue);
+    }
+
+    @Override
+    public void executeVoid(VirtualFrame frameValue) {
+        executeBoolean(frameValue);
+        return;
     }
 
     @Override
@@ -45,12 +61,6 @@ public final class InNodeGen extends InNode {
             throw unsupported(leftNodeValue_, ex.getResult());
         }
         return this.inOperation(leftNodeValue_, rightNodeValue_);
-    }
-
-    @Override
-    public void executeVoid(VirtualFrame frameValue) {
-        executeBoolean(frameValue);
-        return;
     }
 
     private UnsupportedSpecializationException unsupported(Object leftNodeValue, Object rightNodeValue) {

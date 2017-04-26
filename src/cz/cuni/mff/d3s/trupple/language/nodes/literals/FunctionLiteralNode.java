@@ -6,18 +6,21 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @NodeInfo(shortName = "func")
 public final class FunctionLiteralNode extends ExpressionNode {
+
 	private final FrameSlot subroutineSlot;
 
-	public FunctionLiteralNode(FrameSlot subroutineSlot) {
+	private final TypeDescriptor type;
+
+	public FunctionLiteralNode(FrameSlot subroutineSlot, TypeDescriptor type) {
 		this.subroutineSlot = subroutineSlot;
-	}
+        this.type = type;
+    }
 
 	@Override
 	public PascalSubroutine executeGeneric(VirtualFrame frame) {
@@ -42,5 +45,10 @@ public final class FunctionLiteralNode extends ExpressionNode {
 		
 		return function;
 	}
+
+    @Override
+    public TypeDescriptor getType() {
+        return this.type;
+    }
 
 }

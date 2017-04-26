@@ -3,11 +3,11 @@ package cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 
 
-public abstract class AccessNode extends StatementNode {
+public abstract class AccessNode extends ExpressionNode {
 
     @Child AccessNode applyToNode;
 
@@ -28,6 +28,7 @@ public abstract class AccessNode extends StatementNode {
         }
     }
 
+    // TODO: won't executeGeneric be sufficient enough?
     protected abstract Object applyTo(VirtualFrame frame, Object value);
 
     public final Object getValue(VirtualFrame frame) throws FrameSlotTypeException {

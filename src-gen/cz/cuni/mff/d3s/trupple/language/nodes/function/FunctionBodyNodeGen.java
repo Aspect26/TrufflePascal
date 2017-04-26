@@ -12,23 +12,31 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @GeneratedBy(FunctionBodyNode.class)
 public final class FunctionBodyNodeGen extends FunctionBodyNode implements SpecializedNode {
 
     private final FrameSlot slot;
+    private final TypeDescriptor typeDescriptor;
     @Child private BaseNode_ specialization_;
 
-    private FunctionBodyNodeGen(StatementNode bodyNode, FrameSlot slot) {
+    private FunctionBodyNodeGen(StatementNode bodyNode, FrameSlot slot, TypeDescriptor typeDescriptor) {
         super(bodyNode);
         this.slot = slot;
+        this.typeDescriptor = typeDescriptor;
         this.specialization_ = UninitializedNode_.create(this);
     }
 
     @Override
     protected FrameSlot getSlot() {
         return this.slot;
+    }
+
+    @Override
+    protected TypeDescriptor getTypeDescriptor() {
+        return this.typeDescriptor;
     }
 
     @Override
@@ -72,8 +80,8 @@ public final class FunctionBodyNodeGen extends FunctionBodyNode implements Speci
         return SpecializationNode.updateRoot(super.deepCopy());
     }
 
-    public static FunctionBodyNode create(StatementNode bodyNode, FrameSlot slot) {
-        return new FunctionBodyNodeGen(bodyNode, slot);
+    public static FunctionBodyNode create(StatementNode bodyNode, FrameSlot slot, TypeDescriptor typeDescriptor) {
+        return new FunctionBodyNodeGen(bodyNode, slot, typeDescriptor);
     }
 
     @GeneratedBy(FunctionBodyNode.class)

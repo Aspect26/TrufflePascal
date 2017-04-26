@@ -1,9 +1,20 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 
-public class LongDescriptor extends PrimitiveDescriptor implements OrdinalDescriptor {
+public class LongDescriptor implements OrdinalDescriptor, PrimitiveDescriptor {
+
+    private static LongDescriptor instance = new LongDescriptor();
+
+    public static LongDescriptor getInstance() {
+        return instance;
+    }
+
+    private LongDescriptor() {
+
+    }
 
     @Override
     public FrameSlotKind getSlotKind() {
@@ -26,8 +37,18 @@ public class LongDescriptor extends PrimitiveDescriptor implements OrdinalDescri
     }
 
     @Override
+    public TypeDescriptor getInnerTypeDescriptor() {
+        return LongDescriptor.getInstance();
+    }
+
+    @Override
     public int getFirstIndex() {
         return Integer.MIN_VALUE;
+    }
+
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return type == RealDescriptor.getInstance();
     }
 
 }

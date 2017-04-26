@@ -1,5 +1,5 @@
 // CheckStyle: start generated
-package cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.string;
+package cz.cuni.mff.d3s.trupple.language.nodes.builtin.arithmetic;
 
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
@@ -9,18 +9,16 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
-@GeneratedBy(StrupperNode.class)
-public final class StrupperNodeGen extends StrupperNode {
+@GeneratedBy(OddBuiltinNode.class)
+public final class OddBuiltinNodeGen extends OddBuiltinNode {
 
-    @Child private ExpressionNode child0_;
+    @Child private ExpressionNode argument_;
     @CompilationFinal private boolean seenUnsupported0;
 
-    private StrupperNodeGen(ExpressionNode child0) {
-        this.child0_ = child0;
+    private OddBuiltinNodeGen(ExpressionNode argument) {
+        this.argument_ = argument;
     }
 
     @Override
@@ -30,31 +28,36 @@ public final class StrupperNodeGen extends StrupperNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frameValue) {
-        Reference child0Value_;
-        try {
-            child0Value_ = PascalTypesGen.expectReference(child0_.executeGeneric(frameValue));
-        } catch (UnexpectedResultException ex) {
-            throw unsupported(ex.getResult());
-        }
-        return this.toUpper(child0Value_);
+        return executeBoolean(frameValue);
     }
 
     @Override
     public void executeVoid(VirtualFrame frameValue) {
-        executeGeneric(frameValue);
+        executeBoolean(frameValue);
         return;
     }
 
-    private UnsupportedSpecializationException unsupported(Object child0Value) {
+    @Override
+    public boolean executeBoolean(VirtualFrame frameValue) {
+        long argumentValue_;
+        try {
+            argumentValue_ = argument_.executeLong(frameValue);
+        } catch (UnexpectedResultException ex) {
+            throw unsupported(ex.getResult());
+        }
+        return this.odd(argumentValue_);
+    }
+
+    private UnsupportedSpecializationException unsupported(Object argumentValue) {
         if (!seenUnsupported0) {
             CompilerDirectives.transferToInterpreterAndInvalidate();
             seenUnsupported0 = true;
         }
-        return new UnsupportedSpecializationException(this, new Node[] {child0_}, child0Value);
+        return new UnsupportedSpecializationException(this, new Node[] {argument_}, argumentValue);
     }
 
-    public static StrupperNode create(ExpressionNode child0) {
-        return new StrupperNodeGen(child0);
+    public static OddBuiltinNode create(ExpressionNode argument) {
+        return new OddBuiltinNodeGen(argument);
     }
 
 }

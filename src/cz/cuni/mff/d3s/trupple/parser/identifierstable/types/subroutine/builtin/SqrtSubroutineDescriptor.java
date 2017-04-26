@@ -8,9 +8,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public class SqrtSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public SqrtSubroutineDescriptor() {
-        super(SqrtBuiltinNodeFactory.create(new ReadArgumentNode(0)),
-                new FormalParameter("i", new RealDescriptor(), false),
-                new RealDescriptor());
+        super(SqrtBuiltinNodeFactory.create(new ReadArgumentNode(0, RealDescriptor.getInstance())),
+                new FormalParameter("i", RealDescriptor.getInstance(), false));
     }
 
 }

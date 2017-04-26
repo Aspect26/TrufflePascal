@@ -21,4 +21,12 @@ public class ReferenceDescriptor implements TypeDescriptor {
         return null;
     }
 
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        return this.typeOfReferenceDescriptor.convertibleTo(type);
+    }
+
+    public TypeDescriptor getReferencedType() {
+        return typeOfReferenceDescriptor;
+    }
 }

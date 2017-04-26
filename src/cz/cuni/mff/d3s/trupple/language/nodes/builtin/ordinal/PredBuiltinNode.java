@@ -5,25 +5,29 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
+// TODO: this node is created only once, not every time for each node -> this means that its argument type is some
+// predefined type (which is long). Overloading of subroutines is not allowed in pascal so it is not implemented
+// and static type check for this subroutine cannot work.
 @NodeInfo(shortName = "pred")
 @NodeChild(value = "argument", type = ExpressionNode.class)
-public abstract class PredBuiltinNode extends BuiltinNode {
+public abstract class PredBuiltinNode extends ExpressionNode {
+
+    protected abstract ExpressionNode getArgument();
 
     @Specialization
-    public long pred(long value) {
+    long pred(long value) {
         return --value;
     }
 
     @Specialization
-    public char pred(char value) {
+    char pred(char value) {
         return --value;
     }
 
     @Specialization
-    public boolean pred(boolean value) {
+    boolean pred(boolean value) {
         if (!value) {
             // TODO: throw custom NoNextValue exception
             throw new IllegalArgumentException("No predcessor for TRUE value.");
@@ -33,7 +37,13 @@ public abstract class PredBuiltinNode extends BuiltinNode {
     }
 
     @Specialization
-    public EnumValue pred(EnumValue value) {
+    EnumValue pred(EnumValue value) {
         return value.getPrevious();
     }
+
+    @Override
+    public TypeDescriptor getType() {
+        return getArgument().getType();
+    }
+
 }

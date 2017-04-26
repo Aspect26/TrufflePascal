@@ -5,12 +5,13 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.BuiltinNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 
 @NodeInfo(shortName = "eof")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
-public abstract class EofBuiltinNode extends BuiltinNode {
+public abstract class EofBuiltinNode extends ExpressionNode {
 
     @Specialization
     boolean isEof(Object... arguments) {
@@ -23,6 +24,11 @@ public abstract class EofBuiltinNode extends BuiltinNode {
 
     private boolean eof(FileValue file) {
         return file.eof();
+    }
+
+    @Override
+    public TypeDescriptor getType() {
+        return BooleanDescriptor.getInstance();
     }
 
 }

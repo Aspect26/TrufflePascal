@@ -2,22 +2,32 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.FunctionPascalRootNode;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
-import cz.cuni.mff.d3s.trupple.parser.exceptions.BuiltinNotSupportedException;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.ArgumentTypeMismatchException;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.IncorectNumberOfArgumentsProvidedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumLiteralDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumTypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
 
-    BuiltinFunctionDescriptor(ExpressionNode bodyNode, List<FormalParameter> parameters, TypeDescriptor returnTypeDescriptor) {
-        super(parameters, returnTypeDescriptor);
-        this.setRootNode(new PascalRootNode(new FrameDescriptor(), bodyNode));
+    BuiltinFunctionDescriptor(ExpressionNode bodyNode, List<FormalParameter> parameters) {
+        super(parameters, bodyNode.getType());
+        this.setRootNode(new FunctionPascalRootNode(new FrameDescriptor(), bodyNode));
+    }
+
+    BuiltinFunctionDescriptor() {
+        super(new ArrayList<>(), null);
     }
 
     @Override
@@ -25,37 +35,10 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
         return false;
     }
 
-
-    public static class NoReferenceParameterBuiltin extends BuiltinFunctionDescriptor {
-
-        NoReferenceParameterBuiltin(ExpressionNode bodyNode, List<FormalParameter> parameters, TypeDescriptor returnTypeDescriptor) {
-            super(bodyNode, parameters, returnTypeDescriptor);
-        }
-
-        @Override
-        public boolean isReferenceParameter(int parameterIndex) {
-            return false;
-        }
-
-    }
-
-    public static class FullReferenceParameterBuiltin extends BuiltinFunctionDescriptor {
-
-        public FullReferenceParameterBuiltin(ExpressionNode bodyNode, List<FormalParameter> parameters, TypeDescriptor returnTypeDescriptor) {
-            super(bodyNode, parameters, returnTypeDescriptor);
-        }
-
-        @Override
-        public boolean isReferenceParameter(int index) {
-            return true;
-        }
-
-    }
-
     public static class OneArgumentBuiltin extends BuiltinFunctionDescriptor {
 
-        public OneArgumentBuiltin(ExpressionNode bodyNode, FormalParameter parameter, TypeDescriptor returnTypeDescriptor) {
-            super(bodyNode, Collections.singletonList(parameter), returnTypeDescriptor);
+        public OneArgumentBuiltin(ExpressionNode bodyNode, FormalParameter parameter) {
+            super(bodyNode, Collections.singletonList(parameter));
         }
 
         @Override
@@ -65,17 +48,25 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
 
     }
 
-    public static class NotSupportedSubroutine extends NoReferenceParameterBuiltin {
+    public static class OrdinalArgumentBuiltin extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
-        NotSupportedSubroutine(TypeDescriptor returnTypeDescriptor) {
-            super(null, Collections.emptyList(), returnTypeDescriptor);
+        OrdinalArgumentBuiltin(ExpressionNode bodyNode, FormalParameter parameter) {
+            super(bodyNode, parameter);
         }
 
         @Override
-        public void verifyArguments(List<ExpressionNode> passedArguments) throws LexicalException {
-            throw new BuiltinNotSupportedException();
+        public void verifyArguments(List<ExpressionNode> arguments) throws LexicalException {
+            if (arguments.size() != 1) {
+                throw new IncorectNumberOfArgumentsProvidedException(1, arguments.size());
+            } else {
+                TypeDescriptor argumentType = arguments.get(0).getType();
+                if (!argumentType.equals(LongDescriptor.getInstance()) && !argumentType.equals(CharDescriptor.getInstance()) &&
+                        !argumentType.equals(BooleanDescriptor.getInstance()) && !(argumentType instanceof EnumLiteralDescriptor) &&
+                        !(argumentType instanceof EnumTypeDescriptor)) {
+                    throw new ArgumentTypeMismatchException(1);
+                }
+            }
         }
-
     }
 
 }

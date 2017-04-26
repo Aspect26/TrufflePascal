@@ -3,9 +3,8 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.dos;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeChildren;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.oracle.truffle.api.frame.FrameSlotTypeException;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 import java.io.IOException;
 
@@ -21,15 +20,12 @@ import java.io.IOException;
  * DosExitCode function is not implemented
  */
 @NodeChildren({ @NodeChild(type = ExpressionNode.class), @NodeChild(type = ExpressionNode.class)})
-public abstract class ExecNode extends ExpressionNode {
+public abstract class ExecNode extends StatementNode {
 
     @Specialization
-    int exec(String command, String arguments) {
+    void exec(String command, String arguments) {
         try {
             Runtime.getRuntime().exec(command + " " + arguments).waitFor();
-
-            // NOTE: it is a procedure, so it shouldn't return anything
-            return 0;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error executing command " + command + ". " + e.getMessage());
         }

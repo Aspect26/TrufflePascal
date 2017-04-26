@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.control;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 public class CaseNode extends StatementNode {
 

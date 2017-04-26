@@ -1,12 +1,14 @@
-package cz.cuni.mff.d3s.trupple.language.nodes;
+package cz.cuni.mff.d3s.trupple.language.nodes.root;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
+import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
-public class PascalRootNode extends RootNode {
+public abstract class PascalRootNode extends RootNode {
+
 	@Child
 	private ExpressionNode bodyNode;
 

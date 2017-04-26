@@ -17,13 +17,18 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 @GeneratedBy(NegationNode.class)
 public final class NegationNodeGen extends NegationNode implements SpecializedNode {
 
-    @Child private ExpressionNode son_;
-    @CompilationFinal private Class<?> sonType_;
+    @Child private ExpressionNode argument_;
+    @CompilationFinal private Class<?> argumentType_;
     @Child private BaseNode_ specialization_;
 
-    private NegationNodeGen(ExpressionNode son) {
-        this.son_ = son;
+    private NegationNodeGen(ExpressionNode argument) {
+        this.argument_ = argument;
         this.specialization_ = UninitializedNode_.create(this);
+    }
+
+    @Override
+    protected ExpressionNode getArgument() {
+        return this.argument_;
     }
 
     @Override
@@ -57,8 +62,8 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
         return SpecializationNode.updateRoot(super.deepCopy());
     }
 
-    public static NegationNode create(ExpressionNode son) {
-        return new NegationNodeGen(son);
+    public static NegationNode create(ExpressionNode argument) {
+        return new NegationNodeGen(argument);
     }
 
     @GeneratedBy(NegationNode.class)
@@ -78,19 +83,19 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
 
         @Override
         protected final Node[] getSuppliedChildren() {
-            return new Node[] {root.son_};
+            return new Node[] {root.argument_};
         }
 
         @Override
-        public final Object acceptAndExecute(Frame frameValue, Object sonValue) {
-            return this.execute_((VirtualFrame) frameValue, sonValue);
+        public final Object acceptAndExecute(Frame frameValue, Object argumentValue) {
+            return this.execute_((VirtualFrame) frameValue, argumentValue);
         }
 
-        public abstract Object execute_(VirtualFrame frameValue, Object sonValue);
+        public abstract Object execute_(VirtualFrame frameValue, Object argumentValue);
 
         public Object execute(VirtualFrame frameValue) {
-            Object sonValue_ = executeSon_(frameValue);
-            return execute_(frameValue, sonValue_);
+            Object argumentValue_ = executeArgument_(frameValue);
+            return execute_(frameValue, argumentValue_);
         }
 
         public void executeVoid(VirtualFrame frameValue) {
@@ -103,11 +108,11 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
         }
 
         @Override
-        protected final SpecializationNode createNext(Frame frameValue, Object sonValue) {
-            if (sonValue instanceof Long) {
+        protected final SpecializationNode createNext(Frame frameValue, Object argumentValue) {
+            if (argumentValue instanceof Long) {
                 return Neg0Node_.create(root);
             }
-            if (sonValue instanceof Double) {
+            if (argumentValue instanceof Double) {
                 return Neg1Node_.create(root);
             }
             return null;
@@ -122,16 +127,16 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
             return (BaseNode_) this.next;
         }
 
-        protected final Object executeSon_(Frame frameValue) {
-            Class<?> sonType_ = root.sonType_;
+        protected final Object executeArgument_(Frame frameValue) {
+            Class<?> argumentType_ = root.argumentType_;
             try {
-                if (sonType_ == long.class) {
-                    return root.son_.executeLong((VirtualFrame) frameValue);
-                } else if (sonType_ == null) {
+                if (argumentType_ == long.class) {
+                    return root.argument_.executeLong((VirtualFrame) frameValue);
+                } else if (argumentType_ == null) {
                     CompilerDirectives.transferToInterpreterAndInvalidate();
                     Class<?> _type = Object.class;
                     try {
-                        Object _value = root.son_.executeGeneric((VirtualFrame) frameValue);
+                        Object _value = root.argument_.executeGeneric((VirtualFrame) frameValue);
                         if (_value instanceof Long) {
                             _type = long.class;
                         } else {
@@ -139,13 +144,13 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
                         }
                         return _value;
                     } finally {
-                        root.sonType_ = _type;
+                        root.argumentType_ = _type;
                     }
                 } else {
-                    return root.son_.executeGeneric((VirtualFrame) frameValue);
+                    return root.argument_.executeGeneric((VirtualFrame) frameValue);
                 }
             } catch (UnexpectedResultException ex) {
-                root.sonType_ = Object.class;
+                root.argumentType_ = Object.class;
                 return ex.getResult();
             }
         }
@@ -159,8 +164,8 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object sonValue) {
-            return uninitialized(frameValue, sonValue);
+        public Object execute_(VirtualFrame frameValue, Object argumentValue) {
+            return uninitialized(frameValue, argumentValue);
         }
 
         static BaseNode_ create(NegationNodeGen root) {
@@ -176,13 +181,13 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
         }
 
         @Override
-        public SpecializationNode merge(SpecializationNode newNode, Frame frameValue, Object sonValue) {
-            return polymorphicMerge(newNode, super.merge(newNode, frameValue, sonValue));
+        public SpecializationNode merge(SpecializationNode newNode, Frame frameValue, Object argumentValue) {
+            return polymorphicMerge(newNode, super.merge(newNode, frameValue, argumentValue));
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object sonValue) {
-            return getNext().execute_(frameValue, sonValue);
+        public Object execute_(VirtualFrame frameValue, Object argumentValue) {
+            return getNext().execute_(frameValue, argumentValue);
         }
 
         static BaseNode_ create(NegationNodeGen root) {
@@ -208,22 +213,22 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
 
         @Override
         public long executeLong(VirtualFrame frameValue) throws UnexpectedResultException {
-            long sonValue_;
+            long argumentValue_;
             try {
-                sonValue_ = root.son_.executeLong(frameValue);
+                argumentValue_ = root.argument_.executeLong(frameValue);
             } catch (UnexpectedResultException ex) {
                 return PascalTypesGen.expectLong(getNext().execute_(frameValue, ex.getResult()));
             }
-            return root.neg(sonValue_);
+            return root.neg(argumentValue_);
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object sonValue) {
-            if (sonValue instanceof Long) {
-                long sonValue_ = (long) sonValue;
-                return root.neg(sonValue_);
+        public Object execute_(VirtualFrame frameValue, Object argumentValue) {
+            if (argumentValue instanceof Long) {
+                long argumentValue_ = (long) argumentValue;
+                return root.neg(argumentValue_);
             }
-            return getNext().execute_(frameValue, sonValue);
+            return getNext().execute_(frameValue, argumentValue);
         }
 
         static BaseNode_ create(NegationNodeGen root) {
@@ -239,12 +244,12 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
         }
 
         @Override
-        public Object execute_(VirtualFrame frameValue, Object sonValue) {
-            if (sonValue instanceof Double) {
-                double sonValue_ = (double) sonValue;
-                return root.neg(sonValue_);
+        public Object execute_(VirtualFrame frameValue, Object argumentValue) {
+            if (argumentValue instanceof Double) {
+                double argumentValue_ = (double) argumentValue;
+                return root.neg(argumentValue_);
             }
-            return getNext().execute_(frameValue, sonValue);
+            return getNext().execute_(frameValue, argumentValue);
         }
 
         static BaseNode_ create(NegationNodeGen root) {

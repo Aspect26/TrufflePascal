@@ -7,15 +7,16 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 
-@NodeChild("valueNode")
+@NodeChild(value = "valueNode", type = ExpressionNode.class)
 @NodeField(name = "slot", type = FrameSlot.class)
-public abstract class AssignmentNode extends ExpressionNode {
+public abstract class AssignmentNode extends StatementNode {
 
     public interface SlotAssignment {
 
@@ -35,76 +36,65 @@ public abstract class AssignmentNode extends ExpressionNode {
     }
 
     @Specialization
-    long writeLong(VirtualFrame frame, long value) {
+    void writeLong(VirtualFrame frame, long value) {
         this.makeAssignment(
                 frame,
                 getSlot(),
                 (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setLong(assignmentFrameSlot, (long) assignmentValue),
                 value
         );
-
-        return value;
     }
 
     @Specialization
-    boolean writeBoolean(VirtualFrame frame, boolean value) {
+    void writeBoolean(VirtualFrame frame, boolean value) {
         this.makeAssignment(
                 frame,
                 getSlot(),
                 (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setBoolean(assignmentFrameSlot, (boolean) assignmentValue),
                 value
         );
-
-        return value;
     }
 
     // NOTE: characters are stored as bytes, since there is no FrameSlotKind for char
     @Specialization
-    char writeChar(VirtualFrame frame, char value) {
+    void writeChar(VirtualFrame frame, char value) {
         this.makeAssignment(
                 frame,
                 getSlot(),
                 (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setByte(assignmentFrameSlot, (byte)((char) assignmentValue)),
                 value
         );
-
-        return value;
     }
 
     @Specialization
-    double writeDouble(VirtualFrame frame, double value) {
+    void writeDouble(VirtualFrame frame, double value) {
         this.makeAssignment(
                 frame,
                 getSlot(),
                 (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setDouble(assignmentFrameSlot, (double) assignmentValue),
                 value
         );
-
-        return value;
     }
 
     @Specialization
-    Object writeEnum(VirtualFrame frame, EnumValue value) {
+    void writeEnum(VirtualFrame frame, EnumValue value) {
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, value);
-        return value;
     }
 
     @Specialization
-    Object assignSet(VirtualFrame frame, SetTypeValue set) {
+    void assignSet(VirtualFrame frame, SetTypeValue set) {
         SetTypeValue setCopy = set.createDeepCopy();
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, setCopy);
-        return setCopy;
     }
 
     @Specialization
-    Object assignRecord(VirtualFrame frame, RecordValue record) {
+    void assignRecord(VirtualFrame frame, RecordValue record) {
         RecordValue recordCopy = record.getCopy();
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, recordCopy);
-        return recordCopy;
     }
 
     @Specialization
-    Object assignReference(VirtualFrame frame, Reference reference) {
+    void assignReference(VirtualFrame frame, Reference reference) {
         // TODO: this if is so wrong, refactor it somehow
         Object referenceValue = this.getValueFromSlot(reference.getFromFrame(), reference.getFrameSlot());
         if (referenceValue instanceof PointerValue) {
@@ -112,11 +102,10 @@ public abstract class AssignmentNode extends ExpressionNode {
         } else {
             this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, referenceValue);
         }
-        return referenceValue;
     }
 
     @Specialization
-    Object assignPointers(VirtualFrame frame, PointerValue pointer) {
+    void assignPointers(VirtualFrame frame, PointerValue pointer) {
         this.makeAssignment(frame, getSlot(),
                 (VirtualFrame assignmentFrame, FrameSlot frameSlot, Object value) ->
                 {
@@ -124,11 +113,10 @@ public abstract class AssignmentNode extends ExpressionNode {
                     assignmentTarget.setHeapSlot(((PointerValue) value).getHeapSlot());
                 },
                 pointer);
-        return pointer;
     }
 
     @Specialization
-    PascalString assignString(VirtualFrame frame, PascalString value) {
+    void assignString(VirtualFrame frame, PascalString value) {
         Object targetObject;
         try {
             targetObject = frame.getObject(getSlot());
@@ -143,21 +131,17 @@ public abstract class AssignmentNode extends ExpressionNode {
                 assignPChar(pointerValue, value);
             }
         }
-
-        return value;
     }
 
     @Specialization
-    PascalSubroutine assignSubroutine(VirtualFrame frame, PascalSubroutine subroutine) {
+    void assignSubroutine(VirtualFrame frame, PascalSubroutine subroutine) {
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, subroutine);
-        return subroutine;
     }
 
     @Specialization
-    Object assignArray(VirtualFrame frame, PascalArray array) {
+    void assignArray(VirtualFrame frame, PascalArray array) {
         PascalArray arrayCopy = (PascalArray) array.createDeepCopy();
         this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, arrayCopy);
-        return arrayCopy;
     }
 
     private void assignPChar(PointerValue pcharPointer, PascalString value) {

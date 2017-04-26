@@ -28,4 +28,11 @@ public class FileDescriptor implements TypeDescriptor {
         }
     }
 
+    @Override
+    public boolean convertibleTo(TypeDescriptor type) {
+        FileDescriptor convertTo = (FileDescriptor) type;
+        return (this.contentTypeDescriptor == null) || (convertTo.contentTypeDescriptor == null) ||
+                (convertTo.contentTypeDescriptor == this.contentTypeDescriptor);
+    }
+
 }
