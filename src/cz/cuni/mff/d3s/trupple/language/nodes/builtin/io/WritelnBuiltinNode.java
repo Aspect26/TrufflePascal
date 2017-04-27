@@ -11,7 +11,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.language.PascalContext;
 
 @NodeInfo(shortName = "writeln")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)

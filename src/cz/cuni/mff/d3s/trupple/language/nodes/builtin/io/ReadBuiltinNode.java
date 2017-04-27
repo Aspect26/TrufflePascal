@@ -15,7 +15,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.CantReadInputExceptio
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.language.PascalContext;
 
 // TODO: refactor this class pls, this is a horrid mess
 @NodeInfo(shortName = "read")

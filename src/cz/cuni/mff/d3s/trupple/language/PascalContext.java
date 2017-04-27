@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.runtime;
+package cz.cuni.mff.d3s.trupple.language;
 
 import java.io.PrintStream;
 import java.util.Random;
@@ -17,7 +17,7 @@ public final class PascalContext extends ExecutionContext {
         }
         return instance;
     }
-	
+
 	private Scanner input;
 	private PrintStream output;
     private Random random;

@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin.io;
 
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalContext;
+import cz.cuni.mff.d3s.trupple.language.PascalContext;
 
 @NodeInfo(shortName = "readln")
 public abstract class ReadlnBuiltinNode extends ReadBuiltinNode {
