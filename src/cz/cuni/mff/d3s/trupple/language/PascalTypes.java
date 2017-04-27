@@ -1,28 +1,25 @@
 package cz.cuni.mff.d3s.trupple.language;
 
-import com.oracle.truffle.api.dsl.TypeCast;
-import com.oracle.truffle.api.dsl.TypeCheck;
+import com.oracle.truffle.api.dsl.ImplicitCast;
 import com.oracle.truffle.api.dsl.TypeSystem;
 import com.oracle.truffle.api.dsl.internal.DSLOptions;
 
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.*;
-import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 
 @TypeSystem({ long.class, boolean.class, char.class, double.class, PascalSubroutine.class, PascalString.class,
-        EnumValue.class, PascalArray.class, Reference.class, PointerValue.class, SetTypeValue.class, FileValue.class,
-        Null.class })
+        EnumValue.class, PascalArray.class, Reference.class, PointerValue.class, SetTypeValue.class, FileValue.class, })
 @DSLOptions
 public class PascalTypes {
 
-	@TypeCheck(Null.class)
-	public static boolean isNull(Object value) {
-		return value == Null.SINGLETON;
-	}
+    @ImplicitCast
+    public static double castLongToDouble(long value) {
+        return value;
+    }
 
-	@TypeCast(Null.class)
-	public static Null asPascalNull(Object value) {
-		assert isNull(value);
-		return Null.SINGLETON;
-	}
+    @ImplicitCast
+    public static PascalString castCharToString(char c) {
+        return new PascalString(String.valueOf(c));
+    }
+    
 }

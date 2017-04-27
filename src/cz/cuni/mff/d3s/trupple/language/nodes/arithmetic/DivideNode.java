@@ -17,21 +17,6 @@ public abstract class DivideNode extends BinaryNode {
     }
 
 	@Specialization
-	protected double div(long left, long right) {
-		return (double) left / right;
-	}
-
-	@Specialization
-	protected double div(double left, long right) {
-		return left / right;
-	}
-
-	@Specialization
-	protected double div(long left, double right) {
-		return left / right;
-	}
-
-	@Specialization
 	protected double div(double left, double right) {
 		return left / right;
 	}

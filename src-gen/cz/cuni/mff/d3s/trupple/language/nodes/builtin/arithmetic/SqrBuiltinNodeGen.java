@@ -112,8 +112,8 @@ public final class SqrBuiltinNodeGen extends SqrBuiltinNode implements Specializ
             if (argumentValue instanceof Long) {
                 return IntegerSquareValueNode_.create(root);
             }
-            if (argumentValue instanceof Double) {
-                return UbleSquareRootValueNode_.create(root);
+            if (PascalTypesGen.isImplicitDouble(argumentValue)) {
+                return UbleSquareRootValueNode_.create(root, argumentValue);
             }
             return null;
         }
@@ -239,21 +239,29 @@ public final class SqrBuiltinNodeGen extends SqrBuiltinNode implements Specializ
     @GeneratedBy(methodName = "doubleSquareRootValue(double)", value = SqrBuiltinNode.class)
     private static final class UbleSquareRootValueNode_ extends BaseNode_ {
 
-        UbleSquareRootValueNode_(SqrBuiltinNodeGen root) {
+        private final Class<?> argumentImplicitType;
+
+        UbleSquareRootValueNode_(SqrBuiltinNodeGen root, Object argumentValue) {
             super(root, 2);
+            this.argumentImplicitType = PascalTypesGen.getImplicitDoubleClass(argumentValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.argumentImplicitType == ((UbleSquareRootValueNode_) other).argumentImplicitType;
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Double) {
-                double argumentValue_ = (double) argumentValue;
+            if (PascalTypesGen.isImplicitDouble(argumentValue, argumentImplicitType)) {
+                double argumentValue_ = PascalTypesGen.asImplicitDouble(argumentValue, argumentImplicitType);
                 return root.doubleSquareRootValue(argumentValue_);
             }
             return getNext().execute_(frameValue, argumentValue);
         }
 
-        static BaseNode_ create(SqrBuiltinNodeGen root) {
-            return new UbleSquareRootValueNode_(root);
+        static BaseNode_ create(SqrBuiltinNodeGen root, Object argumentValue) {
+            return new UbleSquareRootValueNode_(root, argumentValue);
         }
 
     }

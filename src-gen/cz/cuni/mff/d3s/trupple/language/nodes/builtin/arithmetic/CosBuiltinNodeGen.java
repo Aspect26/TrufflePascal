@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(CosBuiltinNode.class)
@@ -94,11 +95,8 @@ public final class CosBuiltinNodeGen extends CosBuiltinNode implements Specializ
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Long) {
-                return IntegerCosValueNode_.create(root);
-            }
-            if (argumentValue instanceof Double) {
-                return UbleCosValueNode_.create(root);
+            if (PascalTypesGen.isImplicitDouble(argumentValue)) {
+                return CosNode_.create(root, argumentValue);
             }
             return null;
         }
@@ -180,56 +178,32 @@ public final class CosBuiltinNodeGen extends CosBuiltinNode implements Specializ
         }
 
     }
-    @GeneratedBy(methodName = "integerCosValue(long)", value = CosBuiltinNode.class)
-    private static final class IntegerCosValueNode_ extends BaseNode_ {
+    @GeneratedBy(methodName = "cos(double)", value = CosBuiltinNode.class)
+    private static final class CosNode_ extends BaseNode_ {
 
-        IntegerCosValueNode_(CosBuiltinNodeGen root) {
+        private final Class<?> argumentImplicitType;
+
+        CosNode_(CosBuiltinNodeGen root, Object argumentValue) {
             super(root, 1);
+            this.argumentImplicitType = PascalTypesGen.getImplicitDoubleClass(argumentValue);
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            long argumentValue_;
-            try {
-                argumentValue_ = root.argument_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeDouble_(frameValue, ex.getResult());
-            }
-            return root.integerCosValue(argumentValue_);
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.argumentImplicitType == ((CosNode_) other).argumentImplicitType;
         }
 
         @Override
         public double executeDouble_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Long) {
-                long argumentValue_ = (long) argumentValue;
-                return root.integerCosValue(argumentValue_);
+            if (PascalTypesGen.isImplicitDouble(argumentValue, argumentImplicitType)) {
+                double argumentValue_ = PascalTypesGen.asImplicitDouble(argumentValue, argumentImplicitType);
+                return root.cos(argumentValue_);
             }
             return getNext().executeDouble_(frameValue, argumentValue);
         }
 
-        static BaseNode_ create(CosBuiltinNodeGen root) {
-            return new IntegerCosValueNode_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "doubleCosValue(double)", value = CosBuiltinNode.class)
-    private static final class UbleCosValueNode_ extends BaseNode_ {
-
-        UbleCosValueNode_(CosBuiltinNodeGen root) {
-            super(root, 2);
-        }
-
-        @Override
-        public double executeDouble_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Double) {
-                double argumentValue_ = (double) argumentValue;
-                return root.doubleCosValue(argumentValue_);
-            }
-            return getNext().executeDouble_(frameValue, argumentValue);
-        }
-
-        static BaseNode_ create(CosBuiltinNodeGen root) {
-            return new UbleCosValueNode_(root);
+        static BaseNode_ create(CosBuiltinNodeGen root, Object argumentValue) {
+            return new CosNode_(root, argumentValue);
         }
 
     }

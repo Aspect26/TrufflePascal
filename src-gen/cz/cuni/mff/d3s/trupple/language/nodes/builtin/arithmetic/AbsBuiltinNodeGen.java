@@ -112,8 +112,8 @@ public final class AbsBuiltinNodeGen extends AbsBuiltinNode implements Specializ
             if (argumentValue instanceof Long) {
                 return IntegerAbsoluteValueNode_.create(root);
             }
-            if (argumentValue instanceof Double) {
-                return UbleAbsoluteValueNode_.create(root);
+            if (PascalTypesGen.isImplicitDouble(argumentValue)) {
+                return UbleAbsoluteValueNode_.create(root, argumentValue);
             }
             return null;
         }
@@ -239,21 +239,29 @@ public final class AbsBuiltinNodeGen extends AbsBuiltinNode implements Specializ
     @GeneratedBy(methodName = "doubleAbsoluteValue(double)", value = AbsBuiltinNode.class)
     private static final class UbleAbsoluteValueNode_ extends BaseNode_ {
 
-        UbleAbsoluteValueNode_(AbsBuiltinNodeGen root) {
+        private final Class<?> argumentImplicitType;
+
+        UbleAbsoluteValueNode_(AbsBuiltinNodeGen root, Object argumentValue) {
             super(root, 2);
+            this.argumentImplicitType = PascalTypesGen.getImplicitDoubleClass(argumentValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.argumentImplicitType == ((UbleAbsoluteValueNode_) other).argumentImplicitType;
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Double) {
-                double argumentValue_ = (double) argumentValue;
+            if (PascalTypesGen.isImplicitDouble(argumentValue, argumentImplicitType)) {
+                double argumentValue_ = PascalTypesGen.asImplicitDouble(argumentValue, argumentImplicitType);
                 return root.doubleAbsoluteValue(argumentValue_);
             }
             return getNext().execute_(frameValue, argumentValue);
         }
 
-        static BaseNode_ create(AbsBuiltinNodeGen root) {
-            return new UbleAbsoluteValueNode_(root);
+        static BaseNode_ create(AbsBuiltinNodeGen root, Object argumentValue) {
+            return new UbleAbsoluteValueNode_(root, argumentValue);
         }
 
     }

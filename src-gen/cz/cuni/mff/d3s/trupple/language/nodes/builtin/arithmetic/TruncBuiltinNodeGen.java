@@ -4,61 +4,239 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin.arithmetic;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
 import com.oracle.truffle.api.dsl.GeneratedBy;
-import com.oracle.truffle.api.dsl.UnsupportedSpecializationException;
+import com.oracle.truffle.api.dsl.internal.SpecializationNode;
+import com.oracle.truffle.api.dsl.internal.SpecializedNode;
+import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(TruncBuiltinNode.class)
-public final class TruncBuiltinNodeGen extends TruncBuiltinNode {
+public final class TruncBuiltinNodeGen extends TruncBuiltinNode implements SpecializedNode {
 
     @Child private ExpressionNode argument_;
-    @CompilationFinal private boolean seenUnsupported0;
+    @CompilationFinal private Class<?> argumentType_;
+    @Child private BaseNode_ specialization_;
 
     private TruncBuiltinNodeGen(ExpressionNode argument) {
         this.argument_ = argument;
+        this.specialization_ = UninitializedNode_.create(this);
     }
 
     @Override
     public NodeCost getCost() {
-        return NodeCost.MONOMORPHIC;
+        return specialization_.getNodeCost();
     }
 
     @Override
     public Object executeGeneric(VirtualFrame frameValue) {
-        return executeLong(frameValue);
+        return specialization_.execute(frameValue);
     }
 
     @Override
     public void executeVoid(VirtualFrame frameValue) {
-        executeLong(frameValue);
+        specialization_.executeVoid(frameValue);
         return;
     }
 
     @Override
     public long executeLong(VirtualFrame frameValue) {
-        double argumentValue_;
-        try {
-            argumentValue_ = PascalTypesGen.expectDouble(argument_.executeGeneric(frameValue));
-        } catch (UnexpectedResultException ex) {
-            throw unsupported(ex.getResult());
-        }
-        return this.truncate(argumentValue_);
+        return specialization_.executeLong(frameValue);
     }
 
-    private UnsupportedSpecializationException unsupported(Object argumentValue) {
-        if (!seenUnsupported0) {
-            CompilerDirectives.transferToInterpreterAndInvalidate();
-            seenUnsupported0 = true;
-        }
-        return new UnsupportedSpecializationException(this, new Node[] {argument_}, argumentValue);
+    @Override
+    public SpecializationNode getSpecializationNode() {
+        return specialization_;
+    }
+
+    @Override
+    public Node deepCopy() {
+        return SpecializationNode.updateRoot(super.deepCopy());
     }
 
     public static TruncBuiltinNode create(ExpressionNode argument) {
         return new TruncBuiltinNodeGen(argument);
     }
 
+    @GeneratedBy(TruncBuiltinNode.class)
+    private abstract static class BaseNode_ extends SpecializationNode {
+
+        @CompilationFinal protected TruncBuiltinNodeGen root;
+
+        BaseNode_(TruncBuiltinNodeGen root, int index) {
+            super(index);
+            this.root = root;
+        }
+
+        @Override
+        protected final void setRoot(Node root) {
+            this.root = (TruncBuiltinNodeGen) root;
+        }
+
+        @Override
+        protected final Node[] getSuppliedChildren() {
+            return new Node[] {root.argument_};
+        }
+
+        @Override
+        public final Object acceptAndExecute(Frame frameValue, Object argumentValue) {
+            return this.executeLong_((VirtualFrame) frameValue, argumentValue);
+        }
+
+        public abstract long executeLong_(VirtualFrame frameValue, Object argumentValue);
+
+        public Object execute(VirtualFrame frameValue) {
+            Object argumentValue_ = executeArgument_(frameValue);
+            return executeLong_(frameValue, argumentValue_);
+        }
+
+        public void executeVoid(VirtualFrame frameValue) {
+            execute(frameValue);
+            return;
+        }
+
+        public long executeLong(VirtualFrame frameValue) {
+            return (long) execute(frameValue);
+        }
+
+        @Override
+        protected final SpecializationNode createNext(Frame frameValue, Object argumentValue) {
+            if (PascalTypesGen.isImplicitDouble(argumentValue)) {
+                return TruncateNode_.create(root, argumentValue);
+            }
+            return null;
+        }
+
+        @Override
+        protected final SpecializationNode createPolymorphic() {
+            return PolymorphicNode_.create(root);
+        }
+
+        protected final BaseNode_ getNext() {
+            return (BaseNode_) this.next;
+        }
+
+        protected final Object executeArgument_(Frame frameValue) {
+            Class<?> argumentType_ = root.argumentType_;
+            try {
+                if (argumentType_ == long.class) {
+                    return root.argument_.executeLong((VirtualFrame) frameValue);
+                } else if (argumentType_ == null) {
+                    CompilerDirectives.transferToInterpreterAndInvalidate();
+                    Class<?> _type = Object.class;
+                    try {
+                        Object _value = root.argument_.executeGeneric((VirtualFrame) frameValue);
+                        if (_value instanceof Long) {
+                            _type = long.class;
+                        } else {
+                            _type = Object.class;
+                        }
+                        return _value;
+                    } finally {
+                        root.argumentType_ = _type;
+                    }
+                } else {
+                    return root.argument_.executeGeneric((VirtualFrame) frameValue);
+                }
+            } catch (UnexpectedResultException ex) {
+                root.argumentType_ = Object.class;
+                return ex.getResult();
+            }
+        }
+
+    }
+    @GeneratedBy(TruncBuiltinNode.class)
+    private static final class UninitializedNode_ extends BaseNode_ {
+
+        UninitializedNode_(TruncBuiltinNodeGen root) {
+            super(root, 2147483647);
+        }
+
+        @Override
+        public long executeLong_(VirtualFrame frameValue, Object argumentValue) {
+            return (long) uninitialized(frameValue, argumentValue);
+        }
+
+        static BaseNode_ create(TruncBuiltinNodeGen root) {
+            return new UninitializedNode_(root);
+        }
+
+    }
+    @GeneratedBy(TruncBuiltinNode.class)
+    private static final class PolymorphicNode_ extends BaseNode_ {
+
+        PolymorphicNode_(TruncBuiltinNodeGen root) {
+            super(root, 0);
+        }
+
+        @Override
+        public SpecializationNode merge(SpecializationNode newNode, Frame frameValue, Object argumentValue) {
+            return polymorphicMerge(newNode, super.merge(newNode, frameValue, argumentValue));
+        }
+
+        @Override
+        public long executeLong(VirtualFrame frameValue) {
+            Object argumentValue_ = executeArgument_(frameValue);
+            return getNext().executeLong_(frameValue, argumentValue_);
+        }
+
+        @Override
+        public long executeLong_(VirtualFrame frameValue, Object argumentValue) {
+            return getNext().executeLong_(frameValue, argumentValue);
+        }
+
+        static BaseNode_ create(TruncBuiltinNodeGen root) {
+            return new PolymorphicNode_(root);
+        }
+
+    }
+    @GeneratedBy(methodName = "truncate(double)", value = TruncBuiltinNode.class)
+    private static final class TruncateNode_ extends BaseNode_ {
+
+        private final Class<?> argumentImplicitType;
+
+        TruncateNode_(TruncBuiltinNodeGen root, Object argumentValue) {
+            super(root, 1);
+            this.argumentImplicitType = PascalTypesGen.getImplicitDoubleClass(argumentValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.argumentImplicitType == ((TruncateNode_) other).argumentImplicitType;
+        }
+
+        @Override
+        public long executeLong(VirtualFrame frameValue) {
+            double argumentValue_;
+            try {
+                if (argumentImplicitType == long.class) {
+                    argumentValue_ = PascalTypes.castLongToDouble(root.argument_.executeLong(frameValue));
+                } else {
+                    Object argumentValue__ = executeArgument_(frameValue);
+                    argumentValue_ = PascalTypesGen.expectImplicitDouble(argumentValue__, argumentImplicitType);
+                }
+            } catch (UnexpectedResultException ex) {
+                return getNext().executeLong_(frameValue, ex.getResult());
+            }
+            return root.truncate(argumentValue_);
+        }
+
+        @Override
+        public long executeLong_(VirtualFrame frameValue, Object argumentValue) {
+            if (PascalTypesGen.isImplicitDouble(argumentValue, argumentImplicitType)) {
+                double argumentValue_ = PascalTypesGen.asImplicitDouble(argumentValue, argumentImplicitType);
+                return root.truncate(argumentValue_);
+            }
+            return getNext().executeLong_(frameValue, argumentValue);
+        }
+
+        static BaseNode_ create(TruncBuiltinNodeGen root, Object argumentValue) {
+            return new TruncateNode_(root, argumentValue);
+        }
+
+    }
 }

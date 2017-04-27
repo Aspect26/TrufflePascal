@@ -13,6 +13,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.GenericEnu
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 @NodeInfo(shortName = "=")
 public abstract class EqualsNode extends BinaryNode {
@@ -20,6 +21,7 @@ public abstract class EqualsNode extends BinaryNode {
     EqualsNode() {
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(BooleanDescriptor.getInstance(), BooleanDescriptor.getInstance()), BooleanDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), BooleanDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), RealDescriptor.getInstance()), BooleanDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(CharDescriptor.getInstance(), CharDescriptor.getInstance()), BooleanDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(GenericEnumTypeDescriptor.getInstance(), GenericEnumTypeDescriptor.getInstance()), BooleanDescriptor.getInstance());
     }
@@ -29,8 +31,13 @@ public abstract class EqualsNode extends BinaryNode {
 		return left == right;
 	}
 
+    @Specialization
+    protected boolean equals(long left, long right) {
+        return left == right;
+    }
+
 	@Specialization
-	protected boolean equals(long left, long right) {
+	protected boolean equals(double left, double right) {
 		return left == right;
 	}
 

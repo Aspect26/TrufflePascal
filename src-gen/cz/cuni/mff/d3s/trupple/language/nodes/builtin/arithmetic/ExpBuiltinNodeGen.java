@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(ExpBuiltinNode.class)
@@ -94,11 +95,8 @@ public final class ExpBuiltinNodeGen extends ExpBuiltinNode implements Specializ
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Long) {
-                return IntegerExponentialValueNode_.create(root);
-            }
-            if (argumentValue instanceof Double) {
-                return UbleExponentialValueNode_.create(root);
+            if (PascalTypesGen.isImplicitDouble(argumentValue)) {
+                return ExpNode_.create(root, argumentValue);
             }
             return null;
         }
@@ -180,56 +178,32 @@ public final class ExpBuiltinNodeGen extends ExpBuiltinNode implements Specializ
         }
 
     }
-    @GeneratedBy(methodName = "integerExponentialValue(long)", value = ExpBuiltinNode.class)
-    private static final class IntegerExponentialValueNode_ extends BaseNode_ {
+    @GeneratedBy(methodName = "exp(double)", value = ExpBuiltinNode.class)
+    private static final class ExpNode_ extends BaseNode_ {
 
-        IntegerExponentialValueNode_(ExpBuiltinNodeGen root) {
+        private final Class<?> argumentImplicitType;
+
+        ExpNode_(ExpBuiltinNodeGen root, Object argumentValue) {
             super(root, 1);
+            this.argumentImplicitType = PascalTypesGen.getImplicitDoubleClass(argumentValue);
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            long argumentValue_;
-            try {
-                argumentValue_ = root.argument_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeDouble_(frameValue, ex.getResult());
-            }
-            return root.integerExponentialValue(argumentValue_);
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.argumentImplicitType == ((ExpNode_) other).argumentImplicitType;
         }
 
         @Override
         public double executeDouble_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Long) {
-                long argumentValue_ = (long) argumentValue;
-                return root.integerExponentialValue(argumentValue_);
+            if (PascalTypesGen.isImplicitDouble(argumentValue, argumentImplicitType)) {
+                double argumentValue_ = PascalTypesGen.asImplicitDouble(argumentValue, argumentImplicitType);
+                return root.exp(argumentValue_);
             }
             return getNext().executeDouble_(frameValue, argumentValue);
         }
 
-        static BaseNode_ create(ExpBuiltinNodeGen root) {
-            return new IntegerExponentialValueNode_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "doubleExponentialValue(double)", value = ExpBuiltinNode.class)
-    private static final class UbleExponentialValueNode_ extends BaseNode_ {
-
-        UbleExponentialValueNode_(ExpBuiltinNodeGen root) {
-            super(root, 2);
-        }
-
-        @Override
-        public double executeDouble_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Double) {
-                double argumentValue_ = (double) argumentValue;
-                return root.doubleExponentialValue(argumentValue_);
-            }
-            return getNext().executeDouble_(frameValue, argumentValue);
-        }
-
-        static BaseNode_ create(ExpBuiltinNodeGen root) {
-            return new UbleExponentialValueNode_(root);
+        static BaseNode_ create(ExpBuiltinNodeGen root, Object argumentValue) {
+            return new ExpNode_(root, argumentValue);
         }
 
     }

@@ -12,11 +12,6 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public abstract class ArctanBuiltinNode extends ExpressionNode {
 
     @Specialization
-    double integerArctanValue(long value) {
-        return Math.atan(value);
-    }
-
-    @Specialization
     double doubleArctanValue(double value) {
         return Math.atan(value);
     }

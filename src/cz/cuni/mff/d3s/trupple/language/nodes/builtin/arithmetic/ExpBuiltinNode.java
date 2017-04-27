@@ -12,12 +12,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public abstract class ExpBuiltinNode extends ExpressionNode {
 
     @Specialization
-    double integerExponentialValue(long value) {
-        return Math.exp(value);
-    }
-
-    @Specialization
-    double doubleExponentialValue(double value) {
+    double exp(double value) {
         return Math.exp(value);
     }
 

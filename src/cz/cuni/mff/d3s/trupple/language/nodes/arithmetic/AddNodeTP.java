@@ -22,22 +22,6 @@ public abstract class AddNodeTP extends AddNode {
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(new PointerDescriptor(PCharDesriptor.getInstance()), new PointerDescriptor(PCharDesriptor.getInstance())), new PointerDescriptor(PCharDesriptor.getInstance()));
     }
 
-	@Specialization
-	protected String add(char left, char right) {
-		return new String(new char[] { left, right } );
-	}
-
-	@Specialization
-	protected String add(char left, String right) {
-		String result = new String(new char[] {left});
-		return result.concat(right);
-	}
-
-	@Specialization
-	protected PascalString add(PascalString left, char right) {
-		return left.concatenate(right);
-	}
-
     @Specialization
     protected PascalString add(PascalString left, PascalString right) {
         return left.concatenate(right);

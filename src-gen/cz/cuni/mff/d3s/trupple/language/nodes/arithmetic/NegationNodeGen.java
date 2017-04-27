@@ -112,8 +112,8 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
             if (argumentValue instanceof Long) {
                 return Neg0Node_.create(root);
             }
-            if (argumentValue instanceof Double) {
-                return Neg1Node_.create(root);
+            if (PascalTypesGen.isImplicitDouble(argumentValue)) {
+                return Neg1Node_.create(root, argumentValue);
             }
             return null;
         }
@@ -239,21 +239,29 @@ public final class NegationNodeGen extends NegationNode implements SpecializedNo
     @GeneratedBy(methodName = "neg(double)", value = NegationNode.class)
     private static final class Neg1Node_ extends BaseNode_ {
 
-        Neg1Node_(NegationNodeGen root) {
+        private final Class<?> argumentImplicitType;
+
+        Neg1Node_(NegationNodeGen root, Object argumentValue) {
             super(root, 2);
+            this.argumentImplicitType = PascalTypesGen.getImplicitDoubleClass(argumentValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.argumentImplicitType == ((Neg1Node_) other).argumentImplicitType;
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Double) {
-                double argumentValue_ = (double) argumentValue;
+            if (PascalTypesGen.isImplicitDouble(argumentValue, argumentImplicitType)) {
+                double argumentValue_ = PascalTypesGen.asImplicitDouble(argumentValue, argumentImplicitType);
                 return root.neg(argumentValue_);
             }
             return getNext().execute_(frameValue, argumentValue);
         }
 
-        static BaseNode_ create(NegationNodeGen root) {
-            return new Neg1Node_(root);
+        static BaseNode_ create(NegationNodeGen root, Object argumentValue) {
+            return new Neg1Node_(root, argumentValue);
         }
 
     }

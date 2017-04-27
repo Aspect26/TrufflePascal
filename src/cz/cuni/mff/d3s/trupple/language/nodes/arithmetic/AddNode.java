@@ -16,23 +16,13 @@ public abstract class AddNode extends BinaryNode {
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), LongDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), RealDescriptor.getInstance()), RealDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), LongDescriptor.getInstance()), RealDescriptor.getInstance());
-        this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), RealDescriptor.getInstance()), RealDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), RealDescriptor.getInstance()), RealDescriptor.getInstance());
     }
 
-	@Specialization
-	protected long add(long left, long right) {
-		return left + right;
-	}
-
-	@Specialization
-	protected double add(double left, long right) {
-		return left + right;
-	}
-
-	@Specialization
-	protected double add(long left, double right) {
-		return left + right;
-	}
+    @Specialization
+    protected long add(long left, long right) {
+        return left + right;
+    }
 
 	@Specialization
 	protected double add(double left, double right) {

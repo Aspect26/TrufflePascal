@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(ArctanBuiltinNode.class)
@@ -94,11 +95,8 @@ public final class ArctanBuiltinNodeGen extends ArctanBuiltinNode implements Spe
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Long) {
-                return IntegerArctanValueNode_.create(root);
-            }
-            if (argumentValue instanceof Double) {
-                return UbleArctanValueNode_.create(root);
+            if (PascalTypesGen.isImplicitDouble(argumentValue)) {
+                return UbleArctanValueNode_.create(root, argumentValue);
             }
             return null;
         }
@@ -180,56 +178,32 @@ public final class ArctanBuiltinNodeGen extends ArctanBuiltinNode implements Spe
         }
 
     }
-    @GeneratedBy(methodName = "integerArctanValue(long)", value = ArctanBuiltinNode.class)
-    private static final class IntegerArctanValueNode_ extends BaseNode_ {
-
-        IntegerArctanValueNode_(ArctanBuiltinNodeGen root) {
-            super(root, 1);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            long argumentValue_;
-            try {
-                argumentValue_ = root.argument_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeDouble_(frameValue, ex.getResult());
-            }
-            return root.integerArctanValue(argumentValue_);
-        }
-
-        @Override
-        public double executeDouble_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Long) {
-                long argumentValue_ = (long) argumentValue;
-                return root.integerArctanValue(argumentValue_);
-            }
-            return getNext().executeDouble_(frameValue, argumentValue);
-        }
-
-        static BaseNode_ create(ArctanBuiltinNodeGen root) {
-            return new IntegerArctanValueNode_(root);
-        }
-
-    }
     @GeneratedBy(methodName = "doubleArctanValue(double)", value = ArctanBuiltinNode.class)
     private static final class UbleArctanValueNode_ extends BaseNode_ {
 
-        UbleArctanValueNode_(ArctanBuiltinNodeGen root) {
-            super(root, 2);
+        private final Class<?> argumentImplicitType;
+
+        UbleArctanValueNode_(ArctanBuiltinNodeGen root, Object argumentValue) {
+            super(root, 1);
+            this.argumentImplicitType = PascalTypesGen.getImplicitDoubleClass(argumentValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.argumentImplicitType == ((UbleArctanValueNode_) other).argumentImplicitType;
         }
 
         @Override
         public double executeDouble_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Double) {
-                double argumentValue_ = (double) argumentValue;
+            if (PascalTypesGen.isImplicitDouble(argumentValue, argumentImplicitType)) {
+                double argumentValue_ = PascalTypesGen.asImplicitDouble(argumentValue, argumentImplicitType);
                 return root.doubleArctanValue(argumentValue_);
             }
             return getNext().executeDouble_(frameValue, argumentValue);
         }
 
-        static BaseNode_ create(ArctanBuiltinNodeGen root) {
-            return new UbleArctanValueNode_(root);
+        static BaseNode_ create(ArctanBuiltinNodeGen root, Object argumentValue) {
+            return new UbleArctanValueNode_(root, argumentValue);
         }
 
     }

@@ -73,13 +73,6 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
         return SpecializationNode.updateRoot(super.deepCopy());
     }
 
-    private static String expectString(Object value) throws UnexpectedResultException {
-        if (value instanceof String) {
-            return (String) value;
-        }
-        throw new UnexpectedResultException(value);
-    }
-
     public static AddNodeTP create(ExpressionNode leftNode, ExpressionNode rightNode) {
         return new AddNodeTPNodeGen(leftNode, rightNode);
     }
@@ -128,43 +121,20 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (rightNodeValue instanceof Long) {
-                if (leftNodeValue instanceof Long) {
-                    return Add0Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return Add1Node_.create(root);
-                }
+            if (leftNodeValue instanceof Long && rightNodeValue instanceof Long) {
+                return Add0Node_.create(root);
             }
-            if (rightNodeValue instanceof Double) {
-                if (leftNodeValue instanceof Long) {
-                    return Add2Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return Add3Node_.create(root);
-                }
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue) && PascalTypesGen.isImplicitDouble(rightNodeValue)) {
+                return Add1Node_.create(root, leftNodeValue, rightNodeValue);
             }
             if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
-                return Add4Node_.create(root);
+                return Add2Node_.create(root);
             }
-            if (leftNodeValue instanceof Character) {
-                if (rightNodeValue instanceof Character) {
-                    return Add5Node_.create(root);
-                }
-                if (rightNodeValue instanceof String) {
-                    return Add6Node_.create(root);
-                }
-            }
-            if (leftNodeValue instanceof PascalString) {
-                if (rightNodeValue instanceof Character) {
-                    return Add7Node_.create(root);
-                }
-                if (rightNodeValue instanceof PascalString) {
-                    return Add8Node_.create(root);
-                }
+            if (PascalTypesGen.isImplicitPascalString(leftNodeValue) && PascalTypesGen.isImplicitPascalString(rightNodeValue)) {
+                return Add3Node_.create(root, leftNodeValue, rightNodeValue);
             }
             if (leftNodeValue instanceof PCharValue && rightNodeValue instanceof PCharValue) {
-                return Add9Node_.create(root);
+                return Add4Node_.create(root);
             }
             return null;
         }
@@ -331,113 +301,43 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
         }
 
     }
-    @GeneratedBy(methodName = "add(double, long)", value = AddNodeTP.class)
+    @GeneratedBy(methodName = "add(double, double)", value = AddNodeTP.class)
     private static final class Add1Node_ extends BaseNode_ {
 
-        Add1Node_(AddNodeTPNodeGen root) {
+        private final Class<?> leftNodeImplicitType;
+        private final Class<?> rightNodeImplicitType;
+
+        Add1Node_(AddNodeTPNodeGen root, Object leftNodeValue, Object rightNodeValue) {
             super(root, 2);
+            this.leftNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(leftNodeValue);
+            this.rightNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(rightNodeValue);
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            double leftNodeValue_;
-            try {
-                leftNodeValue_ = PascalTypesGen.expectDouble(root.leftNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            long rightNodeValue_;
-            try {
-                rightNodeValue_ = root.rightNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.add(leftNodeValue_, rightNodeValue_);
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.leftNodeImplicitType == ((Add1Node_) other).leftNodeImplicitType && this.rightNodeImplicitType == ((Add1Node_) other).rightNodeImplicitType;
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Long) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                long rightNodeValue_ = (long) rightNodeValue;
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue, leftNodeImplicitType) && PascalTypesGen.isImplicitDouble(rightNodeValue, rightNodeImplicitType)) {
+                double leftNodeValue_ = PascalTypesGen.asImplicitDouble(leftNodeValue, leftNodeImplicitType);
+                double rightNodeValue_ = PascalTypesGen.asImplicitDouble(rightNodeValue, rightNodeImplicitType);
                 return root.add(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add1Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "add(long, double)", value = AddNodeTP.class)
-    private static final class Add2Node_ extends BaseNode_ {
-
-        Add2Node_(AddNodeTPNodeGen root) {
-            super(root, 3);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            long leftNodeValue_;
-            try {
-                leftNodeValue_ = root.leftNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            double rightNodeValue_;
-            try {
-                rightNodeValue_ = PascalTypesGen.expectDouble(root.rightNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.add(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Long && rightNodeValue instanceof Double) {
-                long leftNodeValue_ = (long) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
-                return root.add(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add2Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "add(double, double)", value = AddNodeTP.class)
-    private static final class Add3Node_ extends BaseNode_ {
-
-        Add3Node_(AddNodeTPNodeGen root) {
-            super(root, 4);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Double) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
-                return root.add(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add3Node_(root);
+        static BaseNode_ create(AddNodeTPNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            return new Add1Node_(root, leftNodeValue, rightNodeValue);
         }
 
     }
     @GeneratedBy(methodName = "add(SetTypeValue, SetTypeValue)", value = AddNodeTP.class)
-    private static final class Add4Node_ extends BaseNode_ {
+    private static final class Add2Node_ extends BaseNode_ {
 
-        Add4Node_(AddNodeTPNodeGen root) {
-            super(root, 5);
+        Add2Node_(AddNodeTPNodeGen root) {
+            super(root, 3);
         }
 
         @Override
@@ -451,157 +351,47 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
         }
 
         static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add4Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "add(char, char)", value = AddNodeTP.class)
-    private static final class Add5Node_ extends BaseNode_ {
-
-        Add5Node_(AddNodeTPNodeGen root) {
-            super(root, 6);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            char leftNodeValue_;
-            try {
-                leftNodeValue_ = root.leftNode_.executeChar(frameValue);
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            char rightNodeValue_;
-            try {
-                rightNodeValue_ = root.rightNode_.executeChar(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.add(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Character && rightNodeValue instanceof Character) {
-                char leftNodeValue_ = (char) leftNodeValue;
-                char rightNodeValue_ = (char) rightNodeValue;
-                return root.add(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add5Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "add(char, String)", value = AddNodeTP.class)
-    private static final class Add6Node_ extends BaseNode_ {
-
-        Add6Node_(AddNodeTPNodeGen root) {
-            super(root, 7);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            char leftNodeValue_;
-            try {
-                leftNodeValue_ = root.leftNode_.executeChar(frameValue);
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            String rightNodeValue_;
-            try {
-                rightNodeValue_ = expectString(root.rightNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.add(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Character && rightNodeValue instanceof String) {
-                char leftNodeValue_ = (char) leftNodeValue;
-                String rightNodeValue_ = (String) rightNodeValue;
-                return root.add(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add6Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "add(PascalString, char)", value = AddNodeTP.class)
-    private static final class Add7Node_ extends BaseNode_ {
-
-        Add7Node_(AddNodeTPNodeGen root) {
-            super(root, 8);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            PascalString leftNodeValue_;
-            try {
-                leftNodeValue_ = PascalTypesGen.expectPascalString(root.leftNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            char rightNodeValue_;
-            try {
-                rightNodeValue_ = root.rightNode_.executeChar(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.add(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof PascalString && rightNodeValue instanceof Character) {
-                PascalString leftNodeValue_ = (PascalString) leftNodeValue;
-                char rightNodeValue_ = (char) rightNodeValue;
-                return root.add(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add7Node_(root);
+            return new Add2Node_(root);
         }
 
     }
     @GeneratedBy(methodName = "add(PascalString, PascalString)", value = AddNodeTP.class)
-    private static final class Add8Node_ extends BaseNode_ {
+    private static final class Add3Node_ extends BaseNode_ {
 
-        Add8Node_(AddNodeTPNodeGen root) {
-            super(root, 9);
+        private final Class<?> leftNodeImplicitType;
+        private final Class<?> rightNodeImplicitType;
+
+        Add3Node_(AddNodeTPNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            super(root, 4);
+            this.leftNodeImplicitType = PascalTypesGen.getImplicitPascalStringClass(leftNodeValue);
+            this.rightNodeImplicitType = PascalTypesGen.getImplicitPascalStringClass(rightNodeValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.leftNodeImplicitType == ((Add3Node_) other).leftNodeImplicitType && this.rightNodeImplicitType == ((Add3Node_) other).rightNodeImplicitType;
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof PascalString && rightNodeValue instanceof PascalString) {
-                PascalString leftNodeValue_ = (PascalString) leftNodeValue;
-                PascalString rightNodeValue_ = (PascalString) rightNodeValue;
+            if (PascalTypesGen.isImplicitPascalString(leftNodeValue, leftNodeImplicitType) && PascalTypesGen.isImplicitPascalString(rightNodeValue, rightNodeImplicitType)) {
+                PascalString leftNodeValue_ = PascalTypesGen.asImplicitPascalString(leftNodeValue, leftNodeImplicitType);
+                PascalString rightNodeValue_ = PascalTypesGen.asImplicitPascalString(rightNodeValue, rightNodeImplicitType);
                 return root.add(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add8Node_(root);
+        static BaseNode_ create(AddNodeTPNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            return new Add3Node_(root, leftNodeValue, rightNodeValue);
         }
 
     }
     @GeneratedBy(methodName = "add(PCharValue, PCharValue)", value = AddNodeTP.class)
-    private static final class Add9Node_ extends BaseNode_ {
+    private static final class Add4Node_ extends BaseNode_ {
 
-        Add9Node_(AddNodeTPNodeGen root) {
-            super(root, 10);
+        Add4Node_(AddNodeTPNodeGen root) {
+            super(root, 5);
         }
 
         @Override
@@ -615,7 +405,7 @@ public final class AddNodeTPNodeGen extends AddNodeTP implements SpecializedNode
         }
 
         static BaseNode_ create(AddNodeTPNodeGen root) {
-            return new Add9Node_(root);
+            return new Add4Node_(root);
         }
 
     }

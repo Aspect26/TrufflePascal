@@ -13,12 +13,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public abstract class SqrtBuiltinNode extends ExpressionNode {
 
     @Specialization
-    double integerSquareRootValue(long value) {
-        return computeSquareRoot(value);
-    }
-
-    @Specialization
-    double doubleSquareRootValue(double value) {
+    double sqrt(double value) {
         return computeSquareRoot(value);
     }
 

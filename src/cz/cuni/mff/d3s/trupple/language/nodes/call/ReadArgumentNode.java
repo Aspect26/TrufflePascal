@@ -22,7 +22,7 @@ public class ReadArgumentNode extends ExpressionNode {
 		if (index < args.length) {
 			return args[index];
 		} else {
-			return Null.SINGLETON;
+			return null;
 		}
 	}
 

@@ -13,16 +13,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public abstract class LnBuiltinNode extends ExpressionNode {
 
     @Specialization
-    double integerNaturalLogarithmValue(long value) {
-        return computeLogarithm(value);
-    }
-
-    @Specialization
-    double doubleNaturalLogarithmValue(double value) {
-        return computeLogarithm(value);
-    }
-
-    private double computeLogarithm(double value) {
+    double ln(double value) {
         if (value > 0) {
             return Math.log(value);
         } else {

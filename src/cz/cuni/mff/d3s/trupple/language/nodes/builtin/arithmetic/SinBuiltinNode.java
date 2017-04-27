@@ -12,12 +12,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public abstract class SinBuiltinNode extends ExpressionNode {
 
     @Specialization
-    double integerSinValue(long value) {
-        return Math.sin(value);
-    }
-
-    @Specialization
-    double doubleSinValue(double value) {
+    double sin(double value) {
         return Math.sin(value);
     }
 

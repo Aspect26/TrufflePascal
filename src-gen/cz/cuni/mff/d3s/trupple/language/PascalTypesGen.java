@@ -1,9 +1,9 @@
 // CheckStyle: start generated
 package cz.cuni.mff.d3s.trupple.language;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.GeneratedBy;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.FileValue;
@@ -213,11 +213,114 @@ public final class PascalTypesGen extends PascalTypes {
         throw new UnexpectedResultException(value);
     }
 
-    public static Null expectNull(Object value) throws UnexpectedResultException {
-        if (PascalTypes.isNull(value)) {
-            return PascalTypes.asPascalNull(value);
+    public static double asImplicitDouble(Object value) {
+        if (value instanceof Long) {
+            return castLongToDouble((long) value);
+        } else if (value instanceof Double) {
+            return (double) value;
+        } else {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            throw new IllegalArgumentException("Illegal type ");
         }
-        throw new UnexpectedResultException(value);
+    }
+
+    public static boolean isImplicitDouble(Object value) {
+        return value instanceof Long
+             || value instanceof Double;
+    }
+
+    public static double asImplicitDouble(Object value, Class<?> typeHint) {
+        if (typeHint == long.class) {
+            return castLongToDouble((long) value);
+        } else if (typeHint == double.class) {
+            return (double) value;
+        } else {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            throw new IllegalArgumentException("Illegal type ");
+        }
+    }
+
+    public static double expectImplicitDouble(Object value, Class<?> typeHint) throws UnexpectedResultException {
+        if (typeHint == long.class && value instanceof Long) {
+            return castLongToDouble((long) value);
+        } else if (typeHint == double.class && value instanceof Double) {
+            return (double) value;
+        } else {
+            throw new UnexpectedResultException(value);
+        }
+    }
+
+    public static boolean isImplicitDouble(Object value, Class<?> typeHint) {
+        return (typeHint == long.class && value instanceof Long)
+             || (typeHint == double.class && value instanceof Double);
+    }
+
+    public static Class<?> getImplicitDoubleClass(Object value) {
+        if (value instanceof Long) {
+            return long.class;
+        } else if (value instanceof Double) {
+            return double.class;
+        } else if (value == null) {
+            return Object.class;
+        } else {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            throw new IllegalArgumentException("Illegal type ");
+        }
+    }
+
+    public static PascalString asImplicitPascalString(Object value) {
+        if (value instanceof Character) {
+            return castCharToString((char) value);
+        } else if (value instanceof PascalString) {
+            return (PascalString) value;
+        } else {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            throw new IllegalArgumentException("Illegal type ");
+        }
+    }
+
+    public static boolean isImplicitPascalString(Object value) {
+        return value instanceof Character
+             || value instanceof PascalString;
+    }
+
+    public static PascalString asImplicitPascalString(Object value, Class<?> typeHint) {
+        if (typeHint == char.class) {
+            return castCharToString((char) value);
+        } else if (typeHint == PascalString.class) {
+            return (PascalString) value;
+        } else {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            throw new IllegalArgumentException("Illegal type ");
+        }
+    }
+
+    public static PascalString expectImplicitPascalString(Object value, Class<?> typeHint) throws UnexpectedResultException {
+        if (typeHint == char.class && value instanceof Character) {
+            return castCharToString((char) value);
+        } else if (typeHint == PascalString.class && value instanceof PascalString) {
+            return (PascalString) value;
+        } else {
+            throw new UnexpectedResultException(value);
+        }
+    }
+
+    public static boolean isImplicitPascalString(Object value, Class<?> typeHint) {
+        return (typeHint == char.class && value instanceof Character)
+             || (typeHint == PascalString.class && value instanceof PascalString);
+    }
+
+    public static Class<?> getImplicitPascalStringClass(Object value) {
+        if (value instanceof Character) {
+            return char.class;
+        } else if (value instanceof PascalString) {
+            return PascalString.class;
+        } else if (value == null) {
+            return Object.class;
+        } else {
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+            throw new IllegalArgumentException("Illegal type ");
+        }
     }
 
 }

@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
@@ -120,33 +121,23 @@ public final class LessThanNodeGen extends LessThanNode implements SpecializedNo
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (rightNodeValue instanceof Long) {
-                if (leftNodeValue instanceof Long) {
-                    return LessThan0Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return LessThan1Node_.create(root);
-                }
+            if (leftNodeValue instanceof Long && rightNodeValue instanceof Long) {
+                return LessThan0Node_.create(root);
             }
-            if (rightNodeValue instanceof Double) {
-                if (leftNodeValue instanceof Long) {
-                    return LessThan2Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return LessThan3Node_.create(root);
-                }
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue) && PascalTypesGen.isImplicitDouble(rightNodeValue)) {
+                return LessThan1Node_.create(root, leftNodeValue, rightNodeValue);
             }
             if (leftNodeValue instanceof Character && rightNodeValue instanceof Character) {
-                return LessThan4Node_.create(root);
+                return LessThan2Node_.create(root);
             }
             if (leftNodeValue instanceof Boolean && rightNodeValue instanceof Boolean) {
-                return LessThan5Node_.create(root);
+                return LessThan3Node_.create(root);
             }
             if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
-                return LessThan6Node_.create(root);
+                return LessThan4Node_.create(root);
             }
             if (leftNodeValue instanceof EnumValue && rightNodeValue instanceof EnumValue) {
-                return LessThan7Node_.create(root);
+                return LessThan5Node_.create(root);
             }
             return null;
         }
@@ -324,115 +315,45 @@ public final class LessThanNodeGen extends LessThanNode implements SpecializedNo
         }
 
     }
-    @GeneratedBy(methodName = "lessThan(double, long)", value = LessThanNode.class)
+    @GeneratedBy(methodName = "lessThan(double, double)", value = LessThanNode.class)
     private static final class LessThan1Node_ extends BaseNode_ {
 
-        LessThan1Node_(LessThanNodeGen root) {
+        private final Class<?> leftNodeImplicitType;
+        private final Class<?> rightNodeImplicitType;
+
+        LessThan1Node_(LessThanNodeGen root, Object leftNodeValue, Object rightNodeValue) {
             super(root, 2);
+            this.leftNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(leftNodeValue);
+            this.rightNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(rightNodeValue);
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            return executeBoolean(frameValue);
-        }
-
-        @Override
-        public boolean executeBoolean(VirtualFrame frameValue) {
-            double leftNodeValue_;
-            try {
-                leftNodeValue_ = PascalTypesGen.expectDouble(root.leftNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().executeBoolean_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            long rightNodeValue_;
-            try {
-                rightNodeValue_ = root.rightNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeBoolean_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.lessThan(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public boolean executeBoolean_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Long) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                long rightNodeValue_ = (long) rightNodeValue;
-                return root.lessThan(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().executeBoolean_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(LessThanNodeGen root) {
-            return new LessThan1Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "lessThan(long, double)", value = LessThanNode.class)
-    private static final class LessThan2Node_ extends BaseNode_ {
-
-        LessThan2Node_(LessThanNodeGen root) {
-            super(root, 3);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            return executeBoolean(frameValue);
-        }
-
-        @Override
-        public boolean executeBoolean(VirtualFrame frameValue) {
-            long leftNodeValue_;
-            try {
-                leftNodeValue_ = root.leftNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().executeBoolean_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            double rightNodeValue_;
-            try {
-                rightNodeValue_ = PascalTypesGen.expectDouble(root.rightNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeBoolean_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.lessThan(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public boolean executeBoolean_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Long && rightNodeValue instanceof Double) {
-                long leftNodeValue_ = (long) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
-                return root.lessThan(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().executeBoolean_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(LessThanNodeGen root) {
-            return new LessThan2Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "lessThan(double, double)", value = LessThanNode.class)
-    private static final class LessThan3Node_ extends BaseNode_ {
-
-        LessThan3Node_(LessThanNodeGen root) {
-            super(root, 4);
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.leftNodeImplicitType == ((LessThan1Node_) other).leftNodeImplicitType && this.rightNodeImplicitType == ((LessThan1Node_) other).rightNodeImplicitType;
         }
 
         @Override
         public boolean executeBoolean(VirtualFrame frameValue) {
             double leftNodeValue_;
             try {
-                leftNodeValue_ = PascalTypesGen.expectDouble(root.leftNode_.executeGeneric(frameValue));
+                if (leftNodeImplicitType == long.class) {
+                    leftNodeValue_ = PascalTypes.castLongToDouble(root.leftNode_.executeLong(frameValue));
+                } else {
+                    Object leftNodeValue__ = executeLeftNode_(frameValue);
+                    leftNodeValue_ = PascalTypesGen.expectImplicitDouble(leftNodeValue__, leftNodeImplicitType);
+                }
             } catch (UnexpectedResultException ex) {
                 Object rightNodeValue = executeRightNode_(frameValue);
                 return getNext().executeBoolean_(frameValue, ex.getResult(), rightNodeValue);
             }
             double rightNodeValue_;
             try {
-                rightNodeValue_ = PascalTypesGen.expectDouble(root.rightNode_.executeGeneric(frameValue));
+                if (rightNodeImplicitType == long.class) {
+                    rightNodeValue_ = PascalTypes.castLongToDouble(root.rightNode_.executeLong(frameValue));
+                } else {
+                    Object rightNodeValue__ = executeRightNode_(frameValue);
+                    rightNodeValue_ = PascalTypesGen.expectImplicitDouble(rightNodeValue__, rightNodeImplicitType);
+                }
             } catch (UnexpectedResultException ex) {
                 return getNext().executeBoolean_(frameValue, leftNodeValue_, ex.getResult());
             }
@@ -441,24 +362,24 @@ public final class LessThanNodeGen extends LessThanNode implements SpecializedNo
 
         @Override
         public boolean executeBoolean_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Double) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue, leftNodeImplicitType) && PascalTypesGen.isImplicitDouble(rightNodeValue, rightNodeImplicitType)) {
+                double leftNodeValue_ = PascalTypesGen.asImplicitDouble(leftNodeValue, leftNodeImplicitType);
+                double rightNodeValue_ = PascalTypesGen.asImplicitDouble(rightNodeValue, rightNodeImplicitType);
                 return root.lessThan(leftNodeValue_, rightNodeValue_);
             }
             return getNext().executeBoolean_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(LessThanNodeGen root) {
-            return new LessThan3Node_(root);
+        static BaseNode_ create(LessThanNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            return new LessThan1Node_(root, leftNodeValue, rightNodeValue);
         }
 
     }
     @GeneratedBy(methodName = "lessThan(char, char)", value = LessThanNode.class)
-    private static final class LessThan4Node_ extends BaseNode_ {
+    private static final class LessThan2Node_ extends BaseNode_ {
 
-        LessThan4Node_(LessThanNodeGen root) {
-            super(root, 5);
+        LessThan2Node_(LessThanNodeGen root) {
+            super(root, 3);
         }
 
         @Override
@@ -495,15 +416,15 @@ public final class LessThanNodeGen extends LessThanNode implements SpecializedNo
         }
 
         static BaseNode_ create(LessThanNodeGen root) {
-            return new LessThan4Node_(root);
+            return new LessThan2Node_(root);
         }
 
     }
     @GeneratedBy(methodName = "lessThan(boolean, boolean)", value = LessThanNode.class)
-    private static final class LessThan5Node_ extends BaseNode_ {
+    private static final class LessThan3Node_ extends BaseNode_ {
 
-        LessThan5Node_(LessThanNodeGen root) {
-            super(root, 6);
+        LessThan3Node_(LessThanNodeGen root) {
+            super(root, 4);
         }
 
         @Override
@@ -540,15 +461,15 @@ public final class LessThanNodeGen extends LessThanNode implements SpecializedNo
         }
 
         static BaseNode_ create(LessThanNodeGen root) {
-            return new LessThan5Node_(root);
+            return new LessThan3Node_(root);
         }
 
     }
     @GeneratedBy(methodName = "lessThan(SetTypeValue, SetTypeValue)", value = LessThanNode.class)
-    private static final class LessThan6Node_ extends BaseNode_ {
+    private static final class LessThan4Node_ extends BaseNode_ {
 
-        LessThan6Node_(LessThanNodeGen root) {
-            super(root, 7);
+        LessThan4Node_(LessThanNodeGen root) {
+            super(root, 5);
         }
 
         @Override
@@ -580,15 +501,15 @@ public final class LessThanNodeGen extends LessThanNode implements SpecializedNo
         }
 
         static BaseNode_ create(LessThanNodeGen root) {
-            return new LessThan6Node_(root);
+            return new LessThan4Node_(root);
         }
 
     }
     @GeneratedBy(methodName = "lessThan(EnumValue, EnumValue)", value = LessThanNode.class)
-    private static final class LessThan7Node_ extends BaseNode_ {
+    private static final class LessThan5Node_ extends BaseNode_ {
 
-        LessThan7Node_(LessThanNodeGen root) {
-            super(root, 8);
+        LessThan5Node_(LessThanNodeGen root) {
+            super(root, 6);
         }
 
         @Override
@@ -620,7 +541,7 @@ public final class LessThanNodeGen extends LessThanNode implements SpecializedNo
         }
 
         static BaseNode_ create(LessThanNodeGen root) {
-            return new LessThan7Node_(root);
+            return new LessThan5Node_(root);
         }
 
     }

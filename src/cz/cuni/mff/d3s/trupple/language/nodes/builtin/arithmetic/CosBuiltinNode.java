@@ -12,12 +12,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public abstract class CosBuiltinNode extends ExpressionNode {
 
     @Specialization
-    double integerCosValue(long value) {
-        return Math.cos(value);
-    }
-
-    @Specialization
-    double doubleCosValue(double value) {
+    double cos(double value) {
         return Math.cos(value);
     }
 

@@ -27,16 +27,6 @@ public abstract class SubtractNode extends BinaryNode {
 	}
 
 	@Specialization
-	double sub(double left, long right) {
-		return left - right;
-	}
-
-	@Specialization
-	double sub(long left, double right) {
-		return left - right;
-	}
-
-	@Specialization
 	double sub(double left, double right) {
 		return left - right;
 	}

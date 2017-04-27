@@ -20,20 +20,10 @@ public abstract class MultiplyNode extends BinaryNode {
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), RealDescriptor.getInstance()), RealDescriptor.getInstance());
     }
 
-	@Specialization
-	long mul(long left, long right) {
-		return left * right;
-	}
-
-	@Specialization
-	double mul(double left, long right) {
-		return left * right;
-	}
-
-	@Specialization
-	double mul(long left, double right) {
-		return left * right;
-	}
+    @Specialization
+    long mul(long left, long right) {
+        return left * right;
+    }
 
 	@Specialization
 	double mul(double left, double right) {

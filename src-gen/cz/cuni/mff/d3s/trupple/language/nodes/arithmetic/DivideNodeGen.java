@@ -109,21 +109,8 @@ public final class DivideNodeGen extends DivideNode implements SpecializedNode {
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (rightNodeValue instanceof Long) {
-                if (leftNodeValue instanceof Long) {
-                    return Div0Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return Div1Node_.create(root);
-                }
-            }
-            if (rightNodeValue instanceof Double) {
-                if (leftNodeValue instanceof Long) {
-                    return Div2Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return Div3Node_.create(root);
-                }
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue) && PascalTypesGen.isImplicitDouble(rightNodeValue)) {
+                return DivNode_.create(root, leftNodeValue, rightNodeValue);
             }
             return null;
         }
@@ -233,145 +220,35 @@ public final class DivideNodeGen extends DivideNode implements SpecializedNode {
         }
 
     }
-    @GeneratedBy(methodName = "div(long, long)", value = DivideNode.class)
-    private static final class Div0Node_ extends BaseNode_ {
-
-        Div0Node_(DivideNodeGen root) {
-            super(root, 1);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            long leftNodeValue_;
-            try {
-                leftNodeValue_ = root.leftNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().executeDouble_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            long rightNodeValue_;
-            try {
-                rightNodeValue_ = root.rightNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeDouble_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.div(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public double executeDouble_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Long && rightNodeValue instanceof Long) {
-                long leftNodeValue_ = (long) leftNodeValue;
-                long rightNodeValue_ = (long) rightNodeValue;
-                return root.div(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().executeDouble_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(DivideNodeGen root) {
-            return new Div0Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "div(double, long)", value = DivideNode.class)
-    private static final class Div1Node_ extends BaseNode_ {
-
-        Div1Node_(DivideNodeGen root) {
-            super(root, 2);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            double leftNodeValue_;
-            try {
-                leftNodeValue_ = PascalTypesGen.expectDouble(root.leftNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().executeDouble_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            long rightNodeValue_;
-            try {
-                rightNodeValue_ = root.rightNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeDouble_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.div(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public double executeDouble_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Long) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                long rightNodeValue_ = (long) rightNodeValue;
-                return root.div(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().executeDouble_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(DivideNodeGen root) {
-            return new Div1Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "div(long, double)", value = DivideNode.class)
-    private static final class Div2Node_ extends BaseNode_ {
-
-        Div2Node_(DivideNodeGen root) {
-            super(root, 3);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            long leftNodeValue_;
-            try {
-                leftNodeValue_ = root.leftNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().executeDouble_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            double rightNodeValue_;
-            try {
-                rightNodeValue_ = PascalTypesGen.expectDouble(root.rightNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeDouble_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.div(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public double executeDouble_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Long && rightNodeValue instanceof Double) {
-                long leftNodeValue_ = (long) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
-                return root.div(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().executeDouble_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(DivideNodeGen root) {
-            return new Div2Node_(root);
-        }
-
-    }
     @GeneratedBy(methodName = "div(double, double)", value = DivideNode.class)
-    private static final class Div3Node_ extends BaseNode_ {
+    private static final class DivNode_ extends BaseNode_ {
 
-        Div3Node_(DivideNodeGen root) {
-            super(root, 4);
+        private final Class<?> leftNodeImplicitType;
+        private final Class<?> rightNodeImplicitType;
+
+        DivNode_(DivideNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            super(root, 1);
+            this.leftNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(leftNodeValue);
+            this.rightNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(rightNodeValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.leftNodeImplicitType == ((DivNode_) other).leftNodeImplicitType && this.rightNodeImplicitType == ((DivNode_) other).rightNodeImplicitType;
         }
 
         @Override
         public double executeDouble_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Double) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue, leftNodeImplicitType) && PascalTypesGen.isImplicitDouble(rightNodeValue, rightNodeImplicitType)) {
+                double leftNodeValue_ = PascalTypesGen.asImplicitDouble(leftNodeValue, leftNodeImplicitType);
+                double rightNodeValue_ = PascalTypesGen.asImplicitDouble(rightNodeValue, rightNodeImplicitType);
                 return root.div(leftNodeValue_, rightNodeValue_);
             }
             return getNext().executeDouble_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(DivideNodeGen root) {
-            return new Div3Node_(root);
+        static BaseNode_ create(DivideNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            return new DivNode_(root, leftNodeValue, rightNodeValue);
         }
 
     }

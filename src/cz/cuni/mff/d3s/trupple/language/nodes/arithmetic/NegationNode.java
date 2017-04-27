@@ -7,12 +7,12 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 public abstract class NegationNode extends UnaryNode {;
 
 	@Specialization
-	protected long neg(long argument) {
+	long neg(long argument) {
 		return -argument;
 	}
 
 	@Specialization
-	protected double neg(double argument) {
+	double neg(double argument) {
 		return -argument;
 	}
 

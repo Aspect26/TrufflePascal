@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 @GeneratedBy(LnBuiltinNode.class)
@@ -94,11 +95,8 @@ public final class LnBuiltinNodeGen extends LnBuiltinNode implements Specialized
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Long) {
-                return IntegerNaturalLogarithmValueNode_.create(root);
-            }
-            if (argumentValue instanceof Double) {
-                return UbleNaturalLogarithmValueNode_.create(root);
+            if (PascalTypesGen.isImplicitDouble(argumentValue)) {
+                return LnNode_.create(root, argumentValue);
             }
             return null;
         }
@@ -180,56 +178,32 @@ public final class LnBuiltinNodeGen extends LnBuiltinNode implements Specialized
         }
 
     }
-    @GeneratedBy(methodName = "integerNaturalLogarithmValue(long)", value = LnBuiltinNode.class)
-    private static final class IntegerNaturalLogarithmValueNode_ extends BaseNode_ {
+    @GeneratedBy(methodName = "ln(double)", value = LnBuiltinNode.class)
+    private static final class LnNode_ extends BaseNode_ {
 
-        IntegerNaturalLogarithmValueNode_(LnBuiltinNodeGen root) {
+        private final Class<?> argumentImplicitType;
+
+        LnNode_(LnBuiltinNodeGen root, Object argumentValue) {
             super(root, 1);
+            this.argumentImplicitType = PascalTypesGen.getImplicitDoubleClass(argumentValue);
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            long argumentValue_;
-            try {
-                argumentValue_ = root.argument_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().executeDouble_(frameValue, ex.getResult());
-            }
-            return root.integerNaturalLogarithmValue(argumentValue_);
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.argumentImplicitType == ((LnNode_) other).argumentImplicitType;
         }
 
         @Override
         public double executeDouble_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Long) {
-                long argumentValue_ = (long) argumentValue;
-                return root.integerNaturalLogarithmValue(argumentValue_);
+            if (PascalTypesGen.isImplicitDouble(argumentValue, argumentImplicitType)) {
+                double argumentValue_ = PascalTypesGen.asImplicitDouble(argumentValue, argumentImplicitType);
+                return root.ln(argumentValue_);
             }
             return getNext().executeDouble_(frameValue, argumentValue);
         }
 
-        static BaseNode_ create(LnBuiltinNodeGen root) {
-            return new IntegerNaturalLogarithmValueNode_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "doubleNaturalLogarithmValue(double)", value = LnBuiltinNode.class)
-    private static final class UbleNaturalLogarithmValueNode_ extends BaseNode_ {
-
-        UbleNaturalLogarithmValueNode_(LnBuiltinNodeGen root) {
-            super(root, 2);
-        }
-
-        @Override
-        public double executeDouble_(VirtualFrame frameValue, Object argumentValue) {
-            if (argumentValue instanceof Double) {
-                double argumentValue_ = (double) argumentValue;
-                return root.doubleNaturalLogarithmValue(argumentValue_);
-            }
-            return getNext().executeDouble_(frameValue, argumentValue);
-        }
-
-        static BaseNode_ create(LnBuiltinNodeGen root) {
-            return new UbleNaturalLogarithmValueNode_(root);
+        static BaseNode_ create(LnBuiltinNodeGen root, Object argumentValue) {
+            return new LnNode_(root, argumentValue);
         }
 
     }

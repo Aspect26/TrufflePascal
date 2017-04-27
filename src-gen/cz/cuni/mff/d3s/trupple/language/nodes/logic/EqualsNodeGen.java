@@ -11,6 +11,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
@@ -127,17 +128,20 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
             if (leftNodeValue instanceof Long && rightNodeValue instanceof Long) {
                 return Equals1Node_.create(root);
             }
-            if (leftNodeValue instanceof Character && rightNodeValue instanceof Character) {
-                return Equals2Node_.create(root);
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue) && PascalTypesGen.isImplicitDouble(rightNodeValue)) {
+                return Equals2Node_.create(root, leftNodeValue, rightNodeValue);
             }
-            if (leftNodeValue instanceof EnumValue && rightNodeValue instanceof EnumValue) {
+            if (leftNodeValue instanceof Character && rightNodeValue instanceof Character) {
                 return Equals3Node_.create(root);
             }
-            if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
+            if (leftNodeValue instanceof EnumValue && rightNodeValue instanceof EnumValue) {
                 return Equals4Node_.create(root);
             }
-            if (leftNodeValue instanceof PointerValue && rightNodeValue instanceof PointerValue) {
+            if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
                 return Equals5Node_.create(root);
+            }
+            if (leftNodeValue instanceof PointerValue && rightNodeValue instanceof PointerValue) {
+                return Equals6Node_.create(root);
             }
             return null;
         }
@@ -360,11 +364,71 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
         }
 
     }
-    @GeneratedBy(methodName = "equals(char, char)", value = EqualsNode.class)
+    @GeneratedBy(methodName = "equals(double, double)", value = EqualsNode.class)
     private static final class Equals2Node_ extends BaseNode_ {
 
-        Equals2Node_(EqualsNodeGen root) {
+        private final Class<?> leftNodeImplicitType;
+        private final Class<?> rightNodeImplicitType;
+
+        Equals2Node_(EqualsNodeGen root, Object leftNodeValue, Object rightNodeValue) {
             super(root, 3);
+            this.leftNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(leftNodeValue);
+            this.rightNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(rightNodeValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.leftNodeImplicitType == ((Equals2Node_) other).leftNodeImplicitType && this.rightNodeImplicitType == ((Equals2Node_) other).rightNodeImplicitType;
+        }
+
+        @Override
+        public boolean executeBoolean(VirtualFrame frameValue) {
+            double leftNodeValue_;
+            try {
+                if (leftNodeImplicitType == long.class) {
+                    leftNodeValue_ = PascalTypes.castLongToDouble(root.leftNode_.executeLong(frameValue));
+                } else {
+                    Object leftNodeValue__ = executeLeftNode_(frameValue);
+                    leftNodeValue_ = PascalTypesGen.expectImplicitDouble(leftNodeValue__, leftNodeImplicitType);
+                }
+            } catch (UnexpectedResultException ex) {
+                Object rightNodeValue = executeRightNode_(frameValue);
+                return getNext().executeBoolean_(frameValue, ex.getResult(), rightNodeValue);
+            }
+            double rightNodeValue_;
+            try {
+                if (rightNodeImplicitType == long.class) {
+                    rightNodeValue_ = PascalTypes.castLongToDouble(root.rightNode_.executeLong(frameValue));
+                } else {
+                    Object rightNodeValue__ = executeRightNode_(frameValue);
+                    rightNodeValue_ = PascalTypesGen.expectImplicitDouble(rightNodeValue__, rightNodeImplicitType);
+                }
+            } catch (UnexpectedResultException ex) {
+                return getNext().executeBoolean_(frameValue, leftNodeValue_, ex.getResult());
+            }
+            return root.equals(leftNodeValue_, rightNodeValue_);
+        }
+
+        @Override
+        public boolean executeBoolean_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue, leftNodeImplicitType) && PascalTypesGen.isImplicitDouble(rightNodeValue, rightNodeImplicitType)) {
+                double leftNodeValue_ = PascalTypesGen.asImplicitDouble(leftNodeValue, leftNodeImplicitType);
+                double rightNodeValue_ = PascalTypesGen.asImplicitDouble(rightNodeValue, rightNodeImplicitType);
+                return root.equals(leftNodeValue_, rightNodeValue_);
+            }
+            return getNext().executeBoolean_(frameValue, leftNodeValue, rightNodeValue);
+        }
+
+        static BaseNode_ create(EqualsNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            return new Equals2Node_(root, leftNodeValue, rightNodeValue);
+        }
+
+    }
+    @GeneratedBy(methodName = "equals(char, char)", value = EqualsNode.class)
+    private static final class Equals3Node_ extends BaseNode_ {
+
+        Equals3Node_(EqualsNodeGen root) {
+            super(root, 4);
         }
 
         @Override
@@ -401,15 +465,15 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
         }
 
         static BaseNode_ create(EqualsNodeGen root) {
-            return new Equals2Node_(root);
+            return new Equals3Node_(root);
         }
 
     }
     @GeneratedBy(methodName = "equals(EnumValue, EnumValue)", value = EqualsNode.class)
-    private static final class Equals3Node_ extends BaseNode_ {
+    private static final class Equals4Node_ extends BaseNode_ {
 
-        Equals3Node_(EqualsNodeGen root) {
-            super(root, 4);
+        Equals4Node_(EqualsNodeGen root) {
+            super(root, 5);
         }
 
         @Override
@@ -441,15 +505,15 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
         }
 
         static BaseNode_ create(EqualsNodeGen root) {
-            return new Equals3Node_(root);
+            return new Equals4Node_(root);
         }
 
     }
     @GeneratedBy(methodName = "equals(SetTypeValue, SetTypeValue)", value = EqualsNode.class)
-    private static final class Equals4Node_ extends BaseNode_ {
+    private static final class Equals5Node_ extends BaseNode_ {
 
-        Equals4Node_(EqualsNodeGen root) {
-            super(root, 5);
+        Equals5Node_(EqualsNodeGen root) {
+            super(root, 6);
         }
 
         @Override
@@ -481,15 +545,15 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
         }
 
         static BaseNode_ create(EqualsNodeGen root) {
-            return new Equals4Node_(root);
+            return new Equals5Node_(root);
         }
 
     }
     @GeneratedBy(methodName = "equals(PointerValue, PointerValue)", value = EqualsNode.class)
-    private static final class Equals5Node_ extends BaseNode_ {
+    private static final class Equals6Node_ extends BaseNode_ {
 
-        Equals5Node_(EqualsNodeGen root) {
-            super(root, 6);
+        Equals6Node_(EqualsNodeGen root) {
+            super(root, 7);
         }
 
         @Override
@@ -521,7 +585,7 @@ public final class EqualsNodeGen extends EqualsNode implements SpecializedNode {
         }
 
         static BaseNode_ create(EqualsNodeGen root) {
-            return new Equals5Node_(root);
+            return new Equals6Node_(root);
         }
 
     }

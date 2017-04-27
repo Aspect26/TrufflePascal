@@ -119,24 +119,14 @@ public final class MultiplyNodeGen extends MultiplyNode implements SpecializedNo
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (rightNodeValue instanceof Long) {
-                if (leftNodeValue instanceof Long) {
-                    return Mul0Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return Mul1Node_.create(root);
-                }
+            if (leftNodeValue instanceof Long && rightNodeValue instanceof Long) {
+                return Mul0Node_.create(root);
             }
-            if (rightNodeValue instanceof Double) {
-                if (leftNodeValue instanceof Long) {
-                    return Mul2Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return Mul3Node_.create(root);
-                }
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue) && PascalTypesGen.isImplicitDouble(rightNodeValue)) {
+                return Mul1Node_.create(root, leftNodeValue, rightNodeValue);
             }
             if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
-                return Mul4Node_.create(root);
+                return Mul2Node_.create(root);
             }
             return null;
         }
@@ -295,113 +285,43 @@ public final class MultiplyNodeGen extends MultiplyNode implements SpecializedNo
         }
 
     }
-    @GeneratedBy(methodName = "mul(double, long)", value = MultiplyNode.class)
+    @GeneratedBy(methodName = "mul(double, double)", value = MultiplyNode.class)
     private static final class Mul1Node_ extends BaseNode_ {
 
-        Mul1Node_(MultiplyNodeGen root) {
+        private final Class<?> leftNodeImplicitType;
+        private final Class<?> rightNodeImplicitType;
+
+        Mul1Node_(MultiplyNodeGen root, Object leftNodeValue, Object rightNodeValue) {
             super(root, 2);
+            this.leftNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(leftNodeValue);
+            this.rightNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(rightNodeValue);
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            double leftNodeValue_;
-            try {
-                leftNodeValue_ = PascalTypesGen.expectDouble(root.leftNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            long rightNodeValue_;
-            try {
-                rightNodeValue_ = root.rightNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.mul(leftNodeValue_, rightNodeValue_);
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.leftNodeImplicitType == ((Mul1Node_) other).leftNodeImplicitType && this.rightNodeImplicitType == ((Mul1Node_) other).rightNodeImplicitType;
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Long) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                long rightNodeValue_ = (long) rightNodeValue;
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue, leftNodeImplicitType) && PascalTypesGen.isImplicitDouble(rightNodeValue, rightNodeImplicitType)) {
+                double leftNodeValue_ = PascalTypesGen.asImplicitDouble(leftNodeValue, leftNodeImplicitType);
+                double rightNodeValue_ = PascalTypesGen.asImplicitDouble(rightNodeValue, rightNodeImplicitType);
                 return root.mul(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(MultiplyNodeGen root) {
-            return new Mul1Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "mul(long, double)", value = MultiplyNode.class)
-    private static final class Mul2Node_ extends BaseNode_ {
-
-        Mul2Node_(MultiplyNodeGen root) {
-            super(root, 3);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            long leftNodeValue_;
-            try {
-                leftNodeValue_ = root.leftNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            double rightNodeValue_;
-            try {
-                rightNodeValue_ = PascalTypesGen.expectDouble(root.rightNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.mul(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Long && rightNodeValue instanceof Double) {
-                long leftNodeValue_ = (long) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
-                return root.mul(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(MultiplyNodeGen root) {
-            return new Mul2Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "mul(double, double)", value = MultiplyNode.class)
-    private static final class Mul3Node_ extends BaseNode_ {
-
-        Mul3Node_(MultiplyNodeGen root) {
-            super(root, 4);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Double) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
-                return root.mul(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(MultiplyNodeGen root) {
-            return new Mul3Node_(root);
+        static BaseNode_ create(MultiplyNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            return new Mul1Node_(root, leftNodeValue, rightNodeValue);
         }
 
     }
     @GeneratedBy(methodName = "mul(SetTypeValue, SetTypeValue)", value = MultiplyNode.class)
-    private static final class Mul4Node_ extends BaseNode_ {
+    private static final class Mul2Node_ extends BaseNode_ {
 
-        Mul4Node_(MultiplyNodeGen root) {
-            super(root, 5);
+        Mul2Node_(MultiplyNodeGen root) {
+            super(root, 3);
         }
 
         @Override
@@ -415,7 +335,7 @@ public final class MultiplyNodeGen extends MultiplyNode implements SpecializedNo
         }
 
         static BaseNode_ create(MultiplyNodeGen root) {
-            return new Mul4Node_(root);
+            return new Mul2Node_(root);
         }
 
     }

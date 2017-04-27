@@ -119,24 +119,14 @@ public final class SubtractNodeGen extends SubtractNode implements SpecializedNo
 
         @Override
         protected final SpecializationNode createNext(Frame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (rightNodeValue instanceof Long) {
-                if (leftNodeValue instanceof Long) {
-                    return Sub0Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return Sub1Node_.create(root);
-                }
+            if (leftNodeValue instanceof Long && rightNodeValue instanceof Long) {
+                return Sub0Node_.create(root);
             }
-            if (rightNodeValue instanceof Double) {
-                if (leftNodeValue instanceof Long) {
-                    return Sub2Node_.create(root);
-                }
-                if (leftNodeValue instanceof Double) {
-                    return Sub3Node_.create(root);
-                }
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue) && PascalTypesGen.isImplicitDouble(rightNodeValue)) {
+                return Sub1Node_.create(root, leftNodeValue, rightNodeValue);
             }
             if (leftNodeValue instanceof SetTypeValue && rightNodeValue instanceof SetTypeValue) {
-                return Sub4Node_.create(root);
+                return Sub2Node_.create(root);
             }
             return null;
         }
@@ -295,113 +285,43 @@ public final class SubtractNodeGen extends SubtractNode implements SpecializedNo
         }
 
     }
-    @GeneratedBy(methodName = "sub(double, long)", value = SubtractNode.class)
+    @GeneratedBy(methodName = "sub(double, double)", value = SubtractNode.class)
     private static final class Sub1Node_ extends BaseNode_ {
 
-        Sub1Node_(SubtractNodeGen root) {
+        private final Class<?> leftNodeImplicitType;
+        private final Class<?> rightNodeImplicitType;
+
+        Sub1Node_(SubtractNodeGen root, Object leftNodeValue, Object rightNodeValue) {
             super(root, 2);
+            this.leftNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(leftNodeValue);
+            this.rightNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(rightNodeValue);
         }
 
         @Override
-        public Object execute(VirtualFrame frameValue) {
-            double leftNodeValue_;
-            try {
-                leftNodeValue_ = PascalTypesGen.expectDouble(root.leftNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            long rightNodeValue_;
-            try {
-                rightNodeValue_ = root.rightNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.sub(leftNodeValue_, rightNodeValue_);
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.leftNodeImplicitType == ((Sub1Node_) other).leftNodeImplicitType && this.rightNodeImplicitType == ((Sub1Node_) other).rightNodeImplicitType;
         }
 
         @Override
         public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Long) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                long rightNodeValue_ = (long) rightNodeValue;
+            if (PascalTypesGen.isImplicitDouble(leftNodeValue, leftNodeImplicitType) && PascalTypesGen.isImplicitDouble(rightNodeValue, rightNodeImplicitType)) {
+                double leftNodeValue_ = PascalTypesGen.asImplicitDouble(leftNodeValue, leftNodeImplicitType);
+                double rightNodeValue_ = PascalTypesGen.asImplicitDouble(rightNodeValue, rightNodeImplicitType);
                 return root.sub(leftNodeValue_, rightNodeValue_);
             }
             return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
         }
 
-        static BaseNode_ create(SubtractNodeGen root) {
-            return new Sub1Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "sub(long, double)", value = SubtractNode.class)
-    private static final class Sub2Node_ extends BaseNode_ {
-
-        Sub2Node_(SubtractNodeGen root) {
-            super(root, 3);
-        }
-
-        @Override
-        public Object execute(VirtualFrame frameValue) {
-            long leftNodeValue_;
-            try {
-                leftNodeValue_ = root.leftNode_.executeLong(frameValue);
-            } catch (UnexpectedResultException ex) {
-                Object rightNodeValue = executeRightNode_(frameValue);
-                return getNext().execute_(frameValue, ex.getResult(), rightNodeValue);
-            }
-            double rightNodeValue_;
-            try {
-                rightNodeValue_ = PascalTypesGen.expectDouble(root.rightNode_.executeGeneric(frameValue));
-            } catch (UnexpectedResultException ex) {
-                return getNext().execute_(frameValue, leftNodeValue_, ex.getResult());
-            }
-            return root.sub(leftNodeValue_, rightNodeValue_);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Long && rightNodeValue instanceof Double) {
-                long leftNodeValue_ = (long) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
-                return root.sub(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(SubtractNodeGen root) {
-            return new Sub2Node_(root);
-        }
-
-    }
-    @GeneratedBy(methodName = "sub(double, double)", value = SubtractNode.class)
-    private static final class Sub3Node_ extends BaseNode_ {
-
-        Sub3Node_(SubtractNodeGen root) {
-            super(root, 4);
-        }
-
-        @Override
-        public Object execute_(VirtualFrame frameValue, Object leftNodeValue, Object rightNodeValue) {
-            if (leftNodeValue instanceof Double && rightNodeValue instanceof Double) {
-                double leftNodeValue_ = (double) leftNodeValue;
-                double rightNodeValue_ = (double) rightNodeValue;
-                return root.sub(leftNodeValue_, rightNodeValue_);
-            }
-            return getNext().execute_(frameValue, leftNodeValue, rightNodeValue);
-        }
-
-        static BaseNode_ create(SubtractNodeGen root) {
-            return new Sub3Node_(root);
+        static BaseNode_ create(SubtractNodeGen root, Object leftNodeValue, Object rightNodeValue) {
+            return new Sub1Node_(root, leftNodeValue, rightNodeValue);
         }
 
     }
     @GeneratedBy(methodName = "sub(SetTypeValue, SetTypeValue)", value = SubtractNode.class)
-    private static final class Sub4Node_ extends BaseNode_ {
+    private static final class Sub2Node_ extends BaseNode_ {
 
-        Sub4Node_(SubtractNodeGen root) {
-            super(root, 5);
+        Sub2Node_(SubtractNodeGen root) {
+            super(root, 3);
         }
 
         @Override
@@ -415,7 +335,7 @@ public final class SubtractNodeGen extends SubtractNode implements SpecializedNo
         }
 
         static BaseNode_ create(SubtractNodeGen root) {
-            return new Sub4Node_(root);
+            return new Sub2Node_(root);
         }
 
     }
