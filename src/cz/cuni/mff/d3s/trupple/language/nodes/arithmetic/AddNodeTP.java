@@ -2,8 +2,8 @@ package cz.cuni.mff.d3s.trupple.language.nodes.arithmetic;
 
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PCharValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PCharValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryArgumentPrimitiveTypes;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;

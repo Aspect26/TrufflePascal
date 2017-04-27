@@ -3,15 +3,15 @@ package cz.cuni.mff.d3s.trupple.language;
 
 import com.oracle.truffle.api.dsl.GeneratedBy;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
-import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.FileValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalString;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.SetTypeValue;
 
 @GeneratedBy(PascalTypes.class)
 public final class PascalTypesGen extends PascalTypes {

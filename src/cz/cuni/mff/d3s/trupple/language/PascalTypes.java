@@ -5,7 +5,7 @@ import com.oracle.truffle.api.dsl.TypeCheck;
 import com.oracle.truffle.api.dsl.TypeSystem;
 import com.oracle.truffle.api.dsl.internal.DSLOptions;
 
-import cz.cuni.mff.d3s.trupple.language.customvalues.*;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 

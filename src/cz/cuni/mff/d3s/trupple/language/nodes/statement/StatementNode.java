@@ -5,7 +5,7 @@ import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 
 public abstract class StatementNode extends Node {
 

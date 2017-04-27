@@ -2,8 +2,6 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable;
 
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
@@ -114,10 +112,6 @@ public class IdentifiersTable {
         return this.frameDescriptor.findFrameSlot(identifier);
     }
 
-    public FrameSlotKind getFrameSlotKind(String identifier) {
-        return this.identifiersMap.get(identifier).getSlotKind();
-    }
-
     public FrameDescriptor getFrameDescriptor() {
         return this.frameDescriptor;
     }
@@ -172,11 +166,6 @@ public class IdentifiersTable {
 
     public boolean isLabel(String identifier) {
         return this.identifiersMap.get(identifier) instanceof LabelDescriptor;
-    }
-
-    public void verifyPassedArgumentsToSubroutine(String identifier, List<ExpressionNode> params) throws LexicalException {
-        SubroutineDescriptor subroutineDescriptor = (SubroutineDescriptor) this.identifiersMap.get(identifier);
-        subroutineDescriptor.verifyArguments(params);
     }
 
     public void addLabel(String identifier) throws LexicalException {

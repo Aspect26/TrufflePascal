@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 public class PointerDescriptor implements TypeDescriptor {

@@ -1,6 +1,6 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin;
 
-import cz.cuni.mff.d3s.trupple.language.nodes.builtin.arithmetic.ArctanBuiltinNodeFactory;
+import cz.cuni.mff.d3s.trupple.language.nodes.builtin.arithmetic.ArctanBuiltinNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
@@ -9,7 +9,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public class ArctanSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public ArctanSubroutineDescriptor() {
-        super(ArctanBuiltinNodeFactory.create(new ReadArgumentNode(0, RealDescriptor.getInstance())),
+        super(ArctanBuiltinNodeGen.create(new ReadArgumentNode(0, RealDescriptor.getInstance())),
              new FormalParameter("i", LongDescriptor.getInstance(), false));
     }
 

@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.customvalues;
+package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.HeapSlot;

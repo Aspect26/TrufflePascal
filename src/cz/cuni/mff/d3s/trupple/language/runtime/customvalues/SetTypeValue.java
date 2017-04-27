@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.customvalues;
+package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
 import java.io.Serializable;
 import java.util.HashSet;

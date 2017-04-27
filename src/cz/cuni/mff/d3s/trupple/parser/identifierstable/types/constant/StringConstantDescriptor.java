@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.CantBeNegatedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;

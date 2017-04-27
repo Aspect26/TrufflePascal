@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 

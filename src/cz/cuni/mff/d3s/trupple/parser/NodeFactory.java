@@ -40,7 +40,6 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDe
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.OverloadedFunctionDescriptor;
 
 public class NodeFactory {
 
@@ -59,7 +58,7 @@ public class NodeFactory {
      * Lexical scope of the main program excluding units. Holds information about registered identifiers and what type
      * are they assigned to.
      */
-	private LexicalScope mainLexicalScope;
+	private LexicalScope globalLexicalScope;
 
     /**
      * Current lexical scope.
@@ -94,8 +93,8 @@ public class NodeFactory {
 	public NodeFactory(IParser parser, boolean usingTPExtension) {
 		this.parser = parser;
 		this.usingTPExtension = usingTPExtension;
-		this.mainLexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
-		this.currentLexicalScope = this.mainLexicalScope;
+		this.globalLexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
+		this.currentLexicalScope = this.globalLexicalScope;
 	}
 
 	public void startPascal(Token identifierToken) {
@@ -1024,7 +1023,7 @@ public class NodeFactory {
     }
 
     public void finishUnitInterfaceSection() {
-	    assert !this.currentLexicalScope.equals(this.mainLexicalScope);
+	    assert !this.currentLexicalScope.equals(this.globalLexicalScope);
 	    this.currentLexicalScope.markAllIdentifiersPublic();
     }
 
@@ -1062,7 +1061,7 @@ public class NodeFactory {
     }
 
     public void endUnit() {
-	    this.currentLexicalScope = this.mainLexicalScope;
+	    this.currentLexicalScope = this.globalLexicalScope;
     }
 
     public VirtualFrame getUnitsFrame() {

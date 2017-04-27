@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 

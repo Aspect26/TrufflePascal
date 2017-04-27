@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.language.customvalues;
+package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.*;
 

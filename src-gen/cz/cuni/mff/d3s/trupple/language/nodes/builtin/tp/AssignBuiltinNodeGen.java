@@ -9,9 +9,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.customvalues.FileValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.FileValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalString;
 
 @GeneratedBy(AssignBuiltinNode.class)
 public final class AssignBuiltinNodeGen extends AssignBuiltinNode {

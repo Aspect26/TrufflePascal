@@ -7,8 +7,8 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 

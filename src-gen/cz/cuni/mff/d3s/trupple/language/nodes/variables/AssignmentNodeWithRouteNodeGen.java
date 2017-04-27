@@ -12,16 +12,16 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalArray;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PascalString;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
-import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalString;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.RecordValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.SetTypeValue;
 
 @GeneratedBy(AssignmentNodeWithRoute.class)
 public final class AssignmentNodeWithRouteNodeGen extends AssignmentNodeWithRoute implements SpecializedNode {

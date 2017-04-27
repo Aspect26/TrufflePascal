@@ -12,7 +12,7 @@ public class Settings {
     private static final String STANDARD_WIRTH = "wirth";
     private static final String STANDARD_TP = "turbo";
 
-    @Option(name="-v", usage="makes compiler verbose")
+    @Option(name="-v", usage="makes the interpreter verbose")
     public boolean verbose;
 
     @Option(name="-I", handler=ImportsOptionHandler.class, usage="specifies directories, where unit files are located")

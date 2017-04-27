@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.variables;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import cz.cuni.mff.d3s.trupple.language.customvalues.RecordValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 

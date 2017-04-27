@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.call;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import cz.cuni.mff.d3s.trupple.language.customvalues.Reference;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
 public class ReferenceInitializationNode extends StatementNode {

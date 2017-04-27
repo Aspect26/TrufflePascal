@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.set;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
-import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.BinaryNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.SetDescriptor;

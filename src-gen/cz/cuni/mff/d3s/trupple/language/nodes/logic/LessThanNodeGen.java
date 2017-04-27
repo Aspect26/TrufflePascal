@@ -12,9 +12,9 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
-import cz.cuni.mff.d3s.trupple.language.customvalues.EnumValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.SetTypeValue;
 
 @GeneratedBy(LessThanNode.class)
 public final class LessThanNodeGen extends LessThanNode implements SpecializedNode {

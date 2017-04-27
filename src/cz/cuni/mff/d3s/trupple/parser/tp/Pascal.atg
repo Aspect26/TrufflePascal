@@ -1,9 +1,7 @@
 COMPILER Pascal
-
 IGNORECASE
 
 CHARACTERS
-
 letter = 'A'..'Z' + 'a'..'z'.
 nonZeroDigit = "123456789".
 digit = "0123456789".
@@ -15,14 +13,12 @@ tab = '\t'.
 stringChar = ANY - "'" - cr - lf.
 
 TOKENS
-
 identifier = letter {letter | digit}.
 stringLiteral = "'" { stringChar | "''" } "'".
 integerLiteral = "0" | nonZeroDigit { digit }.
 doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] { digit } | ("0" | nonZeroDigit { digit }) "." digit { digit } ["e" ["-"|"+"] { digit }].
 
 PRAGMAS
-
 COMMENTS FROM "(*" TO "*)"
 COMMENTS FROM "{" TO "}"
 IGNORE cr + lf + tab

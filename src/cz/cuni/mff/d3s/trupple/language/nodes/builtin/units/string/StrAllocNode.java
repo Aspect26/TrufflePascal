@@ -2,8 +2,8 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.string;
 
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PCharValue;
-import cz.cuni.mff.d3s.trupple.language.customvalues.PointerValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PCharValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.HeapSlot;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.PascalHeap;
