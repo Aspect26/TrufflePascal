@@ -12,11 +12,12 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalString;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
@@ -111,8 +112,8 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             if (valueNodeValue instanceof Character) {
                 return WriteCharNode_.create(root);
             }
-            if (valueNodeValue instanceof Double) {
-                return WriteDoubleNode_.create(root);
+            if (PascalTypesGen.isImplicitDouble(valueNodeValue)) {
+                return WriteDoubleNode_.create(root, valueNodeValue);
             }
             if (valueNodeValue instanceof EnumValue) {
                 return WriteEnumNode_.create(root);
@@ -129,8 +130,8 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             if (valueNodeValue instanceof PointerValue) {
                 return AssignPointersNode_.create(root);
             }
-            if (valueNodeValue instanceof PascalString) {
-                return AssignStringNode_.create(root);
+            if (PascalTypesGen.isImplicitPascalString(valueNodeValue)) {
+                return AssignStringNode_.create(root, valueNodeValue);
             }
             if (valueNodeValue instanceof PascalSubroutine) {
                 return AssignSubroutineNode_.create(root);
@@ -339,14 +340,22 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
     @GeneratedBy(methodName = "writeDouble(VirtualFrame, double)", value = AssignmentNode.class)
     private static final class WriteDoubleNode_ extends BaseNode_ {
 
-        WriteDoubleNode_(AssignmentNodeGen root) {
+        private final Class<?> valueNodeImplicitType;
+
+        WriteDoubleNode_(AssignmentNodeGen root, Object valueNodeValue) {
             super(root, 4);
+            this.valueNodeImplicitType = PascalTypesGen.getImplicitDoubleClass(valueNodeValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.valueNodeImplicitType == ((WriteDoubleNode_) other).valueNodeImplicitType;
         }
 
         @Override
         public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
-            if (valueNodeValue instanceof Double) {
-                double valueNodeValue_ = (double) valueNodeValue;
+            if (PascalTypesGen.isImplicitDouble(valueNodeValue, valueNodeImplicitType)) {
+                double valueNodeValue_ = PascalTypesGen.asImplicitDouble(valueNodeValue, valueNodeImplicitType);
                 root.writeDouble(frameValue, valueNodeValue_);
                 return;
             }
@@ -354,8 +363,8 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             return;
         }
 
-        static BaseNode_ create(AssignmentNodeGen root) {
-            return new WriteDoubleNode_(root);
+        static BaseNode_ create(AssignmentNodeGen root, Object valueNodeValue) {
+            return new WriteDoubleNode_(root, valueNodeValue);
         }
 
     }
@@ -477,14 +486,22 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
     @GeneratedBy(methodName = "assignString(VirtualFrame, PascalString)", value = AssignmentNode.class)
     private static final class AssignStringNode_ extends BaseNode_ {
 
-        AssignStringNode_(AssignmentNodeGen root) {
+        private final Class<?> valueNodeImplicitType;
+
+        AssignStringNode_(AssignmentNodeGen root, Object valueNodeValue) {
             super(root, 10);
+            this.valueNodeImplicitType = PascalTypesGen.getImplicitPascalStringClass(valueNodeValue);
+        }
+
+        @Override
+        public boolean isSame(SpecializationNode other) {
+            return super.isSame(other) && this.valueNodeImplicitType == ((AssignStringNode_) other).valueNodeImplicitType;
         }
 
         @Override
         public void executeVoid_(VirtualFrame frameValue, Object valueNodeValue) {
-            if (valueNodeValue instanceof PascalString) {
-                PascalString valueNodeValue_ = (PascalString) valueNodeValue;
+            if (PascalTypesGen.isImplicitPascalString(valueNodeValue, valueNodeImplicitType)) {
+                PascalString valueNodeValue_ = PascalTypesGen.asImplicitPascalString(valueNodeValue, valueNodeImplicitType);
                 root.assignString(frameValue, valueNodeValue_);
                 return;
             }
@@ -492,8 +509,8 @@ public final class AssignmentNodeGen extends AssignmentNode implements Specializ
             return;
         }
 
-        static BaseNode_ create(AssignmentNodeGen root) {
-            return new AssignStringNode_(root);
+        static BaseNode_ create(AssignmentNodeGen root, Object valueNodeValue) {
+            return new AssignStringNode_(root, valueNodeValue);
         }
 
     }

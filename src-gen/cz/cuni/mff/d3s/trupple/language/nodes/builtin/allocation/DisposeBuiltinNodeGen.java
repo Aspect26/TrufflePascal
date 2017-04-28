@@ -9,6 +9,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
 
@@ -31,7 +32,7 @@ public final class DisposeBuiltinNodeGen extends DisposeBuiltinNode {
     public void executeVoid(VirtualFrame frameValue) {
         PointerValue child0Value_;
         try {
-            child0Value_ = expectPointerValue(child0_.executeGeneric(frameValue));
+            child0Value_ = PascalTypesGen.expectPointerValue(child0_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             throw unsupported(ex.getResult());
         }
@@ -45,13 +46,6 @@ public final class DisposeBuiltinNodeGen extends DisposeBuiltinNode {
             seenUnsupported0 = true;
         }
         return new UnsupportedSpecializationException(this, new Node[] {child0_}, child0Value);
-    }
-
-    private static PointerValue expectPointerValue(Object value) throws UnexpectedResultException {
-        if (value instanceof PointerValue) {
-            return (PointerValue) value;
-        }
-        throw new UnexpectedResultException(value);
     }
 
     public static DisposeBuiltinNode create(ExpressionNode child0) {

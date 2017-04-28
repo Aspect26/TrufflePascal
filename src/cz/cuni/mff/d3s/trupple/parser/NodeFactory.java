@@ -25,7 +25,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
@@ -611,15 +611,15 @@ public class NodeFactory {
             case "<=":
                 resultExpression = LessThanOrEqualNodeGen.create(leftNode, rightNode); break;
             case ">":
-                BinaryNode lessThanOrEqual = this.verifyOperandArguments(LessThanOrEqualNodeGen.create(leftNode, rightNode), operator);
+                BinaryExpressionNode lessThanOrEqual = this.verifyOperandArguments(LessThanOrEqualNodeGen.create(leftNode, rightNode), operator);
                 resultExpression = NotNodeGen.create(lessThanOrEqual); break;
             case ">=":
-                BinaryNode lessThan = this.verifyOperandArguments(LessThanNodeGen.create(leftNode, rightNode), operator);
+                BinaryExpressionNode lessThan = this.verifyOperandArguments(LessThanNodeGen.create(leftNode, rightNode), operator);
                 resultExpression = NotNodeGen.create(lessThan); break;
             case "=":
                 resultExpression = EqualsNodeGen.create(leftNode, rightNode); break;
             case "<>":
-                BinaryNode equals = this.verifyOperandArguments(EqualsNodeGen.create(leftNode, rightNode), operator);
+                BinaryExpressionNode equals = this.verifyOperandArguments(EqualsNodeGen.create(leftNode, rightNode), operator);
                 resultExpression = NotNodeGen.create(equals); break;
             case "in":
                 resultExpression = InNodeGen.create(leftNode, rightNode); break;
@@ -717,7 +717,8 @@ public class NodeFactory {
 
     public ArrayAccessNode createArrayAccessNode(AccessNode previousAccessNode, List<ExpressionNode> indexNodes) {
         TypeDescriptor accessedVariableDescriptor = previousAccessNode.getType();
-        for (ExpressionNode indexNode : indexNodes) {
+
+        for (int i = 0; i< indexNodes.size(); ++i) {
             if (!(accessedVariableDescriptor instanceof ArrayDescriptor)) {
                 parser.SemErr("Cannot index this type");
                 break;
@@ -726,6 +727,7 @@ public class NodeFactory {
                 accessedVariableDescriptor = accessingArrayDescriptor.getOneStepInnerDescriptor();
             }
         }
+
 	    return new ArrayAccessNode(previousAccessNode, indexNodes, accessedVariableDescriptor);
     }
 
@@ -757,8 +759,7 @@ public class NodeFactory {
     private ExpressionNode createInvokeNode(FrameSlot subroutineSlot, SubroutineDescriptor descriptor, List<ExpressionNode> params) {
         TypeDescriptor subroutineReturnDescriptor = (descriptor instanceof FunctionDescriptor)?
                 ((FunctionDescriptor) descriptor).getReturnDescriptor() : null;
-        FunctionLiteralNode literal = new FunctionLiteralNode(subroutineSlot, subroutineReturnDescriptor);
-        return InvokeNodeGen.create(params.toArray(new ExpressionNode[params.size()]), literal);
+        return InvokeNodeGen.create(subroutineSlot, params.toArray(new ExpressionNode[params.size()]), subroutineReturnDescriptor);
     }
 
     public ExpressionNode createReferencePassNode(Token variableToken) {

@@ -2,25 +2,17 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.call;
 
 import com.oracle.truffle.api.dsl.GeneratedBy;
+import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeCost;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @GeneratedBy(InvokeNode.class)
 public final class InvokeNodeGen extends InvokeNode {
 
-    @Child private FunctionLiteralNode functionNode_;
-
-    private InvokeNodeGen(ExpressionNode[] argumentNodes, FunctionLiteralNode functionNode) {
-        super(argumentNodes);
-        this.functionNode_ = functionNode;
-    }
-
-    @Override
-    protected FunctionLiteralNode getFunctionNode() {
-        return this.functionNode_;
+    private InvokeNodeGen(FrameSlot subroutineSlot, ExpressionNode[] argumentNodes, TypeDescriptor type) {
+        super(subroutineSlot, argumentNodes, type);
     }
 
     @Override
@@ -30,8 +22,7 @@ public final class InvokeNodeGen extends InvokeNode {
 
     @Override
     public Object executeGeneric(VirtualFrame frameValue) {
-        PascalSubroutine functionNodeValue_ = functionNode_.executeGeneric(frameValue);
-        return this.executeGeneric(frameValue, functionNodeValue_);
+        return this.invoke(frameValue);
     }
 
     @Override
@@ -40,8 +31,8 @@ public final class InvokeNodeGen extends InvokeNode {
         return;
     }
 
-    public static InvokeNode create(ExpressionNode[] argumentNodes, FunctionLiteralNode functionNode) {
-        return new InvokeNodeGen(argumentNodes, functionNode);
+    public static InvokeNode create(FrameSlot subroutineSlot, ExpressionNode[] argumentNodes, TypeDescriptor type) {
+        return new InvokeNodeGen(subroutineSlot, argumentNodes, type);
     }
 
 }

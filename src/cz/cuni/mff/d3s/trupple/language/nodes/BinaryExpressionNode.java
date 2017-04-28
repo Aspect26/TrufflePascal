@@ -1,9 +1,7 @@
-package cz.cuni.mff.d3s.trupple.language.nodes.arithmetic;
+package cz.cuni.mff.d3s.trupple.language.nodes;
 
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeChildren;
-import cz.cuni.mff.d3s.trupple.language.nodes.BinaryArgumentPrimitiveTypes;
-import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.SetDescriptor;
@@ -15,7 +13,7 @@ import java.util.Map;
         @NodeChild(value = "leftNode", type = ExpressionNode.class),
         @NodeChild(value = "rightNode", type = ExpressionNode.class)
 })
-public abstract class BinaryNode extends ExpressionNode {
+public abstract class BinaryExpressionNode extends ExpressionNode {
 
     protected abstract ExpressionNode getLeftNode();
 

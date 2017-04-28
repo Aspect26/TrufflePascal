@@ -1,10 +1,10 @@
-package cz.cuni.mff.d3s.trupple.language.runtime;
+package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.RootCallTarget;
-import com.oracle.truffle.api.interop.ForeignAccess;
-import com.oracle.truffle.api.interop.TruffleObject;
 
-public class PascalSubroutine implements TruffleObject {
+@CompilerDirectives.ValueType
+public class PascalSubroutine {
 
 	private RootCallTarget callTarget;
 
@@ -20,8 +20,4 @@ public class PascalSubroutine implements TruffleObject {
 		return callTarget;
 	}
 	
-	@Override
-	public ForeignAccess getForeignAccess() {
-		return null;
-	}
 }

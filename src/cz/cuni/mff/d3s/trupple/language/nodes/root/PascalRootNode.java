@@ -1,12 +1,18 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.root;
 
+import com.oracle.truffle.api.dsl.TypeSystemReference;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
+import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
+/**
+ * This node represents the root node of a syntax tree of any subroutine.
+ */
+@TypeSystemReference(PascalTypes.class)
 public abstract class PascalRootNode extends RootNode {
 
 	@Child

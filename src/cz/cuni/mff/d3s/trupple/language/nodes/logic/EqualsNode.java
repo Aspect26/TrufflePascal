@@ -7,7 +7,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryArgumentPrimitiveTypes;
-import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.BinaryNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.BinaryExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.GenericEnumTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
@@ -16,7 +16,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 @NodeInfo(shortName = "=")
-public abstract class EqualsNode extends BinaryNode {
+public abstract class EqualsNode extends BinaryExpressionNode {
 
     EqualsNode() {
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(BooleanDescriptor.getInstance(), BooleanDescriptor.getInstance()), BooleanDescriptor.getInstance());

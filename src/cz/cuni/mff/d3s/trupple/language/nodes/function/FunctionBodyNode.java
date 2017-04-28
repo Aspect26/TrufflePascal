@@ -20,60 +20,19 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 public abstract class FunctionBodyNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
-
     protected abstract TypeDescriptor getTypeDescriptor();
 
 	@Child
 	private StatementNode bodyNode;
 
-	public FunctionBodyNode(StatementNode bodyNode) {
+	FunctionBodyNode(StatementNode bodyNode) {
 		this.bodyNode = bodyNode;
 	}
 
-	// TODO: do we need this specializations? I think not
-
-	@Specialization(guards = "isLongKind()")
-	public long execLong(VirtualFrame frame) {
-		bodyNode.executeVoid(frame);
-
-		try {
-			return frame.getLong(getSlot());
-		} catch (FrameSlotTypeException e) {
-			return -1;
-		}
-	}
-
-	@Specialization(guards = "isBoolKind()")
-	public boolean execBool(VirtualFrame frame) {
-		bodyNode.executeVoid(frame);
-
-		try {
-			return frame.getBoolean(getSlot());
-		} catch (FrameSlotTypeException e) {
-			return false;
-		}
-	}
-
-	@Specialization(guards = "isCharKind()")
-	public char execChar(VirtualFrame frame) {
-		bodyNode.executeVoid(frame);
-
-		try {
-			return (char) frame.getByte(getSlot());
-		} catch (FrameSlotTypeException e) {
-			return '0';
-		}
-	}
-
 	@Specialization
-    public Object execGeneric(VirtualFrame frame) {
+    Object executeFunction(VirtualFrame frame) {
         bodyNode.executeVoid(frame);
-
-        try {
-            return frame.getObject(getSlot());
-        } catch (FrameSlotTypeException e) {
-            return null;
-        }
+        return frame.getValue(getSlot());
     }
 
     @Override
@@ -81,15 +40,4 @@ public abstract class FunctionBodyNode extends ExpressionNode {
         return this.getTypeDescriptor();
     }
 
-	protected boolean isLongKind() {
-		return getSlot().getKind() == FrameSlotKind.Long;
-	}
-
-	protected boolean isBoolKind() {
-		return getSlot().getKind() == FrameSlotKind.Boolean;
-	}
-
-	protected boolean isCharKind() {
-		return getSlot().getKind() == FrameSlotKind.Byte;
-	}
 }

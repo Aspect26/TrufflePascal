@@ -5,7 +5,7 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.ArgumentTypeMismatchException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.IncorectNumberOfArgumentsProvidedException;
@@ -32,6 +32,10 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
     @Override
     public Object getDefaultValue() {
         return this.subroutine;
+    }
+
+    public SubroutineDescriptor getOverload(List<ExpressionNode> arguments) throws LexicalException {
+        return this;
     }
 
     public List<FormalParameter> getFormalParameters() {

@@ -9,6 +9,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 
@@ -37,7 +38,7 @@ public final class GetDateNodeGen extends GetDateNode {
     public void executeVoid(VirtualFrame frameValue) {
         Reference child0Value_;
         try {
-            child0Value_ = expectReference(child0_.executeGeneric(frameValue));
+            child0Value_ = PascalTypesGen.expectReference(child0_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             Object child1Value = child1_.executeGeneric(frameValue);
             Object child2Value = child2_.executeGeneric(frameValue);
@@ -46,7 +47,7 @@ public final class GetDateNodeGen extends GetDateNode {
         }
         Reference child1Value_;
         try {
-            child1Value_ = expectReference(child1_.executeGeneric(frameValue));
+            child1Value_ = PascalTypesGen.expectReference(child1_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             Object child2Value = child2_.executeGeneric(frameValue);
             Object child3Value = child3_.executeGeneric(frameValue);
@@ -54,14 +55,14 @@ public final class GetDateNodeGen extends GetDateNode {
         }
         Reference child2Value_;
         try {
-            child2Value_ = expectReference(child2_.executeGeneric(frameValue));
+            child2Value_ = PascalTypesGen.expectReference(child2_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             Object child3Value = child3_.executeGeneric(frameValue);
             throw unsupported(child0Value_, child1Value_, ex.getResult(), child3Value);
         }
         Reference child3Value_;
         try {
-            child3Value_ = expectReference(child3_.executeGeneric(frameValue));
+            child3Value_ = PascalTypesGen.expectReference(child3_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             throw unsupported(child0Value_, child1Value_, child2Value_, ex.getResult());
         }
@@ -75,13 +76,6 @@ public final class GetDateNodeGen extends GetDateNode {
             seenUnsupported0 = true;
         }
         return new UnsupportedSpecializationException(this, new Node[] {child0_, child1_, child2_, child3_}, child0Value, child1Value, child2Value, child3Value);
-    }
-
-    private static Reference expectReference(Object value) throws UnexpectedResultException {
-        if (value instanceof Reference) {
-            return (Reference) value;
-        }
-        throw new UnexpectedResultException(value);
     }
 
     public static GetDateNode create(ExpressionNode child0, ExpressionNode child1, ExpressionNode child2, ExpressionNode child3) {

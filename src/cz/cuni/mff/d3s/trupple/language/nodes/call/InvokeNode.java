@@ -1,49 +1,61 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.call;
 
 import com.oracle.truffle.api.CompilerAsserts;
-import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
+import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.literals.FunctionLiteralNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
-// TODO: do not combine @NodeChild and @Child annotations -> it is messy
+/**
+ * The node for invoking a subroutine call.
+ */
 @NodeInfo(shortName = "invoke")
-@NodeChild(value = "functionNode", type = FunctionLiteralNode.class)
 public abstract class InvokeNode extends ExpressionNode {
+
+    private final FrameSlot subroutineSlot;
+    private final TypeDescriptor type;
 
     @Children
 	private final ExpressionNode[] argumentNodes;
-	@Child
-	private DispatchNode dispatchNode;
 
-	protected abstract FunctionLiteralNode getFunctionNode();
-
-	InvokeNode(ExpressionNode[] argumentNodes) {
-		this.argumentNodes = argumentNodes;
-		this.dispatchNode = DispatchNodeGen.create();
+	InvokeNode(FrameSlot subroutineSlot, ExpressionNode[] argumentNodes, TypeDescriptor type) {
+		this.subroutineSlot = subroutineSlot;
+	    this.argumentNodes = argumentNodes;
+	    this.type = type;
 	}
 
 	@Specialization
-	@ExplodeLoop
-	public Object executeGeneric(VirtualFrame frame, PascalSubroutine function) {
-		CompilerAsserts.compilationConstant(argumentNodes.length);
+	Object invoke(VirtualFrame frame) {
+		PascalSubroutine subroutine = this.getMySubroutine(frame);
+        Object[] argumentValues = this.evaluateArguments(frame);
 
-		Object[] argumentValues = new Object[argumentNodes.length + 1];
-		argumentValues[0] = frame;
-		for (int i = 0; i < argumentNodes.length; i++) {
-			argumentValues[i+1] = argumentNodes[i].executeGeneric(frame);
-		}
-		return dispatchNode.executeDispatch(frame, function, argumentValues);
+        return subroutine.getCallTarget().call(argumentValues);
 	}
 
 	@Override
     public TypeDescriptor getType() {
-	    return getFunctionNode().getType();
+	    return this.type;
+    }
+
+    private PascalSubroutine getMySubroutine(VirtualFrame frame) {
+	    VirtualFrame frameContainingSubroutine = this.getFrameContainingSlot(frame, this.subroutineSlot);
+        return (PascalSubroutine) frameContainingSubroutine.getValue(this.subroutineSlot);
+    }
+
+    @ExplodeLoop
+    private Object[] evaluateArguments(VirtualFrame frame) {
+        CompilerAsserts.compilationConstant(argumentNodes.length);
+        Object[] argumentValues = new Object[argumentNodes.length + 1];
+        argumentValues[0] = frame;
+        for (int i = 0; i < argumentNodes.length; i++) {
+            argumentValues[i+1] = argumentNodes[i].executeGeneric(frame);
+        }
+
+        return argumentValues;
     }
 }

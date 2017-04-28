@@ -8,7 +8,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.IdentifiersTable;
@@ -23,7 +23,6 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConsta
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ReturnTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.OverloadedFunctionDescriptor;
 
 import java.util.*;
 
@@ -32,7 +31,7 @@ public class LexicalScope {
     private String name;
     private final LexicalScope outer;
     private int loopDepth;
-    private final Set<String> publicIdentifiers;
+    private final Set<String> publicIdentifiers; // TODO: why is this never used?
     private final IdentifiersTable localIdentifiers;
     final List<StatementNode> scopeInitializationNodes = new ArrayList<>();
 
@@ -70,11 +69,7 @@ public class LexicalScope {
 
     SubroutineDescriptor getSubroutineDescriptor(String identifier, List<ExpressionNode> actualArguments) throws LexicalException {
         SubroutineDescriptor subroutineDescriptor = (SubroutineDescriptor) this.getIdentifierDescriptor(identifier);
-        if (subroutineDescriptor instanceof OverloadedFunctionDescriptor) {
-            subroutineDescriptor = ((OverloadedFunctionDescriptor) subroutineDescriptor).getOverload(actualArguments);
-        }
-
-        return subroutineDescriptor;
+        return subroutineDescriptor.getOverload(actualArguments);
     }
 
     FrameSlot getReturnSlot() {

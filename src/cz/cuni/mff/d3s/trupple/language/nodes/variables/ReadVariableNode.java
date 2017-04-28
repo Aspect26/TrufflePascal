@@ -21,55 +21,10 @@ public abstract class ReadVariableNode extends ExpressionNode {
 
 	protected abstract TypeDescriptor getTypeDescriptor();
 
-	// TODO: what about this @Specialization(guards = "getTypeDescriptor == LongDescriptor.getInstance()")
-	@Specialization(guards = "isLongKindOrLongReference(frame, getSlot())")
-	long readLong(VirtualFrame frame) {
-		VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-		try {
-			return slotsFrame.getLong(getSlot());
-		} catch (FrameSlotTypeException e) {
-			throw new PascalRuntimeException("Unexpected error");
-		}
-	}
-
-	@Specialization(guards = "isBoolKindOrBoolReference(frame, getSlot())")
-	boolean readBool(VirtualFrame frame) {
-        VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-        try {
-            return slotsFrame.getBoolean(getSlot());
-        } catch (FrameSlotTypeException e) {
-            throw new PascalRuntimeException("Unexpected error");
-        }
-	}
-
-    @Specialization(guards = "isCharKindOrCharReference(frame, getSlot())")
-	char readChar(VirtualFrame frame) {
-        VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-        try {
-            return (char) slotsFrame.getByte(getSlot());
-        } catch (FrameSlotTypeException e) {
-            throw new PascalRuntimeException("Unexpected error");
-        }
-	}
-
-    @Specialization(guards = "isDoubleKindOrDoubleReference(frame, getSlot())")
-	double readDouble(VirtualFrame frame) {
-        VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-        try {
-            return slotsFrame.getDouble(getSlot());
-        } catch (FrameSlotTypeException e) {
-            throw new PascalRuntimeException("Unexpected error");
-        }
-	}
-
     @Specialization
 	Object readObject(VirtualFrame frame) {
         VirtualFrame slotsFrame = this.getFrameContainingSlot(frame, getSlot());
-        try {
-            return slotsFrame.getObject(getSlot());
-        } catch (FrameSlotTypeException e) {
-            throw new PascalRuntimeException("Unexpected error");
-        }
+        return this.getValueFromSlot(slotsFrame, getSlot());
 	}
 
 	@Override

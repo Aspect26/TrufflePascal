@@ -9,6 +9,7 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeCost;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
+import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.FileValue;
 
@@ -31,7 +32,7 @@ public final class RewriteBuiltinNodeGen extends RewriteBuiltinNode {
     public void executeVoid(VirtualFrame frameValue) {
         FileValue fileValue_;
         try {
-            fileValue_ = expectFileValue(file_.executeGeneric(frameValue));
+            fileValue_ = PascalTypesGen.expectFileValue(file_.executeGeneric(frameValue));
         } catch (UnexpectedResultException ex) {
             throw unsupported(ex.getResult());
         }
@@ -45,13 +46,6 @@ public final class RewriteBuiltinNodeGen extends RewriteBuiltinNode {
             seenUnsupported0 = true;
         }
         return new UnsupportedSpecializationException(this, new Node[] {file_}, fileValue);
-    }
-
-    private static FileValue expectFileValue(Object value) throws UnexpectedResultException {
-        if (value instanceof FileValue) {
-            return (FileValue) value;
-        }
-        throw new UnexpectedResultException(value);
     }
 
     public static RewriteBuiltinNode create(ExpressionNode file) {
