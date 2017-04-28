@@ -1,9 +1,12 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import com.oracle.truffle.api.CompilerDirectives;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+@CompilerDirectives.ValueType
 public class SetTypeValue implements Serializable {
 
     private final Set<Object> data;

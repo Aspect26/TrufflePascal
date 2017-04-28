@@ -41,6 +41,14 @@ public abstract class ExpressionNode extends StatementNode {
 
     public abstract TypeDescriptor getType();
 
+    private Reference tryGetReference(VirtualFrame frame, FrameSlot slot) {
+        try {
+            return (Reference)frame.getObject(slot);
+        } catch (FrameSlotTypeException | ClassCastException e) {
+            return null;
+        }
+    }
+
 	/**
 	 * guard functions -> code smell :(
 	 */

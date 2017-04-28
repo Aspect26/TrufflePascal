@@ -16,7 +16,7 @@ public abstract class DispatchNode extends Node {
 	}
 
 	@Specialization
-	protected static Object doDirect(VirtualFrame frame, PascalSubroutine function, Object[] arguments) {
-		return function.getCallTarget().call(arguments);
+	protected static Object doDirect(PascalSubroutine subroutine, Object[] arguments) {
+		return subroutine.getCallTarget().call(arguments);
 	}
 }

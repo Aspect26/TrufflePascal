@@ -1,9 +1,11 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.HeapSlot;
 import cz.cuni.mff.d3s.trupple.language.runtime.heap.PascalHeap;
 
+@CompilerDirectives.ValueType
 public class PointerValue {
 
     private HeapSlot heapSlot;

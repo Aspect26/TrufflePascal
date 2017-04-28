@@ -26,10 +26,9 @@ public abstract class AssignmentNode extends StatementNode {
 
     protected abstract FrameSlot getSlot();
 
-    // TODO: the third argument shall be removed
     protected void makeAssignment(VirtualFrame frame, FrameSlot slot, AssignmentNodeWithRoute.SlotAssignment slotAssignment, Object value) {
         try {
-            this.setValueToSlot(frame, slot, value);
+            slotAssignment.assign(frame, slot, value);
         } catch (FrameSlotTypeException e) {
             throw new PascalRuntimeException("Wrong access");
         }
@@ -95,8 +94,7 @@ public abstract class AssignmentNode extends StatementNode {
 
     @Specialization
     void assignReference(VirtualFrame frame, Reference reference) {
-        // TODO: this if is so wrong, refactor it somehow
-        Object referenceValue = this.getValueFromSlot(reference.getFromFrame(), reference.getFrameSlot());
+        Object referenceValue = reference.getFromFrame().getValue(reference.getFrameSlot());
         if (referenceValue instanceof PointerValue) {
             this.assignPointers(frame, (PointerValue) referenceValue);
         } else {

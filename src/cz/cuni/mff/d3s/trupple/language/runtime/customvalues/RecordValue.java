@@ -1,11 +1,13 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import java.util.Map;
 
+@CompilerDirectives.ValueType
 public class RecordValue {
 
     private final VirtualFrame frame;

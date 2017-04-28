@@ -1,9 +1,11 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumTypeDescriptor;
 
 import java.util.List;
 
+@CompilerDirectives.ValueType
 public abstract class PascalOrdinal {
     public abstract int getRealIndex(Object index);
     public abstract int getSize();

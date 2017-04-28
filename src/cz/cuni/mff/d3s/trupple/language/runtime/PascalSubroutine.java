@@ -16,22 +16,10 @@ public class PascalSubroutine implements TruffleObject {
 		this(null);
 	}
 
-	void setCallTarget(RootCallTarget callTarget) {
-		this.callTarget = callTarget;
-	}
-	
 	public RootCallTarget getCallTarget() {
 		return callTarget;
 	}
 	
-	boolean isImplemented() {
-		return callTarget != null;
-	}
-	
-	static PascalSubroutine createUnimplementedFunction() {
-        return new PascalSubroutine();
-    }
-
 	@Override
 	public ForeignAccess getForeignAccess() {
 		return null;

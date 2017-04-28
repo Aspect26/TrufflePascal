@@ -17,8 +17,8 @@ public abstract class PascalRootNode extends RootNode {
 		this.bodyNode = bodyNode;
 	}
 
-	@Override
 	public Object execute(VirtualFrame virtualFrame) {
 		return bodyNode.executeGeneric(virtualFrame);
 	}
+
 }

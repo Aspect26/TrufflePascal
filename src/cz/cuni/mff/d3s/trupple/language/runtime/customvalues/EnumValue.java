@@ -1,9 +1,11 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumTypeDescriptor;
 
 import java.io.Serializable;
 
+@CompilerDirectives.ValueType
 public class EnumValue implements Serializable {
 
 	private final EnumTypeDescriptor enumType;

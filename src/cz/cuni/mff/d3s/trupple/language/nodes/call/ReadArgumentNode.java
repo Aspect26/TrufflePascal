@@ -3,7 +3,6 @@ package cz.cuni.mff.d3s.trupple.language.nodes.call;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.Null;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 public class ReadArgumentNode extends ExpressionNode {

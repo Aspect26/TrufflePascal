@@ -127,7 +127,7 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
         }
 
     }
-    @GeneratedBy(methodName = "doDirect(VirtualFrame, PascalSubroutine, Object[])", value = DispatchNode.class)
+    @GeneratedBy(methodName = "doDirect(PascalSubroutine, Object[])", value = DispatchNode.class)
     private static final class DirectNode_ extends BaseNode_ {
 
         DirectNode_(DispatchNodeGen root) {
@@ -136,7 +136,7 @@ public final class DispatchNodeGen extends DispatchNode implements SpecializedNo
 
         @Override
         public Object execute(VirtualFrame frameValue, PascalSubroutine arg0Value, Object[] arg1Value) {
-            return DispatchNode.doDirect(frameValue, arg0Value, arg1Value);
+            return DispatchNode.doDirect(arg0Value, arg1Value);
         }
 
         static BaseNode_ create(DispatchNodeGen root) {
