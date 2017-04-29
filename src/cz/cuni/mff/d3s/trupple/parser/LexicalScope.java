@@ -31,14 +31,12 @@ public class LexicalScope {
     private String name;
     private final LexicalScope outer;
     private int loopDepth;
-    private final Set<String> publicIdentifiers; // TODO: why is this never used?
-    private final IdentifiersTable localIdentifiers;
+    final IdentifiersTable localIdentifiers;
     final List<StatementNode> scopeInitializationNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
         this.name = name;
         this.outer = outer;
-        this.publicIdentifiers = new HashSet<>();
         this.localIdentifiers = (usingTPExtension)? new IdentifiersTableTP() : new IdentifiersTable();
     }
 
@@ -49,7 +47,6 @@ public class LexicalScope {
     LexicalScope getOuterScope() {
         return this.outer;
     }
-
 
     public IdentifiersTable getIdentifiersTable() {
         return this.localIdentifiers;
@@ -140,8 +137,14 @@ public class LexicalScope {
         return this.localIdentifiers.containsIdentifier(identifier) && !(this.localIdentifiers.getIdentifierDescriptor(identifier) instanceof ReturnTypeDescriptor);
     }
 
-    boolean containsReturnType(String identifier) {
-        return this.localIdentifiers.containsIdentifier(identifier) && (this.localIdentifiers.getIdentifierDescriptor(identifier) instanceof ReturnTypeDescriptor);
+    boolean containsPublicIdentifier(String identifier) {
+        return this.containsLocalIdentifier(identifier);
+    }
+
+    boolean containsReturnType(String identifier, boolean onlyPublic) {
+        return this.localIdentifiers.containsIdentifier(identifier) &&
+                (this.localIdentifiers.getIdentifierDescriptor(identifier) instanceof ReturnTypeDescriptor) &&
+                (!onlyPublic || this.containsPublicIdentifier(identifier));
     }
 
     FrameSlot registerReferenceVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
@@ -270,14 +273,6 @@ public class LexicalScope {
 
         FrameSlot frameSlot = this.localIdentifiers.getFrameSlot(identifier);
         return InitializationNodeFactory.create(frameSlot, typeDescriptor.getDefaultValue(), frame);
-    }
-
-    void markAllIdentifiersPublic() {
-        Map<String, TypeDescriptor> allIdentifiers = this.localIdentifiers.getAllIdentifiers();
-        for (Map.Entry<String, TypeDescriptor> entry : allIdentifiers.entrySet()) {
-            String currentIdentifier = entry.getKey();
-            this.publicIdentifiers.add(currentIdentifier);
-        }
     }
 
     void increaseLoopDepth() {

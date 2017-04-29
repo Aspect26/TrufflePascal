@@ -157,7 +157,7 @@ public class NodeFactory {
 
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, boolean withReturnType) {
 	    try {
-            T result = lookupToParentScope(this.currentLexicalScope, identifier, lookupFunction, withReturnType);
+            T result = lookupToParentScope(this.currentLexicalScope, identifier, lookupFunction, withReturnType, false);
             if (result == null) {
                 result = lookupInUnits(identifier, lookupFunction);
             }
@@ -176,11 +176,11 @@ public class NodeFactory {
     }
 
     private <T> T lookupToParentScope(LexicalScope scope, String identifier, GlobalObjectLookup<T> lookupFunction,
-                                      boolean withReturnType) throws LexicalException {
+                                      boolean withReturnType, boolean onlyPublic) throws LexicalException {
         while (scope != null) {
-            if (scope.containsLocalIdentifier(identifier)){
+            if ((onlyPublic)? scope.containsPublicIdentifier(identifier) : scope.containsLocalIdentifier(identifier)) {
                 return lookupFunction.onFound(scope, identifier);
-            } else if (withReturnType && currentLexicalScope.containsReturnType(identifier)) {
+            } else if (withReturnType && currentLexicalScope.containsReturnType(identifier, onlyPublic)) {
                 return lookupFunction.onFound(currentLexicalScope, identifier);
             } else {
                 scope = scope.getOuterScope();
@@ -195,7 +195,7 @@ public class NodeFactory {
         T result = null;
 
         for (LexicalScope unitScope : this.units) {
-            result = lookupToParentScope(unitScope, identifier, lookupFunction, false);
+            result = lookupToParentScope(unitScope, identifier, lookupFunction, false, unitScope != this.currentLexicalScope);
             if (result != null) {
                 break;
             }
@@ -1025,7 +1025,7 @@ public class NodeFactory {
 
     public void finishUnitInterfaceSection() {
 	    assert !this.currentLexicalScope.equals(this.globalLexicalScope);
-	    this.currentLexicalScope.markAllIdentifiersPublic();
+        ((UnitLexicalScope) this.currentLexicalScope).markAllIdentifiersPublic();
     }
 
     public void startUnitProcedureImplementation(ProcedureHeading heading) {

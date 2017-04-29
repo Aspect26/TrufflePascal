@@ -22,6 +22,7 @@ function strcomp(leftOperand, rightOperand: PChar): integer;
 }
 function strupper(str: PChar): PChar;
 
+
 IMPLEMENTATION
 
 function getPCharSize(str: PChar): integer; forward;
