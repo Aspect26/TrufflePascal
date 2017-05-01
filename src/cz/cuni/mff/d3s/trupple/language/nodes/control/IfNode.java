@@ -6,18 +6,22 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
+import com.oracle.truffle.api.profiles.ConditionProfile;
+import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 
 @NodeInfo(shortName = "if", description = "The node implementing a conditional statement")
 public final class IfNode extends StatementNode {
 
 	@Child
-	ExpressionNode conditionNode;
+	private ExpressionNode conditionNode;
 	@Child
-	StatementNode thenNode;
+	private StatementNode thenNode;
 	@Child
-	StatementNode elseNode;
+	private StatementNode elseNode;
+    private final ConditionProfile conditionProfile = ConditionProfile.createCountingProfile();
 
 	public IfNode(ExpressionNode conditionNode, StatementNode thenNode, StatementNode elseNode) {
 		this.conditionNode = conditionNode;
@@ -27,7 +31,7 @@ public final class IfNode extends StatementNode {
 
 	@Override
 	public void executeVoid(VirtualFrame frame) {
-		if (checkCondition(frame)) {
+		if (conditionProfile.profile(checkCondition(frame))) {
 			thenNode.executeVoid(frame);
 		} else {
 			if (elseNode != null) {
@@ -40,7 +44,8 @@ public final class IfNode extends StatementNode {
 		try {
 			return conditionNode.executeBoolean(frame);
 		} catch (UnexpectedResultException e) {
-			throw new UnsupportedSpecializationException(this, new Node[] { conditionNode }, e.getResult());
+		    // This should not happen thanks to our compile time type checking
+			throw new PascalRuntimeException("The condition node provided for if is not boolean type");
 		}
 	}
 }
