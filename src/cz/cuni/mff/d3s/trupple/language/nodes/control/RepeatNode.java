@@ -4,7 +4,7 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.*;
 
-import com.oracle.truffle.api.profiles.ConditionProfile;
+import com.oracle.truffle.api.profiles.LoopConditionProfile;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.BreakExceptionTP;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
@@ -20,7 +20,7 @@ public class RepeatNode extends StatementNode {
         @Child
         private StatementNode body;
 
-        private final ConditionProfile conditionProfile = ConditionProfile.createCountingProfile();
+        private final LoopConditionProfile conditionProfile = LoopConditionProfile.createCountingProfile();
 
         private RepeatRepeatingNode(ExpressionNode condition, StatementNode body) {
             this.condition = condition;
