@@ -2,7 +2,6 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin.units.crt;
 
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
-import com.sun.media.jfxmedia.logging.Logger;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
@@ -22,7 +21,7 @@ public abstract class DelayNode extends StatementNode {
         try {
             Thread.sleep(miliSeconds);
         } catch (InterruptedException e) {
-            Logger.logMsg(Logger.INFO, "Delay was interrupted.");
+            // TODO: what to do here?
         }
     }
 

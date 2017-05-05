@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.logic;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-import cz.cuni.mff.d3s.trupple.language.nodes.BinaryArgumentPrimitiveTypes;
+import cz.cuni.mff.d3s.trupple.language.nodes.utils.BinaryArgumentPrimitiveTypes;
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 

@@ -1,14 +1,13 @@
-package cz.cuni.mff.d3s.trupple.language.nodes;
+package cz.cuni.mff.d3s.trupple.language.nodes.utils;
 
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
-import javafx.util.Pair;
 
 public class BinaryArgumentPrimitiveTypes {
 
-    private final Pair<TypeDescriptor, TypeDescriptor> types;
+    private final Tuple<TypeDescriptor, TypeDescriptor> types;
 
     public BinaryArgumentPrimitiveTypes(TypeDescriptor leftType, TypeDescriptor rightType) {
-        this.types = new Pair<>(leftType, rightType);
+        this.types = new Tuple<>(leftType, rightType);
     }
 
     @Override
