@@ -16,13 +16,14 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
  * This call is not very reliable, it is recommended to use some system specific calls for timings.
  *
  * Differences:
- * None. Note that the System.currentTimeMillis function is used so it won't be too precise, as stated in specification :)
+ * Our implementation uses Java's System.nanoTime() which is very precise in contrast with the specification of the
+ * official Pascal function.
  */
 public abstract class GetMsCountNode extends ExpressionNode {
 
     @Specialization
     long getMiliseconds(VirtualFrame frame) {
-        return System.currentTimeMillis();
+        return System.nanoTime() / (1024 * 1024);
     }
 
     @Override

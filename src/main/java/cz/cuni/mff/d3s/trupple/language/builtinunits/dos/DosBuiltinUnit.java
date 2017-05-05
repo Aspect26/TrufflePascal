@@ -10,6 +10,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.BuiltinFunctionDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.BuiltinProcedureDescriptor;
 
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class DosBuiltinUnit extends BuiltinUnitAbstr {
         );
         data.add(new UnitSubroutineData(
                 "getMsCount",
-                new BuiltinProcedureDescriptor.NoArgumentBuiltin(GetMsCountNodeGen.create())
+                new BuiltinFunctionDescriptor.NoArgumentBuiltin(GetMsCountNodeGen.create())
                 )
         );
         data.add(new UnitSubroutineData(

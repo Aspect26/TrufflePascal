@@ -31,7 +31,7 @@ public class CompilerMain {
         if (settings.isTPExtensionSet()) {
             UnitEvaluator.evalUnits(engine, settings.imports);
         }
-        engine.eval(source, "");
+        engine.eval(source);
 
         engine.dispose();
     }

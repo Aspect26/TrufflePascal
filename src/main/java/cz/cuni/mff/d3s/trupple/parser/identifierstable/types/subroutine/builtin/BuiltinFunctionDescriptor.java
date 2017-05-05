@@ -69,4 +69,12 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
         }
     }
 
+    public static class NoArgumentBuiltin extends BuiltinFunctionDescriptor {
+
+        public NoArgumentBuiltin(ExpressionNode bodyNode) {
+            super(bodyNode, Collections.emptyList());
+        }
+
+    }
+
 }
