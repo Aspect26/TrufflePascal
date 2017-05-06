@@ -8,6 +8,7 @@ import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 
 public class ImportsOptionHandler extends OptionHandler<String> {
+
 	public ImportsOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super String> setter) {
         super(parser, option, setter);
     }

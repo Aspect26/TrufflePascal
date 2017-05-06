@@ -21,6 +21,7 @@ public class CompilerMain {
 
 	public static void main(String[] args) throws Exception {
         settings = parseArguments(args);
+        PascalLanguage.INSTANCE.setUp(settings.usesTPExtension(), settings.usesExtendedGoto());
 		executeSource(Source.newBuilder(new File(settings.getSourcePath())).mimeType(PascalLanguage.MIME_TYPE).build(), System.in, System.out);
 	}
 
@@ -28,8 +29,8 @@ public class CompilerMain {
         engine = PolyglotEngine.newBuilder().setIn(input).setOut(output).setErr(System.err).build();
         assert engine.getLanguages().containsKey(PascalLanguage.MIME_TYPE);
 
-        if (settings.isTPExtensionSet()) {
-            UnitEvaluator.evalUnits(engine, settings.imports);
+        if (settings.usesTPExtension()) {
+            UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
         }
         engine.eval(source);
 
