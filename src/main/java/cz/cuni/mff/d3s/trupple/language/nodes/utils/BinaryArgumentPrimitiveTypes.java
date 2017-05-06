@@ -17,20 +17,20 @@ public class BinaryArgumentPrimitiveTypes {
         }
 
         BinaryArgumentPrimitiveTypes compareToArgs = (BinaryArgumentPrimitiveTypes) compareTo;
-        return compareToArgs.types.getKey().equals(this.types.getKey()) && compareToArgs.types.getValue().equals(this.types.getValue());
+        return compareToArgs.types.getFirst().equals(this.types.getFirst()) && compareToArgs.types.getSecond().equals(this.types.getSecond());
     }
 
     @Override
     public int hashCode() {
-        return types.getKey().hashCode() * types.getValue().hashCode();
+        return types.getFirst().hashCode() * types.getSecond().hashCode();
     }
 
     public TypeDescriptor getLeftType() {
-        return this.types.getKey();
+        return this.types.getFirst();
     }
 
     public TypeDescriptor getRightType() {
-        return this.types.getValue();
+        return this.types.getSecond();
     }
 
 }

@@ -10,11 +10,11 @@ class Tuple<X, Y> {
         this.second = second;
     }
 
-    X getKey() {
+    X getFirst() {
         return this.first;
     }
 
-    Y getValue() {
+    Y getSecond() {
         return this.second;
     }
 

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -21,29 +20,24 @@ import org.junit.Ignore;
 public abstract class JUnitTest {
 
 	protected ByteArrayOutputStream output;
-	private ByteArrayOutputStream error;
 	private PolyglotEngine engine;
 
 	@Before
 	public void setUp() {
 		output = new ByteArrayOutputStream();
-		error = new ByteArrayOutputStream();
-        engine = PolyglotEngine.newBuilder().setIn(System.in).setOut(System.out).setErr(error).build();
+        engine = PolyglotEngine.newBuilder().setIn(System.in).setOut(System.out).setErr(System.err).build();
 
         assertTrue(engine.getLanguages().containsKey(PascalLanguage.MIME_TYPE));
         System.setOut(new PrintStream(output));
-        System.setErr(new PrintStream(error));
 	}
 
 	public void clearOutputs() {
         output = new ByteArrayOutputStream();
-        error = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
-        System.setErr(new PrintStream(error));
     }
 	
 	private void setInput(String input) {
-        engine = PolyglotEngine.newBuilder().setIn(new ByteArrayInputStream(input.getBytes())).setOut(System.out).setErr(error).build();
+        engine = PolyglotEngine.newBuilder().setIn(new ByteArrayInputStream(input.getBytes())).setOut(System.out).setErr(System.err).build();
 	}
 
 	void testWithInput(String sourceCode, String input, String expectedOutput) {
@@ -80,8 +74,9 @@ public abstract class JUnitTest {
                         boolean extendedGotoSupport, String[] arguments) {
         Source source = this.createSource(sourceCode);
         clearOutputs();
+        PascalLanguage.INSTANCE.setUp(useTPExtension, extendedGotoSupport);
         engine.eval(source);
-        assertEquals(expectedOutput, output.toString() + error.toString());
+        assertEquals(expectedOutput, output.toString());
     }
 
 	private Source createSource(String source) {

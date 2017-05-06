@@ -25,18 +25,15 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
 
     public static final String MIME_TYPE = "application/x-pascal";
     private IParser parser;
-    private boolean useTPExtension = true;
+    private boolean useTPExtension = false;
     private boolean extendedGotoSupport = true;
 
     private PascalLanguage() {
     }
 
-    public void useTPExtension(boolean use) {
-        this.useTPExtension = use;
-    }
-
-    public void useExtendedGotoSupport(boolean use) {
-        this.extendedGotoSupport = use;
+    public void setUp(boolean tpExtension, boolean extendedGoto) {
+        this.useTPExtension = tpExtension;
+        this.extendedGotoSupport = extendedGoto;
     }
 
     @Override
@@ -74,20 +71,13 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
     protected CallTarget parse(ParsingRequest request) throws Exception {
         Source source = request.getSource();
 
-        if (this.parser == null) {
-            this.parser = (useTPExtension) ? new Parser(extendedGotoSupport) : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
-        }
+        this.parser = (useTPExtension) ? new Parser(extendedGotoSupport) : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
         parseSource(source);
         if (parser.getRootNode() != null) {
             return Truffle.getRuntime().createCallTarget(parser.getRootNode());
         } else {
             return null;
         }
-    }
-
-    public CallTarget testRun(Source source) throws Exception {
-        parseSource(source);
-        return Truffle.getRuntime().createCallTarget(parser.getRootNode());
     }
 
     private void parseSource(Source source) throws Exception {
