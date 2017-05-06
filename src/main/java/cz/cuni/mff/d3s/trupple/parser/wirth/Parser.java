@@ -40,9 +40,9 @@ public class Parser implements IParser {
 
 	
 
-	public Parser(boolean extendedGotoSupport) {
+	public Parser() {
 		this.factory = new NodeFactory(this, false);
-		this.extendedGotoSupport = extendedGotoSupport;
+		this.extendedGotoSupport = false;
 		errors = new Errors();
 	}
 
@@ -1207,20 +1207,26 @@ public class Parser implements IParser {
 
 	};
 
+	public void reset() {
+        this.factory.reset();
+        this.errors = new Errors();
+        this.mainNode = null;
+    }
+
 	public boolean isUsingTPExtension() {
         return false;
+    }
+
+    public void setExtendedGoto(boolean extendedGoto) {
+        this.extendedGotoSupport = extendedGoto;
     }
 	
     public boolean hadErrors() {
         return errors.count > 0;
     }
 
-    public VirtualFrame getUnitsFrame() {
-        return this.factory.getUnitsFrame();
-    }
-
     public RootNode getRootNode() {
-        return this.mainNode;
+        return (this.mainNode == null)? factory.createUnitRootNode() : this.mainNode;
     }
 
     boolean caseEnds(){

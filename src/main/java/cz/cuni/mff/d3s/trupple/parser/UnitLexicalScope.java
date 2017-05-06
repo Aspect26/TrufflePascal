@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.trupple.parser;
 
-import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
@@ -13,7 +13,6 @@ import java.util.Set;
 
 class UnitLexicalScope extends LexicalScope {
 
-    private VirtualFrame frame;
     private final Set<String> publicIdentifiers;
 
     UnitLexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
@@ -23,22 +22,11 @@ class UnitLexicalScope extends LexicalScope {
 
     @Override
     BlockNode createInitializationBlock() {
-        UnitLexicalScope outerUnitScope = (UnitLexicalScope) this.getOuterScope();
-        VirtualFrame outerFrame = (outerUnitScope != null)? outerUnitScope.getFrame() : null;
-        Object[] frameArguments = (outerFrame != null)? new Object[]{outerFrame} : new Object[0];
-
-        if (this.frame == null) {
-            this.frame = Truffle.getRuntime().createVirtualFrame(frameArguments, this.getFrameDescriptor());
-        }
-
-        List<StatementNode> initializationNodes = this.generateInitializationNodes(this.frame);
+        VirtualFrame unitFrame = PascalLanguage.INSTANCE.findContext().createUnitFrame(this.getName(), this.getFrameDescriptor());
+        List<StatementNode> initializationNodes = this.generateInitializationNodes(unitFrame);
         initializationNodes.addAll(this.scopeInitializationNodes);
 
         return new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
-    }
-
-    VirtualFrame getFrame() {
-        return this.frame;
     }
 
     @Override

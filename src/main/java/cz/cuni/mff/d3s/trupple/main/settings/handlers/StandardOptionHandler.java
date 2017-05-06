@@ -13,7 +13,7 @@ public class StandardOptionHandler extends OptionHandler<String> {
     private static final String STANDARD_TP = "turbo";
     private final CmdLineParser parser;
 
-    protected StandardOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super String> setter) {
+    public StandardOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super String> setter) {
         super(parser, option, setter);
         this.parser = parser;
     }

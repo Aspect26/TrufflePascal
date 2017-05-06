@@ -40,9 +40,9 @@ public class Parser implements IParser {
 
 	
 
-	public Parser(boolean extendedGotoSupport) {
+	public Parser() {
 		this.factory = new NodeFactory(this, true);
-		this.extendedGotoSupport = extendedGotoSupport;
+		this.extendedGotoSupport = false;
 		errors = new Errors();
 	}
 
@@ -1228,7 +1228,7 @@ public class Parser implements IParser {
 
 	void UnitFooter() {
 		Expect(22);
-		factory.endUnit(); 
+		factory.finishUnit(); 
 		Expect(34);
 	}
 
@@ -1326,20 +1326,26 @@ public class Parser implements IParser {
 
 	};
 
+    public void reset() {
+        this.factory.reset();
+        this.errors = new Errors();
+        this.mainNode = null;
+    }
+
 	public boolean isUsingTPExtension() {
 	    return true;
 	}
+
+	public void setExtendedGoto(boolean extendedGoto) {
+        this.extendedGotoSupport = extendedGoto;
+    }
 	
     public boolean hadErrors(){
     	return errors.count > 0;
     }
 
-    public VirtualFrame getUnitsFrame() {
-        return this.factory.getUnitsFrame();
-    }
-
     public RootNode getRootNode() {
-        return this.mainNode;
+        return (this.mainNode == null)? factory.createUnitRootNode() : this.mainNode;
     }
     
     boolean caseEnds(){
@@ -1415,7 +1421,7 @@ class Errors {
 	public int count = 0;                                    // number of errors detected
 	public java.io.PrintStream errorStream = System.err;     // error messages go to this stream
 	public String errMsgFormat = "-- line {0} col {1}: {2}"; // 0=line, 1=column, 2=text
-
+	
 	protected void printMsg(int line, int column, String msg) {
 		StringBuffer b = new StringBuffer(errMsgFormat);
 		int pos = b.indexOf("{0}");

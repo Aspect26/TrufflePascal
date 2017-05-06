@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.parser;
 import com.oracle.truffle.api.frame.FrameDescriptor;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
+import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.BlockNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.InitializationNodeFactory;
@@ -90,6 +91,7 @@ public class LexicalScope {
     }
 
     void setSubroutineRootNode(String identifier, PascalRootNode rootNode) throws LexicalException {
+        PascalLanguage.INSTANCE.findContext().updateSubroutine(this.name, identifier, rootNode);
         this.localIdentifiers.setSubroutineRootNode(identifier, rootNode);
     }
 
@@ -151,16 +153,16 @@ public class LexicalScope {
         return this.localIdentifiers.addReference(identifier, typeDescriptor);
     }
 
-    FrameSlot registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        return this.localIdentifiers.addVariable(identifier, typeDescriptor);
+    void registerLocalVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        this.localIdentifiers.addVariable(identifier, typeDescriptor);
     }
 
     void addScopeInitializationNode(StatementNode initializationNode) {
         this.scopeInitializationNodes.add(initializationNode);
     }
 
-    FrameSlot registerReturnVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        return this.localIdentifiers.addReturnVariable(identifier, typeDescriptor);
+    void registerReturnVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        this.localIdentifiers.addReturnVariable(identifier, typeDescriptor);
     }
 
     TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {

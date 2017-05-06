@@ -7,7 +7,6 @@ import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.source.Source;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.IParser;
-import cz.cuni.mff.d3s.trupple.parser.tp.Parser;
 
 import java.io.*;
 
@@ -24,16 +23,25 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
     public static final PascalLanguage INSTANCE = new PascalLanguage();
 
     public static final String MIME_TYPE = "application/x-pascal";
-    private IParser parser;
-    private boolean useTPExtension = false;
-    private boolean extendedGotoSupport = true;
+    private IParser currentParser;
+    private final IParser wirthParser;
+    private final IParser turboParser;
 
     private PascalLanguage() {
+        this.wirthParser = new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
+        this.turboParser = new cz.cuni.mff.d3s.trupple.parser.tp.Parser();
     }
 
     public void setUp(boolean tpExtension, boolean extendedGoto) {
-        this.useTPExtension = tpExtension;
-        this.extendedGotoSupport = extendedGoto;
+        this.currentParser = (tpExtension)? this.turboParser : this.wirthParser;
+        this.currentParser.setExtendedGoto(extendedGoto);
+    }
+
+    public void reset(boolean tpExtension, boolean extendedGoto) {
+        try {
+            this.findContext().reset();
+        } catch (NullPointerException e) {}
+        this.setUp(tpExtension, extendedGoto);
     }
 
     @Override
@@ -71,18 +79,14 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
     protected CallTarget parse(ParsingRequest request) throws Exception {
         Source source = request.getSource();
 
-        this.parser = (useTPExtension) ? new Parser(extendedGotoSupport) : new cz.cuni.mff.d3s.trupple.parser.wirth.Parser(extendedGotoSupport);
+        this.currentParser.reset();
         parseSource(source);
-        if (parser.getRootNode() != null) {
-            return Truffle.getRuntime().createCallTarget(parser.getRootNode());
-        } else {
-            return null;
-        }
+        return Truffle.getRuntime().createCallTarget(this.currentParser.getRootNode());
     }
 
     private void parseSource(Source source) throws Exception {
-        this.parser.Parse(source);
-        if (parser.hadErrors()) {
+        this.currentParser.Parse(source);
+        if (this.currentParser.hadErrors()) {
             throw new Exception("Errors while parsing source " + source.getName() + ".");
         }
     }

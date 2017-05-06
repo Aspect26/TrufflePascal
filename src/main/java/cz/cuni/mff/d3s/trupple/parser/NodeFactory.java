@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.trupple.parser;
 import java.util.*;
 
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.VirtualFrame;
+import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.*;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.dos.DosBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.crt.CrtBuiltinUnit;
@@ -11,9 +11,7 @@ import cz.cuni.mff.d3s.trupple.language.builtinunits.strings.StringBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import cz.cuni.mff.d3s.trupple.language.builtinunits.graph.GraphBuiltinUnit;
 import cz.cuni.mff.d3s.trupple.language.nodes.arithmetic.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.call.InvokeNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.call.ReferenceInitializationNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.call.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.control.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
@@ -97,6 +95,11 @@ public class NodeFactory {
 		this.currentLexicalScope = this.globalLexicalScope;
 	}
 
+	public void reset() {
+        this.globalLexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
+        this.currentLexicalScope = this.globalLexicalScope;
+    }
+
 	public void startPascal(Token identifierToken) {
 		this.currentLexicalScope.setName(this.getIdentifierFromToken(identifierToken));
 	}
@@ -111,7 +114,7 @@ public class NodeFactory {
         if (this.builtinUnits.containsKey(unitIdentifier)) {
             BuiltinUnit builtinUnit = this.builtinUnits.get(unitIdentifier);
             builtinUnit.importTo(this.currentLexicalScope);
-        } else if (!this.containsUnitScope(unitIdentifier)) {
+        } else if (!this.isUnitRegistered(unitIdentifier)) {
             parser.SemErr("Unknown unit: " + unitIdentifier + ". Did you forget to include it?");
         }
     }
@@ -135,24 +138,8 @@ public class NodeFactory {
         }
     }
 
-    private boolean containsUnit(String identifier) {
-	    for (LexicalScope unitScope : this.units) {
-	        if (unitScope.getName().equals(identifier)) {
-	            return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean containsUnitScope(String identifier) {
-	    for (LexicalScope unitScope : this.units) {
-	        if (unitScope.getName().equals(identifier)) {
-	            return true;
-            }
-        }
-
-        return false;
+    private boolean isUnitRegistered(String identifier) {
+	    return PascalLanguage.INSTANCE.findContext().isUnitRegistered(identifier);
     }
 
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, boolean withReturnType) {
@@ -672,9 +659,8 @@ public class NodeFactory {
 
         return this.doLookup(identifier, (LexicalScope foundInLexicalScope, String foundIdentifier) -> {
             if (foundInLexicalScope.isParameterlessSubroutine(foundIdentifier)) {
-                return this.createInvokeNode(foundInLexicalScope.getLocalSlot(foundIdentifier),
-                        (SubroutineDescriptor) foundInLexicalScope.getIdentifierDescriptor(foundIdentifier),
-                        Collections.emptyList());
+                SubroutineDescriptor descriptor = (SubroutineDescriptor) foundInLexicalScope.getIdentifierDescriptor(foundIdentifier);
+                return this.createInvokeNode(foundIdentifier, descriptor, foundInLexicalScope, Collections.emptyList());
             }
             else {
                 // TODO: check if it is a constant or a variable
@@ -749,17 +735,24 @@ public class NodeFactory {
             if (foundInScope.isSubroutine(foundIdentifier)) {
                 SubroutineDescriptor subroutineDescriptor = foundInScope.getSubroutineDescriptor(foundIdentifier, params);
                 subroutineDescriptor.verifyArguments(params);
-                return this.createInvokeNode(foundInScope.getLocalSlot(foundIdentifier), subroutineDescriptor, params);
+                return this.createInvokeNode(foundIdentifier, subroutineDescriptor, foundInScope, params);
             } else {
                 throw new LexicalException(foundIdentifier + " is not a subroutine.");
             }
         });
     }
 
-    private ExpressionNode createInvokeNode(FrameSlot subroutineSlot, SubroutineDescriptor descriptor, List<ExpressionNode> params) {
-        TypeDescriptor subroutineReturnDescriptor = (descriptor instanceof FunctionDescriptor)?
-                ((FunctionDescriptor) descriptor).getReturnDescriptor() : null;
-        return InvokeNodeGen.create(subroutineSlot, params.toArray(new ExpressionNode[params.size()]), subroutineReturnDescriptor);
+    private ExpressionNode createInvokeNode(String identifier, SubroutineDescriptor descriptor, LexicalScope subroutineScope, List<ExpressionNode> argumentNodes) {
+	    ExpressionNode[] arguments = argumentNodes.toArray(new ExpressionNode[argumentNodes.size()]);
+	    TypeDescriptor returnType = (descriptor instanceof FunctionDescriptor)? ((FunctionDescriptor) descriptor).getReturnDescriptor() : null;
+
+	    if (subroutineScope instanceof UnitLexicalScope) {
+	        String unitIdentifier = subroutineScope.getName();
+            return ContextInvokeNodeGen.create(identifier, unitIdentifier, arguments, returnType);
+        } else {
+	        FrameSlot subroutineSlot = subroutineScope.getLocalSlot(identifier);
+	        return InvokeNodeGen.create(subroutineSlot, arguments, returnType);
+        }
     }
 
     public ExpressionNode createReferencePassNode(Token variableToken) {
@@ -818,6 +811,10 @@ public class NodeFactory {
 
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
         return new ProcedurePascalRootNode(currentLexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
+    }
+
+    public PascalRootNode createUnitRootNode() {
+	    return new ProcedurePascalRootNode(currentLexicalScope.getFrameDescriptor(), this.currentLexicalScope.createInitializationBlock());
     }
 
     private void addProgramArgumentsAssignmentNodes() {
@@ -992,7 +989,7 @@ public class NodeFactory {
     public void startUnit(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
-        if (this.containsUnit(identifier)) {
+        if (PascalLanguage.INSTANCE.findContext().isUnitRegistered(identifier)) {
             parser.SemErr("Unit with name " + identifier + " is already defined.");
             return;
         }
@@ -1024,7 +1021,6 @@ public class NodeFactory {
     }
 
     public void finishUnitInterfaceSection() {
-	    assert !this.currentLexicalScope.equals(this.globalLexicalScope);
         ((UnitLexicalScope) this.currentLexicalScope).markAllIdentifiersPublic();
     }
 
@@ -1061,17 +1057,7 @@ public class NodeFactory {
         }
     }
 
-    public void endUnit() {
-	    this.currentLexicalScope = this.globalLexicalScope;
-    }
-
-    public VirtualFrame getUnitsFrame() {
-	    VirtualFrame unitsFrame = null;
-	    if (this.units.size() > 0) {
-	        unitsFrame = this.units.get(this.units.size() - 1).getFrame();
-        }
-
-        return unitsFrame;
+    public void finishUnit() {
     }
 
 }

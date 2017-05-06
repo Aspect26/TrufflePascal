@@ -4,8 +4,6 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 
-import java.util.Scanner;
-
 @NodeInfo(shortName = "readln")
 public abstract class ReadlnBuiltinNode extends ReadBuiltinNode {
 

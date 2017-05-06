@@ -20,24 +20,26 @@ import org.junit.Ignore;
 public abstract class JUnitTest {
 
 	protected ByteArrayOutputStream output;
+	private ByteArrayInputStream input;
 	private PolyglotEngine engine;
 
 	@Before
 	public void setUp() {
 		output = new ByteArrayOutputStream();
+		input = new ByteArrayInputStream(new byte[0]);
         engine = PolyglotEngine.newBuilder().setIn(System.in).setOut(System.out).setErr(System.err).build();
 
         assertTrue(engine.getLanguages().containsKey(PascalLanguage.MIME_TYPE));
         System.setOut(new PrintStream(output));
 	}
 
-	public void clearOutputs() {
+	private void clearOutput() {
         output = new ByteArrayOutputStream();
         System.setOut(new PrintStream(output));
     }
 	
 	private void setInput(String input) {
-        engine = PolyglotEngine.newBuilder().setIn(new ByteArrayInputStream(input.getBytes())).setOut(System.out).setErr(System.err).build();
+	    this.input = new ByteArrayInputStream(input.getBytes());
 	}
 
 	void testWithInput(String sourceCode, String input, String expectedOutput) {
@@ -72,10 +74,13 @@ public abstract class JUnitTest {
 
 	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
                         boolean extendedGotoSupport, String[] arguments) {
-        Source source = this.createSource(sourceCode);
-        clearOutputs();
-        PascalLanguage.INSTANCE.setUp(useTPExtension, extendedGotoSupport);
-        engine.eval(source);
+        clearOutput();
+        engine = PolyglotEngine.newBuilder().setIn(this.input).setOut(System.out).setErr(System.err).build();
+        PascalLanguage.INSTANCE.reset(useTPExtension, extendedGotoSupport);
+        for (String importSource : imports) {
+            engine.eval(this.createSource(importSource));
+        }
+        engine.eval(this.createSource(sourceCode));
         assertEquals(expectedOutput, output.toString());
     }
 

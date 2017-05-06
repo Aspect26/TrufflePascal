@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.call;
 
 import com.oracle.truffle.api.CompilerAsserts;
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
@@ -19,9 +20,8 @@ public abstract class InvokeNode extends ExpressionNode {
 
     private final FrameSlot subroutineSlot;
     private final TypeDescriptor type;
-
-    @Children
-	private final ExpressionNode[] argumentNodes;
+    @Children private final ExpressionNode[] argumentNodes;
+    @CompilerDirectives.CompilationFinal private PascalSubroutine subroutine;
 
 	InvokeNode(FrameSlot subroutineSlot, ExpressionNode[] argumentNodes, TypeDescriptor type) {
 		this.subroutineSlot = subroutineSlot;
@@ -31,7 +31,10 @@ public abstract class InvokeNode extends ExpressionNode {
 
 	@Specialization
 	Object invoke(VirtualFrame frame) {
-		PascalSubroutine subroutine = this.getMySubroutine(frame);
+	    if (subroutine == null) {
+	        CompilerDirectives.transferToInterpreterAndInvalidate();
+	        subroutine = this.getMySubroutine(frame);
+        }
         Object[] argumentValues = this.evaluateArguments(frame);
 
         return subroutine.getCallTarget().call(argumentValues);
@@ -49,7 +52,6 @@ public abstract class InvokeNode extends ExpressionNode {
 
     @ExplodeLoop
     private Object[] evaluateArguments(VirtualFrame frame) {
-        CompilerAsserts.compilationConstant(argumentNodes.length);
         Object[] argumentValues = new Object[argumentNodes.length + 1];
         argumentValues[0] = frame;
         for (int i = 0; i < argumentNodes.length; i++) {

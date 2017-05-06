@@ -928,7 +928,7 @@ identifier										(. factory.startUnit(t); .)
 
 UnitFooter
 =
-"end"											(. factory.endUnit(); .)
+"end"											(. factory.finishUnit(); .)
 "."
 .
 
