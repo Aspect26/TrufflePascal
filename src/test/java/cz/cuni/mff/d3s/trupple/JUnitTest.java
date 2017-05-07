@@ -72,16 +72,33 @@ public abstract class JUnitTest {
 	    this.test(sourceCode, imports, expectedOutput, useTPExtension, extendedGotoSupport, new String[0]);
 	}
 
-	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
+    protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
                         boolean extendedGotoSupport, String[] arguments) {
+        this.test(sourceCode, imports, expectedOutput, useTPExtension, extendedGotoSupport, arguments, false);
+    }
+
+	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
+                        boolean extendedGotoSupport, String[] arguments, boolean useBuiltinUnits) {
         clearOutput();
         engine = PolyglotEngine.newBuilder().setIn(this.input).setOut(System.out).setErr(System.err).build();
         PascalLanguage.INSTANCE.reset(useTPExtension, extendedGotoSupport);
+        if (useBuiltinUnits) {
+            evalBuiltinSubroutines();
+        }
         for (String importSource : imports) {
             engine.eval(this.createSource(importSource));
         }
         engine.eval(this.createSource(sourceCode));
         assertEquals(expectedOutput, output.toString());
+    }
+
+    private void evalBuiltinSubroutines() {
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get("./builtinunits/strings.pas"));
+            engine.eval(this.createSource(new String(encoded)));
+        } catch (IOException e) {
+            System.err.print("Could not read strings unit");
+        }
     }
 
 	private Source createSource(String source) {

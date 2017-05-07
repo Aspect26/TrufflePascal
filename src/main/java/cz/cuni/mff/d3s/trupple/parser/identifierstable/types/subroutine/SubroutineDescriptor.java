@@ -5,6 +5,7 @@ import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.ArgumentTypeMismatchException;
@@ -49,6 +50,10 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
     public void setRootNode(RootNode rootNode) {
         RootCallTarget callTarget = Truffle.getRuntime().createCallTarget(rootNode);
         this.subroutine = new PascalSubroutine(callTarget);
+    }
+
+    public PascalRootNode getRootNode() {
+        return (PascalRootNode) this.subroutine.getCallTarget().getRootNode();
     }
 
     public boolean hasParameters() {

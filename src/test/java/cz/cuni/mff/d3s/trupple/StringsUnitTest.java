@@ -2,6 +2,8 @@ package cz.cuni.mff.d3s.trupple;
 
 import org.junit.Test;
 
+import java.util.Collections;
+
 public class StringsUnitTest extends JUnitTest {
 
     @Test
@@ -23,7 +25,7 @@ public class StringsUnitTest extends JUnitTest {
                 "end.";
 
         String output = "-36METALLICA - 2ND OF APRIL 2018 IN PRAGUE." + String.valueOf('\0');
-        test(code, output, true);
+        test(code, Collections.emptyList(), output, true, false, new String[0], true);
     }
 
 }

@@ -16,7 +16,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.graphics.PascalGraphMode;
 public abstract class InitGraphNode extends StatementNode {
 
     @Specialization
-    public void initGraph(long graphDriver, long graphMode, PascalString pathToDriver) {
+    void initGraph(long graphDriver, long graphMode, PascalString pathToDriver) {
         PascalGraphMode.init();
     }
 

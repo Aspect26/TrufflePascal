@@ -53,12 +53,6 @@ public class NodeFactory {
 	private IParser parser;
 
     /**
-     * Lexical scope of the main program excluding units. Holds information about registered identifiers and what type
-     * are they assigned to.
-     */
-	private LexicalScope globalLexicalScope;
-
-    /**
      * Current lexical scope.
      */
 	private LexicalScope currentLexicalScope;
@@ -91,13 +85,11 @@ public class NodeFactory {
 	public NodeFactory(IParser parser, boolean usingTPExtension) {
 		this.parser = parser;
 		this.usingTPExtension = usingTPExtension;
-		this.globalLexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
-		this.currentLexicalScope = this.globalLexicalScope;
+		this.currentLexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
 	}
 
 	public void reset() {
-        this.globalLexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
-        this.currentLexicalScope = this.globalLexicalScope;
+        this.currentLexicalScope = new LexicalScope(null, "_main", parser.isUsingTPExtension());
     }
 
 	public void startPascal(Token identifierToken) {
@@ -113,7 +105,9 @@ public class NodeFactory {
         String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);  // TODO: can't use getIdentifierFromToken() here
         if (this.builtinUnits.containsKey(unitIdentifier)) {
             BuiltinUnit builtinUnit = this.builtinUnits.get(unitIdentifier);
-            builtinUnit.importTo(this.currentLexicalScope);
+            UnitLexicalScope unitScope = new UnitLexicalScope(null, unitIdentifier, this.usingTPExtension);
+            builtinUnit.importTo(unitScope);
+            this.units.add(unitScope);
         } else if (!this.isUnitRegistered(unitIdentifier)) {
             parser.SemErr("Unknown unit: " + unitIdentifier + ". Did you forget to include it?");
         }

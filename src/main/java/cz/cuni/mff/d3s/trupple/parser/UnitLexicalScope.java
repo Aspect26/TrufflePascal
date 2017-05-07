@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class UnitLexicalScope extends LexicalScope {
+public class UnitLexicalScope extends LexicalScope {
 
     private final Set<String> publicIdentifiers;
 
@@ -34,7 +34,7 @@ class UnitLexicalScope extends LexicalScope {
         return this.publicIdentifiers.contains(identifier);
     }
 
-    void markAllIdentifiersPublic() {
+    public void markAllIdentifiersPublic() {
         Map<String, TypeDescriptor> allIdentifiers = this.localIdentifiers.getAllIdentifiers();
         for (Map.Entry<String, TypeDescriptor> entry : allIdentifiers.entrySet()) {
             String currentIdentifier = entry.getKey();

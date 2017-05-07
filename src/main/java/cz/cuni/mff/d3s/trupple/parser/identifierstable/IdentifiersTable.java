@@ -198,12 +198,12 @@ public class IdentifiersTable {
         return this.registerNewIdentifier(identifier, new ReferenceDescriptor(typeDescriptor));
     }
 
-    public FrameSlot addVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        return this.registerNewIdentifier(identifier, typeDescriptor);
+    public void addVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
+        this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
-    public FrameSlot addReturnVariable(String identifier, TypeDescriptor returnTypeDescriptor) throws LexicalException {
-        return this.registerNewIdentifier(identifier, new ReturnTypeDescriptor(returnTypeDescriptor));
+    public void addReturnVariable(String identifier, TypeDescriptor returnTypeDescriptor) throws LexicalException {
+        this.registerNewIdentifier(identifier, new ReturnTypeDescriptor(returnTypeDescriptor));
     }
 
     public void addConstant(String identifier, ConstantDescriptor descriptor) throws LexicalException {
@@ -285,8 +285,8 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, typeDescriptor);
     }
 
-    public FrameSlot addSubroutine(String identifier, SubroutineDescriptor descriptor) throws LexicalException {
-        return this.registerNewIdentifier(identifier, descriptor);
+    public void addSubroutine(String identifier, SubroutineDescriptor descriptor) throws LexicalException {
+        this.registerNewIdentifier(identifier, descriptor);
     }
 
     public ConstantDescriptor getConstant(String identifier) throws LexicalException {

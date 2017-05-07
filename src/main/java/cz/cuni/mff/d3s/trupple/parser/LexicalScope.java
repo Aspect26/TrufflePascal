@@ -212,6 +212,7 @@ public class LexicalScope {
     public void registerBuiltinSubroutine(String identifier, SubroutineDescriptor descriptor) {
         try {
             this.localIdentifiers.addSubroutine(identifier, descriptor);
+            PascalLanguage.INSTANCE.findContext().updateSubroutine(this.name, identifier, descriptor.getRootNode());
         } catch (LexicalException e) {
             throw new PascalRuntimeException("Could not register builtin subroutine: " + identifier);
         }
