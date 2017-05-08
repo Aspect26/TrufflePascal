@@ -725,6 +725,7 @@ public class NodeFactory {
 
     public ExpressionNode createSubroutineCall(Token identifierToken, List<ExpressionNode> params) {
         String identifier = this.getIdentifierFromToken(identifierToken);
+
         return this.doLookup(identifier, (LexicalScope foundInScope, String foundIdentifier) -> {
             if (foundInScope.isSubroutine(foundIdentifier)) {
                 SubroutineDescriptor subroutineDescriptor = foundInScope.getSubroutineDescriptor(foundIdentifier, params);

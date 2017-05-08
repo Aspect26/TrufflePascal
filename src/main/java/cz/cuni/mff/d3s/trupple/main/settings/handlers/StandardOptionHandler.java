@@ -28,9 +28,8 @@ public class StandardOptionHandler extends OptionHandler<String> {
         return 1;
     }
 
-    @Override
     public String getDefaultMetaVariable() {
-        return STANDARD_TP;
+        return "VAL";
     }
 
     public static boolean isTurbo(String value) {
