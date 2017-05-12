@@ -640,13 +640,17 @@ public class NodeFactory {
 	    return new SimpleAccessNode(frameSlot, typeDescriptor);
     }
 
-    public StatementNode createAssignmentWithRoute(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
+    public StatementNode createAssignmentNode(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, true);
         this.checkTypesAreCompatible(valueNode.getType(), accessNode.getType());
+        TypeDescriptor targetType = this.doLookup(variableIdentifier, LexicalScope::getIdentifierDescriptor, true);
 
-        return (accessNode instanceof SimpleAccessNode)?
-                AssignmentNodeGen.create(valueNode, frameSlot) : AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
+        if (accessNode instanceof SimpleAccessNode) {
+            return (targetType instanceof ReferenceDescriptor)? AssignReferenceNodeGen.create(valueNode, frameSlot) : AssignmentNodeGen.create(valueNode, frameSlot);
+        } else {
+            return AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
+        }
     }
 
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
@@ -659,7 +663,8 @@ public class NodeFactory {
             }
             else {
                 // TODO: check if it is a constant or a variable
-                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier), foundInLexicalScope.getIdentifierDescriptor(foundIdentifier));
+                boolean isReference = foundInLexicalScope.getIdentifierDescriptor(foundIdentifier) instanceof ReferenceDescriptor;
+                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier), foundInLexicalScope.getIdentifierDescriptor(foundIdentifier), isReference);
             }
         });
     }

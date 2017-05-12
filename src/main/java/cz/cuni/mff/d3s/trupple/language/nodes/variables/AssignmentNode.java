@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.variables;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.Specialization;
@@ -7,6 +8,7 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
+import com.oracle.truffle.api.nodes.ExplodeLoop;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
@@ -34,66 +36,53 @@ public abstract class AssignmentNode extends StatementNode {
         }
     }
 
+    @CompilerDirectives.CompilationFinal private int jumps = -1;
+
     @Specialization
     void writeLong(VirtualFrame frame, long value) {
-        frame.setLong(getSlot(), value);
+        getFrame(frame).setLong(getSlot(), value);
     }
 
     @Specialization
     void writeBoolean(VirtualFrame frame, boolean value) {
-        frame.setBoolean(getSlot(), value);
+        getFrame(frame).setBoolean(getSlot(), value);
     }
 
     @Specialization
     void writeChar(VirtualFrame frame, char value) {
-        frame.setByte(getSlot(), (byte) value);
+        getFrame(frame).setByte(getSlot(), (byte) value);
     }
 
     @Specialization
     void writeDouble(VirtualFrame frame, double value) {
-        frame.setDouble(getSlot(), value);
+        getFrame(frame).setDouble(getSlot(), value);
     }
 
     @Specialization
     void writeEnum(VirtualFrame frame, EnumValue value) {
-        frame.setObject(getSlot(), value);
+        getFrame(frame).setObject(getSlot(), value);
     }
 
     @Specialization
     void assignSet(VirtualFrame frame, SetTypeValue set) {
-        frame.setObject(getSlot(), set.createDeepCopy());
+        getFrame(frame).setObject(getSlot(), set.createDeepCopy());
     }
 
     @Specialization
     void assignRecord(VirtualFrame frame, RecordValue record) {
-        frame.setObject(getSlot(), record.getCopy());
-    }
-
-    @Specialization
-    void assignReference(VirtualFrame frame, Reference reference) {
-        Object referenceValue = reference.getFromFrame().getValue(reference.getFrameSlot());
-        if (referenceValue instanceof PointerValue) {
-            this.assignPointers(frame, (PointerValue) referenceValue);
-        } else {
-            // TODO: this does not has to be object...
-            frame.setObject(getSlot(), referenceValue);
-        }
+        getFrame(frame).setObject(getSlot(), record.getCopy());
     }
 
     @Specialization
     void assignPointers(VirtualFrame frame, PointerValue pointer) {
-        PointerValue assignmentTarget = (PointerValue) frame.getValue(getSlot());
+        PointerValue assignmentTarget = (PointerValue) getFrame(frame).getValue(getSlot());
         assignmentTarget.setHeapSlot((pointer).getHeapSlot());
     }
 
     @Specialization
     void assignString(VirtualFrame frame, PascalString value) {
-        Object targetObject;
-        try {
-            targetObject = frame.getObject(getSlot());
-        } catch (FrameSlotTypeException e) {
-            throw new PascalRuntimeException("Unexpected error");
-        }
+        frame = getFrame(frame);
+        Object targetObject = frame.getValue(getSlot());
         if (targetObject instanceof PascalString) {
             this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, value);
         } else if (targetObject instanceof PointerValue) {
@@ -106,17 +95,31 @@ public abstract class AssignmentNode extends StatementNode {
 
     @Specialization
     void assignSubroutine(VirtualFrame frame, PascalSubroutine subroutine) {
-        frame.setObject(getSlot(), subroutine);
+        getFrame(frame).setObject(getSlot(), subroutine);
     }
 
     @Specialization
     void assignArray(VirtualFrame frame, PascalArray array) {
-        frame.setObject(getSlot(), array.createDeepCopy());
+        getFrame(frame).setObject(getSlot(), array.createDeepCopy());
     }
 
     void assignPChar(PointerValue pcharPointer, PascalString value) {
         PCharValue pchar = (PCharValue) pcharPointer.getDereferenceValue();
         pchar.assignString(value.toString());
+    }
+
+    @ExplodeLoop
+    protected VirtualFrame getFrame(VirtualFrame frame) {
+        if (jumps == -1) {
+            jumps = this.getJumpsToFrame(frame, getSlot());
+            CompilerDirectives.transferToInterpreterAndInvalidate();
+        }
+
+        for (int i = 0; i < jumps; ++i) {
+            frame = (VirtualFrame) frame.getArguments()[0];
+        }
+
+        return frame;
     }
 
 }

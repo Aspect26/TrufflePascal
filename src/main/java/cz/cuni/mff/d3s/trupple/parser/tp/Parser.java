@@ -2,7 +2,6 @@
 package cz.cuni.mff.d3s.trupple.parser.tp;
 
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
@@ -837,7 +836,7 @@ public class Parser implements IParser {
 			AccessNode accessNode = InnerAccessRoute(identifierToken);
 			Expect(37);
 			ExpressionNode value = Expression();
-			statement = factory.createAssignmentWithRoute(identifierToken, accessNode, value); 
+			statement = factory.createAssignmentNode(identifierToken, accessNode, value);
 		} else SynErr(82);
 		return statement;
 	}

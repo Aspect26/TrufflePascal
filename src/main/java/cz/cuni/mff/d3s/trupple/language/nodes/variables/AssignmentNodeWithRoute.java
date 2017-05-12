@@ -4,10 +4,7 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalString;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.AccessNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
@@ -119,7 +116,7 @@ public abstract class AssignmentNodeWithRoute extends AssignmentNode {
      * @param frame this parameter is needed to generate {@link AssignmentNodeWithRouteNodeGen}
      */
     @Specialization
-    void totallyUnnecessarSpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLife (VirtualFrame frame) {
+    void totallyUnnecessarySpecializationFunctionWhichWillNeverBeUsedButTruffleDSLJustFuckingNeedsItSoItCanGenerateTheActualNodeFromThisClass_IJustWantedToCreateTheLongestIdentifierIHaveEverCreateInMyLife (VirtualFrame frame) {
 
     }
 

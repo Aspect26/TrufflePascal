@@ -8,14 +8,10 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 public class BlockNode extends StatementNode {
 
     @Children
-    final StatementNode[] bodyNodes;
+    private final StatementNode[] bodyNodes;
 
     public BlockNode(StatementNode[] bodyNodes) {
         this.bodyNodes = bodyNodes;
-    }
-
-    protected BlockNode() {
-        this.bodyNodes = new StatementNode[0];
     }
 
     @Override

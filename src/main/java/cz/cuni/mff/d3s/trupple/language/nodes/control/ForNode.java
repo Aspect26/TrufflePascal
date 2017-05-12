@@ -43,9 +43,9 @@ public class ForNode extends StatementNode {
 		this.controlSlot = controlSlot;
 		this.body = body;
 		this.hasEndedNode = (ascending)?
-                LessThanOrEqualNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType), finalValue)
+                LessThanOrEqualNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType, false), finalValue)
                 :
-                NotNodeGen.create(LessThanNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType), finalValue));
+                NotNodeGen.create(LessThanNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType, false), finalValue));
 	}
 
 	@Override

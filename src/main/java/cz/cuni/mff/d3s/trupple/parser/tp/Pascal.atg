@@ -557,7 +557,7 @@ identifier                                      (. Token identifierToken = t; .)
 |
     InnerAccessRoute<out AccessNode accessNode, identifierToken>
     ":="
-    Expression<out ExpressionNode value>        (. statement = factory.createAssignmentWithRoute(identifierToken, accessNode, value); .)
+    Expression<out ExpressionNode value>        (. statement = factory.createAssignmentNode(identifierToken, accessNode, value); .)
 )
 .
 

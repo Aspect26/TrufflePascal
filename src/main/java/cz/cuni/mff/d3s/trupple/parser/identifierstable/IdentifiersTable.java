@@ -54,6 +54,7 @@ public class IdentifiersTable {
         typeDescriptors.put("integer", LongDescriptor.getInstance());
         typeDescriptors.put("shortint", LongDescriptor.getInstance());
         typeDescriptors.put("longint", LongDescriptor.getInstance());
+        typeDescriptors.put("int64", LongDescriptor.getInstance());
         typeDescriptors.put("byte", LongDescriptor.getInstance());
         typeDescriptors.put("word", LongDescriptor.getInstance());
         typeDescriptors.put("single", RealDescriptor.getInstance());
