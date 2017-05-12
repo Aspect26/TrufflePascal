@@ -1,9 +1,7 @@
 COMPILER Pascal
-
 IGNORECASE
 
 CHARACTERS
-
 letter = 'A'..'Z' + 'a'..'z'.
 nonZeroDigit = "123456789".
 digit = "0123456789".
@@ -15,14 +13,12 @@ tab = '\t'.
 stringChar = ANY - "'" - cr - lf.
 
 TOKENS
-
 identifier = letter {letter | digit}.
 stringLiteral = "'" { stringChar | "''" } "'".
 integerLiteral = "0" | nonZeroDigit { digit }.
 doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] { digit } | ("0" | nonZeroDigit { digit }) "." digit { digit } ["e" ["-"|"+"] { digit }].
 
 PRAGMAS
-
 COMMENTS FROM "(*" TO "*)"
 COMMENTS FROM "{" TO "}"
 IGNORE cr + lf + tab
@@ -32,7 +28,7 @@ PRODUCTIONS
 Pascal
 =
 (
-    Program
+    [ Program ]
 	[ ImportsSection ]
 	Declarations
 	MainFunction
@@ -587,13 +583,12 @@ InnerAccessRouteElement<out AccessNode accessNode, AccessNode previousAccessNode
 =                                               (. accessNode = null; .)
 (
     ArrayIndex<. out List<ExpressionNode> indexNodes .>
-                                                (. accessNode = new ArrayAccessNode(previousAccessNode, indexNodes); .)
+                                                (. accessNode = factory.createArrayAccessNode(previousAccessNode, indexNodes); .)
 |
     "."
-    identifier                                  (. String variableIdentifier = factory.getIdentifierFromToken(t); .)
-                                                (. accessNode = new RecordAccessNode(previousAccessNode, variableIdentifier); .)
+    identifier                                  (. accessNode = factory.createRecordAccessNode(previousAccessNode, t); .)
 |
-    "^"                                         (. accessNode = new PointerDereference(previousAccessNode); .)
+    "^"                                         (. accessNode = factory.createPointerDereferenceAccessNode(previousAccessNode); .)
 )
 .
 
@@ -933,7 +928,7 @@ identifier										(. factory.startUnit(t); .)
 
 UnitFooter
 =
-"end"											(. factory.endUnit(); .)
+"end"											(. factory.finishUnit(); .)
 "."
 .
 

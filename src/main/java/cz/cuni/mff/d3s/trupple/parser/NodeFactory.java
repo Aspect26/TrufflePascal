@@ -471,7 +471,7 @@ public class NodeFactory {
         if (startValue.getType() != finalValue.getType() && !startValue.getType().convertibleTo(finalValue.getType())) {
             parser.SemErr("Type mismatch in beginning and last value of for loop.");
         }
-        AssignmentNode initialAssignment = this.createCheckedAssignment(iteratingIdentifier, startValue);
+        AssignmentNode initialAssignment = this.createAssignmentNode(iteratingIdentifier, startValue);
         return new ForNode(ascending, initialAssignment, controlSlot, controlSlotType, finalValue, startValue, loopBody);
     }
 
@@ -645,7 +645,8 @@ public class NodeFactory {
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, true);
         this.checkTypesAreCompatible(valueNode.getType(), accessNode.getType());
 
-        return AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
+        return (accessNode instanceof SimpleAccessNode)?
+                AssignmentNodeGen.create(valueNode, frameSlot) : AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
     }
 
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
@@ -870,7 +871,7 @@ public class NodeFactory {
                 } else {
                     this.currentLexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
                     final ExpressionNode readNode = new ReadArgumentNode(count, parameters.get(count++).type);
-                    final AssignmentNode assignment = this.createCheckedAssignment(parameter.identifier, readNode);
+                    final AssignmentNode assignment = this.createAssignmentNode(parameter.identifier, readNode);
 
                     this.currentLexicalScope.addScopeInitializationNode(assignment);
                 }
@@ -880,7 +881,7 @@ public class NodeFactory {
         }
     }
 
-    private AssignmentNode createCheckedAssignment(String targetIdentifier, ExpressionNode valueNode) {
+    private AssignmentNode createAssignmentNode(String targetIdentifier, ExpressionNode valueNode) {
         TypeDescriptor targetType = this.doLookup(targetIdentifier, LexicalScope::getIdentifierDescriptor);
         this.checkTypesAreCompatible(valueNode.getType(), targetType);
 	    FrameSlot targetSlot = this.doLookup(targetIdentifier, LexicalScope::getLocalSlot);

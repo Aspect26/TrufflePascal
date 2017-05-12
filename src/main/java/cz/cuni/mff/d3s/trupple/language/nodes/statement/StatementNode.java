@@ -44,8 +44,26 @@ public abstract class StatementNode extends Node {
 		
 		return null;
 	}
-	
-	private boolean frameContainsSlot(VirtualFrame frame, FrameSlot slot) {
+
+    protected int getJumpsToFrame(VirtualFrame currentFrame, FrameSlot slot) {
+	    int result = 0;
+        if (frameContainsSlot(currentFrame, slot)) {
+            return result;
+        }
+
+        while (currentFrame.getArguments().length > 0) {
+            currentFrame = (VirtualFrame) currentFrame.getArguments()[0];
+            ++result;
+            if (frameContainsSlot(currentFrame, slot)) {
+                return result;
+            }
+        }
+
+        return -1;
+    }
+
+
+    private boolean frameContainsSlot(VirtualFrame frame, FrameSlot slot) {
 		return frame.getFrameDescriptor().getSlots().contains(slot);
 	}
 

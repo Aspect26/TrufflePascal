@@ -26,7 +26,7 @@ public abstract class AssignmentNode extends StatementNode {
 
     protected abstract FrameSlot getSlot();
 
-    protected void makeAssignment(VirtualFrame frame, FrameSlot slot, AssignmentNodeWithRoute.SlotAssignment slotAssignment, Object value) {
+    protected void makeAssignment(VirtualFrame frame, FrameSlot slot, SlotAssignment slotAssignment, Object value) {
         try {
             slotAssignment.assign(frame, slot, value);
         } catch (FrameSlotTypeException e) {
@@ -36,60 +36,37 @@ public abstract class AssignmentNode extends StatementNode {
 
     @Specialization
     void writeLong(VirtualFrame frame, long value) {
-        this.makeAssignment(
-                frame,
-                getSlot(),
-                (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setLong(assignmentFrameSlot, (long) assignmentValue),
-                value
-        );
+        frame.setLong(getSlot(), value);
     }
 
     @Specialization
     void writeBoolean(VirtualFrame frame, boolean value) {
-        this.makeAssignment(
-                frame,
-                getSlot(),
-                (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setBoolean(assignmentFrameSlot, (boolean) assignmentValue),
-                value
-        );
+        frame.setBoolean(getSlot(), value);
     }
 
-    // NOTE: characters are stored as bytes, since there is no FrameSlotKind for char
     @Specialization
     void writeChar(VirtualFrame frame, char value) {
-        this.makeAssignment(
-                frame,
-                getSlot(),
-                (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setByte(assignmentFrameSlot, (byte)((char) assignmentValue)),
-                value
-        );
+        frame.setByte(getSlot(), (byte) value);
     }
 
     @Specialization
     void writeDouble(VirtualFrame frame, double value) {
-        this.makeAssignment(
-                frame,
-                getSlot(),
-                (VirtualFrame assignmentFrame, FrameSlot assignmentFrameSlot, Object assignmentValue) -> assignmentFrame.setDouble(assignmentFrameSlot, (double) assignmentValue),
-                value
-        );
+        frame.setDouble(getSlot(), value);
     }
 
     @Specialization
     void writeEnum(VirtualFrame frame, EnumValue value) {
-        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, value);
+        frame.setObject(getSlot(), value);
     }
 
     @Specialization
     void assignSet(VirtualFrame frame, SetTypeValue set) {
-        SetTypeValue setCopy = set.createDeepCopy();
-        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, setCopy);
+        frame.setObject(getSlot(), set.createDeepCopy());
     }
 
     @Specialization
     void assignRecord(VirtualFrame frame, RecordValue record) {
-        RecordValue recordCopy = record.getCopy();
-        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, recordCopy);
+        frame.setObject(getSlot(), record.getCopy());
     }
 
     @Specialization
@@ -98,19 +75,15 @@ public abstract class AssignmentNode extends StatementNode {
         if (referenceValue instanceof PointerValue) {
             this.assignPointers(frame, (PointerValue) referenceValue);
         } else {
-            this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, referenceValue);
+            // TODO: this does not has to be object...
+            frame.setObject(getSlot(), referenceValue);
         }
     }
 
     @Specialization
     void assignPointers(VirtualFrame frame, PointerValue pointer) {
-        this.makeAssignment(frame, getSlot(),
-                (VirtualFrame assignmentFrame, FrameSlot frameSlot, Object value) ->
-                {
-                    PointerValue assignmentTarget = (PointerValue) assignmentFrame.getObject(frameSlot);
-                    assignmentTarget.setHeapSlot(((PointerValue) value).getHeapSlot());
-                },
-                pointer);
+        PointerValue assignmentTarget = (PointerValue) frame.getValue(getSlot());
+        assignmentTarget.setHeapSlot((pointer).getHeapSlot());
     }
 
     @Specialization
@@ -133,16 +106,15 @@ public abstract class AssignmentNode extends StatementNode {
 
     @Specialization
     void assignSubroutine(VirtualFrame frame, PascalSubroutine subroutine) {
-        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, subroutine);
+        frame.setObject(getSlot(), subroutine);
     }
 
     @Specialization
     void assignArray(VirtualFrame frame, PascalArray array) {
-        PascalArray arrayCopy = (PascalArray) array.createDeepCopy();
-        this.makeAssignment(frame, getSlot(), VirtualFrame::setObject, arrayCopy);
+        frame.setObject(getSlot(), array.createDeepCopy());
     }
 
-    private void assignPChar(PointerValue pcharPointer, PascalString value) {
+    void assignPChar(PointerValue pcharPointer, PascalString value) {
         PCharValue pchar = (PCharValue) pcharPointer.getDereferenceValue();
         pchar.assignString(value.toString());
     }

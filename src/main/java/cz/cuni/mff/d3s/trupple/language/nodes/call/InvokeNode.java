@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.call;
 
-import com.oracle.truffle.api.CompilerAsserts;
 import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
