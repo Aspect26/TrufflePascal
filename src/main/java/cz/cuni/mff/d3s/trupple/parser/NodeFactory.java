@@ -698,16 +698,18 @@ public class NodeFactory {
         }
     }
 
-    public ReadFromArrayNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {
+    public ExpressionNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {
 	    TypeDescriptor returnDescriptor = arrayExpression.getType();
-        for (int i = 0; i < indexes.size(); ++i) {
+	    ExpressionNode result = arrayExpression;
+	    for (ExpressionNode index : indexes) {
             if (!(returnDescriptor instanceof ArrayDescriptor)) {
                 parser.SemErr("Not an array");
                 break;
             }
             returnDescriptor = ((ArrayDescriptor) returnDescriptor).getOneStepInnerDescriptor();
+            result = ReadFromArrayNodeGen.create(result, index, returnDescriptor);
         }
-	    return ReadFromArrayNodeGen.create(indexes.toArray(new ExpressionNode[indexes.size()]), arrayExpression, returnDescriptor);
+        return result;
     }
 
     public ReadDereferenceNode createReadDereferenceNode(ExpressionNode pointerExpression) {

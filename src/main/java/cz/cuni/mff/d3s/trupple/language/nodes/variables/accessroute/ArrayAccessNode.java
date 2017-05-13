@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;

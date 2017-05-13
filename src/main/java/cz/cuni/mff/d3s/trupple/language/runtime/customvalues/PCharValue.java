@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.IndexOutOfBoundsException;
 
 public class PCharValue implements PascalArray {

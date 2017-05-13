@@ -1,13 +1,14 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.FixedPascalArray;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalOrdinal;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 import java.util.List;
 
@@ -28,6 +29,22 @@ public class ArrayDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
+        if (dimensions.size() == 1) {
+            if (finalReturnTypeDescriptor == LongDescriptor.getInstance()) {
+                long[] data = new long[this.dimensions.get(0).getSize()];
+                return new LongPascalArray(this.createOrdinal(dimensions.get(0)), data);
+            } else if (finalReturnTypeDescriptor == RealDescriptor.getInstance()) {
+                double[] data = new double[this.dimensions.get(0).getSize()];
+                return new DoublePascalArray(this.createOrdinal(dimensions.get(0)), data);
+            } else if (finalReturnTypeDescriptor == CharDescriptor.getInstance()) {
+                char[] data = new char[this.dimensions.get(0).getSize()];
+                return new CharPascalArray(this.createOrdinal(dimensions.get(0)), data);
+            } else if (finalReturnTypeDescriptor == BooleanDescriptor.getInstance()) {
+                boolean[] data = new boolean[this.dimensions.get(0).getSize()];
+                return new BooleanPascalArray(this.createOrdinal(dimensions.get(0)), data);
+            }
+        }
+
         Object[] data = this.createArrayData();
         return new FixedPascalArray(this.createOrdinal(dimensions.get(0)), data);
     }

@@ -1,5 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
+
 public class PascalString implements PascalArray {
 
     private String value;
