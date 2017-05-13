@@ -13,14 +13,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.UnexpectedRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.BooleanConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.CharConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.RealConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 @NodeFields({
     @NodeField(name = "slot", type = FrameSlot.class),
@@ -138,39 +130,8 @@ public abstract class ReadVariableNode extends ExpressionNode {
         return frame;
     }
 
-    boolean isLong() {
-	    return getType() == LongDescriptor.getInstance() || getType() instanceof LongConstantDescriptor;
-    }
-
-    boolean isDouble() {
-	    return getType() == RealDescriptor.getInstance() || getType() instanceof RealConstantDescriptor;
-    }
-
-    boolean isChar() {
-	    return getType() == CharDescriptor.getInstance() || getType() instanceof CharConstantDescriptor;
-    }
-
-    boolean isBoolean() {
-	    return getType() == BooleanDescriptor.getInstance() || getType() instanceof BooleanConstantDescriptor;
-    }
-
-    boolean isLongReference() {
-	    return this.isLong() && getIsReference();
-    }
-
-    boolean isDoubleReference() {
-	    return this.isDouble() && getIsReference();
-    }
-
-    boolean isCharReference() {
-	    return this.isChar() && getIsReference();
-    }
-
-    boolean isBooleanReference() {
-	    return this.isBoolean() && getIsReference();
-    }
-
-    boolean isReference() {
+    @Override
+    protected boolean isReference() {
 	    return this.getIsReference();
     }
 

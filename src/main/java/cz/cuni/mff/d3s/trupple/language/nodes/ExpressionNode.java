@@ -8,6 +8,14 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.BooleanConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.CharConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.RealConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 /**
  * This is a base node for each node that shall return any value after its execution. Not all the
@@ -43,6 +51,42 @@ public abstract class ExpressionNode extends StatementNode {
 
 	public EnumValue executeEnum(VirtualFrame frame) throws UnexpectedResultException {
 	    return PascalTypesGen.expectEnumValue(executeGeneric(frame));
+    }
+
+    protected boolean isLong() {
+        return getType() == LongDescriptor.getInstance() || getType() instanceof LongConstantDescriptor;
+    }
+
+    protected boolean isDouble() {
+        return getType() == RealDescriptor.getInstance() || getType() instanceof RealConstantDescriptor;
+    }
+
+    protected boolean isChar() {
+        return getType() == CharDescriptor.getInstance() || getType() instanceof CharConstantDescriptor;
+    }
+
+    protected boolean isBoolean() {
+        return getType() == BooleanDescriptor.getInstance() || getType() instanceof BooleanConstantDescriptor;
+    }
+
+    protected boolean isLongReference() {
+        return this.isLong() && isReference();
+    }
+
+    protected boolean isDoubleReference() {
+        return this.isDouble() && isReference();
+    }
+
+    protected boolean isCharReference() {
+        return this.isChar() && isReference();
+    }
+
+    protected boolean isBooleanReference() {
+        return this.isBoolean() && isReference();
+    }
+
+    protected boolean isReference() {
+        return false;
     }
 
 }

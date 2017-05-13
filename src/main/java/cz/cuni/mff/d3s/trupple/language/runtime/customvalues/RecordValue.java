@@ -57,6 +57,10 @@ public class RecordValue {
         }
     }
 
+    public FrameSlot getSlot(String identifier) {
+        return this.frameDescriptor.findFrameSlot(identifier);
+    }
+
     public VirtualFrame getFrame() {
         return this.frame;
     }

@@ -22,6 +22,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.root.ProcedurePascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadDereferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
@@ -669,10 +670,6 @@ public class NodeFactory {
         });
     }
 
-    public ExpressionNode createExpressionFromIdentifierWithRoute(AccessNode accessNode) {
-        return new ReadVariableWithRouteNode(accessNode);
-    }
-
     public PointerDereference createPointerDereferenceAccessNode(AccessNode previousAccessNode) {
 	    TypeDescriptor dereferencedType = previousAccessNode.getType();
 	    if (!(dereferencedType instanceof PointerDescriptor)) {
@@ -699,6 +696,48 @@ public class NodeFactory {
                 return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableType);
             }
         }
+    }
+
+    public ReadFromArrayNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {
+	    TypeDescriptor returnDescriptor = arrayExpression.getType();
+        for (int i = 0; i < indexes.size(); ++i) {
+            if (!(returnDescriptor instanceof ArrayDescriptor)) {
+                parser.SemErr("Not an array");
+                break;
+            }
+            returnDescriptor = ((ArrayDescriptor) returnDescriptor).getOneStepInnerDescriptor();
+        }
+	    return ReadFromArrayNodeGen.create(indexes.toArray(new ExpressionNode[indexes.size()]), arrayExpression, returnDescriptor);
+    }
+
+    public ReadDereferenceNode createReadDereferenceNode(ExpressionNode pointerExpression) {
+        TypeDescriptor returnType = null;
+	    if (!(pointerExpression.getType() instanceof PointerDescriptor)) {
+            parser.SemErr("Can not dereference this type");
+        } else {
+	        returnType = ((PointerDescriptor) pointerExpression.getType()).getInnerTypeDescriptor();
+        }
+
+        return ReadDereferenceNodeGen.create(pointerExpression, returnType);
+    }
+
+    public ReadFromRecordNode createReadFromRecordNode(ExpressionNode recordExpression, Token identifierToken) {
+        TypeDescriptor descriptor = recordExpression.getType();
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        TypeDescriptor returnType = null;
+
+        if (!(descriptor instanceof RecordDescriptor)) {
+            parser.SemErr("Cannot access non record type this way");
+        } else {
+            RecordDescriptor accessedRecordDescriptor = (RecordDescriptor) descriptor;
+            if (!accessedRecordDescriptor.containsIdentifier(identifier)) {
+                parser.SemErr("The record does not contain this identifier");
+            } else {
+                returnType = accessedRecordDescriptor.getLexicalScope().getIdentifierDescriptor(identifier);
+            }
+        }
+
+        return ReadFromRecordNodeGen.create(recordExpression, returnType, identifier);
     }
 
     public ArrayAccessNode createArrayAccessNode(AccessNode previousAccessNode, List<ExpressionNode> indexNodes) {

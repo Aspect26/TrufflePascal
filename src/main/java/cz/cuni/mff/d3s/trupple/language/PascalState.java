@@ -26,11 +26,6 @@ public class PascalState extends ExecutionContext {
         this.random = new Random(26270);
         this.unitSubroutines = new HashMap<>();
         this.unitFrames = new HashMap<>();
-/*
-        this.createUnitFrame("crt", new FrameDescriptor());
-        this.createUnitFrame("dos", new FrameDescriptor());
-        this.createUnitFrame("stringscorejava", new FrameDescriptor());
-        this.createUnitFrame("graphcorejava", new FrameDescriptor());*/
     }
 
     public void reset() {
