@@ -7,6 +7,7 @@ import com.oracle.truffle.api.nodes.UnexpectedResultException;
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.BooleanConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.CharConstantDescriptor;
@@ -51,6 +52,10 @@ public abstract class ExpressionNode extends StatementNode {
 
 	public EnumValue executeEnum(VirtualFrame frame) throws UnexpectedResultException {
 	    return PascalTypesGen.expectEnumValue(executeGeneric(frame));
+    }
+
+    public PascalArray executePascalArray(VirtualFrame frame) throws UnexpectedResultException {
+	    return PascalTypesGen.expectPascalArray(executeGeneric(frame));
     }
 
     protected boolean isLong() {

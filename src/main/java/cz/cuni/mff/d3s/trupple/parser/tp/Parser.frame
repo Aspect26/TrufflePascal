@@ -29,14 +29,13 @@ Coco/R itself) does not fall under the GNU General Public License.
 package cz.cuni.mff.d3s.trupple.parser.tp;
 
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import com.oracle.truffle.api.source.Source;
 import cz.cuni.mff.d3s.trupple.parser.*;
+
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
