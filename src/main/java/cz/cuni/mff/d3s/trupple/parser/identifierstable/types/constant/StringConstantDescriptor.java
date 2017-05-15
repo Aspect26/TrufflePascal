@@ -10,14 +10,12 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDescriptor;
 
-import java.util.Collections;
-
 public class StringConstantDescriptor extends ArrayDescriptor implements ConstantDescriptor {
 
     private final PascalString value;
 
     public StringConstantDescriptor(String value) {
-        super(Collections.singletonList(new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(value.length()))), CharDescriptor.getInstance());
+        super(new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(Integer.MAX_VALUE)), CharDescriptor.getInstance());
         this.value = new PascalString(value);
     }
 

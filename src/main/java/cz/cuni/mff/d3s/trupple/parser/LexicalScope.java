@@ -18,6 +18,8 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.FileDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.PointerDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
@@ -166,11 +168,11 @@ public class LexicalScope {
         this.localIdentifiers.addReturnVariable(identifier, typeDescriptor);
     }
 
-    TypeDescriptor createArrayType(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {
-        return this.localIdentifiers.createArray(ordinalDimensions, typeDescriptor);
+    ArrayDescriptor createArrayType(OrdinalDescriptor dimension, TypeDescriptor typeDescriptor) {
+        return this.localIdentifiers.createArray(dimension, typeDescriptor);
     }
 
-    TypeDescriptor createEnumType(List<String> identifiers) throws LexicalException {
+    EnumTypeDescriptor createEnumType(List<String> identifiers) throws LexicalException {
         return this.localIdentifiers.createEnum(identifiers);
     }
 

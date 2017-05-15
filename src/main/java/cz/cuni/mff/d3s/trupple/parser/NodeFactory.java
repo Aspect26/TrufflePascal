@@ -26,7 +26,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.variables.read.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.write.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.write.AssignReferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.UnexpectedRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownIdentifierException;
@@ -222,8 +221,13 @@ public class NodeFactory {
     public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, Token returnTypeToken) {
 	    String typeIdentifier = this.getTypeNameFromToken(returnTypeToken);
 	    TypeDescriptor returnTypeDescriptor = this.doLookup(typeIdentifier, LexicalScope::getTypeDescriptor);
+	    ArrayDescriptor array = currentLexicalScope.createArrayType(ordinalDimensions.get(ordinalDimensions.size() - 1), returnTypeDescriptor);
 
-	    return currentLexicalScope.createArrayType(ordinalDimensions, returnTypeDescriptor);
+	    for (int i = ordinalDimensions.size() - 2; i > -1; --i) {
+	        array = currentLexicalScope.createArrayType(ordinalDimensions.get(i), array);
+        }
+
+	    return array;
     }
 
     public TypeDescriptor createSetType(OrdinalDescriptor baseType) {
@@ -657,12 +661,13 @@ public class NodeFactory {
         return (targetType instanceof ReferenceDescriptor)? AssignReferenceNodeGen.create(valueNode, frameSlot) : SimpleAssignmentNodeGen.create(valueNode, frameSlot);
     }
 
-    private StatementNode createAssignmentToArray(ExpressionNode arrayExpression, ExpressionNode indexNode, ExpressionNode valueNode) {
+    private StatementNode createAssignmentToArray(ExpressionNode arrayExpression, ExpressionNode indexExpressionNode, ExpressionNode valueNode) {
 	    if (!(arrayExpression.getType() instanceof ArrayDescriptor)) {
             parser.SemErr("Not an array");
         } else {
-	        this.doTypeCheck(valueNode.getType(), ((ArrayDescriptor) arrayExpression.getType()).getOneStepInnerDescriptor());
+	        this.doTypeCheck(valueNode.getType(), ((ArrayDescriptor) arrayExpression.getType()).getValuesDescriptor());
         }
+        ReadIndexNode indexNode = ReadIndexNodeGen.create(indexExpressionNode, ((ArrayDescriptor) arrayExpression.getType()).getOffset());
         return AssignToArrayNodeGen.create(arrayExpression, indexNode, valueNode);
     }
 
@@ -708,17 +713,17 @@ public class NodeFactory {
     }
 
     public ExpressionNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {
-	    TypeDescriptor returnDescriptor = arrayExpression.getType();
-	    ExpressionNode result = arrayExpression;
+	    ExpressionNode readArrayNode = arrayExpression;
 	    for (ExpressionNode index : indexes) {
-            if (!(returnDescriptor instanceof ArrayDescriptor)) {
+	        if (!(readArrayNode.getType() instanceof  ArrayDescriptor)) {
                 parser.SemErr("Not an array");
                 break;
             }
-            returnDescriptor = ((ArrayDescriptor) returnDescriptor).getOneStepInnerDescriptor();
-            result = ReadFromArrayNodeGen.create(result, index, returnDescriptor);
+            ReadIndexNode readIndexNode = ReadIndexNodeGen.create(index, ((ArrayDescriptor) readArrayNode.getType()).getOffset());
+            TypeDescriptor returnType = ((ArrayDescriptor) readArrayNode.getType()).getValuesDescriptor();
+	        readArrayNode = ReadFromArrayNodeGen.create(readArrayNode, readIndexNode, returnType);
         }
-        return result;
+        return readArrayNode;
     }
 
     public ReadDereferenceNode createReadDereferenceNode(ExpressionNode pointerExpression) {

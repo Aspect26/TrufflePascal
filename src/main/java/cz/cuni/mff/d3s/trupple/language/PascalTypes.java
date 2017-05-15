@@ -5,7 +5,7 @@ import com.oracle.truffle.api.dsl.TypeSystem;
 
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
 
 @TypeSystem({ long.class, boolean.class, char.class, double.class, PascalSubroutine.class, PascalString.class,
         EnumValue.class, PascalArray.class, Reference.class, PointerValue.class, SetTypeValue.class, FileValue.class, })

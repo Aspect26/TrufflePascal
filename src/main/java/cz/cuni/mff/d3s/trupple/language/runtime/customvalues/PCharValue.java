@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.IndexOutOfBoundsException;
 
 public class PCharValue implements PascalArray {
@@ -38,27 +37,14 @@ public class PCharValue implements PascalArray {
     }
 
     @Override
-    public Object getValueAt(Object index) {
-        int indexValue = (int) (long) index;
-        this.checkArrayIndex(indexValue);
-        return this.data.charAt(indexValue);
+    public Object getValueAt(int index) {
+        return this.data.charAt(index);
     }
 
     @Override
-    public Object getValueAt(Object[] indexes) {
-        return this.getValueAt(indexes[0]);
-    }
-
-    @Override
-    public void setValueAt(Object index, Object value) {
-        int indexValue = (int) (long) index;
-        this.checkArrayIndex(indexValue);
-        this.data = this.data.substring(0, indexValue) + value + this.data.substring(indexValue + 1);
-    }
-
-    @Override
-    public void setValueAt(Object[] indexes, Object value) {
-        this.setValueAt(indexes[0], value);
+    public void setValueAt(int index, Object value) {
+        this.checkArrayIndex(index);
+        this.data = this.data.substring(0, index) + value + this.data.substring(index + 1);
     }
 
     @Override

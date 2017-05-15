@@ -8,8 +8,6 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 
-import java.util.Collections;
-
 public class StringDescriptor extends ArrayDescriptor implements PrimitiveDescriptor {
 
     private static StringDescriptor instance = new StringDescriptor();
@@ -19,7 +17,7 @@ public class StringDescriptor extends ArrayDescriptor implements PrimitiveDescri
     }
 
     private StringDescriptor() {
-        super(Collections.singletonList(new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(Long.MAX_VALUE))), CharDescriptor.getInstance());
+        super(new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(Integer.MAX_VALUE)), CharDescriptor.getInstance());
 
     }
 
