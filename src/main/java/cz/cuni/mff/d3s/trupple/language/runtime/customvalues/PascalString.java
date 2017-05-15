@@ -1,7 +1,5 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
-
 public class PascalString implements PascalArray {
 
     private String value;
@@ -19,26 +17,14 @@ public class PascalString implements PascalArray {
     }
 
     @Override
-    public Object getValueAt(Object index) {
-        int intIndex = this.getIndex(index);
-        return this.value.charAt(intIndex);
+    public Object getValueAt(int index) {
+        return this.value.charAt(index);
     }
 
     @Override
-    public Object getValueAt(Object[] indexes) {
-        return this.getValueAt(indexes[0]);
-    }
-
-    @Override
-    public void setValueAt(Object index, Object value) {
-        int intIndex = this.getIndex(index);
+    public void setValueAt(int index, Object value) {
         char newChar = (Character) value;
-        this.value = this.value.substring(0, intIndex) + newChar + this.value.substring(++intIndex);
-    }
-
-    @Override
-    public void setValueAt(Object[] indexes, Object value) {
-        this.setValueAt(indexes[0], value);
+        this.value = this.value.substring(0, index) + newChar + this.value.substring(++index);
     }
 
     @Override
@@ -59,12 +45,4 @@ public class PascalString implements PascalArray {
         return new PascalString(this.value.concat(value.value));
     }
 
-    private int getIndex(Object index) {
-        int intIndex = (int) (long) index;
-        if (intIndex >= this.value.length()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        return intIndex;
-    }
 }

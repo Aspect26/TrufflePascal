@@ -1,8 +1,6 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.*;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalOrdinal;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
@@ -10,16 +8,14 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
-import java.util.List;
-
 public class ArrayDescriptor implements TypeDescriptor {
 
-    private final List<OrdinalDescriptor> dimensions;
-    private final TypeDescriptor finalReturnTypeDescriptor;
+    private final OrdinalDescriptor dimension;
+    private final TypeDescriptor valuesDescriptor;
 
-    public ArrayDescriptor(List<OrdinalDescriptor> dimensions, TypeDescriptor returnTypeDescriptor) {
-        this.dimensions = dimensions;
-        this.finalReturnTypeDescriptor = returnTypeDescriptor;
+    public ArrayDescriptor(OrdinalDescriptor dimension, TypeDescriptor valuesDescriptor) {
+        this.dimension = dimension;
+        this.valuesDescriptor = valuesDescriptor;
     }
 
     @Override
@@ -29,71 +25,29 @@ public class ArrayDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        if (dimensions.size() == 1) {
-            if (finalReturnTypeDescriptor == LongDescriptor.getInstance()) {
-                long[] data = new long[this.dimensions.get(0).getSize()];
-                return new LongPascalArray(this.createOrdinal(dimensions.get(0)), data);
-            } else if (finalReturnTypeDescriptor == RealDescriptor.getInstance()) {
-                double[] data = new double[this.dimensions.get(0).getSize()];
-                return new DoublePascalArray(this.createOrdinal(dimensions.get(0)), data);
-            } else if (finalReturnTypeDescriptor == CharDescriptor.getInstance()) {
-                char[] data = new char[this.dimensions.get(0).getSize()];
-                return new CharPascalArray(this.createOrdinal(dimensions.get(0)), data);
-            } else if (finalReturnTypeDescriptor == BooleanDescriptor.getInstance()) {
-                boolean[] data = new boolean[this.dimensions.get(0).getSize()];
-                return new BooleanPascalArray(this.createOrdinal(dimensions.get(0)), data);
+        if (valuesDescriptor == LongDescriptor.getInstance()) {
+            return new long[this.dimension.getSize()];
+        } else if (valuesDescriptor == RealDescriptor.getInstance()) {
+            return new double[this.dimension.getSize()];
+        } else if (valuesDescriptor == CharDescriptor.getInstance()) {
+            return new char[this.dimension.getSize()];
+        } else if (valuesDescriptor == BooleanDescriptor.getInstance()) {
+            return new boolean[this.dimension.getSize()];
+        } else {
+            Object[] data = new Object[dimension.getSize()];
+            for (int i = 0; i < data.length; ++i) {
+                data[i] = valuesDescriptor.getDefaultValue();
             }
-        }
-
-        Object[] data = this.createArrayData();
-        return new FixedPascalArray(this.createOrdinal(dimensions.get(0)), data);
-    }
-
-    public TypeDescriptor getOneStepInnerDescriptor() {
-        if (dimensions.size() == 1) {
-            return this.finalReturnTypeDescriptor;
-        } else {
-            return new ArrayDescriptor(dimensions.subList(1, dimensions.size()), finalReturnTypeDescriptor);
+            return data;
         }
     }
 
-    private PascalOrdinal createOrdinal(OrdinalDescriptor descriptor) {
-        if (descriptor instanceof OrdinalDescriptor.RangeDescriptor || descriptor instanceof LongDescriptor) {
-            return new PascalOrdinal.RangePascalOrdinal(descriptor.getSize(), descriptor.getFirstIndex());
-        } else if (descriptor instanceof BooleanDescriptor) {
-            return PascalOrdinal.booleanPascalOrdinal;
-        } else if (descriptor instanceof CharDescriptor) {
-            return PascalOrdinal.charPascalOrdinal;
-        } else if (descriptor instanceof  EnumTypeDescriptor) {
-            return new PascalOrdinal.EnumPascalOrdinal((EnumTypeDescriptor) descriptor);
-        } else {
-            return null;
-        }
+    public int getOffset() {
+        return this.dimension.getFirstIndex();
     }
 
-    private Object[] createArrayData() {
-        OrdinalDescriptor myDimension = this.dimensions.get(0);
-        Object[] data = new Object[myDimension.getSize()];
-        TypeDescriptor innerDescriptor = this.createInnerDescriptor();
-
-        for (int i = 0; i < data.length; ++i) {
-            data[i] = innerDescriptor.getDefaultValue();
-        }
-
-        return data;
-    }
-
-    private TypeDescriptor createInnerDescriptor() {
-        if (this.dimensions.size() > 1) {
-            return this.createInnerArrayDescriptor();
-        } else {
-            return this.finalReturnTypeDescriptor;
-        }
-    }
-
-    private TypeDescriptor createInnerArrayDescriptor() {
-        List<OrdinalDescriptor> innerDimensions = this.dimensions.subList(1, this.dimensions.size());
-        return new ArrayDescriptor(innerDimensions, this.finalReturnTypeDescriptor);
+    public TypeDescriptor getValuesDescriptor() {
+        return this.valuesDescriptor;
     }
 
     @Override

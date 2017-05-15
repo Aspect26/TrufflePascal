@@ -214,7 +214,7 @@ public class IdentifiersTable {
         this.registerNewIdentifier(identifier, descriptor);
     }
 
-    public TypeDescriptor createEnum(List<String> identifiers) throws LexicalException {
+    public EnumTypeDescriptor createEnum(List<String> identifiers) throws LexicalException {
         EnumTypeDescriptor enumTypeDescriptor = new EnumTypeDescriptor(identifiers);
 
         for (String identifier : identifiers) {
@@ -240,8 +240,8 @@ public class IdentifiersTable {
         return (innerTypeDescriptor == null)? new PointerDescriptor(innerTypeIdentifier) : new PointerDescriptor(innerTypeDescriptor);
     }
 
-    public TypeDescriptor createArray(List<OrdinalDescriptor> ordinalDimensions, TypeDescriptor typeDescriptor) {
-        return new ArrayDescriptor(ordinalDimensions, typeDescriptor);
+    public ArrayDescriptor createArray(OrdinalDescriptor dimension, TypeDescriptor typeDescriptor) {
+        return new ArrayDescriptor(dimension, typeDescriptor);
     }
 
     public TypeDescriptor createSetType(OrdinalDescriptor base) {
