@@ -480,7 +480,7 @@ public class NodeFactory {
             parser.SemErr("Type mismatch in beginning and last value of for loop.");
         }
         SimpleAssignmentNode initialAssignment = this.createAssignmentNode(iteratingIdentifier, startValue);
-        return new NewForNode(controlSlot, initialAssignment, finalValue, controlSlotType, ascending, loopBody);
+        return new ForNode(ascending, initialAssignment, controlSlot, controlSlotType, finalValue, startValue, loopBody);
     }
 
     public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
