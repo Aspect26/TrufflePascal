@@ -6,11 +6,17 @@ import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.GenericEnumTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 
 public class SuccSubroutineDescriptor extends OverloadedFunctionDescriptor {
 
     public SuccSubroutineDescriptor() {
+        this.addOverLoad(new BuiltinFunctionDescriptor.OrdinalArgumentBuiltin(
+                SuccBuiltinNodeGen.create(new ReadArgumentNode(0, IntDescriptor.getInstance())),
+                new FormalParameter("i", IntDescriptor.getInstance(), false)
+        ));
+
         this.addOverLoad(new BuiltinFunctionDescriptor.OrdinalArgumentBuiltin(
                 SuccBuiltinNodeGen.create(new ReadArgumentNode(0, LongDescriptor.getInstance())),
                 new FormalParameter("i", LongDescriptor.getInstance(), false)

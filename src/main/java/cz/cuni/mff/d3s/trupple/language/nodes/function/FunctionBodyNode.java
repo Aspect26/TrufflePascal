@@ -29,6 +29,8 @@ public abstract class FunctionBodyNode extends ExpressionNode {
 		this.bodyNode = bodyNode;
 	}
 
+	// TODO: type specializations
+
 	@Specialization
     Object executeFunction(VirtualFrame frame) {
         bodyNode.executeVoid(frame);

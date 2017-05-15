@@ -13,7 +13,12 @@ public abstract class SqrBuiltinNode extends ExpressionNode {
     protected abstract ExpressionNode getArgument();
 
     @Specialization
-    long integerSquareValue(long value) {
+    int integerSquareValue(int value) {
+        return value * value;
+    }
+
+    @Specialization
+    long longSquareValue(long value) {
         return (value * value);
     }
 

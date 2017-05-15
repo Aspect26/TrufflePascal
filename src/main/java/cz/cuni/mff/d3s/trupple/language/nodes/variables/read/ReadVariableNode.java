@@ -29,6 +29,15 @@ public abstract class ReadVariableNode extends ExpressionNode {
 
 	@CompilerDirectives.CompilationFinal private int jumps = -1;
 
+    @Specialization(guards = "isInt()")
+    int readInt(VirtualFrame frame) {
+        try {
+            return getFrame(frame).getInt(getSlot());
+        } catch (FrameSlotTypeException e) {
+            throw new UnexpectedRuntimeException();
+        }
+    }
+
 	@Specialization(guards = "isLong()")
     long readLong(VirtualFrame frame) {
         try {

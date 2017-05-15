@@ -48,7 +48,7 @@ public class IntDescriptor implements OrdinalDescriptor, PrimitiveDescriptor {
 
     @Override
     public boolean convertibleTo(TypeDescriptor type) {
-        return type == RealDescriptor.getInstance();
+        return type == LongDescriptor.getInstance() || type == RealDescriptor.getInstance();
     }
 
 }

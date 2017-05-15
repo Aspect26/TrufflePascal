@@ -12,6 +12,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumLitera
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.EnumTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
 
@@ -60,9 +61,9 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
                 throw new IncorectNumberOfArgumentsProvidedException(1, arguments.size());
             } else {
                 TypeDescriptor argumentType = arguments.get(0).getType();
-                if (!argumentType.equals(LongDescriptor.getInstance()) && !argumentType.equals(CharDescriptor.getInstance()) &&
-                        !argumentType.equals(BooleanDescriptor.getInstance()) && !(argumentType instanceof EnumLiteralDescriptor) &&
-                        !(argumentType instanceof EnumTypeDescriptor)) {
+                if (!argumentType.equals(IntDescriptor.getInstance()) && !argumentType.equals(LongDescriptor.getInstance()) &&
+                        !argumentType.equals(CharDescriptor.getInstance()) && !argumentType.equals(BooleanDescriptor.getInstance()) &&
+                        !(argumentType instanceof EnumLiteralDescriptor) && !(argumentType instanceof EnumTypeDescriptor)) {
                     throw new ArgumentTypeMismatchException(1);
                 }
             }

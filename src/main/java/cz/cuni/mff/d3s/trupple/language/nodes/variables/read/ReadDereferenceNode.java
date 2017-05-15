@@ -13,6 +13,11 @@ public abstract class ReadDereferenceNode extends ExpressionNode {
 
     protected abstract TypeDescriptor getReturnType();
 
+    @Specialization(guards = "isInt()")
+    int dereferenceInt(PointerValue pointer) {
+        return (int) pointer.getDereferenceValue();
+    }
+
     @Specialization(guards = "isLong()")
     long dereferenceLong(PointerValue pointer) {
         return (long) pointer.getDereferenceValue();

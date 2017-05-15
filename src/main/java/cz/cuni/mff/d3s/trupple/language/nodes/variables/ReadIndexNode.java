@@ -18,7 +18,12 @@ public abstract class ReadIndexNode extends ExpressionNode {
      * We need to return an int because arrays may be indexed only by ints in Java
      */
     @Specialization
-    int getIntIndex(long index) {
+    int getIntIndex(int index) {
+        return index - getOffset();
+    }
+
+    @Specialization
+    int getLongIndex(long index) {
         return (int) index - getOffset();
     }
 

@@ -38,6 +38,7 @@ public class RecordValue {
         // TODO: whole initialization process is weird
         // this switch is surely a duplicity and is also somewhere else in the code
         switch (slot.getKind()) {
+            case Int: frame.setInt(slot, (int) value); break;
             case Long: frame.setLong(slot, (long) value); break;
             case Double: frame.setDouble(slot, (double) value); break;
             case Byte: frame.setByte(slot, (byte) (char) value); break;
@@ -49,6 +50,7 @@ public class RecordValue {
     private void copySlotValue(VirtualFrame fromFrame, VirtualFrame toFrame, FrameSlot slot) throws FrameSlotTypeException {
         // TODO: this switch is surely a duplicity and is also somewhere else in the code
         switch (slot.getKind()) {
+            case Int: toFrame.setInt(slot, fromFrame.getInt(slot)); break;
             case Long: toFrame.setLong(slot, fromFrame.getLong(slot)); break;
             case Double: toFrame.setDouble(slot, fromFrame.getDouble(slot)); break;
             case Byte: toFrame.setByte(slot, fromFrame.getByte(slot)); break;

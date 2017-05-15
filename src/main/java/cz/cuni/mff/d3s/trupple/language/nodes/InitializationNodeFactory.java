@@ -9,6 +9,8 @@ public class InitializationNodeFactory{
 	public static StatementNode create(FrameSlot frameSlot, Object value, VirtualFrame frame) {
 	    // TODO: this is a duplicity
         switch (frameSlot.getKind()) {
+            case Int: return (frame == null)?
+                    new IntInitializationNode(frameSlot, (int) value) : new IntInitializationWithFrameNode(frameSlot, (int) value, frame);
             case Long: return (frame == null)?
                     new LongInitializationNode(frameSlot, (long) value) : new LongInitializationWithFrameNode(frameSlot, (long) value, frame);
             case Double: return (frame == null)?
@@ -33,6 +35,38 @@ abstract class InitializationNode extends StatementNode {
 	
 	@Override
 	public abstract void executeVoid(VirtualFrame frame);
+}
+
+class IntInitializationNode extends InitializationNode {
+
+    protected final int value;
+
+    IntInitializationNode(FrameSlot slot, int value) {
+        super(slot);
+        this.value = value;
+    }
+
+    @Override
+    public void executeVoid(VirtualFrame frame) {
+        frame.setInt(slot, value);
+    }
+
+}
+
+class IntInitializationWithFrameNode extends IntInitializationNode {
+
+    private final VirtualFrame frame;
+
+    IntInitializationWithFrameNode(FrameSlot slot, int value, VirtualFrame frame) {
+        super(slot, value);
+        this.frame = frame;
+    }
+
+    @Override
+    public void executeVoid(VirtualFrame frame) {
+        this.frame.setInt(slot, value);
+    }
+
 }
 
 class LongInitializationNode extends InitializationNode {

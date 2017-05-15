@@ -17,6 +17,11 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalString;
 public abstract class AssignToArrayNode extends StatementNode {
 
     @Specialization
+    void assignInt(int[] array, int index, int value) {
+        array[index] = value;
+    }
+
+    @Specialization
     void assignLong(long[] array, int index, long value) {
         array[index] = value;
     }

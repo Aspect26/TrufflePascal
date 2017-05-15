@@ -12,6 +12,11 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescr
 public abstract class ChrBuiltinNode extends ExpressionNode {
 
     @Specialization
+    char chr(int value) {
+        return (char) (value % 256);
+    }
+
+    @Specialization
     char chr(long value) {
         return (char) (value % 256);
     }

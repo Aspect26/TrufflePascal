@@ -480,7 +480,7 @@ public class NodeFactory {
             parser.SemErr("Type mismatch in beginning and last value of for loop.");
         }
         SimpleAssignmentNode initialAssignment = this.createAssignmentNode(iteratingIdentifier, startValue);
-        return new ForNode(ascending, initialAssignment, controlSlot, controlSlotType, finalValue, startValue, loopBody);
+        return new NewForNode(controlSlot, initialAssignment, finalValue, controlSlotType, ascending, loopBody);
     }
 
     public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
@@ -831,7 +831,11 @@ public class NodeFactory {
     }
 
     public ExpressionNode createNumericLiteralNode(Token literalToken) {
-        return new LongLiteralNode(getLongFromToken(literalToken));
+	    try {
+	        return new IntLiteralNode(this.getIntFromToken(literalToken));
+        } catch(NumberFormatException e) {
+	        return new LongLiteralNode(this.getLongFromToken(literalToken));
+        }
     }
 
     public ExpressionNode createFloatLiteralNode(Token token) {
@@ -997,6 +1001,10 @@ public class NodeFactory {
             }
 	        values.add(constant.getValue());
         }
+    }
+
+    private int getIntFromToken(Token token) {
+        return Integer.parseInt(token.val);
     }
 
     public long getLongFromToken(Token token) {

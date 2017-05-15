@@ -9,6 +9,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.SetTypeValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.utils.BinaryArgumentPrimitiveTypes;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.SetDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
@@ -16,10 +17,19 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public abstract class SubtractNode extends BinaryExpressionNode {
 
     SubtractNode() {
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(IntDescriptor.getInstance(), IntDescriptor.getInstance()), IntDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), LongDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), IntDescriptor.getInstance()), LongDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(IntDescriptor.getInstance(), LongDescriptor.getInstance()), LongDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), LongDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), RealDescriptor.getInstance()), RealDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), LongDescriptor.getInstance()), RealDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), RealDescriptor.getInstance()), RealDescriptor.getInstance());
+    }
+
+    @Specialization
+    int sub(int left, int right) {
+        return ExactMath.subtractExact(left, right);
     }
 
 	@Specialization

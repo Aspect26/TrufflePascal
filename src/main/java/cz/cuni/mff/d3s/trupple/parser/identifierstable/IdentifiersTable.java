@@ -16,10 +16,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.label.LabelDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.*;
 
@@ -54,15 +51,13 @@ public class IdentifiersTable {
     }
 
     protected void addBuiltinTypes() {
-        typeDescriptors.put("integer", LongDescriptor.getInstance());
-        typeDescriptors.put("shortint", LongDescriptor.getInstance());
+        typeDescriptors.put("integer", IntDescriptor.getInstance());
+        typeDescriptors.put("shortint", IntDescriptor.getInstance());
         typeDescriptors.put("longint", LongDescriptor.getInstance());
         typeDescriptors.put("int64", LongDescriptor.getInstance());
-        typeDescriptors.put("byte", LongDescriptor.getInstance());
-        typeDescriptors.put("word", LongDescriptor.getInstance());
+        typeDescriptors.put("byte", IntDescriptor.getInstance());
         typeDescriptors.put("single", RealDescriptor.getInstance());
         typeDescriptors.put("real", RealDescriptor.getInstance());
-        typeDescriptors.put("double", RealDescriptor.getInstance());
         typeDescriptors.put("boolean", BooleanDescriptor.getInstance());
         typeDescriptors.put("char", CharDescriptor.getInstance());
 

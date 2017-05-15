@@ -15,6 +15,8 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 
+import java.util.Arrays;
+
 @NodeField(name = "slot", type = FrameSlot.class)
 @NodeChild(value = "valueNode", type = ExpressionNode.class)
 public abstract class SimpleAssignmentNode extends StatementNode {
@@ -22,6 +24,11 @@ public abstract class SimpleAssignmentNode extends StatementNode {
     protected abstract FrameSlot getSlot();
 
     @CompilerDirectives.CompilationFinal private int jumps = -1;
+
+    @Specialization
+    void writeInt(VirtualFrame frame, int value) {
+        getFrame(frame).setInt(getSlot(), value);
+    }
 
     @Specialization
     void writeLong(VirtualFrame frame, long value) {
@@ -84,9 +91,28 @@ public abstract class SimpleAssignmentNode extends StatementNode {
     }
 
     @Specialization
+    void assignIntArray(VirtualFrame frame, int[] array) {
+        getFrame(frame).setObject(getSlot(), Arrays.copyOf(array, array.length));
+    }
+
+    @Specialization
     void assignLongArray(VirtualFrame frame, long[] array) {
-        // TODO: fix this and add other specializations
-        getFrame(frame).setObject(getSlot(), array);
+        getFrame(frame).setObject(getSlot(), Arrays.copyOf(array, array.length));
+    }
+
+    @Specialization
+    void assignDoubleArray(VirtualFrame frame, double[] array) {
+        getFrame(frame).setObject(getSlot(), Arrays.copyOf(array, array.length));
+    }
+
+    @Specialization
+    void assignCharArray(VirtualFrame frame, char[] array) {
+        getFrame(frame).setObject(getSlot(), Arrays.copyOf(array, array.length));
+    }
+
+    @Specialization
+    void assignBooleanArray(VirtualFrame frame, boolean[] array) {
+        getFrame(frame).setObject(getSlot(), Arrays.copyOf(array, array.length));
     }
 
     @Specialization

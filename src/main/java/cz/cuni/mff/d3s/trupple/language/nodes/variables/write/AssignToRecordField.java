@@ -21,6 +21,11 @@ public abstract class AssignToRecordField extends StatementNode {
     }
 
     @Specialization
+    void assignInt(RecordValue record, int value) {
+        record.getFrame().setInt(record.getSlot(this.identifier), value);
+    }
+
+    @Specialization
     void assignLong(RecordValue record, long value) {
         record.getFrame().setLong(record.getSlot(this.identifier), value);
     }

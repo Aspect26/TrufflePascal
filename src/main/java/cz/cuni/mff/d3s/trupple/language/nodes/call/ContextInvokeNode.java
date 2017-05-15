@@ -29,6 +29,8 @@ public abstract class ContextInvokeNode extends ExpressionNode {
         return this.returnType;
     }
 
+    // TODO: type specializations
+
     @Specialization
     Object invoke(VirtualFrame frame) {
         if (subroutine == null) {

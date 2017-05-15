@@ -22,6 +22,12 @@ public abstract class AssignReferenceNode extends StatementNode {
     @CompilerDirectives.CompilationFinal private int jumps = -1;
 
     @Specialization
+    void writeInt(VirtualFrame frame, int value) {
+        Reference reference = (Reference) getFrame(frame).getValue(getSlot());
+        reference.getFromFrame().setInt(reference.getFrameSlot(), value);
+    }
+
+    @Specialization
     void writeLong(VirtualFrame frame, long value) {
         Reference reference = (Reference) getFrame(frame).getValue(getSlot());
         reference.getFromFrame().setLong(reference.getFrameSlot(), value);

@@ -9,15 +9,16 @@ import cz.cuni.mff.d3s.trupple.language.nodes.utils.BinaryArgumentPrimitiveTypes
 import cz.cuni.mff.d3s.trupple.language.nodes.BinaryExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.GenericEnumTypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.*;
 
 @NodeInfo(shortName = "<=")
 public abstract class LessThanOrEqualNode extends BinaryExpressionNode {
 
     LessThanOrEqualNode() {
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(IntDescriptor.getInstance(), IntDescriptor.getInstance()), BooleanDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), BooleanDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), IntDescriptor.getInstance()), BooleanDescriptor.getInstance());
+        this.typeTable.put(new BinaryArgumentPrimitiveTypes(IntDescriptor.getInstance(), LongDescriptor.getInstance()), BooleanDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), LongDescriptor.getInstance()), BooleanDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(RealDescriptor.getInstance(), LongDescriptor.getInstance()), BooleanDescriptor.getInstance());
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(LongDescriptor.getInstance(), RealDescriptor.getInstance()), BooleanDescriptor.getInstance());
@@ -27,23 +28,28 @@ public abstract class LessThanOrEqualNode extends BinaryExpressionNode {
         this.typeTable.put(new BinaryArgumentPrimitiveTypes(GenericEnumTypeDescriptor.getInstance(), GenericEnumTypeDescriptor.getInstance()), BooleanDescriptor.getInstance());
     }
 
+    @Specialization
+    boolean lessThanOrEqual(int left, int right) {
+        return left <= right;
+    }
+
 	@Specialization
 	boolean lessThanOrEqual(long left, long right) {
 		return left <= right;
 	}
 
 	@Specialization
-	boolean lessThan(double left, double right) {
+	boolean lessThanOrEqual(double left, double right) {
 		return left <= right;
 	}
 
 	@Specialization
-	boolean lessThan(char left, char right) {
+	boolean lessThanOrEqual(char left, char right) {
 		return left <= right;
 	}
 
 	@Specialization
-	boolean lessThan(boolean left, boolean right) {
+	boolean lessThanOrEqual(boolean left, boolean right) {
 		return !left && right;
 	}
 
@@ -53,7 +59,7 @@ public abstract class LessThanOrEqualNode extends BinaryExpressionNode {
 	}
 
 	@Specialization
-	boolean lessThan(EnumValue left, EnumValue right) {
+	boolean lessThanOrEqual(EnumValue left, EnumValue right) {
 		return left.lesserThan(right) || left.equals(right);
 	}
 
