@@ -22,9 +22,12 @@ import cz.cuni.mff.d3s.trupple.language.nodes.root.ProcedurePascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.set.SymmetricDifferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.*;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadDereferenceNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.read.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.write.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.write.AssignReferenceNodeGen;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.array.PascalArray;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.UnexpectedRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.UnknownIdentifierException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
@@ -232,8 +235,8 @@ public class NodeFactory {
     }
 
     public void startRecord() {
-	    this.currentLexicalScope = new LexicalScope(this.currentLexicalScope, "_record", this.usingTPExtension);
-    }
+        this.currentLexicalScope = new RecordLexicalScope(this.currentLexicalScope);
+	}
 
     public TypeDescriptor createRecordType() {
 	    return this.currentLexicalScope.createRecordDescriptor();
@@ -472,7 +475,7 @@ public class NodeFactory {
         if (startValue.getType() != finalValue.getType() && !startValue.getType().convertibleTo(finalValue.getType())) {
             parser.SemErr("Type mismatch in beginning and last value of for loop.");
         }
-        AssignmentNode initialAssignment = this.createAssignmentNode(iteratingIdentifier, startValue);
+        SimpleAssignmentNode initialAssignment = this.createAssignmentNode(iteratingIdentifier, startValue);
         return new ForNode(ascending, initialAssignment, controlSlot, controlSlotType, finalValue, startValue, loopBody);
     }
 
@@ -630,28 +633,54 @@ public class NodeFactory {
         }
     }
 
-    public AccessNode createSimpleAccessNode(Token identifierToken) {
-	    String identifier = this.getIdentifierFromToken(identifierToken);
-	    FrameSlot frameSlot = this.doLookup(identifier, LexicalScope::getLocalSlot, true);
-        TypeDescriptor typeDescriptor = this.doLookup(identifier, LexicalScope::getIdentifierDescriptor);
-        if (typeDescriptor instanceof ReferenceDescriptor) {
-            typeDescriptor = ((ReferenceDescriptor) typeDescriptor).getReferencedType();
+    public StatementNode finishAssignmentNode(AssignmentData assignmentData, ExpressionNode valueNode) {
+        switch (assignmentData.type) {
+            case Simple:
+                return createSimpleAssignment(assignmentData.targetIdentifier, valueNode);
+            case Array:
+                return createAssignmentToArray(assignmentData.targetNode, assignmentData.arrayIndexNode, valueNode);
+            case Dereference:
+                return createAssignmentToDereference(assignmentData.targetNode, valueNode);
+            case Record:
+                return createAssignmentToRecordField(assignmentData.targetNode, assignmentData.targetIdentifier, valueNode);
         }
 
-	    return new SimpleAccessNode(frameSlot, typeDescriptor);
+        throw new UnexpectedRuntimeException();
     }
 
-    public StatementNode createAssignmentNode(Token identifierToken, AccessNode accessNode, ExpressionNode valueNode) {
+    private StatementNode createSimpleAssignment(Token identifierToken, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, true);
-        this.checkTypesAreCompatible(valueNode.getType(), accessNode.getType());
         TypeDescriptor targetType = this.doLookup(variableIdentifier, LexicalScope::getIdentifierDescriptor, true);
+        this.checkTypesAreCompatible(valueNode.getType(), targetType);
 
-        if (accessNode instanceof SimpleAccessNode) {
-            return (targetType instanceof ReferenceDescriptor)? AssignReferenceNodeGen.create(valueNode, frameSlot) : AssignmentNodeGen.create(valueNode, frameSlot);
+        return (targetType instanceof ReferenceDescriptor)? AssignReferenceNodeGen.create(valueNode, frameSlot) : SimpleAssignmentNodeGen.create(valueNode, frameSlot);
+    }
+
+    private StatementNode createAssignmentToArray(ExpressionNode arrayExpression, ExpressionNode indexNode, ExpressionNode valueNode) {
+	    if (!(arrayExpression.getType() instanceof ArrayDescriptor)) {
+            parser.SemErr("Not an array");
         } else {
-            return AssignmentNodeWithRouteNodeGen.create(accessNode, valueNode, frameSlot);
+	        this.doTypeCheck(valueNode.getType(), ((ArrayDescriptor) arrayExpression.getType()).getOneStepInnerDescriptor());
         }
+        return AssignToArrayNodeGen.create(arrayExpression, indexNode, valueNode);
+    }
+
+    private StatementNode createAssignmentToDereference(ExpressionNode pointerExpression, ExpressionNode valueNode) {
+        if ( !(pointerExpression.getType() instanceof PointerDescriptor)) {
+            parser.SemErr("Not a pointer");
+        } else {
+            this.doTypeCheck(valueNode.getType(), ((PointerDescriptor) pointerExpression.getType()).getInnerTypeDescriptor());
+        }
+        return AssignToDereferenceNodeGen.create(pointerExpression, valueNode);
+    }
+
+    private StatementNode createAssignmentToRecordField(ExpressionNode recordExpression, Token identifierToken, ExpressionNode valueNode) {
+        String identifier = this.getIdentifierFromToken(identifierToken);
+        if ( !(recordExpression.getType() instanceof RecordDescriptor)) {
+            parser.SemErr("Not a record");
+        }
+        return AssignToRecordFieldNodeGen.create(identifier, recordExpression, valueNode);
     }
 
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
@@ -670,32 +699,12 @@ public class NodeFactory {
         });
     }
 
-    public PointerDereference createPointerDereferenceAccessNode(AccessNode previousAccessNode) {
-	    TypeDescriptor dereferencedType = previousAccessNode.getType();
-	    if (!(dereferencedType instanceof PointerDescriptor)) {
-	        parser.SemErr("Can not dereference variable of this type");
-	        return new PointerDereference(previousAccessNode, dereferencedType);
-        } else {
-            return new PointerDereference(previousAccessNode, ((PointerDescriptor) dereferencedType).getInnerTypeDescriptor());
-        }
-    }
+    ExpressionNode createReadVariableNode(Token identifierToken) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+	    FrameSlot variableSlot = this.doLookup(identifier, LexicalScope::getLocalSlot);
+	    TypeDescriptor type = this.doLookup(identifier, LexicalScope::getIdentifierDescriptor);
 
-    public RecordAccessNode createRecordAccessNode(AccessNode previousAccessNode, Token accessVariableToken) {
-	    TypeDescriptor accessedVariableDescriptor = previousAccessNode.getType();
-        String variableIdentifier = this.getIdentifierFromToken(accessVariableToken);
-	    if (!(accessedVariableDescriptor instanceof RecordDescriptor)) {
-            parser.SemErr("Cannot access non record type this way");
-            return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableDescriptor);
-        } else {
-	        RecordDescriptor accessedRecordDescriptor = (RecordDescriptor) accessedVariableDescriptor;
-	        if (!accessedRecordDescriptor.containsIdentifier(variableIdentifier)) {
-                parser.SemErr("Cannot access non record type this way");
-                return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableDescriptor);
-            } else {
-	            TypeDescriptor accessedVariableType = accessedRecordDescriptor.getLexicalScope().getIdentifierDescriptor(variableIdentifier);
-                return new RecordAccessNode(previousAccessNode, variableIdentifier, accessedVariableType);
-            }
-        }
+	    return ReadVariableNodeGen.create(variableSlot, type, type instanceof ReferenceDescriptor);
     }
 
     public ExpressionNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {
@@ -713,12 +722,16 @@ public class NodeFactory {
     }
 
     public ReadDereferenceNode createReadDereferenceNode(ExpressionNode pointerExpression) {
-        TypeDescriptor returnType = null;
-	    if (!(pointerExpression.getType() instanceof PointerDescriptor)) {
-            parser.SemErr("Can not dereference this type");
-        } else {
-	        returnType = ((PointerDescriptor) pointerExpression.getType()).getInnerTypeDescriptor();
+        PointerDescriptor pointerDescriptor = null;
+        if (pointerExpression.getType() instanceof PointerDescriptor) {
+            pointerDescriptor = (PointerDescriptor) pointerExpression.getType();
+        } else if (pointerExpression.getType() instanceof ReferenceDescriptor && ((ReferenceDescriptor) pointerExpression.getType()).getReferencedType() instanceof PointerDescriptor) {
+            pointerDescriptor = (PointerDescriptor) ((ReferenceDescriptor) pointerExpression.getType()).getReferencedType();
         }
+	    else {
+            parser.SemErr("Can not dereference this type");
+        }
+        TypeDescriptor returnType = (pointerDescriptor != null)? pointerDescriptor.getInnerTypeDescriptor() : null;
 
         return ReadDereferenceNodeGen.create(pointerExpression, returnType);
     }
@@ -729,7 +742,7 @@ public class NodeFactory {
         TypeDescriptor returnType = null;
 
         if (!(descriptor instanceof RecordDescriptor)) {
-            parser.SemErr("Cannot access non record type this way");
+            parser.SemErr("Can not access non record type this way");
         } else {
             RecordDescriptor accessedRecordDescriptor = (RecordDescriptor) descriptor;
             if (!accessedRecordDescriptor.containsIdentifier(identifier)) {
@@ -740,22 +753,6 @@ public class NodeFactory {
         }
 
         return ReadFromRecordNodeGen.create(recordExpression, returnType, identifier);
-    }
-
-    public ArrayAccessNode createArrayAccessNode(AccessNode previousAccessNode, List<ExpressionNode> indexNodes) {
-        TypeDescriptor accessedVariableDescriptor = previousAccessNode.getType();
-
-        for (int i = 0; i< indexNodes.size(); ++i) {
-            if (!(accessedVariableDescriptor instanceof ArrayDescriptor)) {
-                parser.SemErr("Cannot index this type");
-                break;
-            } else {
-                ArrayDescriptor accessingArrayDescriptor = (ArrayDescriptor) accessedVariableDescriptor;
-                accessedVariableDescriptor = accessingArrayDescriptor.getOneStepInnerDescriptor();
-            }
-        }
-
-	    return new ArrayAccessNode(previousAccessNode, indexNodes, accessedVariableDescriptor);
     }
 
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
@@ -917,7 +914,7 @@ public class NodeFactory {
                 } else {
                     this.currentLexicalScope.registerLocalVariable(parameter.identifier, typeDescriptor);
                     final ExpressionNode readNode = new ReadArgumentNode(count, parameters.get(count++).type);
-                    final AssignmentNode assignment = this.createAssignmentNode(parameter.identifier, readNode);
+                    final SimpleAssignmentNode assignment = this.createAssignmentNode(parameter.identifier, readNode);
 
                     this.currentLexicalScope.addScopeInitializationNode(assignment);
                 }
@@ -927,11 +924,12 @@ public class NodeFactory {
         }
     }
 
-    private AssignmentNode createAssignmentNode(String targetIdentifier, ExpressionNode valueNode) {
+    private SimpleAssignmentNode createAssignmentNode(String targetIdentifier, ExpressionNode valueNode) {
         TypeDescriptor targetType = this.doLookup(targetIdentifier, LexicalScope::getIdentifierDescriptor);
         this.checkTypesAreCompatible(valueNode.getType(), targetType);
 	    FrameSlot targetSlot = this.doLookup(targetIdentifier, LexicalScope::getLocalSlot);
-        return AssignmentNodeGen.create(valueNode, targetSlot);
+
+	    return SimpleAssignmentNodeGen.create(valueNode, targetSlot);
     }
 
     private boolean checkTypesAreCompatible(TypeDescriptor leftType, TypeDescriptor rightType) {
@@ -965,6 +963,12 @@ public class NodeFactory {
         }
 
         return node;
+    }
+
+    private void doTypeCheck(TypeDescriptor left, TypeDescriptor right) {
+        if (!(left == right) && !left.convertibleTo(right)) {
+            parser.SemErr("Type mismatch");
+        }
     }
 
     public void assertLegalsCaseValues(OrdinalDescriptor ordinal, List<ConstantDescriptor> constants) {

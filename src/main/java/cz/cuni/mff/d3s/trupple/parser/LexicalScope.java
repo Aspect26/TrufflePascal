@@ -32,13 +32,14 @@ public class LexicalScope {
     private String name;
     private final LexicalScope outer;
     private int loopDepth;
-    final IdentifiersTable localIdentifiers;
+    IdentifiersTable localIdentifiers;
     final List<StatementNode> scopeInitializationNodes = new ArrayList<>();
 
     LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
         this.name = name;
         this.outer = outer;
         this.localIdentifiers = (usingTPExtension)? new IdentifiersTableTP() : new IdentifiersTable();
+        this.localIdentifiers.addBuiltins();
     }
 
     String getName() {

@@ -39,6 +39,9 @@ public class IdentifiersTable {
 
     public IdentifiersTable() {
         this.initialize();
+    }
+
+    public void addBuiltins() {
         addBuiltinTypes();
         addBuiltinConstants();
         addBuiltinFunctions();

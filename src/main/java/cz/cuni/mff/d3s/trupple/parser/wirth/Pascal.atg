@@ -553,41 +553,33 @@ identifier                                      (. Token identifierToken = t; .)
 |
     SubroutineCall<out statement, identifierToken>
 |
-    InnerAccessRoute<out AccessNode accessNode, identifierToken>
-    ":="
-    Expression<out ExpressionNode value>        (. statement = factory.createAssignmentNode(identifierToken, accessNode, value); .)
+    Assignment<out statement, identifierToken>
 )
 .
 
 
-InnerAccessRoute<out AccessNode accessRoute, Token identifierToken>
-=                                               (. accessRoute = factory.createSimpleAccessNode(identifierToken); .)
-{
-    InnerAccessRouteElement<out accessRoute, accessRoute>
-}
+Assignment<out StatementNode assignment, Token identifierToken>
+=
+AssignmentRoute<out AssignmentData assignmentData, identifierToken>
+":="
+Expression<out ExpressionNode value>        (. assignment = factory.finishAssignmentNode(assignmentData, value); .)
 .
 
 
-InnerAccessRouteNonEmpty<out AccessNode accessRoute, Token identifierToken>
-=                                               (. accessRoute = factory.createSimpleAccessNode(identifierToken); .)
-InnerAccessRouteElement<out accessRoute, accessRoute>
+AssignmentRoute<out AssignmentData data, Token identifierToken>
+=
+                                            (. data = new AssignmentData(); .)
+                                            (. data.setSimple(factory, identifierToken); .)
 {
-    InnerAccessRouteElement<out accessRoute, accessRoute>
+    (
+         ArrayIndex<. out List<ExpressionNode> indexNodes .>
+                                            (. data.setArray(factory, indexNodes); .)
+    |
+        "^"                                 (. data.setDereference(factory); .)
+    |
+        "." identifier                      (. data.setRecord(factory, t); .)
+    )
 }
-.
-
-
-InnerAccessRouteElement<out AccessNode accessNode, AccessNode previousAccessNode>
-=                                               (. accessNode = null; .)
-(
-    ArrayIndex<. out List<ExpressionNode> indexNodes .>
-                                                (. accessNode = factory.createArrayAccessNode(previousAccessNode, indexNodes); .)
-|
-    "."
-    identifier                                  (. accessNode = factory.createRecordAccessNode(previousAccessNode, t); .)
-|
-    "^"                                         (. accessNode = factory.createPointerDereferenceAccessNode(previousAccessNode); .)
-)
 .
 
 

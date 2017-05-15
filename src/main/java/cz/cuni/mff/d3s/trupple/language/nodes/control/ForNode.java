@@ -13,8 +13,8 @@ import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.AssignmentNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.ReadVariableNodeGen;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.write.SimpleAssignmentNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.variables.read.ReadVariableNodeGen;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @NodeInfo(shortName = "for")
@@ -30,13 +30,13 @@ public class ForNode extends StatementNode {
 	private final boolean ascending;
 	private final FrameSlot controlSlot;
 	@Child
-	private AssignmentNode assignment;
+	private SimpleAssignmentNode assignment;
 	@Child
 	private StatementNode body;
 	@Child
     private ExpressionNode hasEndedNode;
 
-	public ForNode(boolean ascending, AssignmentNode assignment, FrameSlot controlSlot, TypeDescriptor controlSlotType, ExpressionNode finalValue, ExpressionNode startValue,
+	public ForNode(boolean ascending, SimpleAssignmentNode assignment, FrameSlot controlSlot, TypeDescriptor controlSlotType, ExpressionNode finalValue, ExpressionNode startValue,
                    StatementNode body) {
 		this.ascending = ascending;
 		this.assignment = assignment;
