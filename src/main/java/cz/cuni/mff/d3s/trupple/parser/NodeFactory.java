@@ -717,7 +717,7 @@ public class NodeFactory {
         boolean isReference = type instanceof ReferenceDescriptor;
 
         return (isLocal)?
-                ReadLocalVariableNodeGen.create(variableSlot, type, isReference)
+                (isReference)? ReadReferenceVariableNodeGen.create(variableSlot, type) : ReadLocalVariableNodeGen.create(variableSlot, type)
                 :
                 ReadGlobalVariableNodeGen.create(variableSlot, type);
     }

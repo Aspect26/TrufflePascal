@@ -6,7 +6,6 @@ import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
-
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.UnexpectedRuntimeException;
@@ -16,62 +15,67 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
     @NodeField(name = "slot", type = FrameSlot.class),
     @NodeField(name = "typeDescriptor", type = TypeDescriptor.class),
 })
-public abstract class ReadLocalVariableNode extends ExpressionNode {
+public abstract class ReadReferenceVariableNode extends ExpressionNode {
 
 	protected abstract FrameSlot getSlot();
 
 	protected abstract TypeDescriptor getTypeDescriptor();
 
     @Specialization(guards = "isInt()")
-    int readInt(VirtualFrame frame) {
+    int readIntReference(VirtualFrame frame) {
         try {
-            return frame.getInt(getSlot());
+            Reference reference = (Reference) frame.getValue(getSlot());
+            return reference.getFromFrame().getInt(reference.getFrameSlot());
         } catch (FrameSlotTypeException e) {
             throw new UnexpectedRuntimeException();
         }
     }
 
-	@Specialization(guards = "isLong()")
-    long readLong(VirtualFrame frame) {
+    @Specialization(guards = "isLong()")
+    long readLongReference(VirtualFrame frame) {
         try {
-            return frame.getLong(getSlot());
+            Reference reference = (Reference) frame.getValue(getSlot());
+            return reference.getFromFrame().getLong(reference.getFrameSlot());
         } catch (FrameSlotTypeException e) {
             throw new UnexpectedRuntimeException();
         }
     }
 
     @Specialization(guards = "isDouble()")
-    double readDouble(VirtualFrame frame) {
+    double readDoubleReference(VirtualFrame frame) {
         try {
-            return frame.getDouble(getSlot());
+            Reference reference = (Reference) frame.getValue(getSlot());
+            return reference.getFromFrame().getDouble(reference.getFrameSlot());
         } catch (FrameSlotTypeException e) {
             throw new UnexpectedRuntimeException();
         }
     }
 
     @Specialization(guards = "isChar()")
-    char readChar(VirtualFrame frame) {
+    char readCharReference(VirtualFrame frame) {
         try {
-            return (char) frame.getByte(getSlot());
+            Reference reference = (Reference) frame.getValue(getSlot());
+            return (char) reference.getFromFrame().getByte(reference.getFrameSlot());
         } catch (FrameSlotTypeException e) {
             throw new UnexpectedRuntimeException();
         }
     }
 
     @Specialization(guards = "isBoolean()")
-    boolean readBoolean(VirtualFrame frame) {
+    boolean readBooleanReference(VirtualFrame frame) {
         try {
-            return frame.getBoolean(getSlot());
+            Reference reference = (Reference) frame.getValue(getSlot());
+            return reference.getFromFrame().getBoolean(reference.getFrameSlot());
         } catch (FrameSlotTypeException e) {
             throw new UnexpectedRuntimeException();
         }
     }
 
     @Specialization
-    Object readGeneric(VirtualFrame frame) {
-	    return frame.getValue(getSlot());
+    Object readReference(VirtualFrame frame) {
+        Reference reference = (Reference) frame.getValue(getSlot());
+        return reference.getFromFrame().getValue(reference.getFrameSlot());
     }
-
 
 	@Override
     public TypeDescriptor getType() {
