@@ -1160,7 +1160,7 @@ public class Parser implements IParser {
 		return expression;
 	}
 
-	private ExpressionNode  ReadRouteElement(ExpressionNode expression) {
+	ExpressionNode  ReadRouteElement(ExpressionNode expression) {
 		ExpressionNode  resultExpression;
 		resultExpression = null; 
 		if (la.kind == 18) {

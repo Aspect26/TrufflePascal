@@ -799,18 +799,22 @@ identifier                                      (. Token identifierToken = t; ex
 
 
 InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
-=							                    (. expression = null; .)
+=							                    (. expression = factory.createExpressionFromSingleIdentifier(identifierToken); .)
 (
-	SubroutineCall<out expression, identifierToken>
+    SubroutineCall<out expression, identifierToken>
+    (
+    |
+        InnerReadRouteNonEmpty<out expression, expression>
+    )
 |
-	InnerReadRouteNonEmpty<out expression, identifierToken>
+	InnerReadRouteNonEmpty<out expression, expression>
 )
 .
 
 
-InnerReadRouteNonEmpty<out ExpressionNode expression, Token identifierToken>
-=                                               (. ExpressionNode readIdentifier = factory.createExpressionFromSingleIdentifier(identifierToken); .)
-ReadRouteElement<out expression, readIdentifier>
+InnerReadRouteNonEmpty<out ExpressionNode expression, ExpressionNode initialExpression>
+=
+ReadRouteElement<out expression, initialExpression>
 {
     ReadRouteElement<out expression, expression>
 }

@@ -1127,19 +1127,22 @@ public class Parser implements IParser {
 
 	ExpressionNode  InnerIdentifierAccess(Token identifierToken) {
 		ExpressionNode  expression;
-		expression = null; 
+		expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
 		if (la.kind == 6) {
 			expression = SubroutineCall(identifierToken);
+			if (StartOf(11)) {
+			} else if (la.kind == 17 || la.kind == 22 || la.kind == 33) {
+				expression = InnerReadRouteNonEmpty(expression);
+			} else SynErr(82);
 		} else if (la.kind == 17 || la.kind == 22 || la.kind == 33) {
-			expression = InnerReadRouteNonEmpty(identifierToken);
-		} else SynErr(82);
+			expression = InnerReadRouteNonEmpty(expression);
+		} else SynErr(83);
 		return expression;
 	}
 
-	ExpressionNode  InnerReadRouteNonEmpty(Token identifierToken) {
+	ExpressionNode  InnerReadRouteNonEmpty(ExpressionNode initialExpression) {
 		ExpressionNode  expression;
-		ExpressionNode readIdentifier = factory.createExpressionFromSingleIdentifier(identifierToken); 
-		expression = ReadRouteElement(readIdentifier);
+		expression = ReadRouteElement(initialExpression);
 		while (la.kind == 17 || la.kind == 22 || la.kind == 33) {
 			expression = ReadRouteElement(expression);
 		}
@@ -1159,7 +1162,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 22) {
 			Get();
 			resultExpression = factory.createReadDereferenceNode(expression); 
-		} else SynErr(83);
+		} else SynErr(84);
 		return resultExpression;
 	}
 
@@ -1188,7 +1191,7 @@ public class Parser implements IParser {
 			parameter = factory.createSubroutineParameterPassNode(t); 
 		} else if (StartOf(6)) {
 			parameter = Expression();
-		} else SynErr(84);
+		} else SynErr(85);
 		return parameter;
 	}
 
@@ -1414,8 +1417,9 @@ class Errors {
 			case 80: s = "invalid LogicLiteral"; break;
 			case 81: s = "invalid SetConstructor"; break;
 			case 82: s = "invalid InnerIdentifierAccess"; break;
-			case 83: s = "invalid ReadRouteElement"; break;
-			case 84: s = "invalid ActualParameter"; break;
+			case 83: s = "invalid InnerIdentifierAccess"; break;
+			case 84: s = "invalid ReadRouteElement"; break;
+			case 85: s = "invalid ActualParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
