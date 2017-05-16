@@ -978,8 +978,13 @@ public class NodeFactory {
     }
 
     private TypeDescriptor getActualType(TypeDescriptor typeDescriptor) {
-        return (typeDescriptor instanceof ReferenceDescriptor)?
-                ((ReferenceDescriptor) typeDescriptor).getReferencedType() : typeDescriptor;
+	    if (typeDescriptor instanceof ReferenceDescriptor) {
+	        return  ((ReferenceDescriptor) typeDescriptor).getReferencedType();
+        } else if (typeDescriptor instanceof FunctionDescriptor) {
+	        return ((FunctionDescriptor) typeDescriptor).getReturnDescriptor();
+        }
+
+        return typeDescriptor;
     }
 
     private <T extends ExpressionNode> T verifyOperandArguments(T node, String operator) {
