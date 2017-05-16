@@ -52,10 +52,6 @@ public abstract class ExpressionNode extends StatementNode {
 	    return PascalTypesGen.expectEnumValue(executeGeneric(frame));
     }
 
-    public PascalArray executePascalArray(VirtualFrame frame) throws UnexpectedResultException {
-	    return PascalTypesGen.expectPascalArray(executeGeneric(frame));
-    }
-
     protected boolean isInt() {
         return getType() == IntDescriptor.getInstance() || getType() instanceof IntConstantDescriptor;
     }

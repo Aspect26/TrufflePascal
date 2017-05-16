@@ -14,8 +14,6 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.write.SimpleAssignmentNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.read.ReadVariableNodeGen;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
 @NodeInfo(shortName = "for")
 public class ForNode extends StatementNode {
@@ -36,16 +34,16 @@ public class ForNode extends StatementNode {
     @Child
     private ExpressionNode hasEndedNode;
 
-    public ForNode(boolean ascending, SimpleAssignmentNode assignment, FrameSlot controlSlot, TypeDescriptor controlSlotType, ExpressionNode finalValue, ExpressionNode startValue,
-                   StatementNode body) {
+    public ForNode(boolean ascending, SimpleAssignmentNode assignment, FrameSlot controlSlot, ExpressionNode finalValue,
+                   ExpressionNode readControlVariableNode, StatementNode body) {
         this.ascending = ascending;
         this.assignment = assignment;
         this.controlSlot = controlSlot;
         this.body = body;
         this.hasEndedNode = (ascending)?
-                LessThanOrEqualNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType, false), finalValue)
+                LessThanOrEqualNodeGen.create(readControlVariableNode, finalValue)
                 :
-                NotNodeGen.create(LessThanNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType, false), finalValue));
+                NotNodeGen.create(LessThanNodeGen.create(readControlVariableNode, finalValue));
     }
 
     @Override

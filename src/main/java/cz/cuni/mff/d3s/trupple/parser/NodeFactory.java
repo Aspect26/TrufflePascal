@@ -472,7 +472,6 @@ public class NodeFactory {
     public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
         String iteratingIdentifier = this.getIdentifierFromToken(variableToken);
         FrameSlot controlSlot = this.doLookup(iteratingIdentifier, LexicalScope::getLocalSlot);
-        TypeDescriptor controlSlotType = currentLexicalScope.getIdentifierDescriptor(iteratingIdentifier);
         if (controlSlot == null) {
             parser.SemErr("Unknown identifier: " + iteratingIdentifier);
         }
@@ -480,7 +479,8 @@ public class NodeFactory {
             parser.SemErr("Type mismatch in beginning and last value of for loop.");
         }
         SimpleAssignmentNode initialAssignment = this.createAssignmentNode(iteratingIdentifier, startValue);
-        return new ForNode(ascending, initialAssignment, controlSlot, controlSlotType, finalValue, startValue, loopBody);
+        ExpressionNode readControlVariableNode = this.createReadVariableNode(variableToken);
+        return new ForNode(ascending, initialAssignment, controlSlot, finalValue, readControlVariableNode, loopBody);
     }
 
     public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
@@ -697,19 +697,29 @@ public class NodeFactory {
                 return this.createInvokeNode(foundIdentifier, descriptor, foundInLexicalScope, Collections.emptyList());
             }
             else {
-                // TODO: check if it is a constant or a variable
-                boolean isReference = foundInLexicalScope.getIdentifierDescriptor(foundIdentifier) instanceof ReferenceDescriptor;
-                return ReadVariableNodeGen.create(foundInLexicalScope.getLocalSlot(foundIdentifier), foundInLexicalScope.getIdentifierDescriptor(foundIdentifier), isReference);
+                return createReadVariableFromScope(foundIdentifier, foundInLexicalScope);
             }
         });
     }
 
     ExpressionNode createReadVariableNode(Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
-	    FrameSlot variableSlot = this.doLookup(identifier, LexicalScope::getLocalSlot);
-	    TypeDescriptor type = this.doLookup(identifier, LexicalScope::getIdentifierDescriptor);
+	    return this.doLookup(identifier, (LexicalScope foundInScope, String foundIdentifier) ->
+	        createReadVariableFromScope(foundIdentifier, foundInScope)
+        );
+    }
 
-	    return ReadVariableNodeGen.create(variableSlot, type, type instanceof ReferenceDescriptor);
+    private ExpressionNode createReadVariableFromScope(String identifier, LexicalScope scope) {
+        // TODO: check if it is a constant or a variable
+        FrameSlot variableSlot = scope.getLocalSlot(identifier);
+        TypeDescriptor type = scope.getIdentifierDescriptor(identifier);
+        boolean isLocal = scope == currentLexicalScope;
+        boolean isReference = type instanceof ReferenceDescriptor;
+
+        return (isLocal)?
+                ReadLocalVariableNodeGen.create(variableSlot, type, isReference)
+                :
+                ReadGlobalVariableNodeGen.create(variableSlot, type);
     }
 
     public ExpressionNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {

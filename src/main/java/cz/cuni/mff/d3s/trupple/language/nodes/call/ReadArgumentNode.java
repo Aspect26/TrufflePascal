@@ -24,4 +24,5 @@ public class ReadArgumentNode extends ExpressionNode {
     public TypeDescriptor getType() {
         return this.argumentType;
     }
+
 }
