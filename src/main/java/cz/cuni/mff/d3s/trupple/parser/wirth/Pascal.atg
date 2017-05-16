@@ -1,0 +1,921 @@
+COMPILER Pascal
+
+IGNORECASE
+
+CHARACTERS
+
+letter = 'A'..'Z' + 'a'..'z'.
+nonZeroDigit = "123456789".
+digit = "0123456789".
+
+cr = '\r'.
+lf = '\n'.
+tab = '\t'.
+
+stringChar = ANY - "'" - cr - lf.
+
+TOKENS
+
+identifier = letter {letter | digit}.
+stringLiteral = "'" { stringChar | "''" } "'".
+integerLiteral = "0" | nonZeroDigit { digit }.
+doubleLiteral = ("0" | nonZeroDigit { digit }) "e" ["-" | "+"] { digit } | ("0" | nonZeroDigit { digit }) "." digit { digit } ["e" ["-"|"+"] { digit }].
+
+PRAGMAS
+
+COMMENTS FROM "(*" TO "*)"
+COMMENTS FROM "{" TO "}"
+IGNORE cr + lf + tab
+
+PRODUCTIONS
+
+Pascal
+=
+Program
+Declarations
+MainFunction
+.
+
+
+Program
+=
+    "program"
+    identifier                                      (. factory.startPascal(t); .)
+                                                    (. List<String> programArgumentsIdentifiers = new ArrayList<>(); .)
+    [
+        "("
+        IdentifiersList<out programArgumentsIdentifiers>
+        ")"
+    ]                                               (. factory.setMainProgramArguments(programArgumentsIdentifiers); .)
+    ";"
+.
+
+
+Declarations
+=
+[ LabelDefinitions ]
+[ ConstantDefinitions ]
+[ TypeDefinitions ]
+[ VariableDeclarations ]
+{ Subroutine }
+.
+
+
+LabelDefinitions
+=                                               (. Token labelToken = null; .)
+"label"
+Label<out labelToken>                           (. factory.registerLabel(labelToken); .)
+{
+    ","
+    Label<out labelToken>                       (. factory.registerLabel(labelToken); .)
+}
+";"
+.
+
+
+Label<out Token labelToken>
+=
+integerLiteral                                  (. labelToken = t; .)
+.
+
+
+TypeDefinitions
+=
+"type"
+TypeDefinition ";"
+{
+    TypeDefinition ";"
+}                                               (. factory.initializeAllUninitializedPointerDescriptors(); .)
+.
+
+
+TypeDefinition
+=
+identifier										(. Token identifier = t; .)
+"="
+Type<out TypeDescriptor typeDescriptor>         (. factory.registerNewType(identifier, typeDescriptor); .)
+.
+
+
+
+Type<out TypeDescriptor typeDescriptor>
+=                                               (. typeDescriptor = null; .)
+(
+    IF(isSubrange())
+    SubrangeType<out typeDescriptor>
+|
+	identifier                                  (.  typeDescriptor = factory.getTypeDescriptor(t); .)
+
+|
+    EnumDefinition<out typeDescriptor>
+|
+	ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
+	{
+		IF(continuesArray())
+		"of"
+		ArrayDefinition<. out List<OrdinalDescriptor> additionalDimensions .>
+												(. ordinalDimensions.addAll(additionalDimensions); .)
+	}
+	"of"
+	identifier									(. typeDescriptor = factory.createArray(ordinalDimensions, t); .)
+|
+    "set" "of"
+    Ordinal<out OrdinalDescriptor ordinal>      (. typeDescriptor = factory.createSetType(ordinal); .)
+|
+    FileType<out typeDescriptor>
+|
+    RecordType<out typeDescriptor>
+|
+    PointerType<out typeDescriptor>
+)
+.
+
+
+ArrayDefinition<. out List<OrdinalDescriptor> ordinalDimensions .>
+=
+[ "packed" ]
+"array"											(. ordinalDimensions = new ArrayList<>(); .)
+"["												(. OrdinalDescriptor ordinalDescriptor = null; .)
+Ordinal<out ordinalDescriptor>					(. ordinalDimensions.add(ordinalDescriptor); .)
+{
+	","
+	Ordinal<out ordinalDescriptor>				(. ordinalDimensions.add(ordinalDescriptor); .)
+}
+"]"
+.
+
+
+EnumDefinition<out TypeDescriptor typeDescriptor>
+=                                               (. List<String> enumIdentifiers = new ArrayList<>(); .)
+"("
+    identifier                                  (. enumIdentifiers.add(factory.getIdentifierFromToken(t)); .)
+    {
+        ","
+        identifier                              (. enumIdentifiers.add(factory.getIdentifierFromToken(t)); .)
+    }
+")"                                             (. typeDescriptor = factory.registerEnum(enumIdentifiers); .)
+.
+
+
+FileType<out TypeDescriptor fileDescriptor>
+=
+"file" "of"
+Type<out TypeDescriptor contentType>            (. fileDescriptor = factory.createFileType(contentType); .)
+.
+
+
+RecordType<out TypeDescriptor typeDescriptor>
+=
+"record"                                        (. factory.startRecord(); .)
+RecordFieldList<out typeDescriptor>
+"end"                                           (. factory.finishRecord(); .)
+.
+
+
+PointerType<out TypeDescriptor typeDescriptor>
+=
+"^"
+identifier                                      (. typeDescriptor = factory.createPointerType(t); .)
+.
+
+
+RecordFieldList<out TypeDescriptor typeDescriptor>
+=
+(
+    RecordFixedPart
+    [
+        IF(recordVariantPartStarts())
+        ";"
+        RecordVariantPart
+    ]
+|
+    RecordVariantPart
+|
+)
+[ ";" ]                                         (. typeDescriptor = factory.createRecordType(); .)
+.
+
+
+RecordFixedPart
+=
+RecordFixedSection
+{
+    IF(recordFixedPartContinues())
+    ";"
+    RecordFixedSection
+}
+.
+
+
+RecordFixedSection
+=
+VariableLineDeclaration
+.
+
+
+RecordVariantPart
+=
+"case"
+RecordVariantSelector<out OrdinalDescriptor selectorType>
+"of"
+RecordVariants<. out List<ConstantDescriptor> caseConstants .>
+                                                (. factory.assertLegalsCaseValues(selectorType, caseConstants); .)
+.
+
+
+RecordVariantSelector<out OrdinalDescriptor selectorDescriptor>
+=                                               (. Token tagToken = null; .)
+[
+    IF(isVariantSelectorTag())
+    identifier                                  (. tagToken = t; .)
+    ":"
+]
+identifier                                      (. if (tagToken != null) factory.registerRecordVariantTagVariable(tagToken, t); .)
+                                                (. selectorDescriptor = factory.castTypeToOrdinalType(factory.getTypeDescriptor(t)); .)
+.
+
+
+RecordVariants<. out List<ConstantDescriptor> caseConstants .>
+=                                               (. caseConstants = new ArrayList<>(); .)
+RecordVariant<. out List<ConstantDescriptor> newCaseConstants .>
+                                                (. caseConstants.addAll(newCaseConstants); .)
+{
+    IF(!recordVariantsEnd())
+    ";"
+    RecordVariant<out newCaseConstants>         (. caseConstants.addAll(newCaseConstants); .)
+}
+.
+
+
+RecordVariant<. out List<ConstantDescriptor> caseConstants .>
+=
+CaseConstantList<out caseConstants>
+":"
+"("
+RecordFieldList<out TypeDescriptor type>
+")"
+.
+
+
+CaseConstantList<. out List<ConstantDescriptor> caseConstants .>
+=                                               (. caseConstants = new ArrayList<>(); .)
+Constant<out ConstantDescriptor constant>       (. caseConstants.add(constant); .)
+{
+    ","
+    Constant<out constant>                      (. caseConstants.add(constant); .)
+}
+.
+
+
+Ordinal<out OrdinalDescriptor ordinal>
+=												(. ordinal = null; .)
+(
+    IF(isSubrange())
+	SubrangeType<out ordinal>
+|
+	Type<out TypeDescriptor typeDescriptor>     (. ordinal = factory.castTypeToOrdinalType(typeDescriptor); .)
+)
+.
+
+
+SubrangeType<out OrdinalDescriptor ordinal>
+=
+Constant<out ConstantDescriptor lowerBound>
+".."
+Constant<out ConstantDescriptor upperBound>     (. ordinal = factory.createSimpleOrdinalDescriptor(lowerBound, upperBound); .)
+.
+
+
+ConstantDefinitions
+=
+"const"
+ConstantDefinition ";"
+{
+    ConstantDefinition ";"
+}
+.
+
+
+ConstantDefinition
+=
+identifier										(. Token identifier = t; .)
+"="
+Constant<out ConstantDescriptor constant>       (. factory.registerConstant(identifier, constant); .)
+.
+
+
+Constant<out ConstantDescriptor constant>
+=
+                                                (. constant = null; String sign = ""; .)
+[
+    "+" | "-"                                   (. sign = t.val; .)
+]
+(
+	UnsignedIntegerLiteral<out long value>      (. constant = factory.createLongConstant(sign, value); .)
+|
+    UnsignedDoubleLiteral<out double value>     (. constant = factory.createDoubleConstant(sign, value); .)
+|
+	StringLiteral<out String value> 			(. constant = factory.createCharOrStringConstant(sign, value); .)
+|
+	IdentifierConstant<out Token identifier>    (. constant = factory.createConstantFromIdentifier(sign, identifier); .)
+)
+.
+
+
+UnsignedIntegerLiteral<out long value>
+=
+integerLiteral                                  (. value = factory.getLongFromToken(t); .)
+.
+
+
+UnsignedDoubleLiteral<out double value>
+=
+doubleLiteral                                   (. value = factory.getDoubleFromToken(t); .)
+.
+
+
+IdentifierConstant<out Token identifierToken>
+=
+identifier                                      (. identifierToken = t; .)
+.
+
+
+VariableDeclarations
+=
+"var"
+VariableLineDeclaration ";"
+{
+    VariableLineDeclaration ";"
+}
+.
+
+
+VariableLineDeclaration
+=
+IdentifiersList<. out List<String> identifiers .>
+":"
+Type<out TypeDescriptor typeDescriptor>         (. factory.registerVariables(identifiers, typeDescriptor); .)
+.
+
+
+IdentifiersList<. out List<String> identifiers .>
+=                                               (. identifiers = new ArrayList<>(); .)
+identifier                                      (. identifiers.add(factory.getIdentifierFromToken(t)); .)
+{
+    ","
+    identifier                                  (. identifiers.add(factory.getIdentifierFromToken(t)); .)
+}
+.
+
+
+Subroutine
+=
+(
+    Procedure ";"
+|
+    Function ";"
+)
+.
+
+
+Procedure
+=
+ProcedureHeading<out ProcedureHeading procedureHeading> ";"
+(
+    "forward"                                   (. factory.forwardProcedure(procedureHeading); .)
+|
+                                                (. factory.startProcedureImplementation(procedureHeading); .)
+    Declarations
+    Block<out StatementNode bodyNode>           (. factory.finishProcedureImplementation(bodyNode); .)
+)
+.
+
+
+Function
+=
+FunctionHeading<out FunctionHeading functionHeading> ";"
+(
+    "forward"                                   (. factory.forwardFunction(functionHeading); .)
+|
+                                                (. factory.startFunctionImplementation(functionHeading); .)
+    Declarations
+    Block<out StatementNode bodyNode>           (. factory.finishFunctionImplementation(bodyNode); .)
+)
+.
+
+
+FunctionHeading<out FunctionHeading functionHeading>
+=
+"function"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+":"
+identifier                                      (. Token returnTypeToken = t; .)
+                                                (. functionHeading = new FunctionHeading(identifierToken, formalParameters, factory.getTypeDescriptor(returnTypeToken)); .)
+.
+
+
+ProcedureHeading<out ProcedureHeading procedureHeading>
+=
+"procedure"
+identifier                                      (. Token identifierToken = t; .)
+                                                (. List<FormalParameter> formalParameters = new ArrayList<>(); .)
+[ FormalParameterList<out formalParameters> ]
+                                                (. procedureHeading = new ProcedureHeading(identifierToken, formalParameters); .)
+.
+
+
+FormalParameterList<. out List<FormalParameter> formalParameters .>
+=
+"("												(. formalParameters = new ArrayList<>(); .)
+												(. List<FormalParameter> newParameters = new ArrayList<>(); .)
+FormalParameter<out newParameters>				(. formalParameters.addAll(newParameters); .)
+{ 
+	";" 
+	FormalParameter<out newParameters> 			(. formalParameters.addAll(newParameters); .)
+}
+")"
+.
+
+
+FormalParameter<. out List<FormalParameter> formalParameters .>
+=                                               (. formalParameters = new ArrayList<>(); .)
+(
+    SubroutineFormalParameter<out FormalParameter parameter>
+                                                (. formalParameters.add(parameter); .)
+|
+    VariableFormalParameter<out formalParameters>
+)
+.
+
+
+SubroutineFormalParameter<out FormalParameter formalParameter>
+=                                               (. formalParameter = null; .)
+(
+    ProcedureFormalParameter<out formalParameter>
+|
+    FunctionFormalParameter<out formalParameter>
+)
+.
+
+
+ProcedureFormalParameter<out FormalParameter formalParameter>
+=
+ProcedureHeading<out ProcedureHeading heading>  (. formalParameter = factory.createProcedureFormalParameter(heading); .)
+.
+
+
+FunctionFormalParameter<out FormalParameter formalParameter>
+=
+FunctionHeading<out FunctionHeading heading>    (. formalParameter = factory.createFunctionFormalParameter(heading); .)
+.
+
+
+VariableFormalParameter<. out List<FormalParameter> formalParameters .>
+=
+												(. List<String> identifiers = new ArrayList<>(); .)
+identifier										(. identifiers.add(factory.getIdentifierFromToken(t)); .)
+{
+	","
+	identifier									(. identifiers.add(factory.getIdentifierFromToken(t)); .)
+}
+":"
+identifier										(. formalParameters = factory.createFormalParametersList(identifiers, t, false); .)
+.
+
+
+MainFunction 
+=
+Block<out StatementNode blockNode>                  (. mainNode = factory.finishMainFunction(blockNode); .)
+"."
+.
+
+
+Block<out StatementNode blockNode>
+=                                               
+    "begin"                                     (. List<StatementNode> bodyNodes = new ArrayList<>(); .)
+    [ 
+        StatementSequence<bodyNodes>
+    ]
+    "end"                                       (. blockNode = factory.createBlockNode(bodyNodes, this.extendedGotoSupport); .)
+.
+
+
+StatementSequence<. List<StatementNode> body .>
+=
+Statement<out StatementNode statement>          (. body.add(statement); .)
+{
+    ";"
+    Statement<out statement>                    (. body.add(statement); .)
+}                                       
+.
+
+
+Statement<out StatementNode statement>
+=                                               (. statement = null; Token label = null;.)
+[
+    Label<out label>
+    ":"
+]
+
+(
+                                                (. statement = factory.createNopStatement(); .)
+|
+    IfStatement<out statement>
+|
+	ForLoop<out statement>
+|
+	WhileLoop<out statement>
+|
+	RepeatLoop<out statement>
+|
+	CaseStatement<out statement>
+|
+    WithStatement<out statement>
+|
+    GotoStatement<out statement>
+|
+    Block<out statement>
+|
+    IdentifierBeginningStatement<out statement>
+)
+                                                (. if (label != null) statement = factory.createLabeledStatement(statement, label); .)
+.
+
+
+
+IdentifierBeginningStatement<out StatementNode statement>
+=                                               (. statement = null; .)
+identifier                                      (. Token identifierToken = t; .)
+(
+                                                (. statement = factory.createSubroutineCall(identifierToken, new ArrayList<>()); .)
+|
+    SubroutineCall<out statement, identifierToken>
+|
+    Assignment<out statement, identifierToken>
+)
+.
+
+
+Assignment<out StatementNode assignment, Token identifierToken>
+=
+AssignmentRoute<out AssignmentData assignmentData, identifierToken>
+":="
+Expression<out ExpressionNode value>        (. assignment = factory.finishAssignmentNode(assignmentData, value); .)
+.
+
+
+AssignmentRoute<out AssignmentData data, Token identifierToken>
+=
+                                            (. data = new AssignmentData(); .)
+                                            (. data.setSimple(factory, identifierToken); .)
+{
+    (
+         ArrayIndex<. out List<ExpressionNode> indexNodes .>
+                                            (. data.setArray(factory, indexNodes); .)
+    |
+        "^"                                 (. data.setDereference(factory); .)
+    |
+        "." identifier                      (. data.setRecord(factory, t); .)
+    )
+}
+.
+
+
+CaseStatement<out StatementNode statement>
+=
+"case"
+Expression<out ExpressionNode caseExpression>
+"of"
+CaseList<out CaseStatementData caseData>        (. caseData.caseExpression = caseExpression; .)
+"end"											(. statement = factory.createCaseStatement(caseData); .)
+.
+
+
+
+CaseList<out CaseStatementData data>
+=                                               (. data = new CaseStatementData(); .)
+Expression<out ExpressionNode caseConstant>     (. data.indexNodes.add(caseConstant); .)
+":"
+Statement<out StatementNode caseStatement>		(. data.statementNodes.add(caseStatement); .)
+{
+	IF(!caseEnds())
+	";"
+	Expression<out caseConstant>                (. data.indexNodes.add(caseConstant); .)
+	":"
+	Statement<out caseStatement>				(. data.statementNodes.add(caseStatement); .)
+}
+[ ";" ]
+[
+	"else"
+	Statement<out data.elseNode>
+]
+[ ";" ]
+.
+
+
+WithStatement<out StatementNode statement>
+=
+"with"
+IdentifiersList<. out List<String> recordIdentifiers .>
+                                                (. LexicalScope initialScope = factory.getScope(); .)
+                                                (. List<FrameSlot> recordSlots = factory.stepIntoRecordsScope(recordIdentifiers); .)
+"do"
+Statement<out StatementNode innerStatement>
+                                                (. factory.setScope(initialScope); .)
+                                                (. statement = factory.createWithStatement(recordSlots, innerStatement); .)
+.
+
+
+ForLoop<out StatementNode statement>
+=                                               (. factory.startLoop(); .)
+"for"											(. boolean ascending = true; .)
+identifier										(. Token variableToken = t; .)
+":="
+Expression<out ExpressionNode startValue>
+(
+	"to"										(. ascending = true; .)
+	|
+	"downto"									(. ascending = false; .)
+)
+Expression<out ExpressionNode finalValue>
+"do"
+Statement<out StatementNode loopBody>			(. statement = factory.createForLoop(ascending, variableToken, startValue, finalValue, loopBody); .)
+                                                (. factory.finishLoop(); .)
+.
+
+
+RepeatLoop<out StatementNode statement>
+=												(. factory.startLoop(); .)
+"repeat"										(. List<StatementNode> bodyNodes = new ArrayList<>(); .)
+StatementSequence<bodyNodes>
+"until"
+Expression<out ExpressionNode condition>		(. statement = factory.createRepeatLoop(condition, factory.createBlockNode(bodyNodes, this.extendedGotoSupport)); .)
+                                                (. factory.finishLoop(); .)
+.
+
+
+WhileLoop<out StatementNode statement>
+=												(. factory.startLoop(); .)
+"while"
+Expression<out ExpressionNode condition>
+"do"
+Statement<out StatementNode loopBody>			(. statement = factory.createWhileLoop(condition, loopBody); .)
+												(. factory.finishLoop(); .)
+.
+
+
+IfStatement<out StatementNode statement>
+=
+"if"
+    Expression<out ExpressionNode condition>
+
+"then"
+    Statement<out StatementNode thenStatement>
+                                                (. StatementNode elseStatement = null; .)
+[
+"else"
+    Statement<out elseStatement>
+]                                               (. statement = factory.createIfStatement(condition, thenStatement, elseStatement); .)
+.
+
+
+GotoStatement<out StatementNode statement>
+=
+"goto"
+integerLiteral                                  (. statement = factory.createGotoStatement(t); .)
+.
+
+
+Expression<out ExpressionNode expression>
+=
+LogicTerm<out expression>
+{
+    "or"                                        (. Token op = t; .)
+    LogicTerm<out ExpressionNode right>         (. expression = factory.createBinaryExpression(op, expression, right); .)
+}
+.
+
+
+LogicTerm<out ExpressionNode expression>
+=
+SignedLogicFactor<out expression>
+{
+    "and"                                       (. Token op = t; .)
+    SignedLogicFactor<out ExpressionNode right> (. expression = factory.createBinaryExpression(op, expression, right); .)
+}
+.
+
+
+SignedLogicFactor<out ExpressionNode expression>
+=												(. expression = null; .)
+(
+	"not"										(. Token op = t; .)
+	SignedLogicFactor<out ExpressionNode right>	(. expression = factory.createUnaryExpression(op, right); .)
+|
+	LogicFactor<out expression>
+)
+.
+
+
+
+LogicFactor<out ExpressionNode expression>
+=
+Arithmetic<out expression>
+[
+    (">" | ">=" | "<" | "<=" | "=" | "<>" | "in")
+                                                (. Token op = t; .)
+    Arithmetic<out ExpressionNode right>        (. expression = factory.createBinaryExpression(op, expression, right); .)
+]
+.
+
+
+Arithmetic<out ExpressionNode expression>
+=
+Term<out expression>
+{
+    ( "+" | "-" )                               (. Token op = t; .)
+    Term<out ExpressionNode right>              (. expression = factory.createBinaryExpression(op, expression, right); .)
+}
+.
+
+
+Term<out ExpressionNode expression>
+=
+SignedFactor<out expression>
+{
+    ( "*" | "/" | "div" | "mod")                (. Token op = t; .)
+    SignedFactor<out ExpressionNode right>      (. expression = factory.createBinaryExpression(op, expression, right); .)
+}
+.
+
+
+SignedFactor<out ExpressionNode expression>
+=                                               (. expression = null; .)
+(
+    ( "+" | "-" )                               (. Token unOp = t; .)
+    SignedFactor<out expression>                (.  expression = factory.createUnaryExpression(unOp, expression); .)
+|
+    Factor<out expression>
+)
+.
+
+
+
+Factor<out ExpressionNode expression>
+=							                    (. expression = null; .)
+(
+	IdentifierAccess<out expression>
+|
+    "("
+    Expression<out expression>
+    ")"
+|
+                                                (. String value = ""; .)
+	StringLiteral<out value>		            (. expression = factory.createCharOrStringLiteralNode(value); .)
+|
+	doubleLiteral								(. expression = factory.createFloatLiteralNode(t); .)
+|
+    integerLiteral                              (. expression = factory.createNumericLiteralNode(t); .)
+|
+												(. boolean val; .)
+    LogicLiteral<out val>						(. expression = factory.createLogicLiteralNode(val); .)
+|
+    SetConstructor<out expression>
+)
+.
+
+
+IdentifierAccess<out ExpressionNode expression>
+=
+identifier                                      (. Token identifierToken = t; expression = null; .)
+(
+                                                (. expression = factory.createExpressionFromSingleIdentifier(identifierToken); .)
+|
+    InnerIdentifierAccess<out expression, identifierToken>
+)
+.
+
+
+InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
+=							                    (. expression = null; .)
+(
+	SubroutineCall<out expression, identifierToken>
+|
+	InnerReadRouteNonEmpty<out expression, identifierToken>
+)
+.
+
+
+InnerReadRouteNonEmpty<out ExpressionNode expression, Token identifierToken>
+=                                               (. ExpressionNode readIdentifier = factory.createExpressionFromSingleIdentifier(identifierToken); .)
+ReadRouteElement<out expression, readIdentifier>
+{
+    ReadRouteElement<out expression, expression>
+}
+.
+
+ReadRouteElement<out ExpressionNode resultExpression, ExpressionNode expression>
+=                                               (. resultExpression = null; .)
+(
+    ArrayIndex<. out List<ExpressionNode> indexNodes .>
+                                                (. resultExpression = factory.createReadFromArrayNode(expression, indexNodes); .)
+|
+    "."
+    identifier                                  (. resultExpression = factory.createReadFromRecordNode(expression, t); .)
+|
+    "^"                                         (. resultExpression = factory.createReadDereferenceNode(expression); .)
+)
+.
+
+
+SubroutineCall<out ExpressionNode expression, Token identifierToken>
+=
+"("
+                                                (. List<ExpressionNode> parameters = new ArrayList<>(); .)
+    [
+        ActualParameters<out parameters, identifierToken>
+    ]
+")"                                             (. expression = factory.createSubroutineCall(identifierToken, parameters); .)
+.
+
+
+StringLiteral<out String value>
+=
+stringLiteral                                   (. value = factory.createStringFromToken(t); .)
+.
+
+
+LogicLiteral<out boolean result>
+=												(. result = false; .)
+(
+	"true"										(. result = true; .)
+|
+	"false"										(. result = false; .)
+)
+.
+
+
+SetConstructor<out ExpressionNode expression>
+=                                               (. expression = null; .)
+"["
+    (
+                                                (. expression = factory.createSetConstructorNode(new ArrayList<>()); .)
+    |
+                                                (. List<ExpressionNode> valueNodes = new ArrayList<ExpressionNode>(); .)
+        Expression<out ExpressionNode valueNode>(. valueNodes.add(valueNode); .)
+        {
+            ","
+            Expression<out valueNode>           (. valueNodes.add(valueNode); .)
+        }
+                                                (. expression = factory.createSetConstructorNode(valueNodes); .)
+    )
+"]"
+.
+
+
+ActualParameters<. out List<ExpressionNode> parameters, Token subroutineToken .>
+=
+                                                (. parameters = new ArrayList<>(); .)
+                                                (. int currentParameter = 0; .)
+ActualParameter<out ExpressionNode parameter, currentParameter, subroutineToken>
+                                                (. parameters.add(parameter); .)
+{
+    ","
+    ActualParameter<out parameter, ++currentParameter, subroutineToken>
+                                                (. parameters.add(parameter); .)
+}
+.
+
+
+ActualParameter<out ExpressionNode parameter, int currentParameterIndex, Token subroutineToken>
+=
+                                                (. parameter = null; .)
+(
+    IF(factory.shouldBeReference(subroutineToken, currentParameterIndex))
+    identifier                                  (. parameter = factory.createReferencePassNode(t); .)
+|
+    IF(factory.shouldBeSubroutine(subroutineToken, currentParameterIndex))
+    identifier                                  (. parameter = factory.createSubroutineParameterPassNode(t); .)
+|
+    Expression<out parameter>
+)
+.
+
+
+ArrayIndex<. out List<ExpressionNode> indexNodes .>
+=
+												(. indexNodes = new ArrayList<>(); .)
+												(. ExpressionNode indexingNode = null; .)
+"["
+	Expression<out indexingNode>	            (. indexNodes.add(indexingNode); .)
+	{
+		","
+		Expression<out indexingNode>	        (. indexNodes.add(indexingNode); .)
+	}
+"]"
+.
+
+
+END Pascal.
