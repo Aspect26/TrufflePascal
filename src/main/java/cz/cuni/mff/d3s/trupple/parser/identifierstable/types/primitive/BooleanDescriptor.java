@@ -3,6 +3,7 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.BooleanConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 
 public class BooleanDescriptor implements OrdinalDescriptor, PrimitiveDescriptor {
@@ -49,7 +50,7 @@ public class BooleanDescriptor implements OrdinalDescriptor, PrimitiveDescriptor
 
     @Override
     public boolean convertibleTo(TypeDescriptor type) {
-        return type instanceof PCharDesriptor;
+        return type instanceof BooleanConstantDescriptor;
     }
 
 }

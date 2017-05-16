@@ -6,6 +6,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.StringConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 
 public class StringDescriptor extends ArrayDescriptor implements PrimitiveDescriptor {
@@ -33,7 +34,7 @@ public class StringDescriptor extends ArrayDescriptor implements PrimitiveDescri
 
     @Override
     public boolean convertibleTo(TypeDescriptor type) {
-        return type instanceof PCharDesriptor;
+        return type instanceof PCharDesriptor || type instanceof StringConstantDescriptor;
     }
 
 }

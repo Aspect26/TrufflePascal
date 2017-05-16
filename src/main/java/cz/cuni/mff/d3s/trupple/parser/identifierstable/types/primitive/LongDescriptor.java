@@ -3,6 +3,8 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.RealConstantDescriptor;
 
 public class LongDescriptor implements OrdinalDescriptor, PrimitiveDescriptor {
 
@@ -48,7 +50,8 @@ public class LongDescriptor implements OrdinalDescriptor, PrimitiveDescriptor {
 
     @Override
     public boolean convertibleTo(TypeDescriptor type) {
-        return type == RealDescriptor.getInstance();
+        return type == RealDescriptor.getInstance() || type instanceof LongConstantDescriptor ||
+                type instanceof RealConstantDescriptor;
     }
 
 }

@@ -19,6 +19,18 @@ public class ConstantsTest extends JUnitTest {
 		this.test(code, output, true);
 	}
 
+    @Test
+    public void constInForLoop() {
+        String code = "program main; \n"+
+                "const max=3;\n"+
+                "var i:integer;\n"+
+                "\n"+
+                "begin\n"+
+                "  for i := 0 to max do write(i);\n"+
+                "end.";
+        this.test(code, "0123", false);
+    }
+
 	// NOTE: not supported in Wirth's standard
     /*
 	@Test

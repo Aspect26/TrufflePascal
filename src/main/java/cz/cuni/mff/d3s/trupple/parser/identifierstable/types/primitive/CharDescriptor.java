@@ -3,6 +3,8 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.CharConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.StringConstantDescriptor;
 
 public class CharDescriptor implements PrimitiveDescriptor, OrdinalDescriptor {
 
@@ -48,7 +50,8 @@ public class CharDescriptor implements PrimitiveDescriptor, OrdinalDescriptor {
 
     @Override
     public boolean convertibleTo(TypeDescriptor type) {
-        return type == StringDescriptor.getInstance();
+        return type == StringDescriptor.getInstance() || type instanceof CharConstantDescriptor ||
+                type instanceof StringConstantDescriptor;
     }
 
 }
