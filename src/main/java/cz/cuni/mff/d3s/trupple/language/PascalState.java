@@ -51,8 +51,8 @@ public class PascalState extends ExecutionContext {
         random = new Random();
     }
 
-    public long getRandom(long upperBound) {
-        return Math.abs(random.nextLong()) % upperBound;
+    public int getRandom(int upperBound) {
+        return Math.abs(random.nextInt()) % upperBound;
     }
 
     public PascalSubroutine getSubroutine(String unitIdentifier, String subroutineIdentifier) {

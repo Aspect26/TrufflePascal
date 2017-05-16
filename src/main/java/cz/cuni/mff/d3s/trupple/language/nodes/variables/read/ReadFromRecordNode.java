@@ -22,6 +22,16 @@ public abstract class ReadFromRecordNode extends ExpressionNode {
 
     protected abstract String getIdentifier();
 
+    @Specialization(guards = "isInt()")
+    int readInt(RecordValue record) {
+        FrameSlot slot = record.getSlot(this.getIdentifier());
+        try {
+            return record.getFrame().getInt(slot);
+        } catch (FrameSlotTypeException e) {
+            throw new UnexpectedRuntimeException();
+        }
+    }
+
     @Specialization(guards = "isLong()")
     long readLong(RecordValue record) {
         FrameSlot slot = record.getSlot(this.getIdentifier());

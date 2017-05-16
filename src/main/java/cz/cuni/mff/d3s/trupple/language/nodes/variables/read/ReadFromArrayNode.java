@@ -20,6 +20,11 @@ public abstract class ReadFromArrayNode extends ExpressionNode {
     protected abstract TypeDescriptor getReturnType();
 
     @Specialization
+    int readInt(int[] array, int index) {
+        return array[index];
+    }
+
+    @Specialization
     long readLong(long[] array, int index) {
         return array[index];
     }

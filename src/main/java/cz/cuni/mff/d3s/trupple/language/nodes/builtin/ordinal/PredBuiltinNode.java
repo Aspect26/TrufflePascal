@@ -17,6 +17,11 @@ public abstract class PredBuiltinNode extends ExpressionNode {
     protected abstract ExpressionNode getArgument();
 
     @Specialization
+    int pred(int value) {
+        return --value;
+    }
+
+    @Specialization
     long pred(long value) {
         return --value;
     }
@@ -30,7 +35,7 @@ public abstract class PredBuiltinNode extends ExpressionNode {
     boolean pred(boolean value) {
         if (!value) {
             // TODO: throw custom NoNextValue exception
-            throw new IllegalArgumentException("No predcessor for TRUE value.");
+            throw new IllegalArgumentException("No predecessor for TRUE value.");
         }
 
         return false;

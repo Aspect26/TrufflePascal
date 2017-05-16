@@ -27,33 +27,36 @@ public class ForNode extends StatementNode {
         void decreaseControlVariable() throws FrameSlotTypeException;
     }
 
-	private final boolean ascending;
-	private final FrameSlot controlSlot;
-	@Child
-	private SimpleAssignmentNode assignment;
-	@Child
-	private StatementNode body;
-	@Child
+    private final boolean ascending;
+    private final FrameSlot controlSlot;
+    @Child
+    private SimpleAssignmentNode assignment;
+    @Child
+    private StatementNode body;
+    @Child
     private ExpressionNode hasEndedNode;
 
-	public ForNode(boolean ascending, SimpleAssignmentNode assignment, FrameSlot controlSlot, TypeDescriptor controlSlotType, ExpressionNode finalValue, ExpressionNode startValue,
+    public ForNode(boolean ascending, SimpleAssignmentNode assignment, FrameSlot controlSlot, TypeDescriptor controlSlotType, ExpressionNode finalValue, ExpressionNode startValue,
                    StatementNode body) {
-		this.ascending = ascending;
-		this.assignment = assignment;
-		this.controlSlot = controlSlot;
-		this.body = body;
-		this.hasEndedNode = (ascending)?
+        this.ascending = ascending;
+        this.assignment = assignment;
+        this.controlSlot = controlSlot;
+        this.body = body;
+        this.hasEndedNode = (ascending)?
                 LessThanOrEqualNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType, false), finalValue)
                 :
                 NotNodeGen.create(LessThanNodeGen.create(ReadVariableNodeGen.create(controlSlot, controlSlotType, false), finalValue));
-	}
+    }
 
-	@Override
-	public void executeVoid(VirtualFrame frame) {
-	    try {
+    @Override
+    public void executeVoid(VirtualFrame frame) {
+        try {
             ControlInterface controlInterface = null;
 
             switch (controlSlot.getKind()) {
+                case Int:
+                    controlInterface = this.createIntControlInterface(frame);
+                    break;
                 case Long:
                     controlInterface = this.createLongControlInterface(frame);
                     break;
@@ -72,11 +75,11 @@ public class ForNode extends StatementNode {
 
             this.execute(frame, controlInterface, ascending);
         } catch (FrameSlotTypeException | UnexpectedResultException e) {
-	        throw new PascalRuntimeException("Something went wrong.");
+            throw new PascalRuntimeException("Something went wrong.");
         }
-	}
+    }
 
-	private void execute(VirtualFrame frame, ControlInterface control, boolean ascending) throws FrameSlotTypeException, UnexpectedResultException {
+    private void execute(VirtualFrame frame, ControlInterface control, boolean ascending) throws FrameSlotTypeException, UnexpectedResultException {
         this.assignment.executeVoid(frame);
         // TODO: check if it should even start
         while (this.hasEndedNode.executeBoolean(frame)) {
@@ -89,9 +92,28 @@ public class ForNode extends StatementNode {
         }
     }
 
+    private ControlInterface createIntControlInterface(VirtualFrame frame) {
+
+        return new ControlInterface() {
+
+            @Override
+            public void increaseControlVariable() throws FrameSlotTypeException {
+                int controlValue = frame.getInt(controlSlot);
+                frame.setInt(controlSlot, ++controlValue);
+            }
+
+            @Override
+            public void decreaseControlVariable() throws FrameSlotTypeException {
+                int controlValue = frame.getInt(controlSlot);
+                frame.setInt(controlSlot, --controlValue);
+            }
+        };
+
+    }
+
     private ControlInterface createLongControlInterface(VirtualFrame frame) {
 
-	    return new ControlInterface() {
+        return new ControlInterface() {
 
             @Override
             public void increaseControlVariable() throws FrameSlotTypeException {

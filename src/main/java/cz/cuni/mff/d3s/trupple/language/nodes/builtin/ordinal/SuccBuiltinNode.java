@@ -17,6 +17,11 @@ public abstract class SuccBuiltinNode extends ExpressionNode {
     protected abstract ExpressionNode getArgument();
 
     @Specialization
+    int succ(int value) {
+        return  ++value;
+    }
+
+    @Specialization
     long succ(long value) {
         return ++value;
     }

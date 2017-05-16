@@ -67,9 +67,13 @@ public abstract class ReadBuiltinNode extends StatementNode {
     private void readOneToReference(FileValue file, Reference reference) {
 	    try {
             switch (reference.getFrameSlot().getKind()) {
+                case Int:
+                    int intValue = readInt(file);
+                    this.setReferenceInt(reference, intValue);
+                    break;
                 case Byte:
-                    char value = readChar(file);
-                    this.setReferenceChar(reference, value);
+                    char charValue = readChar(file);
+                    this.setReferenceChar(reference, charValue);
                     break;
                 case Double:
                     double doubleValue = readDouble(file);
@@ -138,6 +142,21 @@ public abstract class ReadBuiltinNode extends StatementNode {
         }
     }
 
+
+    private int readInt(FileValue file) throws IOException {
+        if (file == null) {
+            return this.input.nextInt();
+        } else {
+            try {
+                Object obj = file.read();
+                return (int) obj;
+            } catch (ClassCastException e) {
+                // TODO: custom exception?
+                throw new PascalRuntimeException("Object in a file is not an integral value");
+            }
+        }
+    }
+
     private Object readObject(FileValue file, Reference reference) throws IOException {
         try {
             Object referenceValue = reference.getFromFrame().getObject(reference.getFrameSlot());
@@ -158,6 +177,10 @@ public abstract class ReadBuiltinNode extends StatementNode {
 
     private String readString() throws IOException {
         return this.readUntilNewline();
+    }
+
+    private void setReferenceInt(Reference reference, int value) {
+        reference.getFromFrame().setInt(reference.getFrameSlot(), value);
     }
 
     private void setReferenceChar(Reference reference, char value) {

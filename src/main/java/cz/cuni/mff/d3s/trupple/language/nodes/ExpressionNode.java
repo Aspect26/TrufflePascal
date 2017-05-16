@@ -9,14 +9,8 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.BooleanConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.CharConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.RealConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.*;
 
 /**
  * This is a base node for each node that shall return any value after its execution. Not all the
@@ -56,6 +50,10 @@ public abstract class ExpressionNode extends StatementNode {
 
     public PascalArray executePascalArray(VirtualFrame frame) throws UnexpectedResultException {
 	    return PascalTypesGen.expectPascalArray(executeGeneric(frame));
+    }
+
+    protected boolean isInt() {
+        return getType() == IntDescriptor.getInstance() || getType() instanceof IntConstantDescriptor;
     }
 
     protected boolean isLong() {

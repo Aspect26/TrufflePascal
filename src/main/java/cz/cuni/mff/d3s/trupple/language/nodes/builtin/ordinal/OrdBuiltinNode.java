@@ -13,23 +13,28 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescr
 public abstract class OrdBuiltinNode extends ExpressionNode {
 
     @Specialization
-    long ord(long value) {
+    int ord(int value) {
         return value;
     }
 
     @Specialization
-    long ord(boolean value) {
+    int ord(long value) {
+        return (int) value;
+    }
+
+    @Specialization
+    int ord(boolean value) {
         return value? 1:0;
     }
 
     @Specialization
-    long ord(char value) {
-        return (long) value;
+    int ord(char value) {
+        return (int) value;
     }
 
     @Specialization
-    long ord(EnumValue value) {
-        return value.getOrdinalValue();
+    int ord(EnumValue value) {
+        return (int) value.getOrdinalValue();
     }
 
     @Override

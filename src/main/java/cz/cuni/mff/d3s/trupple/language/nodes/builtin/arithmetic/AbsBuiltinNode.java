@@ -13,7 +13,12 @@ public abstract class AbsBuiltinNode extends ExpressionNode {
     protected abstract ExpressionNode getArgument();
 
     @Specialization
-    long integerAbsoluteValue(long value) {
+    int intAbsoluteValue(int value) {
+        return Math.abs(value);
+    }
+
+    @Specialization
+    long longAbsoluteValue(long value) {
         return Math.abs(value);
     }
 

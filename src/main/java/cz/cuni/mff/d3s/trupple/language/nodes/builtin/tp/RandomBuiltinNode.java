@@ -7,6 +7,7 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 
 @NodeInfo(shortName = "random")
@@ -14,13 +15,13 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescr
 public abstract class RandomBuiltinNode extends ExpressionNode {
 
     @Specialization
-	long getRandom(long upperBound) {
+	int getRandom(int upperBound) {
 		return PascalLanguage.INSTANCE.findContext().getRandom(upperBound);
 	}
 
     @Override
     public TypeDescriptor getType() {
-        return LongDescriptor.getInstance();
+        return IntDescriptor.getInstance();
     }
 
 }

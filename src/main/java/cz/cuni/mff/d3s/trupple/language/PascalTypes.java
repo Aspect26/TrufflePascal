@@ -7,9 +7,19 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
 
-@TypeSystem({ long.class, boolean.class, char.class, double.class, PascalSubroutine.class, PascalString.class,
+@TypeSystem({ int.class, long.class, boolean.class, char.class, double.class, PascalSubroutine.class, PascalString.class,
         EnumValue.class, PascalArray.class, Reference.class, PointerValue.class, SetTypeValue.class, FileValue.class, })
 public class PascalTypes {
+
+    @ImplicitCast
+    public static long castIntToLong(int value) {
+        return value;
+    }
+
+    @ImplicitCast
+    public static double castIntToDouble(int value) {
+        return value;
+    }
 
     @ImplicitCast
     public static double castLongToDouble(long value) {

@@ -3,10 +3,7 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.*;
 
 public class ArrayDescriptor implements TypeDescriptor {
 
@@ -25,7 +22,9 @@ public class ArrayDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        if (valuesDescriptor == LongDescriptor.getInstance()) {
+        if (valuesDescriptor == IntDescriptor.getInstance()) {
+            return new int[this.dimension.getSize()];
+        } if (valuesDescriptor == LongDescriptor.getInstance()) {
             return new long[this.dimension.getSize()];
         } else if (valuesDescriptor == RealDescriptor.getInstance()) {
             return new double[this.dimension.getSize()];
