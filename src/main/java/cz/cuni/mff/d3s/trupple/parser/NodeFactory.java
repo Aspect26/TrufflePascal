@@ -662,17 +662,21 @@ public class NodeFactory {
     }
 
     private StatementNode createAssignmentToArray(ExpressionNode arrayExpression, ExpressionNode indexExpressionNode, ExpressionNode valueNode) {
-	    if (!(arrayExpression.getType() instanceof ArrayDescriptor)) {
+	    TypeDescriptor expressionType = getActualType(arrayExpression.getType());
+	    int arrayOffset = 0;
+	    if (!(expressionType instanceof ArrayDescriptor)) {
             parser.SemErr("Not an array");
         } else {
-	        this.doTypeCheck(valueNode.getType(), ((ArrayDescriptor) arrayExpression.getType()).getValuesDescriptor());
+	        this.doTypeCheck(valueNode.getType(), ((ArrayDescriptor) expressionType).getValuesDescriptor());
+	        arrayOffset = ((ArrayDescriptor) expressionType).getOffset();
         }
-        ReadIndexNode indexNode = ReadIndexNodeGen.create(indexExpressionNode, ((ArrayDescriptor) arrayExpression.getType()).getOffset());
+        ReadIndexNode indexNode = ReadIndexNodeGen.create(indexExpressionNode, arrayOffset);
         return AssignToArrayNodeGen.create(arrayExpression, indexNode, valueNode);
     }
 
     private StatementNode createAssignmentToDereference(ExpressionNode pointerExpression, ExpressionNode valueNode) {
-        if ( !(pointerExpression.getType() instanceof PointerDescriptor)) {
+        TypeDescriptor expressionType = getActualType(pointerExpression.getType());
+	    if (!(expressionType instanceof PointerDescriptor)) {
             parser.SemErr("Not a pointer");
         } else {
             this.doTypeCheck(valueNode.getType(), ((PointerDescriptor) pointerExpression.getType()).getInnerTypeDescriptor());
@@ -682,7 +686,8 @@ public class NodeFactory {
 
     private StatementNode createAssignmentToRecordField(ExpressionNode recordExpression, Token identifierToken, ExpressionNode valueNode) {
         String identifier = this.getIdentifierFromToken(identifierToken);
-        if ( !(recordExpression.getType() instanceof RecordDescriptor)) {
+        TypeDescriptor expressionType = getActualType(recordExpression.getType());
+        if (!(expressionType instanceof RecordDescriptor)) {
             parser.SemErr("Not a record");
         }
         return AssignToRecordFieldNodeGen.create(identifier, recordExpression, valueNode);
@@ -725,12 +730,13 @@ public class NodeFactory {
     public ExpressionNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {
 	    ExpressionNode readArrayNode = arrayExpression;
 	    for (ExpressionNode index : indexes) {
-	        if (!(readArrayNode.getType() instanceof  ArrayDescriptor)) {
+	        TypeDescriptor actualType = this.getActualType(readArrayNode.getType());
+	        if (!(actualType instanceof  ArrayDescriptor)) {
                 parser.SemErr("Not an array");
                 break;
             }
-            ReadIndexNode readIndexNode = ReadIndexNodeGen.create(index, ((ArrayDescriptor) readArrayNode.getType()).getOffset());
-            TypeDescriptor returnType = ((ArrayDescriptor) readArrayNode.getType()).getValuesDescriptor();
+            ReadIndexNode readIndexNode = ReadIndexNodeGen.create(index, ((ArrayDescriptor) actualType).getOffset());
+            TypeDescriptor returnType = ((ArrayDescriptor) actualType).getValuesDescriptor();
 	        readArrayNode = ReadFromArrayNodeGen.create(readArrayNode, readIndexNode, returnType);
         }
         return readArrayNode;
@@ -738,10 +744,9 @@ public class NodeFactory {
 
     public ReadDereferenceNode createReadDereferenceNode(ExpressionNode pointerExpression) {
         PointerDescriptor pointerDescriptor = null;
-        if (pointerExpression.getType() instanceof PointerDescriptor) {
-            pointerDescriptor = (PointerDescriptor) pointerExpression.getType();
-        } else if (pointerExpression.getType() instanceof ReferenceDescriptor && ((ReferenceDescriptor) pointerExpression.getType()).getReferencedType() instanceof PointerDescriptor) {
-            pointerDescriptor = (PointerDescriptor) ((ReferenceDescriptor) pointerExpression.getType()).getReferencedType();
+        TypeDescriptor actualType = this.getActualType(pointerExpression.getType());
+        if (actualType instanceof PointerDescriptor) {
+            pointerDescriptor = (PointerDescriptor) actualType;
         }
 	    else {
             parser.SemErr("Can not dereference this type");
@@ -752,7 +757,7 @@ public class NodeFactory {
     }
 
     public ReadFromRecordNode createReadFromRecordNode(ExpressionNode recordExpression, Token identifierToken) {
-        TypeDescriptor descriptor = recordExpression.getType();
+        TypeDescriptor descriptor = this.getActualType(recordExpression.getType());
         String identifier = this.getIdentifierFromToken(identifierToken);
         TypeDescriptor returnType = null;
 
@@ -970,6 +975,11 @@ public class NodeFactory {
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
         }
+    }
+
+    private TypeDescriptor getActualType(TypeDescriptor typeDescriptor) {
+        return (typeDescriptor instanceof ReferenceDescriptor)?
+                ((ReferenceDescriptor) typeDescriptor).getReferencedType() : typeDescriptor;
     }
 
     private <T extends ExpressionNode> T verifyOperandArguments(T node, String operator) {

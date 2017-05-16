@@ -105,4 +105,29 @@ public class ReferencePassingTest extends JUnitTest {
         String output="42a";
         this.test(code, output, true);
     }
+
+    @Test
+    public void passArrayByReference() {
+        String code="program main;\n"+
+                "\n"+
+                "type myarray = array [ 1 .. 3 ] of integer;\n"+
+                "\n"+
+                "procedure action(var a : myarray);\n"+
+                "begin\n"+
+                "  a[1] := 0;\n"+
+                "end;\n"+
+                "\n"+
+                "var arr : myarray;\n"+
+                "\n"+
+                "begin\n"+
+                "    arr[1] := 1;\n"+
+                "    arr[2] := 2;\n"+
+                "    arr[3] := 3;\n"+
+                "    write(arr[1], arr[2], arr[3]);\n"+
+                "    action(arr);\n"+
+                "    write(arr[1], arr[2], arr[3]);\n"+
+                "end.\n";
+        this.test(code, "123023", true);
+    }
+
 }
