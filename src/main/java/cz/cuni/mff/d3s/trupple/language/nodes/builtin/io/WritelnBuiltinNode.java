@@ -18,7 +18,7 @@ public abstract class WritelnBuiltinNode extends StatementNode {
 
     @Specialization
     public void writeln(Object... values) {
-        if (values[0] instanceof FileValue) {
+        if (values.length > 0 && values[0] instanceof FileValue) {
             FileValue file = (FileValue) values[0];
             Object[] arguments = Arrays.copyOfRange(values, 1, values.length);
             file.writeln(arguments);
