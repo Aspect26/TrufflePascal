@@ -98,7 +98,7 @@ public class PascalHeap {
 
     // TODO: this needs to be tested
     private void doGarbageCollecting() {
-        this.emptyMemorySlot = this.findFirstEmptyMemorySlot(this.MIN_ADDRESS);
+        this.emptyMemorySlot = this.findFirstEmptyMemorySlot(MIN_ADDRESS);
 
         for (HeapSlot slot : this.heapSlots) {
 

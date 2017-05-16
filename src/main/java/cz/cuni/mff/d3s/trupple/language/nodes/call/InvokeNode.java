@@ -28,8 +28,6 @@ public abstract class InvokeNode extends ExpressionNode {
 	    this.type = type;
 	}
 
-	// TODO: type specializations
-
 	@Specialization
 	Object invoke(VirtualFrame frame) {
 	    if (subroutine == null) {

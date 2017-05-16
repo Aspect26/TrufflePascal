@@ -15,15 +15,9 @@ public class ReadArgumentNode extends ExpressionNode {
         this.argumentType = argumentType;
     }
 
-    // TODO: specializations
 	@Override
 	public Object executeGeneric(VirtualFrame frame) {
-		Object[] args = frame.getArguments();
-		if (index < args.length) {
-			return args[index];
-		} else {
-			return null;
-		}
+        return frame.getArguments()[index];
 	}
 
     @Override

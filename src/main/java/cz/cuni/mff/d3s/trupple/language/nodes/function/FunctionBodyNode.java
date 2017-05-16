@@ -4,7 +4,6 @@ import com.oracle.truffle.api.dsl.NodeField;
 import com.oracle.truffle.api.dsl.NodeFields;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.frame.FrameSlot;
-import com.oracle.truffle.api.frame.FrameSlotKind;
 import com.oracle.truffle.api.frame.FrameSlotTypeException;
 import com.oracle.truffle.api.frame.VirtualFrame;
 
@@ -29,7 +28,35 @@ public abstract class FunctionBodyNode extends ExpressionNode {
 		this.bodyNode = bodyNode;
 	}
 
-	// TODO: type specializations
+	@Specialization(guards = "isInt()", rewriteOn = FrameSlotTypeException.class)
+    int executeIntFunction(VirtualFrame frame) throws FrameSlotTypeException {
+	    bodyNode.executeVoid(frame);
+        return frame.getInt(getSlot());
+    }
+
+    @Specialization(guards = "isLong()", rewriteOn = FrameSlotTypeException.class)
+    long executeLongFunction(VirtualFrame frame) throws FrameSlotTypeException {
+        bodyNode.executeVoid(frame);
+        return frame.getLong(getSlot());
+    }
+
+    @Specialization(guards = "isBoolean()", rewriteOn = FrameSlotTypeException.class)
+    boolean executeBooleanFunction(VirtualFrame frame) throws FrameSlotTypeException {
+        bodyNode.executeVoid(frame);
+        return frame.getBoolean(getSlot());
+    }
+
+    @Specialization(guards = "isChar()", rewriteOn = FrameSlotTypeException.class)
+    char executeCharFunction(VirtualFrame frame) throws FrameSlotTypeException {
+        bodyNode.executeVoid(frame);
+        return (char) frame.getByte(getSlot());
+    }
+
+    @Specialization(guards = "isDouble()", rewriteOn = FrameSlotTypeException.class)
+    double executeDoubleFunction(VirtualFrame frame) throws FrameSlotTypeException {
+        bodyNode.executeVoid(frame);
+        return frame.getDouble(getSlot());
+    }
 
 	@Specialization
     Object executeFunction(VirtualFrame frame) {

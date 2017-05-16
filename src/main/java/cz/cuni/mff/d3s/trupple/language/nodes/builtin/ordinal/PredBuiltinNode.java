@@ -7,9 +7,6 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
-// TODO: this node is created only once, not every time for each node -> this means that its argument type is some
-// predefined type (which is long). Overloading of subroutines is not allowed in pascal so it is not implemented
-// and static type check for this subroutine cannot work.
 @NodeInfo(shortName = "pred")
 @NodeChild(value = "argument", type = ExpressionNode.class)
 public abstract class PredBuiltinNode extends ExpressionNode {

@@ -105,7 +105,7 @@ public class NodeFactory {
     }
 
     public void registerUnit(Token unitIdentifierToken) {
-        String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);  // TODO: can't use getIdentifierFromToken() here
+        String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);
         if (this.builtinUnits.containsKey(unitIdentifier)) {
             BuiltinUnit builtinUnit = this.builtinUnits.get(unitIdentifier);
             UnitLexicalScope unitScope = new UnitLexicalScope(null, unitIdentifier, this.usingTPExtension);
