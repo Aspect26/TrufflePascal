@@ -33,7 +33,7 @@ public class CompilerMain {
         if (settings.usesTPExtension()) {
             UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
         }
-        engine.eval(source);
+            engine.eval(source);
 
         engine.dispose();
     }

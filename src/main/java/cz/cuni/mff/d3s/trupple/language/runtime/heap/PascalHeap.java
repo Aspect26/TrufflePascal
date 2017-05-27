@@ -48,7 +48,7 @@ public class PascalHeap {
     private PascalHeap() {
         this.memory = new HashMap<>();
         this.heapSlots = new HashSet<>();
-        this.emptyMemorySlot = this.MIN_ADDRESS;
+        this.emptyMemorySlot = MIN_ADDRESS;
     }
 
     public static PascalHeap getInstance() {
@@ -67,7 +67,7 @@ public class PascalHeap {
         this.heapSlots.add(slot);
 
         if (this.emptyMemorySlot == Integer.MAX_VALUE) {
-            this.doGarbageCollecting();
+            this.defragmentHeap();
         }
     }
 
@@ -97,7 +97,7 @@ public class PascalHeap {
     }
 
     // TODO: this needs to be tested
-    private void doGarbageCollecting() {
+    private void defragmentHeap() {
         this.emptyMemorySlot = this.findFirstEmptyMemorySlot(MIN_ADDRESS);
 
         for (HeapSlot slot : this.heapSlots) {
