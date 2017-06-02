@@ -825,7 +825,7 @@ public class NodeFactory {
         PascalSubroutine function = this.doLookup(variableIdentifier, LexicalScope::getSubroutine);
         TypeDescriptor descriptor = this.doLookup(variableIdentifier, LexicalScope::getIdentifierDescriptor);
 
-        return new StoreSubroutineArgumentNode(function, (SubroutineDescriptor) descriptor);
+        return new SubroutineLiteralNode(function, (SubroutineDescriptor) descriptor);
     }
 
     public ExpressionNode createLogicLiteralNode(boolean value) {
