@@ -47,6 +47,11 @@ public class IntConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public TypeDescriptor getInnerType() {
+        return this.getType();
+    }
+
+    @Override
+    public TypeDescriptor getType() {
         return IntDescriptor.getInstance();
     }
 

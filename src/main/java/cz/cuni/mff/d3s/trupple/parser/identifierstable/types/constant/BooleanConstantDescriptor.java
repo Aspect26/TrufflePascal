@@ -45,8 +45,13 @@ public class BooleanConstantDescriptor implements OrdinalConstantDescriptor {
     }
 
     @Override
-    public TypeDescriptor getInnerType() {
+    public TypeDescriptor getType() {
         return BooleanDescriptor.getInstance();
+    }
+
+    @Override
+    public TypeDescriptor getInnerType() {
+        return this.getType();
     }
 
     @Override

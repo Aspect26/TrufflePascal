@@ -44,8 +44,13 @@ public class LongConstantDescriptor implements OrdinalConstantDescriptor {
     }
 
     @Override
-    public TypeDescriptor getInnerType() {
+    public TypeDescriptor getType() {
         return LongDescriptor.getInstance();
+    }
+
+    @Override
+    public TypeDescriptor getInnerType() {
+        return this.getType();
     }
 
     @Override

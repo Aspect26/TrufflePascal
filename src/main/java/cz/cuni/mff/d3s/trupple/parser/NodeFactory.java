@@ -294,11 +294,30 @@ public class NodeFactory {
         }
     }
 
-    public ConstantDescriptor createLongConstant(String sign, long value) {
-	    switch (sign) {
+    public ConstantDescriptor createNumericConstant(String sign, long value) {
+	    try {
+	        return createIntConstant(sign, Math.toIntExact(value));
+        } catch (ArithmeticException e) {
+	        return createLongConstant(sign, value);
+        }
+    }
+
+    private ConstantDescriptor createIntConstant(String sign, int value) {
+        switch (sign) {
             case "":
-	        case "+": return new LongConstantDescriptor(value);
-	        case "-": return new LongConstantDescriptor(-value);
+            case "+": return new IntConstantDescriptor(value);
+            case "-": return new IntConstantDescriptor(-value);
+            default:
+                parser.SemErr("Unknown unary operator: " + sign);
+                return new IntConstantDescriptor(0);
+        }
+    }
+
+    private ConstantDescriptor createLongConstant(String sign, long value) {
+        switch (sign) {
+            case "":
+            case "+": return new LongConstantDescriptor(value);
+            case "-": return new LongConstantDescriptor(-value);
             default:
                 parser.SemErr("Unknown unary operator: " + sign);
                 return new LongConstantDescriptor(0);
@@ -720,11 +739,22 @@ public class NodeFactory {
         TypeDescriptor type = scope.getIdentifierDescriptor(identifier);
         boolean isLocal = scope == currentLexicalScope;
         boolean isReference = type instanceof ReferenceDescriptor;
+        boolean isConstant = type instanceof ConstantDescriptor;
 
-        return (isLocal)?
-                (isReference)? ReadReferenceVariableNodeGen.create(variableSlot, type) : ReadLocalVariableNodeGen.create(variableSlot, type)
-                :
-                ReadGlobalVariableNodeGen.create(variableSlot, type);
+        if (isLocal) {
+            if (isReference) {
+                return ReadReferenceVariableNodeGen.create(variableSlot, type);
+            } else {
+                if (isConstant) {
+                    ConstantDescriptor constantType = (ConstantDescriptor) type;
+                    return ReadConstantNodeGen.create(constantType.getValue(), constantType);
+                } else {
+                    return ReadLocalVariableNodeGen.create(variableSlot, type);
+                }
+            }
+        } else {
+            return ReadGlobalVariableNodeGen.create(variableSlot, type);
+        }
     }
 
     public ExpressionNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {

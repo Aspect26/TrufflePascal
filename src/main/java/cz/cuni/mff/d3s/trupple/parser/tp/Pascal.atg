@@ -338,7 +338,7 @@ Constant<out ConstantDescriptor constant>
     "+" | "-"                                   (. sign = t.val; .)
 ]
 (
-	UnsignedIntegerLiteral<out long value>      (. constant = factory.createLongConstant(sign, value); .)
+	UnsignedIntegerLiteral<out long value>      (. constant = factory.createNumericConstant(sign, value); .)
 |
     UnsignedDoubleLiteral<out double value>     (. constant = factory.createDoubleConstant(sign, value); .)
 |

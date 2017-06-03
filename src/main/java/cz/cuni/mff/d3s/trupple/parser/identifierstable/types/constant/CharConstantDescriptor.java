@@ -51,6 +51,11 @@ public class CharConstantDescriptor implements OrdinalConstantDescriptor {
 
     @Override
     public TypeDescriptor getInnerType() {
+        return this.getType();
+    }
+
+    @Override
+    public TypeDescriptor getType() {
         return CharDescriptor.getInstance();
     }
 

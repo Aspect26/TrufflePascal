@@ -40,6 +40,11 @@ public class StringConstantDescriptor extends ArrayDescriptor implements Constan
     }
 
     @Override
+    public TypeDescriptor getType() {
+        return StringDescriptor.getInstance();
+    }
+
+    @Override
     public boolean isSigned() {
         return false;
     }

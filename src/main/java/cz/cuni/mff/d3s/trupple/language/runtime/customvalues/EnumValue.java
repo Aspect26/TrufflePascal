@@ -34,10 +34,6 @@ public class EnumValue implements Serializable {
 	    return this.value.hashCode();
     }
 
-	int getIntValue() {
-		return this.enumType.getIdentifiers().indexOf(value);
-	}
-
 	public EnumValue getNext() {
 	    return this.enumType.getNext(this.value);
     }

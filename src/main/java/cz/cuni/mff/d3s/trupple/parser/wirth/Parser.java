@@ -451,7 +451,7 @@ public class Parser implements IParser {
 		}
 		if (la.kind == 3) {
 			long value = UnsignedIntegerLiteral();
-			constant = factory.createLongConstant(sign, value); 
+			constant = factory.createNumericConstant(sign, value);
 		} else if (la.kind == 4) {
 			double value = UnsignedDoubleLiteral();
 			constant = factory.createDoubleConstant(sign, value); 

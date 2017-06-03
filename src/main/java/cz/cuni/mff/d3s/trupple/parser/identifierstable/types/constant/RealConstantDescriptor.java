@@ -33,6 +33,11 @@ public class RealConstantDescriptor implements ConstantDescriptor {
     }
 
     @Override
+    public TypeDescriptor getType() {
+        return RealDescriptor.getInstance();
+    }
+
+    @Override
     public boolean isSigned() {
         return true;
     }

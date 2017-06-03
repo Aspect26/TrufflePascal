@@ -10,4 +10,7 @@ public interface ConstantDescriptor extends TypeDescriptor {
     boolean isSigned();
 
     ConstantDescriptor negatedCopy() throws LexicalException;
+
+    TypeDescriptor getType();
+
 }
