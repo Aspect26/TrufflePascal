@@ -17,7 +17,7 @@ public class Settings {
     @Option(name="-std", handler= StandardOptionHandler.class, usage="sets the standard to be used")
     private String standard;
 
-    @Option(name="-g", usage="sets extended goto support")
+    @Option(name="-j", usage="sets extended goto support")
     private boolean extendedGotoSupport = false;
 
     @Argument
