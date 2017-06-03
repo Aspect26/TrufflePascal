@@ -65,4 +65,21 @@ public class EnumTest extends JUnitTest {
 		String output = "Luke Skywalker";
 		test(code, output);
 	}
+
+	@Test
+    public void enumVariantRecordPartDeclarationTest() {
+        String code = "program variantEnumTest;\n"+
+                "type color = (red, green, blue);\n"+
+                " r = record\n"+
+                " case color of\n"+
+                " red: ( i:integer; );\n"+
+                " green: ( j:integer; );\n"+
+                " blue: ( m:integer; );\n"+
+                " end;\n"+
+                "begin\n"+
+                " write(\'It is working\');"+
+                "end.";
+
+        test(code, "It is working");
+    }
 }

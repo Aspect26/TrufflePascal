@@ -36,7 +36,7 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
 
     @Override
     public boolean containsValue(Object value) {
-        return (value instanceof String) && this.identifiers.contains(value);
+        return (value instanceof EnumValue) && this.identifiers.contains(((EnumValue) value).getValue());
     }
 
     @Override

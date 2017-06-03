@@ -734,7 +734,6 @@ public class NodeFactory {
     }
 
     private ExpressionNode createReadVariableFromScope(String identifier, LexicalScope scope) {
-        // TODO: check if it is a constant or a variable
         FrameSlot variableSlot = scope.getLocalSlot(identifier);
         TypeDescriptor type = scope.getIdentifierDescriptor(identifier);
         boolean isLocal = scope == currentLexicalScope;
@@ -745,6 +744,7 @@ public class NodeFactory {
             ConstantDescriptor constantType = (ConstantDescriptor) type;
             return ReadConstantNodeGen.create(constantType.getValue(), constantType);
         } else if (isLocal) {
+            // TODO: check if it is a variable
             if (isReference) {
                 return ReadReferenceVariableNodeGen.create(variableSlot, type);
             } else {

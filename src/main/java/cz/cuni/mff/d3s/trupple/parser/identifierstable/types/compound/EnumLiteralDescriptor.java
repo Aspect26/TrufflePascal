@@ -33,7 +33,7 @@ public class EnumLiteralDescriptor implements TypeDescriptor, ConstantDescriptor
 
     @Override
     public Object getValue() {
-        return this.identifier;
+        return new EnumValue(this.enumTypeDescriptor, this.identifier);
     }
 
     public EnumTypeDescriptor getEnumType() {

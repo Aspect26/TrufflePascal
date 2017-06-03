@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.trupple;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -15,6 +16,7 @@ import java.util.Collections;
 public class ProgramArgumentsTest extends JUnitTest {
 
     @Test
+    @Ignore
     public void copyFileFromProgramArgumentsTest() {
 
         PrintWriter writer;
@@ -56,6 +58,7 @@ public class ProgramArgumentsTest extends JUnitTest {
     }
 
     @Test
+    @Ignore
     public void stringProgramArgumentsTest() {
         String arg1 = "I've got a jar of dirt!";
         String arg2 = "Did everyone see that? Because I will not be doing it again.";
