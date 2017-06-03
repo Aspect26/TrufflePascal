@@ -741,16 +741,14 @@ public class NodeFactory {
         boolean isReference = type instanceof ReferenceDescriptor;
         boolean isConstant = type instanceof ConstantDescriptor;
 
-        if (isLocal) {
+        if (isConstant) {
+            ConstantDescriptor constantType = (ConstantDescriptor) type;
+            return ReadConstantNodeGen.create(constantType.getValue(), constantType);
+        } else if (isLocal) {
             if (isReference) {
                 return ReadReferenceVariableNodeGen.create(variableSlot, type);
             } else {
-                if (isConstant) {
-                    ConstantDescriptor constantType = (ConstantDescriptor) type;
-                    return ReadConstantNodeGen.create(constantType.getValue(), constantType);
-                } else {
-                    return ReadLocalVariableNodeGen.create(variableSlot, type);
-                }
+                return ReadLocalVariableNodeGen.create(variableSlot, type);
             }
         } else {
             return ReadGlobalVariableNodeGen.create(variableSlot, type);
