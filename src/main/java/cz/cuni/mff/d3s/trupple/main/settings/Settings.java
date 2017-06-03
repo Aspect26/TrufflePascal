@@ -1,6 +1,7 @@
 package cz.cuni.mff.d3s.trupple.main.settings;
 
 import cz.cuni.mff.d3s.trupple.main.settings.handlers.StandardOptionHandler;
+import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 import org.kohsuke.args4j.spi.StringOptionHandler;
@@ -19,15 +20,20 @@ public class Settings {
     @Option(name="-g", usage="sets extended goto support")
     private boolean extendedGotoSupport = false;
 
-    @Option(name="-s", handler=StringOptionHandler.class, usage="sets the source to be evaluated")
-    private String source = null;
+    @Argument
+    private List<String> arguments = new ArrayList<>();
 
     public Settings() {
-        // this.includeDirectories.add("./builtinunits");
+        this.includeDirectories.add("./builtinunits");
     }
 
     public String getSourcePath() {
-        return source;
+        if (this.arguments.size() == 0) {
+            throw new IllegalArgumentException("No source file specified.");
+        } else if (this.arguments.size() > 1) {
+            throw new IllegalArgumentException("Only one source file can be specified.");
+        }
+        return this.arguments.get(0);
     }
 
     public boolean usesTPExtension() {

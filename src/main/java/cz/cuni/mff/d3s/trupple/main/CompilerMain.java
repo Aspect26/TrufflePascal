@@ -44,9 +44,6 @@ public class CompilerMain {
 
 		try {
 			argumentsParser.parseArgument(args);
-			if(settings.getSourcePath() == null) {
-                throw new IllegalArgumentException("No source file specified.");
-            }
             return settings;
 		} catch(CmdLineException e) {
 			throw new WrongOptionsException(e, argumentsParser);
