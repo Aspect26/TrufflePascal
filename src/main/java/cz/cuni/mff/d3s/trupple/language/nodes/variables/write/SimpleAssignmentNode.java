@@ -115,6 +115,15 @@ public abstract class SimpleAssignmentNode extends StatementNode {
         getFrame(frame).setObject(getSlot(), Arrays.copyOf(array, array.length));
     }
 
+    /**
+     * This is used for multidimensional arrays
+     */
+    @Specialization
+    void assignArray(VirtualFrame frame, Object[] array) {
+        getFrame(frame).setObject(getSlot(), Arrays.copyOf(array, array.length));
+    }
+
+
     @Specialization
     void assignArray(VirtualFrame frame, PascalArray array) {
         getFrame(frame).setObject(getSlot(), array.createDeepCopy());

@@ -29,7 +29,6 @@ public class CompilerMain {
         PolyglotEngine engine = PolyglotEngine.newBuilder().setIn(input).setOut(output).setErr(System.err).build();
         assert engine.getLanguages().containsKey(PascalLanguage.MIME_TYPE);
 
-        System.out.println(Truffle.getRuntime().getName());
         if (settings.usesTPExtension()) {
             UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
         }
