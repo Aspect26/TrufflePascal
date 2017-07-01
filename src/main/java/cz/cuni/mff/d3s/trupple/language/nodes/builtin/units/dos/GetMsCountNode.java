@@ -23,7 +23,7 @@ public abstract class GetMsCountNode extends ExpressionNode {
 
     @Specialization
     long getMiliseconds(VirtualFrame frame) {
-        return System.nanoTime() / (1024 * 1024);
+        return System.nanoTime() / (1000 * 1000);
     }
 
     @Override
