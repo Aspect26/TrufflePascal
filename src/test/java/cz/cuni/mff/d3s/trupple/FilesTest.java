@@ -110,7 +110,7 @@ public class FilesTest extends JUnitTest {
     public void eolFileTest() {
         String code = "program main;\n"+
                 "\n"+
-                "var f: file of char; c:char;\n"+
+                "var f: text; c:char;\n"+
                 "\n"+
                 "begin\n"+
                 " assign(f,\'out.txt\');\n"+

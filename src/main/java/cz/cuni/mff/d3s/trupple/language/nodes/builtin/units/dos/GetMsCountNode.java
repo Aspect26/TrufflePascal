@@ -5,7 +5,6 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
 /**
  * Official specification:
@@ -22,7 +21,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescr
 public abstract class GetMsCountNode extends ExpressionNode {
 
     @Specialization
-    long getMiliseconds(VirtualFrame frame) {
+    long getMilliseconds(VirtualFrame frame) {
         return System.nanoTime() / (1000 * 1000);
     }
 

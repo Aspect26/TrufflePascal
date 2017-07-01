@@ -21,11 +21,7 @@ public class FileDescriptor implements TypeDescriptor {
 
     @Override
     public Object getDefaultValue() {
-        if (contentTypeDescriptor instanceof CharDescriptor) {
-            return new TextFileValue();
-        } else {
-            return new ObjectFileValue();
-        }
+        return new ObjectFileValue();
     }
 
     @Override

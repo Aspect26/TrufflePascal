@@ -4,8 +4,8 @@ import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.TextFileValue;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 
@@ -15,14 +15,14 @@ public abstract class EolBuiltinNode extends ExpressionNode {
 
     @Specialization
     boolean isEol(Object... arguments) {
-        return (arguments.length == 0)? eol() : eol((FileValue) arguments[0]);
+        return (arguments.length == 0)? eol() : eol((TextFileValue) arguments[0]);
     }
 
     private boolean eol() {
         return !PascalLanguage.INSTANCE.findContext().getInput().hasNext();
     }
 
-    private boolean eol(FileValue file) {
+    private boolean eol(TextFileValue file) {
         return file.eol();
     }
 
