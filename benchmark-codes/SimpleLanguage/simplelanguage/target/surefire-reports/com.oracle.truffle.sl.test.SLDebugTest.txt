@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.oracle.truffle.sl.test.SLDebugTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.169 sec - in com.oracle.truffle.sl.test.SLDebugTest

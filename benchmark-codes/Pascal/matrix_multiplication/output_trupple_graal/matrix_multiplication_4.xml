@@ -1,0 +1,68 @@
+<benchmarkset>
+<name>matrix_multiplication</name>
+<benchmark>
+<number>1</number>
+[truffle] opt fail         FunctionPascalRootNode@1e9e725a                             |Reason org.graalvm.compiler.code.SourceStackTraceBailoutException$1: CompilerAsserts.neverPartOfCompilation() 
+org.graalvm.compiler.code.SourceStackTraceBailoutException$1: CompilerAsserts.neverPartOfCompilation()
+	at cz.cuni.mff.d3s.trupple.language.PascalLanguage.findContext(PascalLanguage.java:68)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNode.getRandom(RandomBuiltinNode.java:19)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNodeGen.executeInt(RandomBuiltinNodeGen.java:48)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNodeGen.executeGeneric(RandomBuiltinNodeGen.java:31)
+	at cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode.execute(PascalRootNode.java:27)
+	at org.graalvm.compiler.truffle.OptimizedCallTarget.callProxy(OptimizedCallTarget.java:233)
+	at org.graalvm.compiler.truffle.OptimizedCallTarget.callRoot(OptimizedCallTarget.java:223)
+Caused by: org.graalvm.compiler.graph.VerificationError: CompilerAsserts.neverPartOfCompilation()
+	at org.graalvm.compiler.truffle.nodes.asserts.NeverPartOfCompilationNode.verifyNotFoundIn(NeverPartOfCompilationNode.java:75)
+	at org.graalvm.compiler.truffle.PartialEvaluator.postPartialEvaluation(PartialEvaluator.java:543)
+	at org.graalvm.compiler.truffle.PartialEvaluator.createGraph(PartialEvaluator.java:207)
+	at org.graalvm.compiler.truffle.TruffleCompiler.compileMethod(TruffleCompiler.java:168)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime.doCompile0(GraalTruffleRuntime.java:514)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime.doCompile(GraalTruffleRuntime.java:500)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime$1.run(GraalTruffleRuntime.java:545)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+	at org.graalvm.compiler.core.CompilerThread.run(CompilerThread.java:51)
+
+<data>1692,1692,1724</data>
+<time>8609</time>
+</benchmark>
+<benchmark>
+<number>2</number>
+<data>1534,1610,1587</data>
+<time>8293</time>
+</benchmark>
+<benchmark>
+<number>3</number>
+<data>1654,1717,1469</data>
+<time>8172</time>
+</benchmark>
+<benchmark>
+<number>4</number>
+<data>1868,1580,1534</data>
+<time>8309</time>
+</benchmark>
+<benchmark>
+<number>5</number>
+<data>1613,1663,1783</data>
+<time>8991</time>
+</benchmark>
+<benchmark>
+<number>6</number>
+<data>1670,1507,1552</data>
+<time>8847</time>
+</benchmark>
+<benchmark>
+<number>7</number>
+<data>1450,1494,1699</data>
+<time>8532</time>
+</benchmark>
+<benchmark>
+<number>8</number>
+<data>1427,1626,1563</data>
+<time>8389</time>
+</benchmark>
+<benchmark>
+<number>9</number>

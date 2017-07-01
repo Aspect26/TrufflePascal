@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.oracle.truffle.sl.test.SLTckTest
+-------------------------------------------------------------------------------
+Tests run: 97, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.149 sec - in com.oracle.truffle.sl.test.SLTckTest

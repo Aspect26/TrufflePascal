@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.oracle.truffle.sl.test.SLJavaInteropTest
+-------------------------------------------------------------------------------
+Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.102 sec - in com.oracle.truffle.sl.test.SLJavaInteropTest

@@ -1,0 +1,127 @@
+<benchmarkset>
+<name>matrix_multiplication</name>
+<benchmark>
+<number>1</number>
+<data>436,375,463</data>
+<time>478</time>
+</benchmark>
+<benchmark>
+<number>2</number>
+<data>419,369,399</data>
+<time>232</time>
+</benchmark>
+<benchmark>
+<number>3</number>
+<data>445,405,363</data>
+<time>182</time>
+</benchmark>
+<benchmark>
+<number>4</number>
+<data>435,396,381</data>
+<time>239</time>
+</benchmark>
+<benchmark>
+<number>5</number>
+[truffle] opt fail         FunctionPascalRootNode@1e9e725a                             |Reason org.graalvm.compiler.code.SourceStackTraceBailoutException$1: CompilerAsserts.neverPartOfCompilation() 
+org.graalvm.compiler.code.SourceStackTraceBailoutException$1: CompilerAsserts.neverPartOfCompilation()
+	at cz.cuni.mff.d3s.trupple.language.PascalLanguage.findContext(PascalLanguage.java:68)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNode.getRandom(RandomBuiltinNode.java:19)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNodeGen.executeInt(RandomBuiltinNodeGen.java:48)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNodeGen.executeGeneric(RandomBuiltinNodeGen.java:31)
+	at cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode.execute(PascalRootNode.java:27)
+	at org.graalvm.compiler.truffle.OptimizedCallTarget.callProxy(OptimizedCallTarget.java:233)
+	at org.graalvm.compiler.truffle.OptimizedCallTarget.callRoot(OptimizedCallTarget.java:223)
+Caused by: org.graalvm.compiler.graph.VerificationError: CompilerAsserts.neverPartOfCompilation()
+	at org.graalvm.compiler.truffle.nodes.asserts.NeverPartOfCompilationNode.verifyNotFoundIn(NeverPartOfCompilationNode.java:75)
+	at org.graalvm.compiler.truffle.PartialEvaluator.postPartialEvaluation(PartialEvaluator.java:543)
+	at org.graalvm.compiler.truffle.PartialEvaluator.createGraph(PartialEvaluator.java:207)
+	at org.graalvm.compiler.truffle.TruffleCompiler.compileMethod(TruffleCompiler.java:168)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime.doCompile0(GraalTruffleRuntime.java:514)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime.doCompile(GraalTruffleRuntime.java:500)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime$1.run(GraalTruffleRuntime.java:545)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+	at org.graalvm.compiler.core.CompilerThread.run(CompilerThread.java:51)
+
+<data>369,401,394</data>
+<time>227</time>
+</benchmark>
+<benchmark>
+<number>6</number>
+<data>368,424,372</data>
+<time>133</time>
+</benchmark>
+<benchmark>
+<number>7</number>
+<data>417,436,554</data>
+<time>129</time>
+</benchmark>
+<benchmark>
+<number>8</number>
+<data>422,534,407</data>
+<time>128</time>
+</benchmark>
+<benchmark>
+<number>9</number>
+<data>365,426,392</data>
+<time>134</time>
+</benchmark>
+<benchmark>
+<number>10</number>
+<data>359,443,353</data>
+<time>130</time>
+</benchmark>
+<benchmark>
+<number>11</number>
+<data>326,384,351</data>
+<time>131</time>
+</benchmark>
+<benchmark>
+<number>12</number>
+<data>321,363,398</data>
+<time>132</time>
+</benchmark>
+<benchmark>
+<number>13</number>
+<data>365,402,376</data>
+<time>134</time>
+</benchmark>
+<benchmark>
+<number>14</number>
+<data>463,329,443</data>
+<time>134</time>
+</benchmark>
+<benchmark>
+<number>15</number>
+<data>447,374,392</data>
+<time>133</time>
+</benchmark>
+<benchmark>
+<number>16</number>
+<data>486,418,469</data>
+<time>133</time>
+</benchmark>
+<benchmark>
+<number>17</number>
+<data>461,447,408</data>
+<time>132</time>
+</benchmark>
+<benchmark>
+<number>18</number>
+<data>460,446,473</data>
+<time>134</time>
+</benchmark>
+<benchmark>
+<number>19</number>
+<data>467,312,369</data>
+<time>132</time>
+</benchmark>
+<benchmark>
+<number>20</number>
+<data>399,430,443</data>
+<time>138</time>
+</benchmark>
+</benchmarkset>

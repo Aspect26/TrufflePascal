@@ -1,0 +1,127 @@
+<benchmarkset>
+<name>matrix_multiplication</name>
+<benchmark>
+<number>1</number>
+[truffle] opt fail         FunctionPascalRootNode@1e9e725a                             |Reason org.graalvm.compiler.code.SourceStackTraceBailoutException$1: CompilerAsserts.neverPartOfCompilation() 
+org.graalvm.compiler.code.SourceStackTraceBailoutException$1: CompilerAsserts.neverPartOfCompilation()
+	at cz.cuni.mff.d3s.trupple.language.PascalLanguage.findContext(PascalLanguage.java:68)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNode.getRandom(RandomBuiltinNode.java:19)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNodeGen.executeInt(RandomBuiltinNodeGen.java:48)
+	at cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp.RandomBuiltinNodeGen.executeGeneric(RandomBuiltinNodeGen.java:31)
+	at cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode.execute(PascalRootNode.java:27)
+	at org.graalvm.compiler.truffle.OptimizedCallTarget.callProxy(OptimizedCallTarget.java:233)
+	at org.graalvm.compiler.truffle.OptimizedCallTarget.callRoot(OptimizedCallTarget.java:223)
+Caused by: org.graalvm.compiler.graph.VerificationError: CompilerAsserts.neverPartOfCompilation()
+	at org.graalvm.compiler.truffle.nodes.asserts.NeverPartOfCompilationNode.verifyNotFoundIn(NeverPartOfCompilationNode.java:75)
+	at org.graalvm.compiler.truffle.PartialEvaluator.postPartialEvaluation(PartialEvaluator.java:543)
+	at org.graalvm.compiler.truffle.PartialEvaluator.createGraph(PartialEvaluator.java:207)
+	at org.graalvm.compiler.truffle.TruffleCompiler.compileMethod(TruffleCompiler.java:168)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime.doCompile0(GraalTruffleRuntime.java:514)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime.doCompile(GraalTruffleRuntime.java:500)
+	at org.graalvm.compiler.truffle.GraalTruffleRuntime$1.run(GraalTruffleRuntime.java:545)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+	at org.graalvm.compiler.core.CompilerThread.run(CompilerThread.java:51)
+
+<data>812,840,802</data>
+<time>1810</time>
+</benchmark>
+<benchmark>
+<number>2</number>
+<data>750,690,737</data>
+<time>1176</time>
+</benchmark>
+<benchmark>
+<number>3</number>
+<data>734,932,830</data>
+<time>1030</time>
+</benchmark>
+<benchmark>
+<number>4</number>
+<data>811,768,824</data>
+<time>984</time>
+</benchmark>
+<benchmark>
+<number>5</number>
+<data>765,735,884</data>
+<time>1104</time>
+</benchmark>
+<benchmark>
+<number>6</number>
+<data>860,799,890</data>
+<time>1171</time>
+</benchmark>
+<benchmark>
+<number>7</number>
+<data>740,831,697</data>
+<time>1082</time>
+</benchmark>
+<benchmark>
+<number>8</number>
+<data>632,828,773</data>
+<time>1103</time>
+</benchmark>
+<benchmark>
+<number>9</number>
+<data>843,822,876</data>
+<time>1084</time>
+</benchmark>
+<benchmark>
+<number>10</number>
+<data>844,804,785</data>
+<time>1018</time>
+</benchmark>
+<benchmark>
+<number>11</number>
+<data>845,859,815</data>
+<time>976</time>
+</benchmark>
+<benchmark>
+<number>12</number>
+<data>747,804,728</data>
+<time>968</time>
+</benchmark>
+<benchmark>
+<number>13</number>
+<data>771,838,874</data>
+<time>1029</time>
+</benchmark>
+<benchmark>
+<number>14</number>
+<data>830,772,899</data>
+<time>1019</time>
+</benchmark>
+<benchmark>
+<number>15</number>
+<data>819,682,782</data>
+<time>1254</time>
+</benchmark>
+<benchmark>
+<number>16</number>
+<data>814,800,824</data>
+<time>1141</time>
+</benchmark>
+<benchmark>
+<number>17</number>
+<data>784,737,819</data>
+<time>1147</time>
+</benchmark>
+<benchmark>
+<number>18</number>
+<data>839,900,774</data>
+<time>1250</time>
+</benchmark>
+<benchmark>
+<number>19</number>
+<data>829,832,756</data>
+<time>1289</time>
+</benchmark>
+<benchmark>
+<number>20</number>
+<data>814,668,845</data>
+<time>1083</time>
+</benchmark>
+</benchmarkset>
