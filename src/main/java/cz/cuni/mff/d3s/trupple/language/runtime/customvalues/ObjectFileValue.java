@@ -65,7 +65,7 @@ public class ObjectFileValue implements FileValue {
     }
 
     @Override
-    public boolean eol() {
+    public boolean eoln() {
         return false;
     }
 

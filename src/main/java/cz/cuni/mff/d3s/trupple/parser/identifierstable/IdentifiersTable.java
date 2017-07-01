@@ -100,7 +100,7 @@ public class IdentifiersTable {
             this.registerNewIdentifier("chr", new ChrSubroutineDescriptor());
             this.registerNewIdentifier("ord", new OrdSubroutineDescriptor());
             this.registerNewIdentifier("eof", new EofSubroutineDescriptor());
-            this.registerNewIdentifier("eol", new EolSubroutineDescriptor());
+            this.registerNewIdentifier("eoln", new EolnSubroutineDescriptor());
             this.registerNewIdentifier("odd", new OddSubroutineDescriptor());
             this.registerNewIdentifier("put", new BuiltinProcedureDescriptor.NotSupportedSubroutine());
         } catch (LexicalException e) {

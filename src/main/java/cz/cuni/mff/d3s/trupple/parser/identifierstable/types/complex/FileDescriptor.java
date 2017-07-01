@@ -2,9 +2,7 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.ObjectFileValue;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.TextFileValue;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 
 public class FileDescriptor implements TypeDescriptor {
 

@@ -364,7 +364,7 @@ public class Scanner {
 			// buffer reads unicode chars, if UTF8 has been detected
 			ch = buffer.Read(); col++; charPos++;
 			// replace isolated '\r' by '\n' in order to make
-			// eol handling uniform across Windows, Unix and Mac
+			// eoln handling uniform across Windows, Unix and Mac
 			if (ch == '\r' && buffer.Peek() != '\n') ch = EOL;
 			if (ch == EOL) { line++; col = 0; }
 		}

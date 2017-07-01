@@ -107,7 +107,7 @@ public class FilesTest extends JUnitTest {
     }
 
     @Test
-    public void eolFileTest() {
+    public void eolnFileTest() {
         String code = "program main;\n"+
                 "\n"+
                 "var f: text; c:char;\n"+
@@ -119,7 +119,7 @@ public class FilesTest extends JUnitTest {
                 " writeln(f, \'Stranger eons death may die\');\n"+
                 "\n"+
                 " reset(f);\n"+
-                " while not eol(f) do begin\n"+
+                " while not eoln(f) do begin\n"+
                 "  read(f, c);\n"+
                 "  write(c);\n"+
                 " end;\n"+

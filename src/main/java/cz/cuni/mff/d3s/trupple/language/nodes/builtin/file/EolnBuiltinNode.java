@@ -9,21 +9,21 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.TextFileValue;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 
-@NodeInfo(shortName = "eol")
+@NodeInfo(shortName = "eoln")
 @NodeChild(value = "arguments", type = ExpressionNode[].class)
-public abstract class EolBuiltinNode extends ExpressionNode {
+public abstract class EolnBuiltinNode extends ExpressionNode {
 
     @Specialization
-    boolean isEol(Object... arguments) {
-        return (arguments.length == 0)? eol() : eol((TextFileValue) arguments[0]);
+    boolean isEoln(Object... arguments) {
+        return (arguments.length == 0)? eoln() : eoln((TextFileValue) arguments[0]);
     }
 
-    private boolean eol() {
+    private boolean eoln() {
         return !PascalLanguage.INSTANCE.findContext().getInput().hasNext();
     }
 
-    private boolean eol(TextFileValue file) {
-        return file.eol();
+    private boolean eoln(TextFileValue file) {
+        return file.eoln();
     }
 
     @Override

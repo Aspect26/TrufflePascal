@@ -79,7 +79,7 @@ public class TextFileValue implements FileValue {
     }
 
     @Override
-    public boolean eol() {
+    public boolean eoln() {
         return inputLine == null || !this.inputLine.hasNext();
     }
 
