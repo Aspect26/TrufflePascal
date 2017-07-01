@@ -60,6 +60,7 @@ public class IdentifiersTable {
         typeDescriptors.put("real", RealDescriptor.getInstance());
         typeDescriptors.put("boolean", BooleanDescriptor.getInstance());
         typeDescriptors.put("char", CharDescriptor.getInstance());
+        typeDescriptors.put("text", TextFileDescriptor.getInstance());
 
         for (Map.Entry<String, TypeDescriptor> typeEntry : typeDescriptors.entrySet()) {
             identifiersMap.put(typeEntry.getKey(), new TypeTypeDescriptor(typeEntry.getValue()));
