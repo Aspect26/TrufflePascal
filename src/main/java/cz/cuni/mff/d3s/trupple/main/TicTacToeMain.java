@@ -12,11 +12,8 @@ public class TicTacToeMain {
 
     public static void main(String[] args) throws Exception {
         Source source = Source.newBuilder(new File(args[0])).mimeType(PascalLanguage.MIME_TYPE).build();
-        PolyglotEngine engine = PolyglotEngine.newBuilder().setErr(System.err).build();
-
-        PolyglotEngine.Value v = engine.eval(source);
-        v.execute();
-        engine.dispose();
+        Game game = new Game(source);
+        game.startGame();
     }
 
     private static class Game {
@@ -27,18 +24,31 @@ public class TicTacToeMain {
         private int[][] data = {{EMPTY,EMPTY,EMPTY},{EMPTY,EMPTY,EMPTY},{EMPTY,EMPTY,EMPTY}};
         private Scanner input = new Scanner(System.in);
         private PrintStream output = System.out;
+        private final Source aiSource;
+        private PolyglotEngine engine;
 
-        public void startGame() {
+        private Game(Source aiSource) {
+            this.aiSource = aiSource;
+        }
+
+        void startGame() {
+            initPolyglot();
+            print();
             while (true) {
-                print();
-
                 playerMove();
+                print();
                 if (isOver()) {
                     playerWins();
                     break;
                 }
 
+                if (isFull()) {
+                    tie();
+                    break;
+                }
+
                 aiMove();
+                print();
                 if (isOver()) {
                     aiWins();
                     break;
@@ -46,12 +56,29 @@ public class TicTacToeMain {
             }
         }
 
+        private void initPolyglot() {
+            this.engine = PolyglotEngine.newBuilder().setErr(System.err).build();
+        }
+
+        private void tie() {
+            this.output.println("It is a draw!");
+        }
+
         private void aiWins() {
-            // TODO: implement
+            this.output.println("You lost! Ouch...");
         }
 
         private void aiMove() {
-            // TODO: implement
+            this.output.println("AI's turn:");
+            PolyglotEngine.Value codeFunction = engine.eval(this.aiSource);
+            PolyglotEngine.Value result = codeFunction.execute(data[0][0], data[0][1], data[0][2], data[1][0], data[1][1], data[1][2], data[2][0], data[2][1], data[2][2]);
+            int position = result.as(Integer.class);
+            int row = position / 3;
+            int column = position % 3;
+            if (data[row][column] != EMPTY) {
+                throw new RuntimeException("The AI script returned occupied slot!");
+            }
+            data[row][column] = AI;
         }
 
         private void playerWins() {
@@ -62,27 +89,63 @@ public class TicTacToeMain {
             this.output.println("Your turn. Please choose row and column (e.g. 1 2): ");
             int row = this.input.nextInt();
             int column = this.input.nextInt();
-            while (this.data[row][column] != EMPTY) {
+            while (this.data[row - 1][column - 1] != EMPTY) {
                 this.output.println("Selected field is already taken, please choose another: ");
                 row = this.input.nextInt();
                 column = this.input.nextInt();
             }
 
-            this.data[row][column] = PLAYER;
+            this.data[row - 1][column - 1] = PLAYER;
         }
 
         private void print() {
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
-                    this.output.print(data[i][j]);
+                    switch(data[i][j]) {
+                        case EMPTY: this.output.print((char)0x25A1); break;
+                        case PLAYER: this.output.print((char)0x2713); break;
+                        case AI: this.output.print('X'); break;
+                    }
                 }
                 this.output.println();
             }
         }
 
         private boolean isOver() {
-            // TODO: implement
-            return false;
+            for (int i = 0; i < 3; ++i) {
+                if (checkRow(i) || checkColumn(i)) {
+                    return true;
+                }
+            }
+            return (checkFirstDiagonal() || checkSecondDiagonal());
+        }
+
+        private boolean isFull() {
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    if (data[i][j] == EMPTY) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private boolean checkRow(int i) {
+            return data[i][0] != EMPTY && (data[i][0] == data[i][1] && data[i][1] == data[i][2]);
+        }
+
+        private boolean checkColumn(int i) {
+            return data[0][i] != EMPTY && (data[0][i] == data[1][i] && data[1][i] == data[2][i]);
+        }
+
+        private boolean checkFirstDiagonal() {
+            return data[0][0] != EMPTY && (data[0][0] == data[1][1] && data[1][1] == data[2][2]);
+        }
+
+        private boolean checkSecondDiagonal() {
+            return data[2][0] != EMPTY && (data[2][0] == data[1][1] && data[1][1] == data[0][2]);
         }
 
     }

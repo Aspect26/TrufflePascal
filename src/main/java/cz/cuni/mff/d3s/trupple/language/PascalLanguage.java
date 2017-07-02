@@ -40,6 +40,7 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
     private PascalLanguage() {
         this.wirthParser = new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
         this.turboParser = new cz.cuni.mff.d3s.trupple.parser.tp.Parser();
+        this.setUp(true, false);
     }
 
     public void setUp(boolean tpExtension, boolean extendedGoto) {

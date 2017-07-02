@@ -32,7 +32,7 @@ public class CompilerMain {
             UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
         }
         PolyglotEngine.Value v = engine.eval(source);
-        v.execute();
+        v.execute(0, 0, 0, 0, 0, 0, 0, 0, 0);
         engine.dispose();
     }
 

@@ -30,10 +30,12 @@ package cz.cuni.mff.d3s.trupple.parser.tp;
 
 import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.nodes.RootNode;
-import cz.cuni.mff.d3s.trupple.language.nodes.variables.accessroute.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
+import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.*;
 import com.oracle.truffle.api.source.Source;
 import cz.cuni.mff.d3s.trupple.parser.*;
+
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
@@ -58,9 +60,9 @@ public class Parser implements IParser {
 
 	-->declarations
 
-	public Parser(boolean extendedGotoSupport) {
+	public Parser() {
 		this.factory = new NodeFactory(this, true);
-		this.extendedGotoSupport = extendedGotoSupport;
+		this.extendedGotoSupport = false;
 		errors = new Errors();
 	}
 
@@ -131,19 +133,29 @@ public class Parser implements IParser {
 -->initialization
 	};
 
+    public void reset() {
+        this.factory.reset();
+        this.errors = new Errors();
+        this.mainNode = null;
+    }
+
 	public boolean isUsingTPExtension() {
 	    return true;
 	}
+
+	public void setExtendedGoto(boolean extendedGoto) {
+        this.extendedGotoSupport = extendedGoto;
+    }
 	
     public boolean hadErrors(){
     	return errors.count > 0;
     }
 
     public RootNode getRootNode() {
-        return this.mainNode;
+        return (this.mainNode == null)? factory.createUnitRootNode() : this.mainNode;
     }
     
-    public boolean caseEnds(){
+    boolean caseEnds(){
         if(la.val.toLowerCase().equals("end") && !t.val.toLowerCase().equals(":"))
             return true;
 
@@ -159,7 +171,7 @@ public class Parser implements IParser {
         return false;
     }
 
-    public boolean continuesArray() {
+    boolean continuesArray() {
         Token next = scanner.Peek();
         scanner.ResetPeek();
         if(next.val.toLowerCase().equals("array") || (next.val.toLowerCase().equals("packed")))
@@ -168,13 +180,13 @@ public class Parser implements IParser {
         return false;
     }
 
-    public boolean isSubrange() {
+    boolean isSubrange() {
         Token next = scanner.Peek();
         scanner.ResetPeek();
         return next.val.toLowerCase().equals("..");
     }
 
-    public  boolean recordFixedPartContinues() {
+     boolean recordFixedPartContinues() {
         String actual = la.val.toLowerCase();
         String next = scanner.Peek().val.toLowerCase();
         scanner.ResetPeek();
@@ -186,18 +198,28 @@ public class Parser implements IParser {
         return !variantPartStarts && !recordsEnds && !innerFieldListEnds;
     }
 
-    public boolean isVariantSelectorTag() {
+    boolean isVariantSelectorTag() {
         Token next = scanner.Peek();
         scanner.ResetPeek();
 
         return next.val.equals(":");
     }
 
-    public boolean recordVariantPartStarts() {
+    boolean recordVariantPartStarts() {
         Token next = scanner.Peek();
-        scanner.ResetPeek();
+                scanner.ResetPeek();
 
         return next.val.equals("case");
+    }
+
+    boolean recordVariantsEnd() {
+        Token nextToken = scanner.Peek();
+        scanner.ResetPeek();
+
+        String lookAhead = la.val.toLowerCase();
+        String next = nextToken.val.toLowerCase();
+
+        return lookAhead.equals("end") || (lookAhead.equals(";") && next.equals("end"));
     }
 
 } // end Parser

@@ -338,7 +338,7 @@ Constant<out ConstantDescriptor constant>
     "+" | "-"                                   (. sign = t.val; .)
 ]
 (
-	UnsignedIntegerLiteral<out long value>      (. constant = factory.createLongConstant(sign, value); .)
+	UnsignedIntegerLiteral<out long value>      (. constant = factory.createNumericConstant(sign, value); .)
 |
     UnsignedDoubleLiteral<out double value>     (. constant = factory.createDoubleConstant(sign, value); .)
 |
@@ -488,6 +488,7 @@ identifier										(. formalParameter = factory.createFormalParametersList(iden
 
 MainFunction 
 =
+                                                (. factory.startMainFunction(); .)
 Block<out StatementNode blockNode>              (. mainNode = factory.finishMainFunction(blockNode); .)
 "."
 .
@@ -555,42 +556,35 @@ identifier                                      (. Token identifierToken = t; .)
 |
     SubroutineCall<out statement, identifierToken>
 |
-    InnerAccessRoute<out AccessNode accessNode, identifierToken>
-    ":="
-    Expression<out ExpressionNode value>        (. statement = factory.createAssignmentWithRoute(identifierToken, accessNode, value); .)
+    Assignment<out statement, identifierToken>
 )
 .
 
 
-InnerAccessRoute<out AccessNode accessRoute, Token identifierToken>
-=                                               (. accessRoute = factory.createSimpleAccessNode(identifierToken); .)
+Assignment<out StatementNode assignment, Token identifierToken>
+=
+AssignmentRoute<out AssignmentData assignmentData, identifierToken>
+":="
+Expression<out ExpressionNode value>        (. assignment = factory.finishAssignmentNode(assignmentData, value); .)
+.
+
+
+AssignmentRoute<out AssignmentData data, Token identifierToken>
+=
+                                            (. data = new AssignmentData(); .)
+                                            (. data.setSimple(factory, identifierToken); .)
 {
-    InnerAccessRouteElement<out accessRoute, accessRoute>
+    (
+         ArrayIndex<. out List<ExpressionNode> indexNodes .>
+                                            (. data.setArray(factory, indexNodes); .)
+    |
+        "^"                                 (. data.setDereference(factory); .)
+    |
+        "." identifier                      (. data.setRecord(factory, t); .)
+    )
 }
 .
 
-
-InnerAccessRouteNonEmpty<out AccessNode accessRoute, Token identifierToken>
-=                                               (. accessRoute = factory.createSimpleAccessNode(identifierToken); .)
-InnerAccessRouteElement<out accessRoute, accessRoute>
-{
-    InnerAccessRouteElement<out accessRoute, accessRoute>
-}
-.
-
-
-InnerAccessRouteElement<out AccessNode accessNode, AccessNode previousAccessNode>
-=                                               (. accessNode = null; .)
-(
-    ArrayIndex<. out List<ExpressionNode> indexNodes .>
-                                                (. accessNode = factory.createArrayAccessNode(previousAccessNode, indexNodes); .)
-|
-    "."
-    identifier                                  (. accessNode = factory.createRecordAccessNode(previousAccessNode, t); .)
-|
-    "^"                                         (. accessNode = factory.createPointerDereferenceAccessNode(previousAccessNode); .)
-)
-.
 
 
 CaseStatement<out StatementNode statement>
@@ -809,12 +803,38 @@ identifier                                      (. Token identifierToken = t; ex
 
 
 InnerIdentifierAccess<out ExpressionNode expression, Token identifierToken>
-=							                    (. expression = null; .)
+=							                    (. expression = factory.createExpressionFromSingleIdentifier(identifierToken); .)
 (
-	SubroutineCall<out expression, identifierToken>
+    SubroutineCall<out expression, identifierToken>
+    (
+    |
+        InnerReadRouteNonEmpty<out expression, expression>
+    )
 |
-	InnerAccessRouteNonEmpty<out AccessNode accessRoute, identifierToken>
-	                                            (. expression = factory.createExpressionFromIdentifierWithRoute(accessRoute); .)
+	InnerReadRouteNonEmpty<out expression, expression>
+)
+.
+
+
+InnerReadRouteNonEmpty<out ExpressionNode expression, ExpressionNode initialExpression>
+=
+ReadRouteElement<out expression, initialExpression>
+{
+    ReadRouteElement<out expression, expression>
+}
+.
+
+
+ReadRouteElement<out ExpressionNode resultExpression, ExpressionNode expression>
+=                                               (. resultExpression = null; .)
+(
+    ArrayIndex<. out List<ExpressionNode> indexNodes .>
+                                                (. resultExpression = factory.createReadFromArrayNode(expression, indexNodes); .)
+|
+    "."
+    identifier                                  (. resultExpression = factory.createReadFromRecordNode(expression, t); .)
+|
+    "^"                                         (. resultExpression = factory.createReadDereferenceNode(expression); .)
 )
 .
 

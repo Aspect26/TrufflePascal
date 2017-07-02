@@ -562,10 +562,16 @@ identifier                                      (. Token identifierToken = t; .)
 
 
 Assignment<out StatementNode assignment, Token identifierToken>
-=
-AssignmentRoute<out AssignmentData assignmentData, identifierToken>
-":="
-Expression<out ExpressionNode value>        (. assignment = factory.finishAssignmentNode(assignmentData, value); .)
+=                                           (. AssignmentData assignmentData; assignment = null; .)
+(
+    IF(isReturnVariable(identifierToken))
+    ":="
+    Expression<out ExpressionNode value>    (. assignment = factory.createSimpleAssignment(identifierToken, value); .)
+|
+    AssignmentRoute<out assignmentData, identifierToken>
+    ":="
+    Expression<out ExpressionNode value>    (. assignment = factory.finishAssignmentNode(assignmentData, value); .)
+)
 .
 
 

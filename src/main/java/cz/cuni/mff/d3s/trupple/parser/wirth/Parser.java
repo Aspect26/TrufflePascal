@@ -830,11 +830,30 @@ public class Parser implements IParser {
 
 	StatementNode  Assignment(Token identifierToken) {
 		StatementNode  assignment;
-		AssignmentData assignmentData = AssignmentRoute(identifierToken);
-		Expect(35);
-		ExpressionNode value = Expression();
-		assignment = factory.finishAssignmentNode(assignmentData, value); 
+		AssignmentData assignmentData; assignment = null; 
+		if (isReturnVariable(identifierToken)) {
+			Expect(35);
+			ExpressionNode value = Expression();
+			assignment = factory.createSimpleAssignment(identifierToken, value); 
+		} else if (StartOf(5)) {
+			assignmentData = AssignmentRoute(identifierToken);
+			Expect(35);
+			ExpressionNode value = Expression();
+			assignment = factory.finishAssignmentNode(assignmentData, value); 
+		} else SynErr(76);
 		return assignment;
+	}
+
+	ExpressionNode  Expression() {
+		ExpressionNode  expression;
+		expression = LogicTerm();
+		while (la.kind == 48) {
+			Get();
+			Token op = t; 
+			ExpressionNode right = LogicTerm();
+			expression = factory.createBinaryExpression(op, expression, right); 
+		}
+		return expression;
 	}
 
 	AssignmentData  AssignmentRoute(Token identifierToken) {
@@ -855,18 +874,6 @@ public class Parser implements IParser {
 			}
 		}
 		return data;
-	}
-
-	ExpressionNode  Expression() {
-		ExpressionNode  expression;
-		expression = LogicTerm();
-		while (la.kind == 48) {
-			Get();
-			Token op = t; 
-			ExpressionNode right = LogicTerm();
-			expression = factory.createBinaryExpression(op, expression, right); 
-		}
-		return expression;
 	}
 
 	List<ExpressionNode>  ArrayIndex() {
@@ -936,7 +943,7 @@ public class Parser implements IParser {
 			expression = factory.createUnaryExpression(op, right); 
 		} else if (StartOf(7)) {
 			expression = LogicFactor();
-		} else SynErr(76);
+		} else SynErr(77);
 		return expression;
 	}
 
@@ -1031,7 +1038,7 @@ public class Parser implements IParser {
 			expression = factory.createUnaryExpression(unOp, expression); 
 		} else if (StartOf(10)) {
 			expression = Factor();
-		} else SynErr(77);
+		} else SynErr(78);
 		return expression;
 	}
 
@@ -1075,7 +1082,7 @@ public class Parser implements IParser {
 			expression = SetConstructor();
 			break;
 		}
-		default: SynErr(78); break;
+		default: SynErr(79); break;
 		}
 		return expression;
 	}
@@ -1088,7 +1095,7 @@ public class Parser implements IParser {
 			expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
 		} else if (StartOf(12)) {
 			expression = InnerIdentifierAccess(identifierToken);
-		} else SynErr(79);
+		} else SynErr(80);
 		return expression;
 	}
 
@@ -1101,7 +1108,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 62) {
 			Get();
 			result = false; 
-		} else SynErr(80);
+		} else SynErr(81);
 		return result;
 	}
 
@@ -1121,7 +1128,7 @@ public class Parser implements IParser {
 				valueNodes.add(valueNode); 
 			}
 			expression = factory.createSetConstructorNode(valueNodes); 
-		} else SynErr(81);
+		} else SynErr(82);
 		Expect(18);
 		return expression;
 	}
@@ -1134,10 +1141,10 @@ public class Parser implements IParser {
 			if (StartOf(11)) {
 			} else if (la.kind == 17 || la.kind == 22 || la.kind == 33) {
 				expression = InnerReadRouteNonEmpty(expression);
-			} else SynErr(82);
+			} else SynErr(83);
 		} else if (la.kind == 17 || la.kind == 22 || la.kind == 33) {
 			expression = InnerReadRouteNonEmpty(expression);
-		} else SynErr(83);
+		} else SynErr(84);
 		return expression;
 	}
 
@@ -1163,7 +1170,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 22) {
 			Get();
 			resultExpression = factory.createReadDereferenceNode(expression); 
-		} else SynErr(84);
+		} else SynErr(85);
 		return resultExpression;
 	}
 
@@ -1192,7 +1199,7 @@ public class Parser implements IParser {
 			parameter = factory.createSubroutineParameterPassNode(t); 
 		} else if (StartOf(6)) {
 			parameter = Expression();
-		} else SynErr(85);
+		} else SynErr(86);
 		return parameter;
 	}
 
@@ -1276,6 +1283,10 @@ public class Parser implements IParser {
         Token next = scanner.Peek();
         scanner.ResetPeek();
         return next.val.toLowerCase().equals("..");
+    }
+
+    boolean isReturnVariable(Token identifierToken) {
+        return factory.isReturnVariable(identifierToken);
     }
 
      boolean recordFixedPartContinues() {
@@ -1411,16 +1422,17 @@ class Errors {
 			case 73: s = "invalid Statement"; break;
 			case 74: s = "invalid ForLoop"; break;
 			case 75: s = "invalid IdentifierBeginningStatement"; break;
-			case 76: s = "invalid SignedLogicFactor"; break;
-			case 77: s = "invalid SignedFactor"; break;
-			case 78: s = "invalid Factor"; break;
-			case 79: s = "invalid IdentifierAccess"; break;
-			case 80: s = "invalid LogicLiteral"; break;
-			case 81: s = "invalid SetConstructor"; break;
-			case 82: s = "invalid InnerIdentifierAccess"; break;
+			case 76: s = "invalid Assignment"; break;
+			case 77: s = "invalid SignedLogicFactor"; break;
+			case 78: s = "invalid SignedFactor"; break;
+			case 79: s = "invalid Factor"; break;
+			case 80: s = "invalid IdentifierAccess"; break;
+			case 81: s = "invalid LogicLiteral"; break;
+			case 82: s = "invalid SetConstructor"; break;
 			case 83: s = "invalid InnerIdentifierAccess"; break;
-			case 84: s = "invalid ReadRouteElement"; break;
-			case 85: s = "invalid ActualParameter"; break;
+			case 84: s = "invalid InnerIdentifierAccess"; break;
+			case 85: s = "invalid ReadRouteElement"; break;
+			case 86: s = "invalid ActualParameter"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

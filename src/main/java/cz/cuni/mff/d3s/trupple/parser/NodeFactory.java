@@ -42,6 +42,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDe
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ReturnTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
 
 public class NodeFactory {
@@ -419,6 +420,13 @@ public class NodeFactory {
         }
     }
 
+    public boolean isReturnVariable(Token identifierToken) {
+	    String identifier = this.getIdentifierFromToken(identifierToken);
+	    TypeDescriptor typeDescriptor = this.doLookup(identifier, LexicalScope::getIdentifierDescriptor, true);
+
+	    return typeDescriptor instanceof ReturnTypeDescriptor;
+    }
+
     public void startProcedureImplementation(ProcedureHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
         try {
@@ -681,7 +689,7 @@ public class NodeFactory {
         throw new UnexpectedRuntimeException();
     }
 
-    private StatementNode createSimpleAssignment(Token identifierToken, ExpressionNode valueNode) {
+    public StatementNode createSimpleAssignment(Token identifierToken, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, true);
         TypeDescriptor targetType = this.doLookup(variableIdentifier, LexicalScope::getIdentifierDescriptor, true);

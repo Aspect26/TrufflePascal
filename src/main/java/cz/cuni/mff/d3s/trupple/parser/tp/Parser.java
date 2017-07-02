@@ -853,11 +853,30 @@ public class Parser implements IParser {
 
 	StatementNode  Assignment(Token identifierToken) {
 		StatementNode  assignment;
-		AssignmentData assignmentData = AssignmentRoute(identifierToken);
-		Expect(37);
-		ExpressionNode value = Expression();
-		assignment = factory.finishAssignmentNode(assignmentData, value); 
+		AssignmentData assignmentData; assignment = null; 
+		if (isReturnVariable(identifierToken)) {
+			Expect(37);
+			ExpressionNode value = Expression();
+			assignment = factory.createSimpleAssignment(identifierToken, value); 
+		} else if (StartOf(7)) {
+			assignmentData = AssignmentRoute(identifierToken);
+			Expect(37);
+			ExpressionNode value = Expression();
+			assignment = factory.finishAssignmentNode(assignmentData, value); 
+		} else SynErr(83);
 		return assignment;
+	}
+
+	ExpressionNode  Expression() {
+		ExpressionNode  expression;
+		expression = LogicTerm();
+		while (la.kind == 50) {
+			Get();
+			Token op = t; 
+			ExpressionNode right = LogicTerm();
+			expression = factory.createBinaryExpression(op, expression, right); 
+		}
+		return expression;
 	}
 
 	AssignmentData  AssignmentRoute(Token identifierToken) {
@@ -878,18 +897,6 @@ public class Parser implements IParser {
 			}
 		}
 		return data;
-	}
-
-	ExpressionNode  Expression() {
-		ExpressionNode  expression;
-		expression = LogicTerm();
-		while (la.kind == 50) {
-			Get();
-			Token op = t; 
-			ExpressionNode right = LogicTerm();
-			expression = factory.createBinaryExpression(op, expression, right); 
-		}
-		return expression;
 	}
 
 	List<ExpressionNode>  ArrayIndex() {
@@ -959,7 +966,7 @@ public class Parser implements IParser {
 			expression = factory.createUnaryExpression(op, right); 
 		} else if (StartOf(9)) {
 			expression = LogicFactor();
-		} else SynErr(83);
+		} else SynErr(84);
 		return expression;
 	}
 
@@ -1058,7 +1065,7 @@ public class Parser implements IParser {
 			expression = factory.createUnaryExpression(unOp, expression); 
 		} else if (StartOf(12)) {
 			expression = Factor();
-		} else SynErr(84);
+		} else SynErr(85);
 		return expression;
 	}
 
@@ -1102,7 +1109,7 @@ public class Parser implements IParser {
 			expression = SetConstructor();
 			break;
 		}
-		default: SynErr(85); break;
+		default: SynErr(86); break;
 		}
 		return expression;
 	}
@@ -1115,7 +1122,7 @@ public class Parser implements IParser {
 			expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
 		} else if (StartOf(14)) {
 			expression = InnerIdentifierAccess(identifierToken);
-		} else SynErr(86);
+		} else SynErr(87);
 		return expression;
 	}
 
@@ -1135,7 +1142,7 @@ public class Parser implements IParser {
 				valueNodes.add(valueNode); 
 			}
 			expression = factory.createSetConstructorNode(valueNodes); 
-		} else SynErr(87);
+		} else SynErr(88);
 		Expect(19);
 		return expression;
 	}
@@ -1148,10 +1155,10 @@ public class Parser implements IParser {
 			if (StartOf(13)) {
 			} else if (la.kind == 18 || la.kind == 23 || la.kind == 34) {
 				expression = InnerReadRouteNonEmpty(expression);
-			} else SynErr(88);
+			} else SynErr(89);
 		} else if (la.kind == 18 || la.kind == 23 || la.kind == 34) {
 			expression = InnerReadRouteNonEmpty(expression);
-		} else SynErr(89);
+		} else SynErr(90);
 		return expression;
 	}
 
@@ -1177,7 +1184,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 23) {
 			Get();
 			resultExpression = factory.createReadDereferenceNode(expression); 
-		} else SynErr(90);
+		} else SynErr(91);
 		return resultExpression;
 	}
 
@@ -1206,7 +1213,7 @@ public class Parser implements IParser {
 			parameter = factory.createSubroutineParameterPassNode(t); 
 		} else if (StartOf(8)) {
 			parameter = Expression();
-		} else SynErr(91);
+		} else SynErr(92);
 		return parameter;
 	}
 
@@ -1284,7 +1291,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 32) {
 			UnitFunctionImplementation();
 			Expect(8);
-		} else SynErr(92);
+		} else SynErr(93);
 	}
 
 	void UnitProcedureImplementation() {
@@ -1297,7 +1304,7 @@ public class Parser implements IParser {
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishProcedureImplementation(bodyNode); 
-		} else SynErr(93);
+		} else SynErr(94);
 	}
 
 	void UnitFunctionImplementation() {
@@ -1310,7 +1317,7 @@ public class Parser implements IParser {
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishFunctionImplementation(bodyNode); 
-		} else SynErr(94);
+		} else SynErr(95);
 	}
 
 
@@ -1396,6 +1403,10 @@ public class Parser implements IParser {
         Token next = scanner.Peek();
         scanner.ResetPeek();
         return next.val.toLowerCase().equals("..");
+    }
+
+    boolean isReturnVariable(Token identifierToken) {
+        return factory.isReturnVariable(identifierToken);
     }
 
      boolean recordFixedPartContinues() {
@@ -1538,18 +1549,19 @@ class Errors {
 			case 80: s = "invalid Statement"; break;
 			case 81: s = "invalid ForLoop"; break;
 			case 82: s = "invalid IdentifierBeginningStatement"; break;
-			case 83: s = "invalid SignedLogicFactor"; break;
-			case 84: s = "invalid SignedFactor"; break;
-			case 85: s = "invalid Factor"; break;
-			case 86: s = "invalid IdentifierAccess"; break;
-			case 87: s = "invalid SetConstructor"; break;
-			case 88: s = "invalid InnerIdentifierAccess"; break;
+			case 83: s = "invalid Assignment"; break;
+			case 84: s = "invalid SignedLogicFactor"; break;
+			case 85: s = "invalid SignedFactor"; break;
+			case 86: s = "invalid Factor"; break;
+			case 87: s = "invalid IdentifierAccess"; break;
+			case 88: s = "invalid SetConstructor"; break;
 			case 89: s = "invalid InnerIdentifierAccess"; break;
-			case 90: s = "invalid ReadRouteElement"; break;
-			case 91: s = "invalid ActualParameter"; break;
-			case 92: s = "invalid UnitSubroutineImplementation"; break;
-			case 93: s = "invalid UnitProcedureImplementation"; break;
-			case 94: s = "invalid UnitFunctionImplementation"; break;
+			case 90: s = "invalid InnerIdentifierAccess"; break;
+			case 91: s = "invalid ReadRouteElement"; break;
+			case 92: s = "invalid ActualParameter"; break;
+			case 93: s = "invalid UnitSubroutineImplementation"; break;
+			case 94: s = "invalid UnitProcedureImplementation"; break;
+			case 95: s = "invalid UnitFunctionImplementation"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);
