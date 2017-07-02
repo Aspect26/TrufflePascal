@@ -2,6 +2,7 @@ package cz.cuni.mff.d3s.trupple;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -71,6 +72,50 @@ public class ProgramArgumentsTest extends JUnitTest {
 
         this.test(source, Collections.emptyList(), output, true, false,
                 new String[] {arg1, arg2, arg3});
+    }
+
+    @Test
+    public void primitiveArgumentsTest() {
+        int i = 443;
+        long l = 56565656565656L;
+        double r = Math.E;
+        boolean b = true;
+
+        String source = "program intArgTest(i, r, l, b);\n"+
+                "var i: integer; r: real; l: longint; b: boolean;\n"+
+                "begin\n"+
+                " write(i,\',\',r,\',\',l,\',\',b);\n"+
+                "end.";
+
+        String output = i + "," + r + "," + l + "," + b;
+        this.test(source, Collections.emptyList(), output, false, false, new Object[] {
+                i, r, l, b
+        });
+    }
+
+    @Test
+    @Ignore
+    public void intArrayArgumentTest() {
+        int[][] data = {
+                {3, 1, 2},
+                {8, 9, 5},
+                {7, 4, 6},
+        };
+        String source = "program intArgTest(data);\n"+
+                "var data: array[1..3, 0..2] of integer; i,j: integer;\n"+
+                "begin\n"+
+                " for i:=1 to 3 do begin\n"+
+                " for j:=0 to 2 do begin\n"+
+                " write(data[i][j]);\n"+
+                " end;\n"+
+                " writeln;\n"+
+                " end;\n"+
+                "end.";
+
+        String output = String.format(data[0][0] + data[0][1] + data[0][2] + "%n" + data[1][0] + data[1][1] + data[1][2]
+                + "%n" + data[2][0] + data[2][1] + data[2][2] + "%n");
+
+        this.test(source, Collections.emptyList(), output, false, false, new Object[]{ data });
     }
 
 }

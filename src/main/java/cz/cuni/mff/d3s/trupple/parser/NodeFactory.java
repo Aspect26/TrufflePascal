@@ -16,6 +16,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.control.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.function.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.literals.*;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.*;
+import cz.cuni.mff.d3s.trupple.language.nodes.program.arguments.ProgramArgumentAssignmentFactory;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.FunctionPascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.ProcedurePascalRootNode;
@@ -925,12 +926,13 @@ public class NodeFactory {
 	        TypeDescriptor typeDescriptor = this.currentLexicalScope.getIdentifierDescriptor(argumentIdentifier);
 
 	        if (typeDescriptor != null) {
-                if (ProgramArgumentAssignmentNode.supportsType(typeDescriptor)) {
-                    this.currentLexicalScope.addScopeInitializationNode(new ProgramArgumentAssignmentNode(argumentSlot, typeDescriptor, currentArgument++));
-                } else {
-                    parser.SemErr("Unsupported argument type for: " + argumentIdentifier);
+                try {
+                    this.currentLexicalScope.addScopeInitializationNode(ProgramArgumentAssignmentFactory.create(argumentSlot, currentArgument, typeDescriptor));
+                } catch (LexicalException e) {
+                    parser.SemErr(e.getMessage());
                 }
             }
+            ++currentArgument;
         }
     }
 
