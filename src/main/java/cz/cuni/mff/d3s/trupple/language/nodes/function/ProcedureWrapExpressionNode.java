@@ -14,7 +14,6 @@ public class ProcedureWrapExpressionNode extends ExpressionNode {
         this.procedureNode = procedureNode;
     }
 
-
     @Override
     public Object executeGeneric(VirtualFrame frame) {
         procedureNode.executeVoid(frame);

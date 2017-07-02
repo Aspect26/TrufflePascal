@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.vm.PolyglotEngine;
 import cz.cuni.mff.d3s.trupple.main.exceptions.CompilerException;
@@ -26,14 +25,14 @@ public class CompilerMain {
 	}
 
 	private static void executeSource(Source source, InputStream input, OutputStream output) throws Exception {
-        PolyglotEngine engine = PolyglotEngine.newBuilder().setIn(input).setOut(output).setErr(System.err).build();
+        PolyglotEngine engine = PolyglotEngine.newBuilder().setIn(input).setOut(output).setErr(System.err).config("mime", "key", "value").build();
         assert engine.getLanguages().containsKey(PascalLanguage.MIME_TYPE);
 
         if (settings.usesTPExtension()) {
             UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
         }
-            engine.eval(source);
-
+        PolyglotEngine.Value v = engine.eval(source);
+        v.execute(1,2,3);
         engine.dispose();
     }
 

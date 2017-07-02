@@ -8,6 +8,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.FileDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.TextFileDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDescriptor;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class ProgramArgumentAssignmentNode extends StatementNode {
         {
             add(StringDescriptor.class);
             add(FileDescriptor.class);
+            add(TextFileDescriptor.class);
         }
     };
 

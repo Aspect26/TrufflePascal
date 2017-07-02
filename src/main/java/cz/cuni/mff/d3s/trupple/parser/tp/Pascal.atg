@@ -488,6 +488,7 @@ identifier										(. formalParameter = factory.createFormalParametersList(iden
 
 MainFunction 
 =
+                                                (. factory.startMainFunction(); .)
 Block<out StatementNode blockNode>              (. mainNode = factory.finishMainFunction(blockNode); .)
 "."
 .

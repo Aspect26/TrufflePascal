@@ -88,7 +88,7 @@ public abstract class JUnitTest {
         for (String importSource : imports) {
             engine.eval(this.createSource(importSource));
         }
-        engine.eval(this.createSource(sourceCode));
+        engine.eval(this.createSource(sourceCode)).execute(arguments);
         assertEquals(expectedOutput, output.toString());
     }
 

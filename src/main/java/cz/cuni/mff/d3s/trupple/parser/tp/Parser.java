@@ -146,6 +146,7 @@ public class Parser implements IParser {
 	}
 
 	void MainFunction() {
+		factory.startMainFunction(); 
 		StatementNode blockNode = Block();
 		mainNode = factory.finishMainFunction(blockNode); 
 		Expect(34);
@@ -485,7 +486,7 @@ public class Parser implements IParser {
 		}
 		if (la.kind == 3) {
 			long value = UnsignedIntegerLiteral();
-			constant = factory.createNumericConstant(sign, value);
+			constant = factory.createNumericConstant(sign, value); 
 		} else if (la.kind == 4) {
 			double value = UnsignedDoubleLiteral();
 			constant = factory.createDoubleConstant(sign, value); 
@@ -1141,19 +1142,22 @@ public class Parser implements IParser {
 
 	ExpressionNode  InnerIdentifierAccess(Token identifierToken) {
 		ExpressionNode  expression;
-		expression = null; 
+		expression = factory.createExpressionFromSingleIdentifier(identifierToken); 
 		if (la.kind == 6) {
 			expression = SubroutineCall(identifierToken);
+			if (StartOf(13)) {
+			} else if (la.kind == 18 || la.kind == 23 || la.kind == 34) {
+				expression = InnerReadRouteNonEmpty(expression);
+			} else SynErr(88);
 		} else if (la.kind == 18 || la.kind == 23 || la.kind == 34) {
-			expression = InnerReadRouteNonEmpty(identifierToken);
-		} else SynErr(88);
+			expression = InnerReadRouteNonEmpty(expression);
+		} else SynErr(89);
 		return expression;
 	}
 
-	ExpressionNode  InnerReadRouteNonEmpty(Token identifierToken) {
+	ExpressionNode  InnerReadRouteNonEmpty(ExpressionNode initialExpression) {
 		ExpressionNode  expression;
-		ExpressionNode readIdentifier = factory.createExpressionFromSingleIdentifier(identifierToken); 
-		expression = ReadRouteElement(readIdentifier);
+		expression = ReadRouteElement(initialExpression);
 		while (la.kind == 18 || la.kind == 23 || la.kind == 34) {
 			expression = ReadRouteElement(expression);
 		}
@@ -1173,7 +1177,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 23) {
 			Get();
 			resultExpression = factory.createReadDereferenceNode(expression); 
-		} else SynErr(89);
+		} else SynErr(90);
 		return resultExpression;
 	}
 
@@ -1202,7 +1206,7 @@ public class Parser implements IParser {
 			parameter = factory.createSubroutineParameterPassNode(t); 
 		} else if (StartOf(8)) {
 			parameter = Expression();
-		} else SynErr(90);
+		} else SynErr(91);
 		return parameter;
 	}
 
@@ -1280,7 +1284,7 @@ public class Parser implements IParser {
 		} else if (la.kind == 32) {
 			UnitFunctionImplementation();
 			Expect(8);
-		} else SynErr(91);
+		} else SynErr(92);
 	}
 
 	void UnitProcedureImplementation() {
@@ -1293,7 +1297,7 @@ public class Parser implements IParser {
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishProcedureImplementation(bodyNode); 
-		} else SynErr(92);
+		} else SynErr(93);
 	}
 
 	void UnitFunctionImplementation() {
@@ -1306,7 +1310,7 @@ public class Parser implements IParser {
 			Declarations();
 			StatementNode bodyNode = Block();
 			factory.finishFunctionImplementation(bodyNode); 
-		} else SynErr(93);
+		} else SynErr(94);
 	}
 
 
@@ -1540,11 +1544,12 @@ class Errors {
 			case 86: s = "invalid IdentifierAccess"; break;
 			case 87: s = "invalid SetConstructor"; break;
 			case 88: s = "invalid InnerIdentifierAccess"; break;
-			case 89: s = "invalid ReadRouteElement"; break;
-			case 90: s = "invalid ActualParameter"; break;
-			case 91: s = "invalid UnitSubroutineImplementation"; break;
-			case 92: s = "invalid UnitProcedureImplementation"; break;
-			case 93: s = "invalid UnitFunctionImplementation"; break;
+			case 89: s = "invalid InnerIdentifierAccess"; break;
+			case 90: s = "invalid ReadRouteElement"; break;
+			case 91: s = "invalid ActualParameter"; break;
+			case 92: s = "invalid UnitSubroutineImplementation"; break;
+			case 93: s = "invalid UnitProcedureImplementation"; break;
+			case 94: s = "invalid UnitFunctionImplementation"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

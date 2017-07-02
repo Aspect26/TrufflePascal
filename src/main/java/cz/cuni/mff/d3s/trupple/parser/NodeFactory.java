@@ -38,6 +38,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.RecordDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.FunctionDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
@@ -390,6 +391,14 @@ public class NodeFactory {
         }
     }
 
+    public void startMainFunction() {
+        try {
+            currentLexicalScope.registerReturnVariable(IntDescriptor.getInstance());
+        } catch (LexicalException e) {
+            parser.SemErr(e.getMessage());
+        }
+    }
+
     public void forwardProcedure(ProcedureHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
         try {
@@ -427,7 +436,7 @@ public class NodeFactory {
         try {
             currentLexicalScope.registerFunctionInterfaceIfNotForwarded(identifier, heading.formalParameters, heading.returnTypeDescriptor);
             currentLexicalScope = new LexicalScope(currentLexicalScope, identifier, parser.isUsingTPExtension());
-            currentLexicalScope.registerReturnVariable(currentLexicalScope.getName(), heading.returnTypeDescriptor);
+            currentLexicalScope.registerReturnVariable(heading.returnTypeDescriptor);
             this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());
@@ -901,7 +910,8 @@ public class NodeFactory {
 	    this.addProgramArgumentsAssignmentNodes();
 
         StatementNode bodyNode = this.createSubroutineNode(blockNode);
-        return new ProcedurePascalRootNode(currentLexicalScope.getFrameDescriptor(), new ProcedureBodyNode(bodyNode));
+        MainFunctionBodyNode functionNode = MainFunctionBodyNodeGen.create(bodyNode, currentLexicalScope.getFrameDescriptor(), currentLexicalScope.getReturnSlot());
+        return new FunctionPascalRootNode(currentLexicalScope.getFrameDescriptor(), functionNode);
     }
 
     public PascalRootNode createUnitRootNode() {
@@ -917,8 +927,9 @@ public class NodeFactory {
 	        if (typeDescriptor != null) {
                 if (ProgramArgumentAssignmentNode.supportsType(typeDescriptor)) {
                     this.currentLexicalScope.addScopeInitializationNode(new ProgramArgumentAssignmentNode(argumentSlot, typeDescriptor, currentArgument++));
+                } else {
+                    parser.SemErr("Unsupported argument type for: " + argumentIdentifier);
                 }
-                // TODO: else -> show warning
             }
         }
     }
@@ -1162,7 +1173,7 @@ public class NodeFactory {
                 currentLexicalScope.forwardFunction(identifier, heading.formalParameters, returnTypeDescriptor);
             }
             currentLexicalScope = new LexicalScope(currentLexicalScope, identifier, parser.isUsingTPExtension());
-            currentLexicalScope.registerReturnVariable(currentLexicalScope.getName(), returnTypeDescriptor);
+            currentLexicalScope.registerReturnVariable(returnTypeDescriptor);
             this.addParameterIdentifiersToLexicalScope(heading.formalParameters);
         } catch (LexicalException e) {
             parser.SemErr(e.getMessage());

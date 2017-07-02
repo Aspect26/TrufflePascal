@@ -164,8 +164,8 @@ public class LexicalScope {
         this.scopeInitializationNodes.add(initializationNode);
     }
 
-    void registerReturnVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        this.localIdentifiers.addReturnVariable(identifier, typeDescriptor);
+    void registerReturnVariable(TypeDescriptor typeDescriptor) throws LexicalException {
+        this.localIdentifiers.addReturnVariable(this.getName(), typeDescriptor);
     }
 
     ArrayDescriptor createArrayType(OrdinalDescriptor dimension, TypeDescriptor typeDescriptor) {

@@ -136,6 +136,7 @@ public class Parser implements IParser {
 	}
 
 	void MainFunction() {
+		factory.startMainFunction(); 
 		StatementNode blockNode = Block();
 		mainNode = factory.finishMainFunction(blockNode); 
 		Expect(33);
@@ -451,7 +452,7 @@ public class Parser implements IParser {
 		}
 		if (la.kind == 3) {
 			long value = UnsignedIntegerLiteral();
-			constant = factory.createNumericConstant(sign, value);
+			constant = factory.createNumericConstant(sign, value); 
 		} else if (la.kind == 4) {
 			double value = UnsignedDoubleLiteral();
 			constant = factory.createDoubleConstant(sign, value); 

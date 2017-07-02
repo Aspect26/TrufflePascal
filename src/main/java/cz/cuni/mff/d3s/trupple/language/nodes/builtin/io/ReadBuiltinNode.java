@@ -106,7 +106,7 @@ public abstract class ReadBuiltinNode extends StatementNode {
         } else {
             try {
                 Object obj = file.read();
-                return (char) obj;
+                return (char) (Character) obj;
             } catch (ClassCastException e) {
                 // TODO: custom exception?
                 throw new PascalRuntimeException("Object in a file is not a character");
