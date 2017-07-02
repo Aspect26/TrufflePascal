@@ -19,7 +19,7 @@ public abstract class EofBuiltinNode extends ExpressionNode {
     }
 
     private boolean eof() {
-        return !PascalLanguage.INSTANCE.findContext().getInput().hasNext();
+        return !PascalLanguage.INSTANCE.getInput().hasNext();
     }
 
     private boolean eof(FileValue file) {

@@ -186,6 +186,10 @@ public class Parser implements IParser {
         return next.val.toLowerCase().equals("..");
     }
 
+    boolean isReturnVariable(Token identifierToken) {
+        return factory.isReturnVariable(identifierToken);
+    }
+
      boolean recordFixedPartContinues() {
         String actual = la.val.toLowerCase();
         String next = scanner.Peek().val.toLowerCase();

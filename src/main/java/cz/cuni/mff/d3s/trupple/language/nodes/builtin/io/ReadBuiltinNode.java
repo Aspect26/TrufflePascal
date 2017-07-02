@@ -2,7 +2,6 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin.io;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import com.oracle.truffle.api.dsl.GenerateNodeFactory;
@@ -25,11 +24,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 public abstract class ReadBuiltinNode extends StatementNode {
 
     private static final String NEW_LINE = System.getProperty("line.separator");
-    private Scanner input;
 
 	@Specialization
     public void read(Object[] arguments) {
-	    this.input = PascalLanguage.INSTANCE.findContext().getInput();
         if (arguments.length == 0) {
             readOne();
         }
@@ -97,16 +94,16 @@ public abstract class ReadBuiltinNode extends StatementNode {
 
     private char readChar(FileValue file) throws IOException {
         if (file == null) {
-            Pattern delimiterPattern = this.input.delimiter();
-            this.input.useDelimiter("");
-            char value = this.input.next().charAt(0);
-            this.input.useDelimiter(delimiterPattern);
+            Pattern delimiterPattern = PascalLanguage.INSTANCE.getInput().delimiter();
+            PascalLanguage.INSTANCE.getInput().useDelimiter("");
+            char value = PascalLanguage.INSTANCE.getInput().next().charAt(0);
+            PascalLanguage.INSTANCE.getInput().useDelimiter(delimiterPattern);
 
             return value;
         } else {
             try {
                 Object obj = file.read();
-                return (char) obj;
+                return (char) (Character) obj;
             } catch (ClassCastException e) {
                 // TODO: custom exception?
                 throw new PascalRuntimeException("Object in a file is not a character");
@@ -116,7 +113,7 @@ public abstract class ReadBuiltinNode extends StatementNode {
 
     private double readDouble(FileValue file) throws IOException {
         if (file == null) {
-            return this.input.nextDouble();
+            return PascalLanguage.INSTANCE.getInput().nextDouble();
         } else {
             try {
                 Object obj = file.read();
@@ -130,7 +127,7 @@ public abstract class ReadBuiltinNode extends StatementNode {
 
     private long readLong(FileValue file) throws IOException {
         if (file == null) {
-            return this.input.nextLong();
+            return PascalLanguage.INSTANCE.getInput().nextLong();
         } else {
             try {
                 Object obj = file.read();
@@ -145,7 +142,7 @@ public abstract class ReadBuiltinNode extends StatementNode {
 
     private int readInt(FileValue file) throws IOException {
         if (file == null) {
-            return this.input.nextInt();
+            return PascalLanguage.INSTANCE.getInput().nextInt();
         } else {
             try {
                 Object obj = file.read();
@@ -200,7 +197,7 @@ public abstract class ReadBuiltinNode extends StatementNode {
     }
 
     private String readUntilNewline() {
-	    return this.input.next("[^" + NEW_LINE + "]");
+	    return PascalLanguage.INSTANCE.getInput().next("[^" + NEW_LINE + "]");
     }
 
 }

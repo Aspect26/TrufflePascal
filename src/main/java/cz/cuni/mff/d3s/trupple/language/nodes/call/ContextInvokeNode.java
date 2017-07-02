@@ -41,11 +41,11 @@ public abstract class ContextInvokeNode extends ExpressionNode {
     }
 
     private PascalSubroutine getSubroutine() {
-        return PascalLanguage.INSTANCE.findContext().getSubroutine(this.unitIdentifier, this.subroutineIdentifier);
+        return PascalLanguage.INSTANCE.getSubroutine(this.unitIdentifier, this.subroutineIdentifier);
     }
 
     private VirtualFrame getUnitFrame() {
-        return PascalLanguage.INSTANCE.findContext().getUnitFrame(this.unitIdentifier);
+        return PascalLanguage.INSTANCE.getUnitFrame(this.unitIdentifier);
     }
 
     private Object[] evaluateArguments(VirtualFrame frame) {

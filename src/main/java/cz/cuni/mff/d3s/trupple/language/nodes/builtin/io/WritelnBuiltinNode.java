@@ -29,8 +29,9 @@ public abstract class WritelnBuiltinNode extends StatementNode {
 
 	@TruffleBoundary
 	private static void doWriteln(Object... arguments) {
-		for (Object agument : arguments)
-			System.out.print(agument);
+		for (Object agument : arguments) {
+            System.out.print(agument);
+        }
 
 		System.out.println();
 	}

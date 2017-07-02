@@ -73,22 +73,23 @@ public abstract class JUnitTest {
 	}
 
     protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
-                        boolean extendedGotoSupport, String[] arguments) {
+                        boolean extendedGotoSupport, Object[] arguments) {
         this.test(sourceCode, imports, expectedOutput, useTPExtension, extendedGotoSupport, arguments, false);
     }
 
 	protected void test(String sourceCode, List<String> imports, String expectedOutput, boolean useTPExtension,
-                        boolean extendedGotoSupport, String[] arguments, boolean useBuiltinUnits) {
+                        boolean extendedGotoSupport, Object[] arguments, boolean useBuiltinUnits) {
         clearOutput();
         engine = PolyglotEngine.newBuilder().setIn(this.input).setOut(System.out).setErr(System.err).build();
         PascalLanguage.INSTANCE.reset(useTPExtension, extendedGotoSupport);
+        PascalLanguage.INSTANCE.setInput(this.input);
         if (useBuiltinUnits) {
             evalBuiltinSubroutines();
         }
         for (String importSource : imports) {
             engine.eval(this.createSource(importSource));
         }
-        engine.eval(this.createSource(sourceCode));
+        engine.eval(this.createSource(sourceCode)).execute(arguments);
         assertEquals(expectedOutput, output.toString());
     }
 

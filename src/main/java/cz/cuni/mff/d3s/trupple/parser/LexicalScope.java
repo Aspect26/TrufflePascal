@@ -94,7 +94,7 @@ public class LexicalScope {
     }
 
     void setSubroutineRootNode(String identifier, PascalRootNode rootNode) throws LexicalException {
-        PascalLanguage.INSTANCE.findContext().updateSubroutine(this.name, identifier, rootNode);
+        PascalLanguage.INSTANCE.updateSubroutine(this.name, identifier, rootNode);
         this.localIdentifiers.setSubroutineRootNode(identifier, rootNode);
     }
 
@@ -164,8 +164,8 @@ public class LexicalScope {
         this.scopeInitializationNodes.add(initializationNode);
     }
 
-    void registerReturnVariable(String identifier, TypeDescriptor typeDescriptor) throws LexicalException {
-        this.localIdentifiers.addReturnVariable(identifier, typeDescriptor);
+    void registerReturnVariable(TypeDescriptor typeDescriptor) throws LexicalException {
+        this.localIdentifiers.addReturnVariable(this.getName(), typeDescriptor);
     }
 
     ArrayDescriptor createArrayType(OrdinalDescriptor dimension, TypeDescriptor typeDescriptor) {
@@ -215,7 +215,7 @@ public class LexicalScope {
     public void registerBuiltinSubroutine(String identifier, SubroutineDescriptor descriptor) {
         try {
             this.localIdentifiers.addSubroutine(identifier, descriptor);
-            PascalLanguage.INSTANCE.findContext().updateSubroutine(this.name, identifier, descriptor.getRootNode());
+            PascalLanguage.INSTANCE.updateSubroutine(this.name, identifier, descriptor.getRootNode());
         } catch (LexicalException e) {
             throw new PascalRuntimeException("Could not register builtin subroutine: " + identifier);
         }

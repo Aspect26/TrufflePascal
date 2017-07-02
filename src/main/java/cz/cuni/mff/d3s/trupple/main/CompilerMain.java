@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.oracle.truffle.api.Truffle;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.vm.PolyglotEngine;
 import cz.cuni.mff.d3s.trupple.main.exceptions.CompilerException;
@@ -21,7 +20,7 @@ public class CompilerMain {
 
 	public static void main(String[] args) throws Exception {
         settings = parseArguments(args);
-        PascalLanguage.INSTANCE.setUp(settings.usesTPExtension(), settings.usesExtendedGoto());
+        PascalLanguage.INSTANCE.reset(settings.usesTPExtension(), settings.usesExtendedGoto());
 		executeSource(Source.newBuilder(new File(settings.getSourcePath())).mimeType(PascalLanguage.MIME_TYPE).build(), System.in, System.out);
 	}
 
@@ -32,8 +31,7 @@ public class CompilerMain {
         if (settings.usesTPExtension()) {
             UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
         }
-            engine.eval(source);
-
+        engine.eval(source).execute();
         engine.dispose();
     }
 
