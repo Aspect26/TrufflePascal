@@ -138,7 +138,7 @@ public class NodeFactory {
     }
 
     private boolean isUnitRegistered(String identifier) {
-	    return PascalLanguage.INSTANCE.findContext().isUnitRegistered(identifier);
+	    return PascalLanguage.INSTANCE.isUnitRegistered(identifier);
     }
 
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, boolean withReturnType) {
@@ -1114,7 +1114,7 @@ public class NodeFactory {
     public void startUnit(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
-        if (PascalLanguage.INSTANCE.findContext().isUnitRegistered(identifier)) {
+        if (PascalLanguage.INSTANCE.isUnitRegistered(identifier)) {
             parser.SemErr("Unit with name " + identifier + " is already defined.");
             return;
         }

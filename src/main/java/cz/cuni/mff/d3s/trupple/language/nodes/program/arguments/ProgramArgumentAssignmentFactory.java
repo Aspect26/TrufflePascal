@@ -5,6 +5,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.FileDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.*;
 
 public class ProgramArgumentAssignmentFactory {

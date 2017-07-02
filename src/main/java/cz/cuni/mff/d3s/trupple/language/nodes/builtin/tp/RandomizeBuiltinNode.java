@@ -10,6 +10,7 @@ public class RandomizeBuiltinNode extends StatementNode {
 	
     @Override
     public void executeVoid(VirtualFrame frame) {
-        PascalLanguage.INSTANCE.findContext().randomize();
+        PascalLanguage.INSTANCE.randomize();
     }
+
 }

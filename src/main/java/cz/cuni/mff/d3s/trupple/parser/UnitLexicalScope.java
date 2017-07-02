@@ -22,7 +22,7 @@ public class UnitLexicalScope extends LexicalScope {
 
     @Override
     BlockNode createInitializationBlock() {
-        VirtualFrame unitFrame = PascalLanguage.INSTANCE.findContext().createUnitFrame(this.getName(), this.getFrameDescriptor());
+        VirtualFrame unitFrame = PascalLanguage.INSTANCE.createUnitFrame(this.getName(), this.getFrameDescriptor());
         List<StatementNode> initializationNodes = this.generateInitializationNodes(unitFrame);
         initializationNodes.addAll(this.scopeInitializationNodes);
 

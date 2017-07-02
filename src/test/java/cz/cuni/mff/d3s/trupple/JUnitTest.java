@@ -82,6 +82,7 @@ public abstract class JUnitTest {
         clearOutput();
         engine = PolyglotEngine.newBuilder().setIn(this.input).setOut(System.out).setErr(System.err).build();
         PascalLanguage.INSTANCE.reset(useTPExtension, extendedGotoSupport);
+        PascalLanguage.INSTANCE.setInput(this.input);
         if (useBuiltinUnits) {
             evalBuiltinSubroutines();
         }

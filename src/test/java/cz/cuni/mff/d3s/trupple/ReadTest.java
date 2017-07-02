@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple;
 
 import org.junit.Test;
 
-public class ReadTest extends JUnitTest{
+public class ReadTest extends JUnitTest {
 	
 	@Test
 	public void simpleReadIntegerTest() {

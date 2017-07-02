@@ -25,14 +25,14 @@ public class CompilerMain {
 	}
 
 	private static void executeSource(Source source, InputStream input, OutputStream output) throws Exception {
-        PolyglotEngine engine = PolyglotEngine.newBuilder().setIn(input).setOut(output).setErr(System.err).config("mime", "key", "value").build();
+        PolyglotEngine engine = PolyglotEngine.newBuilder().setIn(input).setOut(output).setErr(System.err).build();
         assert engine.getLanguages().containsKey(PascalLanguage.MIME_TYPE);
 
         if (settings.usesTPExtension()) {
             UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
         }
         PolyglotEngine.Value v = engine.eval(source);
-        v.execute(1,2,3);
+        v.execute();
         engine.dispose();
     }
 

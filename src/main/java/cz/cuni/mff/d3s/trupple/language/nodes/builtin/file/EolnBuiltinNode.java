@@ -19,7 +19,7 @@ public abstract class EolnBuiltinNode extends ExpressionNode {
     }
 
     private boolean eoln() {
-        return !PascalLanguage.INSTANCE.findContext().getInput().hasNext();
+        return !PascalLanguage.INSTANCE.getInput().hasNext();
     }
 
     private boolean eoln(TextFileValue file) {
