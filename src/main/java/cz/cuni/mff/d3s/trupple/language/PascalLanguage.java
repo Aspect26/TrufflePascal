@@ -32,24 +32,20 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
     private IParser currentParser;
     private final IParser wirthParser;
     private final IParser turboParser;
-    private Random random = new Random(26270);
-    private Map<String, VirtualFrame> unitFrames = new HashMap<>();
-    private Map<String, Map<String, PascalSubroutine>> unitSubroutines = new HashMap<>();
+    private Random random;
+    private Map<String, VirtualFrame> unitFrames;
+    private Map<String, Map<String, PascalSubroutine>> unitSubroutines;
     private Scanner input = new Scanner(System.in);
 
     private PascalLanguage() {
         this.wirthParser = new cz.cuni.mff.d3s.trupple.parser.wirth.Parser();
         this.turboParser = new cz.cuni.mff.d3s.trupple.parser.tp.Parser();
-        this.setUp(true, false);
-    }
-
-    public void setUp(boolean tpExtension, boolean extendedGoto) {
-        this.currentParser = (tpExtension)? this.turboParser : this.wirthParser;
-        this.currentParser.setExtendedGoto(extendedGoto);
+        this.reset(false, false);
     }
 
     public void reset(boolean tpExtension, boolean extendedGoto) {
-        this.setUp(tpExtension, extendedGoto);
+        this.currentParser = (tpExtension)? this.turboParser : this.wirthParser;
+        this.currentParser.setExtendedGoto(extendedGoto);
         random = new Random(26270);
         unitFrames = new HashMap<>();
         unitSubroutines = new HashMap<>();
@@ -58,12 +54,12 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
 
     @Override
     protected PascalState createContext(Env environment) {
-        return new PascalState(new PrintWriter(environment.out()), environment.in());
+        return new PascalState();
     }
 
     @Override
     protected Object findExportedSymbol(PascalState state, String globalName, boolean onlyExplicit) {
-        return state.getExportedSymbol(globalName);
+        return null;
     }
 
     @Override

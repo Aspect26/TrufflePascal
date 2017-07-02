@@ -20,7 +20,7 @@ public class CompilerMain {
 
 	public static void main(String[] args) throws Exception {
         settings = parseArguments(args);
-        PascalLanguage.INSTANCE.setUp(settings.usesTPExtension(), settings.usesExtendedGoto());
+        PascalLanguage.INSTANCE.reset(settings.usesTPExtension(), settings.usesExtendedGoto());
 		executeSource(Source.newBuilder(new File(settings.getSourcePath())).mimeType(PascalLanguage.MIME_TYPE).build(), System.in, System.out);
 	}
 
@@ -31,8 +31,7 @@ public class CompilerMain {
         if (settings.usesTPExtension()) {
             UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
         }
-        PolyglotEngine.Value v = engine.eval(source);
-        v.execute(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        engine.eval(source).execute();
         engine.dispose();
     }
 

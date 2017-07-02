@@ -18,10 +18,10 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 })
 public abstract class MainFunctionBodyNode extends ExpressionNode {
 
-	protected abstract FrameSlot getSlot();
-
 	private final StatementNode body;
 	private final FrameDescriptor frameDescriptor;
+
+    protected abstract FrameSlot getSlot();
 
 	MainFunctionBodyNode(StatementNode body, FrameDescriptor frameDescriptor) {
         this.body = body;

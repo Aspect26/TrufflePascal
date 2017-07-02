@@ -17,7 +17,7 @@ public class MainFunctionObject implements TruffleObject {
 
     @Override
     public ForeignAccess getForeignAccess() {
-        ForeignAccess.Factory26 f = new ForeignAccess.Factory26() {
+        ForeignAccess.Factory26 factory = new ForeignAccess.Factory26() {
             @Override
             public CallTarget accessIsNull() {
                 return null;
@@ -89,23 +89,7 @@ public class MainFunctionObject implements TruffleObject {
             }
         };
 
-        ForeignAccess.Factory factory = new ForeignAccess.Factory() {
-
-            @Override
-            public boolean canHandle(TruffleObject truffleObject) {
-                return false;
-            }
-
-            @Override
-            public CallTarget accessMessage(Message message) {
-                if (message.getClass().getName().equals("com.oracle.truffle.api.interop.Execute")) { // TODO: remove this reflection
-                    return Truffle.getRuntime().createCallTarget(rootNode);
-                }
-                return null;
-            }
-
-        };
-        return ForeignAccess.create(factory);
+        return ForeignAccess.create(MainFunctionObject.class, factory);
     }
 
 }
