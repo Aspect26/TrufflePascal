@@ -21,7 +21,7 @@ import cz.cuni.mff.d3s.trupple.language.runtime.graphics.PascalGraphMode;
 public abstract class PutPixelNode extends StatementNode {
 
     @Specialization
-    public void putPixel(long x, long y, long color) {
+    void putPixel(long x, long y, long color) {
         PascalGraphMode.drawPixel((int) x, (int) y, (int) color);
     }
 

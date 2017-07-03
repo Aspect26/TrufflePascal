@@ -25,7 +25,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescr
 public abstract class GetMsCountNode extends ExpressionNode {
 
     @Specialization
-    long getMilliseconds(VirtualFrame frame) {
+    long getMilliseconds() {
         return System.nanoTime() / (1000 * 1000);
     }
 
