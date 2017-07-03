@@ -12,6 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Node representing set constructor.
+ */
 public class SetConstructorNode extends ExpressionNode {
 
     @Children private final ExpressionNode[] valueNodes;

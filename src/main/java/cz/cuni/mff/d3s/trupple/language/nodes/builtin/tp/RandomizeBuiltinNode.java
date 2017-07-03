@@ -5,6 +5,9 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
+/**
+ * Node representing Turbo Pascal's randomize procedure. It resets actual random seed.
+ */
 @NodeInfo(shortName = "randomize")
 public class RandomizeBuiltinNode extends StatementNode {
 	

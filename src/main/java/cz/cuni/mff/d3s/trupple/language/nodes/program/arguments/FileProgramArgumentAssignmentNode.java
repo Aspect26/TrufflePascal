@@ -7,14 +7,18 @@ import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.FileValue;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 
+/**
+ * If a Pascal program receives a path to a file as an argument, and type of this argument is file, this node automatically
+ * assigns this path to the file variable.
+ */
 public class FileProgramArgumentAssignmentNode extends StatementNode {
 
     private final FrameSlot frameSlot;
     private final int index;
 
-    public FileProgramArgumentAssignmentNode(FrameSlot frameSlot, int index) {
+    FileProgramArgumentAssignmentNode(FrameSlot frameSlot, int index) {
         this.frameSlot = frameSlot;
-        this.index = index;
+        this.index = index + 1;
     }
 
     @Override

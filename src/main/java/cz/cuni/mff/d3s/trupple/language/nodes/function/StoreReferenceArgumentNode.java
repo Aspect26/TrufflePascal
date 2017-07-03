@@ -6,6 +6,10 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
+/**
+ * When a variable is passed to a subroutine as a reference, it has to be wrapped to a {@link Reference} object. This
+ * node takes care of this wrapping.
+ */
 public class StoreReferenceArgumentNode extends ExpressionNode {
 
 	private final FrameSlot variableSlot;

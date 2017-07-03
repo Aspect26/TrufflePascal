@@ -9,6 +9,10 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeExceptio
 
 import java.util.List;
 
+/**
+ * Representation of Pascal's with statement. It steps into frame of provided record values and executes the inner
+ * statements.
+ */
 public class WithNode extends StatementNode {
 
     private final List<FrameSlot> recordSlots;

@@ -11,6 +11,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 
+/**
+ * Node representing Pascal's while loop.
+ */
 @NodeInfo(shortName = "while", description = "The node implementing a while loop")
 public class WhileNode extends StatementNode {
 

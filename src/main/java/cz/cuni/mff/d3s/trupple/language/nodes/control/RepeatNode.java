@@ -10,6 +10,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 
+/**
+ * Node representing Pascal's repeat loop.
+ */
 @NodeInfo(shortName = "repeat", description = "The node implementing a repeat loop")
 public class RepeatNode extends StatementNode {
 

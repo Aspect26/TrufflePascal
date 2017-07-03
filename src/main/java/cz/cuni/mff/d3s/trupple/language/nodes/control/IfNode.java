@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.trupple.language.nodes.control;
 
-import com.oracle.truffle.api.CompilerDirectives;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
@@ -10,6 +9,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeException;
 
+/**
+ * Node representing if statement.
+ */
 @NodeInfo(shortName = "if", description = "The node implementing a conditional statement")
 public final class IfNode extends StatementNode {
 

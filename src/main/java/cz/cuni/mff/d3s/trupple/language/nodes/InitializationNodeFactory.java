@@ -4,7 +4,11 @@ import com.oracle.truffle.api.frame.FrameSlot;
 import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
-public class InitializationNodeFactory{
+/**
+ * Node factory for initialization nodes. Each variable has to be initialized before it is read. This factory creates
+ * initialization node for given variable based on its type.
+ */
+public class InitializationNodeFactory {
 
 	public static StatementNode create(FrameSlot frameSlot, Object value, VirtualFrame frame) {
 	    // TODO: this is a duplicity
@@ -25,6 +29,9 @@ public class InitializationNodeFactory{
 	}
 }
 
+/**
+ * Base class for every initialization node.
+ */
 abstract class InitializationNode extends StatementNode {
 	
 	protected final FrameSlot slot;
@@ -37,6 +44,9 @@ abstract class InitializationNode extends StatementNode {
 	public abstract void executeVoid(VirtualFrame frame);
 }
 
+/**
+ * Initialization node for integer type variables. It looks for the variable in current frame.
+ */
 class IntInitializationNode extends InitializationNode {
 
     protected final int value;
@@ -53,6 +63,10 @@ class IntInitializationNode extends InitializationNode {
 
 }
 
+/**
+ * Initialization node for integer type variables. It looks for the variable the specified frame. It is used to
+ * initialize variables inside a unit.
+ */
 class IntInitializationWithFrameNode extends IntInitializationNode {
 
     private final VirtualFrame frame;
@@ -69,6 +83,9 @@ class IntInitializationWithFrameNode extends IntInitializationNode {
 
 }
 
+/**
+ * Initialization node for long type variables. It looks for the variable the current frame.
+ */
 class LongInitializationNode extends InitializationNode {
 
 	protected final long value;
@@ -85,6 +102,10 @@ class LongInitializationNode extends InitializationNode {
 
 }
 
+/**
+ * Initialization node for long type variables. It looks for the variable the specified frame. It is used to
+ * initialize variables inside a unit.
+ */
 class LongInitializationWithFrameNode extends LongInitializationNode {
 
     private final VirtualFrame frame;
@@ -101,6 +122,9 @@ class LongInitializationWithFrameNode extends LongInitializationNode {
 
 }
 
+/**
+ * Initialization node for char type variables. It looks for the variable the current frame.
+ */
 class CharInitializationNode extends InitializationNode {
 
 	protected final char value;
@@ -117,6 +141,10 @@ class CharInitializationNode extends InitializationNode {
 
 }
 
+/**
+ * Initialization node for char type variables. It looks for the variable the specified frame. It is used to
+ * initialize variables inside a unit.
+ */
 class CharInitializationWithFrameNode extends CharInitializationNode {
 
     private final VirtualFrame frame;
@@ -133,6 +161,9 @@ class CharInitializationWithFrameNode extends CharInitializationNode {
 
 }
 
+/**
+ * Initialization node for real type variables. It looks for the variable the current frame.
+ */
 class DoubleInitializationNode extends InitializationNode {
 
 	protected final double value;
@@ -149,6 +180,10 @@ class DoubleInitializationNode extends InitializationNode {
 
 }
 
+/**
+ * Initialization node for real type variables. It looks for the variable the specified frame. It is used to
+ * initialize variables inside a unit.
+ */
 class DoubleInitializationWithFrameNode extends DoubleInitializationNode {
 
     private final VirtualFrame frame;
@@ -165,6 +200,9 @@ class DoubleInitializationWithFrameNode extends DoubleInitializationNode {
 
 }
 
+/**
+ * Initialization node for boolean type variables. It looks for the variable the current frame.
+ */
 class BooleanInitializationNode extends InitializationNode {
 
 	protected final boolean value;
@@ -181,6 +219,10 @@ class BooleanInitializationNode extends InitializationNode {
 
 }
 
+/**
+ * Initialization node for boolean type variables. It looks for the variable the specified frame. It is used to
+ * initialize variables inside a unit.
+ */
 class BooleanInitializationWithFrameNode extends BooleanInitializationNode {
 
     private final VirtualFrame frame;
@@ -197,6 +239,9 @@ class BooleanInitializationWithFrameNode extends BooleanInitializationNode {
 
 }
 
+/**
+ * Initialization node for generic type variables. It looks for the variable the current frame.
+ */
 class ObjectInitializationNode extends InitializationNode {
 
 	protected final Object value;
@@ -213,6 +258,10 @@ class ObjectInitializationNode extends InitializationNode {
 
 }
 
+/**
+ * Initialization node for generic type variables. It looks for the variable the specified frame. It is used to
+ * initialize variables inside a unit.
+ */
 class ObjectInitializationWithFrameNode extends ObjectInitializationNode {
 
     private final VirtualFrame frame;

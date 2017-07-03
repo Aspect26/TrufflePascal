@@ -5,17 +5,15 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.nodes.UnexpectedResultException;
 
 import cz.cuni.mff.d3s.trupple.language.PascalTypesGen;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.EnumValue;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.*;
 
 /**
- * This is a base node for each node that shall return any value after its execution. Not all the
- * specialized execute{Type} methods are implemented because we do not really need them since we are using
- * Truffle's specializations.
+ * This is a base node class for each node that represents an expression (returns a value after its execution). Not all
+ * the specialized execute{Type} methods are implemented because we do not really need them since we are using Truffle's
+ * specializations.
  */
 @NodeInfo(description = "Abstract class for all nodes that return value")
 public abstract class ExpressionNode extends StatementNode {
@@ -48,10 +46,6 @@ public abstract class ExpressionNode extends StatementNode {
 		return PascalTypesGen.expectCharacter(executeGeneric(frame));
 	}
 
-	public EnumValue executeEnum(VirtualFrame frame) throws UnexpectedResultException {
-	    return PascalTypesGen.expectEnumValue(executeGeneric(frame));
-    }
-
     protected boolean isInt() {
         return getType() == IntDescriptor.getInstance() || getType() instanceof IntConstantDescriptor;
     }
@@ -72,22 +66,10 @@ public abstract class ExpressionNode extends StatementNode {
         return getType() == BooleanDescriptor.getInstance() || getType() instanceof BooleanConstantDescriptor;
     }
 
-    protected boolean isLongReference() {
-        return this.isLong() && isReference();
-    }
-
-    protected boolean isDoubleReference() {
-        return this.isDouble() && isReference();
-    }
-
-    protected boolean isCharReference() {
-        return this.isChar() && isReference();
-    }
-
-    protected boolean isBooleanReference() {
-        return this.isBoolean() && isReference();
-    }
-
+    /**
+     * Returns true if this expression is a reference. Vast majority of expressions are not references so only those that
+     * are have to override this method.
+     */
     protected boolean isReference() {
         return false;
     }

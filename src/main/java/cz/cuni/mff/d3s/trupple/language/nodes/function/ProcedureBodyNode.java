@@ -5,6 +5,9 @@ import com.oracle.truffle.api.nodes.NodeInfo;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
+/**
+ * Node representing body of a procedure. It contains a body node which is executed along with this node.
+ */
 @NodeInfo(shortName = "procedure body")
 public final class ProcedureBodyNode extends StatementNode {
 

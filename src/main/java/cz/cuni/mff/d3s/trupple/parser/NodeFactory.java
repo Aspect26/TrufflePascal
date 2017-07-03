@@ -853,7 +853,7 @@ public class NodeFactory {
 
 	    if (subroutineScope instanceof UnitLexicalScope) {
 	        String unitIdentifier = subroutineScope.getName();
-            return ContextInvokeNodeGen.create(identifier, unitIdentifier, arguments, returnType);
+            return UnitInvokeNodeGen.create(identifier, unitIdentifier, arguments, returnType);
         } else {
 	        FrameSlot subroutineSlot = subroutineScope.getLocalSlot(identifier);
 	        return InvokeNodeGen.create(subroutineSlot, arguments, returnType);
@@ -871,11 +871,11 @@ public class NodeFactory {
         PascalSubroutine function = this.doLookup(variableIdentifier, LexicalScope::getSubroutine);
         TypeDescriptor descriptor = this.doLookup(variableIdentifier, LexicalScope::getIdentifierDescriptor);
 
-        return new SubroutineLiteralNode(function, (SubroutineDescriptor) descriptor);
+        return SubroutineLiteralNodeGen.create(function, (SubroutineDescriptor) descriptor);
     }
 
     public ExpressionNode createLogicLiteralNode(boolean value) {
-        return new LogicLiteralNode(value);
+        return LogicLiteralNodeGen.create(value);
     }
 
     public ExpressionNode createSetConstructorNode(List<ExpressionNode> valueNodes) {
@@ -893,18 +893,18 @@ public class NodeFactory {
 
     public ExpressionNode createNumericLiteralNode(Token literalToken) {
 	    try {
-	        return new IntLiteralNode(this.getIntFromToken(literalToken));
+	        return IntLiteralNodeGen.create(this.getIntFromToken(literalToken));
         } catch(NumberFormatException e) {
-	        return new LongLiteralNode(this.getLongFromToken(literalToken));
+	        return LongLiteralNodeGen.create(this.getLongFromToken(literalToken));
         }
     }
 
     public ExpressionNode createFloatLiteralNode(Token token) {
-        return new DoubleLiteralNode(getDoubleFromToken(token));
+        return DoubleLiteralNodeGen.create(getDoubleFromToken(token));
     }
 
     public ExpressionNode createCharOrStringLiteralNode(String literal) {
-        return (literal.length() == 1) ? new CharLiteralNode(literal.charAt(0)) : new StringLiteralNode(literal);
+        return (literal.length() == 1) ? CharLiteralNodeGen.create(literal.charAt(0)) : StringLiteralNodeGen.create(literal);
     }
 
     public StatementNode createBlockNode(List<StatementNode> bodyNodes, boolean useExtendedVersion) {

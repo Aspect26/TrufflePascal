@@ -6,7 +6,10 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.GotoException;
 
 import java.util.*;
 
-@NodeInfo(shortName = "block", description = "The node implementation of a block of source code with extended support of goto statements.")
+/**
+ * Block node implementation with extended support of goto statements.
+ */
+@NodeInfo(shortName = "block")
 public class ExtendedBlockNode extends StatementNode {
 
     @Children

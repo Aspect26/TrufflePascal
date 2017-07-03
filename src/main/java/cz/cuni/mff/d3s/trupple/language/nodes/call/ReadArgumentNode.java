@@ -5,6 +5,12 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
+/**
+ * This node reads one argument from actual frame at specified index. It is used mainly with assignment node where this
+ * node reads value of received argument and the assignment node assigns it to the variable representing the argument.
+ *
+ * {@see NodeFactory#addParameterIdentifiersToLexicalScope()}
+ */
 public class ReadArgumentNode extends ExpressionNode {
 
 	private final int index;

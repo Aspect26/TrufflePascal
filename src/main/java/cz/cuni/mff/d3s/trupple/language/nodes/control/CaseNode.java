@@ -5,6 +5,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
+/**
+ * Node representing case statement.
+ */
 public class CaseNode extends StatementNode {
 
 	@Children

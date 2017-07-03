@@ -7,7 +7,7 @@ import com.oracle.truffle.api.nodes.Node;
 import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 
 /**
- * This class is a parent class for each nodes that represent a statement
+ * This class is an abstract class for each node that represent a statement.
  */
 @TypeSystemReference(PascalTypes.class)
 public abstract class StatementNode extends Node {
@@ -42,6 +42,16 @@ public abstract class StatementNode extends Node {
 		return null;
 	}
 
+    /**
+     * Gets the number of required jumps to the parent frame to get frame containing specified slot. This function is
+     * used for optimization. If we have some node that uses frame slot which is not from its frame then first time it
+     * is executed it has to look in which frame the slot belongs, remember the number of jumps and each next time it is
+     * executed it directly jumps by that number and retrieves the slot. This is thanks to the fact that the number of jumps
+     * cannot change.
+     * @param currentFrame the initial frame
+     * @param slot the queried slot
+     * @return the number of jumps to parent frame to find the queried slot
+     */
     protected int getJumpsToFrame(VirtualFrame currentFrame, FrameSlot slot) {
 	    int result = 0;
         if (frameContainsSlot(currentFrame, slot)) {
@@ -60,6 +70,11 @@ public abstract class StatementNode extends Node {
     }
 
 
+    /**
+     * Checks whether specified frame contains specified slot.
+     * @param frame the frame
+     * @param slot the slot
+     */
     private boolean frameContainsSlot(VirtualFrame frame, FrameSlot slot) {
 		return frame.getFrameDescriptor().getSlots().contains(slot);
 	}

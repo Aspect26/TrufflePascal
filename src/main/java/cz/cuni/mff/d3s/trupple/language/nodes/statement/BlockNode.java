@@ -5,7 +5,10 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import com.oracle.truffle.api.nodes.ExplodeLoop;
 import com.oracle.truffle.api.nodes.NodeInfo;
 
-@NodeInfo(shortName = "block", description = "The node implementation of a block of source code.")
+/**
+ * A node representing Pascal's block. It contains list of ordered statements that are executed along this notgd.
+ */
+@NodeInfo(shortName = "block")
 public class BlockNode extends StatementNode {
 
     @Children

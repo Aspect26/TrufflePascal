@@ -15,6 +15,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.logic.LessThanOrEqualNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.logic.NotNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.variables.write.SimpleAssignmentNode;
 
+/**
+ * Node representing for cycle.
+ */
 @NodeInfo(shortName = "for")
 public class ForNode extends StatementNode {
 

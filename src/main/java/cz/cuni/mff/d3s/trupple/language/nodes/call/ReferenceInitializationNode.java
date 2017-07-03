@@ -5,6 +5,9 @@ import com.oracle.truffle.api.frame.VirtualFrame;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.Reference;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 
+/**
+ * This node is used to initialize reference passed variable in called subroutine.
+ */
 public class ReferenceInitializationNode extends StatementNode {
 
     private final FrameSlot frameSlot;

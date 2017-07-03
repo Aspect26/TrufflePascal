@@ -10,7 +10,7 @@ import cz.cuni.mff.d3s.trupple.language.PascalTypes;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 
 /**
- * This node represents the root node of a syntax tree of any subroutine.
+ * This node represents the root node of AST of any subroutine or main program.
  */
 @TypeSystemReference(PascalTypes.class)
 public abstract class PascalRootNode extends RootNode {
