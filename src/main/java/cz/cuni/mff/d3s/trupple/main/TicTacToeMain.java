@@ -13,7 +13,12 @@ public class TicTacToeMain {
     public static void main(String[] args) throws Exception {
         Source source = Source.newBuilder(new File(args[0])).mimeType(PascalLanguage.MIME_TYPE).build();
         Game game = new Game(source);
-        game.startGame();
+        try {
+            game.startGame();
+        } catch (RuntimeException e) {
+            System.out.println(e.getMessage());
+            System.out.print("Game over.");
+        }
     }
 
     private static class Game {
@@ -73,14 +78,12 @@ public class TicTacToeMain {
 
         private void aiMove() {
             this.output.println("AI's turn:");
-            PolyglotEngine.Value result = this.parsedAIScript.execute(data[0][0], data[0][1], data[0][2], data[1][0], data[1][1], data[1][2], data[2][0], data[2][1], data[2][2]);
+            PolyglotEngine.Value result = this.parsedAIScript.execute(data[0][0], data[0][1], data[0][2], data[1][0],
+                    data[1][1], data[1][2], data[2][0], data[2][1], data[2][2]);
             int position = result.as(Integer.class);
-            int row = position / 3;
-            int column = position % 3;
-            if (data[row][column] != EMPTY) {
-                throw new RuntimeException("The AI script returned occupied slot!");
+            if (!setCell(position / 3, position % 3, AI)) {
+                throw new RuntimeException("The AI script returned invalid slot!");
             }
-            data[row][column] = AI;
         }
 
         private void playerWins() {
@@ -91,13 +94,10 @@ public class TicTacToeMain {
             this.output.println("Your turn. Please choose row and column (e.g. 1 2): ");
             int row = this.input.nextInt();
             int column = this.input.nextInt();
-            while (this.data[row - 1][column - 1] != EMPTY) {
-                this.output.println("Selected field is already taken, please choose another: ");
+            while (!setCell(row - 1, column - 1, PLAYER)) {
                 row = this.input.nextInt();
                 column = this.input.nextInt();
             }
-
-            this.data[row - 1][column - 1] = PLAYER;
         }
 
         private void print() {
@@ -131,6 +131,19 @@ public class TicTacToeMain {
                 }
             }
 
+            return true;
+        }
+
+        private boolean setCell(int row, int column, int value) {
+            if (row < 0 || row > 2 || column < 0 || column > 2) {
+                this.output.println("Selected position is invalid!");
+                return false;
+            }
+            if (data[row][column] != EMPTY) {
+                this.output.println("Selected position is already taken!");
+                return false;
+            }
+            data[row][column] = value;
             return true;
         }
 
