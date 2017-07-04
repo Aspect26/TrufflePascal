@@ -21,18 +21,20 @@ public class TicTacToeMain {
         private static final int EMPTY = 0;
         private static final int PLAYER = 1;
         private static final int AI = 2;
+
         private int[][] data = {{EMPTY,EMPTY,EMPTY},{EMPTY,EMPTY,EMPTY},{EMPTY,EMPTY,EMPTY}};
+
         private Scanner input = new Scanner(System.in);
         private PrintStream output = System.out;
-        private final Source aiSource;
+
         private PolyglotEngine engine;
+        private PolyglotEngine.Value parsedAIScript;
 
         private Game(Source aiSource) {
-            this.aiSource = aiSource;
+            initPolyglot(aiSource);
         }
 
         void startGame() {
-            initPolyglot();
             print();
             while (true) {
                 playerMove();
@@ -56,8 +58,9 @@ public class TicTacToeMain {
             }
         }
 
-        private void initPolyglot() {
+        private void initPolyglot(Source aiSource) {
             this.engine = PolyglotEngine.newBuilder().setErr(System.err).build();
+            this.parsedAIScript = engine.eval(aiSource);
         }
 
         private void tie() {
@@ -70,8 +73,7 @@ public class TicTacToeMain {
 
         private void aiMove() {
             this.output.println("AI's turn:");
-            PolyglotEngine.Value codeFunction = engine.eval(this.aiSource);
-            PolyglotEngine.Value result = codeFunction.execute(data[0][0], data[0][1], data[0][2], data[1][0], data[1][1], data[1][2], data[2][0], data[2][1], data[2][2]);
+            PolyglotEngine.Value result = this.parsedAIScript.execute(data[0][0], data[0][1], data[0][2], data[1][0], data[1][1], data[1][2], data[2][0], data[2][1], data[2][2]);
             int position = result.as(Integer.class);
             int row = position / 3;
             int column = position % 3;
