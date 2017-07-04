@@ -91,7 +91,7 @@ public class TicTacToeMain {
         }
 
         private void playerMove() {
-            this.output.println("Your turn. Please choose row and column (e.g. 1 2): ");
+            this.output.print("Your turn. Please choose row and column (e.g. 1 2): ");
             int row = this.input.nextInt();
             int column = this.input.nextInt();
             while (!setCell(row - 1, column - 1, PLAYER)) {
