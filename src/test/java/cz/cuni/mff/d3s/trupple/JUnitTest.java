@@ -102,7 +102,7 @@ public abstract class JUnitTest {
         }
     }
 
-	private Source createSource(String source) {
+	Source createSource(String source) {
         return Source.newBuilder(source).
                 name("<testCode>").
                 mimeType(PascalLanguage.MIME_TYPE).

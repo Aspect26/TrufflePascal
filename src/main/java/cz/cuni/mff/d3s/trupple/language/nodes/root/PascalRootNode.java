@@ -16,7 +16,7 @@ import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 public abstract class PascalRootNode extends RootNode {
 
 	@Child
-	private ExpressionNode bodyNode;
+	protected ExpressionNode bodyNode;
 
 	public PascalRootNode(FrameDescriptor frameDescriptor, ExpressionNode bodyNode) {
 		super(PascalLanguage.class, null, frameDescriptor);
