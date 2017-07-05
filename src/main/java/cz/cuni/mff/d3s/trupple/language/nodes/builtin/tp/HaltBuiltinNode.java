@@ -3,12 +3,9 @@ package cz.cuni.mff.d3s.trupple.language.nodes.builtin.tp;
 import com.oracle.truffle.api.dsl.NodeChild;
 import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
-import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
-import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.ExitExceptionTP;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.HaltExceptionTP;
 
 /**
  * Node representing Turbo Pascal's exit function. When the procedure is executed, it immediately stops the program's
@@ -19,11 +16,11 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescri
  */
 @NodeInfo(shortName = "exit")
 @NodeChild(value = "argument", type = ExpressionNode.class)
-public abstract class ExitBuiltinNode extends StatementNode {
+public abstract class HaltBuiltinNode extends StatementNode {
 
     @Specialization
 	void exit(int returnValue) {
-        throw new ExitExceptionTP(returnValue);
+        throw new HaltExceptionTP(returnValue);
 	}
 
 }

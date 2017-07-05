@@ -16,7 +16,7 @@ public class ProgramOutputTest extends JUnitTest {
 
     @Test
     public void exitCodeReturnTest() {
-        String source = "program none; begin exit(28); end.";
+        String source = "program none; begin halt(28); end.";
         this.testResultValue(source, 28);
     }
 
