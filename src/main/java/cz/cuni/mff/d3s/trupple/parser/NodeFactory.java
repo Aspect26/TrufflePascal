@@ -394,11 +394,6 @@ public class NodeFactory {
     }
 
     public void startMainFunction() {
-        try {
-            currentLexicalScope.registerReturnVariable(IntDescriptor.getInstance());
-        } catch (LexicalException e) {
-            parser.SemErr(e.getMessage());
-        }
     }
 
     public void forwardProcedure(ProcedureHeading heading) {

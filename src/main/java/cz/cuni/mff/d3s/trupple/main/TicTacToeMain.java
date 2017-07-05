@@ -11,14 +11,10 @@ import java.util.Scanner;
 public class TicTacToeMain {
 
     public static void main(String[] args) throws Exception {
+        PascalLanguage.INSTANCE.reset(true, false);
         Source source = Source.newBuilder(new File(args[0])).mimeType(PascalLanguage.MIME_TYPE).build();
         Game game = new Game(source);
-        try {
-            game.startGame();
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
-            System.out.print("Game over.");
-        }
+        game.startGame();
     }
 
     private static class Game {
