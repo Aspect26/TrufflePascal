@@ -5,16 +5,33 @@ import com.oracle.truffle.api.vm.PolyglotEngine;
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Scanner;
 
 public class TicTacToeMain {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
+        if (args.length != 1) {
+            System.err.print("Expected one argument");
+            return;
+        }
+
+        File sourceFile = new File(args[0]);
+        if (!sourceFile.exists()) {
+            System.err.print("Could not find " + args[0]);
+            return;
+        }
+
+        Source source = Source.newBuilder(sourceFile).mimeType(PascalLanguage.MIME_TYPE).build();
         PascalLanguage.INSTANCE.reset(true, false);
-        Source source = Source.newBuilder(new File(args[0])).mimeType(PascalLanguage.MIME_TYPE).build();
         Game game = new Game(source);
-        game.startGame();
+
+        try {
+            game.startGame();
+        } catch (RuntimeException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     private static class Game {
