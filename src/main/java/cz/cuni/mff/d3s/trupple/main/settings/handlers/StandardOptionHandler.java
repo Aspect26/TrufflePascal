@@ -22,7 +22,7 @@ public class StandardOptionHandler extends OptionHandler<String> {
     public int parseArguments(Parameters parameters) throws CmdLineException {
         String value = parameters.getParameter(0);
         if (!value.equals(STANDARD_TP) && !value.equals(STANDARD_WIRTH)) {
-            throw new CmdLineException(parser, "Unknown value provided to the option. Expected one of the values: " + STANDARD_TP + "," + STANDARD_WIRTH, new IllegalArgumentException());
+            throw new CmdLineException(parser, "Unknown value provided to the std option. Expected one of the values: " + STANDARD_TP + "," + STANDARD_WIRTH, new IllegalArgumentException());
         }
         setter.addValue(value);
         return 1;
@@ -33,6 +33,6 @@ public class StandardOptionHandler extends OptionHandler<String> {
     }
 
     public static boolean isTurbo(String value) {
-        return value.equals(STANDARD_TP);
+        return value != null && value.equals(STANDARD_TP);
     }
 }

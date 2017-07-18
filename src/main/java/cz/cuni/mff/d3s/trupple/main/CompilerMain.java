@@ -18,20 +18,29 @@ public class CompilerMain {
 
 	private static Settings settings;
 
-	public static void main(String[] args) throws Exception {
-        settings = parseArguments(args);
-        PascalLanguage.INSTANCE.reset(settings.usesTPExtension(), settings.usesExtendedGoto());
-		executeSource(Source.newBuilder(new File(settings.getSourcePath())).mimeType(PascalLanguage.MIME_TYPE).build(), System.in, System.out);
+	public static void main(String[] args) {
+        try {
+            settings = parseArguments(args);
+            PascalLanguage.INSTANCE.reset(settings.usesTPExtension(), settings.usesExtendedGoto());
+            executeSource(Source.newBuilder(getSourceFile(settings.getSourcePath())).mimeType(PascalLanguage.MIME_TYPE).build(), System.in, System.out);
+        } catch (Exception e) {
+            System.err.print(e.getMessage());
+        }
+
 	}
 
 	private static void executeSource(Source source, InputStream input, OutputStream output) throws Exception {
         PolyglotEngine engine = PolyglotEngine.newBuilder().setIn(input).setOut(output).setErr(System.err).build();
         assert engine.getLanguages().containsKey(PascalLanguage.MIME_TYPE);
 
-        if (settings.usesTPExtension()) {
-            UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
+        try {
+            if (settings.usesTPExtension()) {
+                UnitEvaluator.evalUnits(engine, settings.getIncludeDirectories());
+            }
+            engine.eval(source).execute();
+        } catch (RuntimeException e) {
+            System.err.print(e.getMessage().split(":")[1]);
         }
-        engine.eval(source).execute();
         engine.dispose();
     }
 
@@ -46,5 +55,13 @@ public class CompilerMain {
 			throw new WrongOptionsException(e, argumentsParser);
 		}
 	}
+
+	private static File getSourceFile(String sourcePath) throws Exception {
+        File sourceFile = new File(sourcePath);
+        if (!sourceFile.exists()) {
+            throw new Exception("Could not find: " + sourcePath);
+        }
+        return sourceFile;
+    }
 
 }

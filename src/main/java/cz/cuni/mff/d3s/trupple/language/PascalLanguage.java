@@ -76,10 +76,10 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
      * Gets source from the request, parses it and return call target that, if called, executes
      * given script in Pascal language.
      * @param request parsing request
-     * @throws Exception the source cannot be passed
+     * @throws PascalParseException the source cannot be parsed
      */
     @Override
-    protected CallTarget parse(ParsingRequest request) throws Exception {
+    protected CallTarget parse(ParsingRequest request) throws PascalParseException {
         Source source = request.getSource();
 
         this.currentParser.reset();
@@ -87,10 +87,10 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
         return Truffle.getRuntime().createCallTarget(this.currentParser.getRootNode());
     }
 
-    private void parseSource(Source source) throws Exception {
+    private void parseSource(Source source) throws PascalParseException {
         this.currentParser.Parse(source);
         if (this.currentParser.hadErrors()) {
-            throw new Exception("Errors while parsing source " + source.getName() + ".");
+            throw new PascalParseException(source.getName());
         }
     }
 
