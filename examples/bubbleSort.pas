@@ -1,8 +1,14 @@
+(*
+    This is a trivial program used in one of our benchmarks in the thesis. It uses bubblesort algorithm.
+    If compiled with FPC, it is better to use getTickCount from sysutils unit for time measurements because it is more
+    precise. Our implementation of getMSCount, however, uses Java's most precise time measurement function which is 
+    System.nanoTime().
+*)
 program bubbleSortBenchmark;
-uses sysutils;
+uses dos;
 
-const size = BENCH_SIZE;
-const iterations = BENCH_ITERS;
+const size = 1000;
+const iterations = 15;
 
 type arrType = array[1..size] of integer;
 
@@ -52,9 +58,9 @@ begin
     data := gen;
     (* dump(data); *)
     
-    start := getTickCount;
+    start := getMSCount;
     bubbleSort(data);
-    fini := getTickCount;
+    fini := getMSCount;
     
     blackhole := blackhole + data[1];
     

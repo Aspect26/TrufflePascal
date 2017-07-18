@@ -1,8 +1,14 @@
-program fibon;
-uses sysutils;
+(*
+    This is a trivial program used in one of our benchmarks in the thesis. It computes one number from fibonacci's sequence.
+    If compiled with FPC, it is better to use getTickCount from sysutils unit for time measurements because it is more
+    precise. Our implementation of getMSCount, however, uses Java's most precise time measurement function which is 
+    System.nanoTime().
+*)
+program fibonacciBenchmark;
+uses dos;
 
-const size = BENCH_SIZE;
-const iterations = BENCH_ITERS;
+const size = 26;
+const iterations = 10;
 
 var blackhole : integer; (* Used to prevent FPC from removing unused parts of code *)
 
@@ -16,9 +22,9 @@ function doBenchmark : int64;
 var res: integer;
     start, fini:int64;
 begin
-    start := getTickCount;
+    start := getMSCount;
     res := fibonacci(size);
-    fini := getTickCount;
+    fini := getMSCount;
     
     blackhole := blackhole + res;
     

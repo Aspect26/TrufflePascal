@@ -1,3 +1,9 @@
+(*
+    Sample AI script for our Tic Tac Toe implementation. It simply chooses the first empty cell in the play area. 
+    The program arguments are cells in the play area. If the cell's value is 0 then it is empty, if it is 1 then player
+    occupies this slot and if it is 2 then it is occupied by the AI. The script returns index of the cell it wants to
+    play (row * column, indexed from 0 to 2). 
+*)
 program tttAI(i11, i12, i13, i21, i22, i23, i31, i32, i33);
 var i11, i12, i13, i21, i22, i23, i31, i32, i33,i,j: integer;
 

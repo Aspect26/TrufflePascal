@@ -1,8 +1,14 @@
+(*
+    This is a trivial program used in one of our benchmarks in the thesis. It computes product of two matrices.
+    If compiled with FPC, it is better to use getTickCount from sysutils unit for time measurements because it is more
+    precise. Our implementation of getMSCount, however, uses Java's most precise time measurement function which is 
+    System.nanoTime().
+*)
 program matrixMultiplication;
-uses sysutils;
+uses dos;
 
- const size = BENCH_SIZE;
-const iterations = BENCH_ITERS;
+ const size = 100;
+const iterations = 10;
 
 type matrixType = array[1..size, 1..size] of integer;
 
@@ -56,9 +62,9 @@ begin
     (* dump(a);
     dump(b); *)
     
-    start := getTickCount;
+    start := getMSCount;
     result := multiply(a,b);
-    fini := getTickCount;
+    fini := getMSCount;
     
     blackhole := blackhole + result[1][1];
     
