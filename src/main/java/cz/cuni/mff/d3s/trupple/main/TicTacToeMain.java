@@ -9,8 +9,15 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Scanner;
 
+/**
+ * Implementation of Tic Tac Toe game. The opponents are a user and an AI. The AI uses a script written in Pascal, which
+ * is evaluated by Trupple interpreter.
+ */
 public class TicTacToeMain {
 
+    /**
+     * Entry point of the game.
+     */
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
             System.err.print("Expected one argument");
@@ -34,6 +41,9 @@ public class TicTacToeMain {
         }
     }
 
+    /**
+     * The class that represents the actual game.
+     */
     private static class Game {
 
         private static final int EMPTY = 0;
@@ -52,6 +62,9 @@ public class TicTacToeMain {
             initPolyglot(aiSource);
         }
 
+        /**
+         * Starts the game. Contains the main game cycle in which the opponents are switching their turns.
+         */
         void startGame() {
             print();
             while (true) {
@@ -89,6 +102,9 @@ public class TicTacToeMain {
             this.output.println("You lost! Ouch...");
         }
 
+        /**
+         * Proceeds the AI turn.
+         */
         private void aiMove() {
             this.output.println("AI's turn:");
             PolyglotEngine.Value result = this.parsedAIScript.execute(data[0][0], data[0][1], data[0][2], data[1][0],
@@ -103,6 +119,9 @@ public class TicTacToeMain {
             this.output.println("You won! Yay!");
         }
 
+        /**
+         * Proceeds the user's turn.
+         */
         private void playerMove() {
             this.output.print("Your turn. Please choose row and column (e.g. 1 2): ");
             int row = this.input.nextInt();
@@ -113,6 +132,9 @@ public class TicTacToeMain {
             }
         }
 
+        /**
+         * Print the play area to the standard input.
+         */
         private void print() {
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
@@ -126,6 +148,9 @@ public class TicTacToeMain {
             }
         }
 
+        /**
+         * Checks whether the game is finished.
+         */
         private boolean isOver() {
             for (int i = 0; i < 3; ++i) {
                 if (checkRow(i) || checkColumn(i)) {
@@ -135,6 +160,9 @@ public class TicTacToeMain {
             return (checkFirstDiagonal() || checkSecondDiagonal());
         }
 
+        /**
+         * Checks whether the play area is full.
+         */
         private boolean isFull() {
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
@@ -147,6 +175,13 @@ public class TicTacToeMain {
             return true;
         }
 
+        /**
+         * Sets new value to specified cell
+         * @param row row index (0 - 2) of the cell
+         * @param column column index (0 - 2) of the cell
+         * @param value the new value
+         * @return true if the setting was successful, false otherwise (wrong value or the cell is occupied)
+         */
         private boolean setCell(int row, int column, int value) {
             if (row < 0 || row > 2 || column < 0 || column > 2) {
                 this.output.println("Selected position is invalid!");
@@ -160,18 +195,36 @@ public class TicTacToeMain {
             return true;
         }
 
+        /**
+         * Checks whether there is a match in the selected row.
+         * @param i the row number
+         * @return true if match found, false otherwise
+         */
         private boolean checkRow(int i) {
             return data[i][0] != EMPTY && (data[i][0] == data[i][1] && data[i][1] == data[i][2]);
         }
 
+        /**
+         * Checks whether there is a match in the selected column.
+         * @param i the row number
+         * @return true if match found, false otherwise
+         */
         private boolean checkColumn(int i) {
             return data[0][i] != EMPTY && (data[0][i] == data[1][i] && data[1][i] == data[2][i]);
         }
 
+        /**
+         * Checks whether there is a match in the left-right diagonal.
+         * @return true if match found, false otherwise
+         */
         private boolean checkFirstDiagonal() {
             return data[0][0] != EMPTY && (data[0][0] == data[1][1] && data[1][1] == data[2][2]);
         }
 
+        /**
+         * Checks whether there is a match in the right-left diagonal.
+         * @return true if match found, false otherwise
+         */
         private boolean checkSecondDiagonal() {
             return data[2][0] != EMPTY && (data[2][0] == data[1][1] && data[1][1] == data[0][2]);
         }

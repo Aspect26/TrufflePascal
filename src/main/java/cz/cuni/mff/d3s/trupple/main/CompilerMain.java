@@ -6,7 +6,6 @@ import java.io.OutputStream;
 
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.vm.PolyglotEngine;
-import cz.cuni.mff.d3s.trupple.main.exceptions.CompilerException;
 import cz.cuni.mff.d3s.trupple.main.exceptions.WrongOptionsException;
 import cz.cuni.mff.d3s.trupple.main.settings.Settings;
 import org.kohsuke.args4j.CmdLineException;
@@ -14,10 +13,16 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import cz.cuni.mff.d3s.trupple.language.PascalLanguage;
 
+/**
+ * Entry point class for the Trupple interpreter.
+ */
 public class CompilerMain {
 
 	private static Settings settings;
 
+    /**
+     * Interpreter entry point.
+     */
 	public static void main(String[] args) {
         try {
             settings = parseArguments(args);
@@ -44,7 +49,7 @@ public class CompilerMain {
         engine.dispose();
     }
 
-	private static Settings parseArguments(String[] args) throws CompilerException {
+	private static Settings parseArguments(String[] args) throws WrongOptionsException {
 		Settings settings = new Settings();
 		CmdLineParser argumentsParser = new CmdLineParser(settings);
 
