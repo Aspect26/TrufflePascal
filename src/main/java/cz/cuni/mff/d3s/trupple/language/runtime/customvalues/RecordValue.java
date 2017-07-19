@@ -7,12 +7,22 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.PascalRuntimeExceptio
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import java.util.Map;
 
+/**
+ * Representation of record-type variables. It contains its own frame where its content is stored and a descriptor of
+ * its own type.
+ */
 @CompilerDirectives.ValueType
 public class RecordValue {
 
     private final VirtualFrame frame;
     private final FrameDescriptor frameDescriptor;
 
+    /**
+     * The default c'tor.
+     * @param frameDescriptor frame descriptor from which the record's frame will be created
+     * @param types map of the record's identifiers and their types
+     */
+    // TODO: can't the frame descriptor be created from the second argument?
     public RecordValue(FrameDescriptor frameDescriptor, Map<String, TypeDescriptor> types) {
         this(frameDescriptor);
         this.initValues(frameDescriptor, types);
@@ -67,6 +77,9 @@ public class RecordValue {
         return this.frame;
     }
 
+    /**
+     * Creates a deep copy of the record.
+     */
     public RecordValue getCopy() {
         RecordValue copy = new RecordValue(this.frameDescriptor);
         for (FrameSlot slot : this.frameDescriptor.getSlots()) {

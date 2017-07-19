@@ -12,7 +12,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
  * and {@link cz.cuni.mff.d3s.trupple.language.nodes.builtin.io.ReadBuiltinNode} because these subroutine have variable
  * number of arguments.
  *
- * {@see ReadArgumentNode}
+ * {@link ReadArgumentNode}
  */
 public class ReadAllArgumentsNode extends ExpressionNode {
 

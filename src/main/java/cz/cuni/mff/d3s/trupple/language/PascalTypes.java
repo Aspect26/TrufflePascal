@@ -7,6 +7,9 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.*;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalArray;
 
+/**
+ * The type system of our interpreter. It specifies which variable types we will be using and implicit casts.
+ */
 @TypeSystem({ int.class, long.class, boolean.class, char.class, double.class, PascalSubroutine.class, PascalString.class,
         EnumValue.class, PascalArray.class, Reference.class, PointerValue.class, SetTypeValue.class, FileValue.class, })
 public class PascalTypes {

@@ -7,14 +7,25 @@ import com.oracle.truffle.api.interop.Message;
 import com.oracle.truffle.api.interop.TruffleObject;
 import com.oracle.truffle.api.nodes.RootNode;
 
+/**
+ * Initial evaluation of a Pascal source returns an instance of this class. It implements {@link TruffleObject} so it
+ * can be used inside other Truffle-based languages. Our implementation also allows execution of these instances which
+ * results in executing the main block of the interpreted Pascal source.
+ */
 public class MainFunctionObject implements TruffleObject {
 
+    /**
+     * The root node of the main block of the interpreted Pascal source.
+     */
     private final RootNode rootNode;
 
     public MainFunctionObject(RootNode rootNode) {
         this.rootNode = rootNode;
     }
 
+    /**
+     * Returns a {@link ForeignAccess} object that is executable outside our language.
+     */
     @Override
     public ForeignAccess getForeignAccess() {
         ForeignAccess.Factory26 factory = new ForeignAccess.Factory26() {

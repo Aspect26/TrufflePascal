@@ -19,7 +19,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.*;
 public abstract class ExpressionNode extends StatementNode {
 
     /**
-     * Gets type of the expression. This method is mainly used for compile time type checking.
+     * Returns type of the expression. This method is mainly used for compile time type checking.
      */
     public abstract TypeDescriptor getType();
 

@@ -24,7 +24,7 @@ import java.util.Scanner;
 public class PascalLanguage extends TruffleLanguage<PascalState> {
 
     /**
-     * NOTE: required by Truffle, if it is missing it won't compile
+     * Required by Truffle. If it is missing, it won't compile
      */
     public static final PascalLanguage INSTANCE = new PascalLanguage();
 
@@ -43,6 +43,11 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
         this.reset(false, false);
     }
 
+    /**
+     * Resets the language settings with provided values.
+     * @param tpExtension flag to use supported Turbo Pascal extensions
+     * @param extendedGoto flag to use extended goto support
+     */
     public void reset(boolean tpExtension, boolean extendedGoto) {
         this.currentParser = (tpExtension)? this.turboParser : this.wirthParser;
         this.currentParser.setExtendedGoto(extendedGoto);
@@ -94,6 +99,9 @@ public class PascalLanguage extends TruffleLanguage<PascalState> {
         }
     }
 
+    /**
+     * Resets the random seed.
+     */
     public void randomize() {
         random = new Random();
     }

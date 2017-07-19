@@ -5,6 +5,9 @@ import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.*;
 import java.io.*;
 import java.io.FileNotFoundException;
 
+/**
+ * Representation of a file type value of generic inner type.
+ */
 public class ObjectFileValue implements FileValue {
 
     private PushbackInputStream pushbackInput;
