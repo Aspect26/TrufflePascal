@@ -43,9 +43,20 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.Function
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ReturnTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.utils.*;
 
+/**
+ * Factory for our nodes. The Parses use it to create nodes for currently parsed rules. It also contains current state
+ * and identifiers table.
+ */
 public class NodeFactory {
 
+    /**
+     * Lambda interface used in {@link NodeFactory#doLookup(String, GlobalObjectLookup, boolean)} function. The function
+     * looks up specified identifier and calls {@link GlobalObjectLookup#onFound(LexicalScope, String)} function  with
+     * the found identifier and lexical sccope in which it was found.
+     * @param <T>
+     */
     private interface GlobalObjectLookup<T> {
 
         T onFound(LexicalScope foundInScope, String foundIdentifier) throws LexicalException;
@@ -101,11 +112,19 @@ public class NodeFactory {
 		this.currentLexicalScope.setName(this.getIdentifierFromToken(identifierToken));
 	}
 
+    /**
+     * Sets the list of identifiers of program arguments.
+     */
 	public void setMainProgramArguments(List<String> argumentIdentifiers) {
 	    assert currentLexicalScope.getOuterScope() == null;
 	    this.mainProgramArgumentsIdentifiers = argumentIdentifiers;
     }
 
+    /**
+     * Called when the <i>uses statement</i> is parsed in a Pascal source file. It registers the specified unit to the
+     * current scope.
+     * @param unitIdentifierToken identifier of the unit
+     */
     public void registerUnit(Token unitIdentifierToken) {
         String unitIdentifier = this.getIdentifierFromToken(unitIdentifierToken);
         if (this.builtinUnits.containsKey(unitIdentifier)) {
@@ -141,6 +160,18 @@ public class NodeFactory {
 	    return PascalLanguage.INSTANCE.isUnitRegistered(identifier);
     }
 
+    /**
+     * Looks up the specified identifier (in current scope and its parent scope up to the topmost scope. If the
+     * identifier is found it calls the {@link GlobalObjectLookup#onFound(LexicalScope, String)} function with the found
+     * identifier and lexical scope in which it was found as arguments.
+     * It firstly looks ups to the topmost lexical scope and if the identifier is not found then it looks up in the unit
+     * scopes.
+     * @param identifier identifier to be looked up
+     * @param lookupFunction the function to be called when the identifier is found
+     * @param withReturnType flag whether to also lookup for functions' return variable which are write-only
+     * @param <T> type of the returned object
+     * @return the value return from the {@link GlobalObjectLookup#onFound(LexicalScope, String)} function
+     */
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction, boolean withReturnType) {
 	    try {
             T result = lookupToParentScope(this.currentLexicalScope, identifier, lookupFunction, withReturnType, false);
@@ -157,10 +188,22 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Overload of {@link NodeFactory#doLookup(String, GlobalObjectLookup, boolean)}.
+     */
     private <T> T doLookup(String identifier, GlobalObjectLookup<T> lookupFunction) {
 	    return this.doLookup(identifier, lookupFunction, false);
     }
 
+    /**
+     * Helper function for {@link NodeFactory#doLookup(String, GlobalObjectLookup, boolean)}. Does the looking up to the
+     * topmost lexical scope.
+     * @param scope scope to begin the lookup in
+     * @param identifier the identifier to lookup
+     * @param lookupFunction function that is called when the identifier is found
+     * @param <T> type of the returned object
+     * @return the value return from the {@link GlobalObjectLookup#onFound(LexicalScope, String)} function
+     */
     private <T> T lookupToParentScope(LexicalScope scope, String identifier, GlobalObjectLookup<T> lookupFunction,
                                       boolean withReturnType, boolean onlyPublic) throws LexicalException {
         while (scope != null) {
@@ -177,6 +220,14 @@ public class NodeFactory {
         return null;
     }
 
+    /**
+     * Helper function for {@link NodeFactory#doLookup(String, GlobalObjectLookup, boolean)}. Does the looking up in the
+     * units.
+     * @param identifier the identifier to lookup
+     * @param lookupFunction function that is called when the identifier is found
+     * @param <T> type of the returned object
+     * @return the value return from the {@link GlobalObjectLookup#onFound(LexicalScope, String)} function
+     */
     private <T> T lookupInUnits(String identifier, GlobalObjectLookup<T> lookupFunction) throws LexicalException {
         T result = null;
 
@@ -195,6 +246,9 @@ public class NodeFactory {
         return this.doLookup(identifier, LexicalScope::getTypeDescriptor);
     }
 
+    /**
+     * Registers new variables to the current lexical scope with the specified identifiers and their type.
+     */
     public void registerVariables(List<String> identifiers, TypeDescriptor typeDescriptor) {
         for (String identifier : identifiers) {
             try {
@@ -395,6 +449,9 @@ public class NodeFactory {
     public void startMainFunction() {
     }
 
+    /**
+     * Forward declaration of a procedure with specified heading.
+     */
     public void forwardProcedure(ProcedureHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
         try {
@@ -404,6 +461,9 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Forward declaration of a function with specified heading.
+     */
     public void forwardFunction(FunctionHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
 
@@ -414,6 +474,10 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Checks whether the specified identifier is identifier of a return variable of any function visible from the
+     * current lexical scope.
+     */
     public boolean isReturnVariable(Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    TypeDescriptor typeDescriptor = this.doLookup(identifier, LexicalScope::getIdentifierDescriptor, true);
@@ -421,6 +485,11 @@ public class NodeFactory {
 	    return typeDescriptor instanceof ReturnTypeDescriptor;
     }
 
+    /**
+     * Changes the current state to the beginning of an implementation of a new procedure. It creates new child scope
+     * to the current scope and and sets it as the current scope.
+     * @param heading heading of the new procedure
+     */
     public void startProcedureImplementation(ProcedureHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
         try {
@@ -433,7 +502,12 @@ public class NodeFactory {
         }
 	}
 
-    public void startFunctionImplementation(FunctionHeading heading) {
+    /**
+     * Changes the current state to the beginning of an implementation of a new function. It creates new child scope
+     * to the current scope and and sets it as the current scope.
+     * @param heading heading of the new function
+     */
+	public void startFunctionImplementation(FunctionHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
 
         try {
@@ -447,15 +521,26 @@ public class NodeFactory {
         }
     }
 
-    public List<FormalParameter> createFormalParametersList(List<String> identifiers, Token typeDescriptor, boolean isOutput) {
+    /**
+     * Creates list of {@link FormalParameter}s from specified identifiers and their type.
+     * @param identifiers the identifiers
+     * @param typeDescriptor type of all the identifiers
+     * @param isReference flag whether the arguments are reference-passed
+     * @return the newly created list
+     */
+    public List<FormalParameter> createFormalParametersList(List<String> identifiers, Token typeDescriptor, boolean isReference) {
         List<FormalParameter> paramList = new ArrayList<>();
         for (String identifier : identifiers) {
-            paramList.add(new FormalParameter(identifier, this.getTypeDescriptor(typeDescriptor), isOutput));
+            paramList.add(new FormalParameter(identifier, this.getTypeDescriptor(typeDescriptor), isReference));
         }
 
         return paramList;
     }
 
+    /**
+     * Creates a {@link FormalParameter} whose type is a procedure with specified signature.
+     * @param heading the procedure's signature
+     */
     public FormalParameter createProcedureFormalParameter(ProcedureHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
         ProcedureDescriptor descriptor = new ProcedureDescriptor(heading.formalParameters);
@@ -463,6 +548,10 @@ public class NodeFactory {
         return new FormalParameter(identifier, descriptor, false, heading.descriptor);
     }
 
+    /**
+     * Creates a {@link FormalParameter} whose type is a function with specified signature.
+     * @param heading the function's signature
+     */
     public FormalParameter createFunctionFormalParameter(FunctionHeading heading) {
         String identifier = this.getIdentifierFromToken(heading.identifierToken);
         FunctionDescriptor descriptor = new FunctionDescriptor(heading.formalParameters, heading.returnTypeDescriptor);
@@ -470,6 +559,11 @@ public class NodeFactory {
         return new FormalParameter(identifier, descriptor, false, heading.descriptor);
     }
 
+    /**
+     * Changes current state after parsing of some procedure is finished. It finishes the procedure's AST and changes
+     * current lexical scope to the parent of current lexical scope.
+     * @param bodyNode body node of the parsed procedure
+     */
     public void finishProcedureImplementation(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final ProcedureBodyNode procedureBodyNode = new ProcedureBodyNode(subroutineNode);
@@ -477,6 +571,11 @@ public class NodeFactory {
         finishSubroutine(rootNode);
     }
 
+    /**
+     * Changes current state after parsing of some function is finished. It finishes the function's AST and changes
+     * current lexical scope to the parent of current lexical scope.
+     * @param bodyNode body node of the parsed function
+     */
     public void finishFunctionImplementation(StatementNode bodyNode) {
         StatementNode subroutineNode = createSubroutineNode(bodyNode);
         final FunctionBodyNode functionBodyNode = FunctionBodyNodeGen.create(
@@ -487,6 +586,18 @@ public class NodeFactory {
         finishSubroutine(rootNode);
     }
 
+    private StatementNode createSubroutineNode(StatementNode bodyNode) {
+        List<StatementNode> subroutineNodes = new ArrayList<>();
+
+        subroutineNodes.add(currentLexicalScope.createInitializationBlock());
+        subroutineNodes.add(bodyNode);
+
+        return new BlockNode(subroutineNodes.toArray(new StatementNode[subroutineNodes.size()]));
+    }
+
+    /**
+     * Changes current state by increasing current loop depth.
+     */
     public void startLoop() {
         currentLexicalScope.increaseLoopDepth();
     }
@@ -500,6 +611,15 @@ public class NodeFactory {
 	    return new LabeledStatement(statement, labelIdentifier);
     }
 
+    /**
+     * Creates {@link ForNode} node with the specified parameters.
+     * @param ascending flag whether the loop is ascending or descending (<i>to</i> or <i>downto</i> in Pascal source)
+     * @param variableToken token of the control variable
+     * @param startValue initial value of the control value
+     * @param finalValue final value of the control value
+     * @param loopBody loop's body node
+     * @return the newly created node
+     */
     public StatementNode createForLoop(boolean ascending, Token variableToken, ExpressionNode startValue, ExpressionNode finalValue, StatementNode loopBody) {
         String iteratingIdentifier = this.getIdentifierFromToken(variableToken);
         FrameSlot controlSlot = this.doLookup(iteratingIdentifier, LexicalScope::getLocalSlot);
@@ -514,6 +634,12 @@ public class NodeFactory {
         return new ForNode(ascending, initialAssignment, controlSlot, finalValue, readControlVariableNode, loopBody);
     }
 
+    /**
+     * Creates {@link RepeatNode} node with the specified parameters.
+     * @param condition the loop's condition node
+     * @param loopBody loop's body node
+     * @return the newly created node
+     */
     public StatementNode createRepeatLoop(ExpressionNode condition, StatementNode loopBody) {
         if (!(condition.getType() == BooleanDescriptor.getInstance())) {
             parser.SemErr("Unless condition must be a boolean value");
@@ -521,6 +647,12 @@ public class NodeFactory {
         return new RepeatNode(condition, loopBody);
     }
 
+    /**
+     * Creates {@link WhileNode} node with the specified parameters.
+     * @param condition the loop's condition node
+     * @param loopBody loop's body node
+     * @return the newly created node
+     */
     public StatementNode createWhileLoop(ExpressionNode condition, StatementNode loopBody) {
         if (!(condition.getType() == BooleanDescriptor.getInstance())) {
             parser.SemErr("While condition must be a boolean value");
@@ -528,6 +660,9 @@ public class NodeFactory {
         return new WhileNode(condition, loopBody);
     }
 
+    /**
+     * Creates {@link BreakNodeTP}
+     */
     public StatementNode createBreak() {
         if (!currentLexicalScope.isInLoop()) {
             parser.SemErr("Break outside a loop: ");
@@ -535,6 +670,9 @@ public class NodeFactory {
         return new BreakNodeTP();
     }
 
+    /**
+     * Changes the current state by decreasing current loop depth.
+     */
     public void finishLoop() {
         try {
             currentLexicalScope.decreaseLoopDepth();
@@ -543,6 +681,13 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Creates {@link IfNode} with specified parameters.
+     * @param condition the condition node
+     * @param thenNode the node that is executed if the condition is true
+     * @param elseNode the node that is executed if the condition is false
+     * @return the newly created node
+     */
     public StatementNode createIfStatement(ExpressionNode condition, StatementNode thenNode, StatementNode elseNode) {
         if (!(condition.getType() == BooleanDescriptor.getInstance())) {
             parser.SemErr("If condition must be a boolean value");
@@ -550,6 +695,12 @@ public class NodeFactory {
 	    return new IfNode(condition, thenNode, elseNode);
     }
 
+    /**
+     * Changes current state by stepping inside lexical scope of specified records (used for <i>with statement</i>).
+      * @param recordIdentifiers identifiers of the records into which current lexical scope will submerge (in the order
+     *                          from the first element of the list to the last)
+     * @return list of slots (to frame descriptors) of records into which the current lexical scope submerged
+     */
     public List<FrameSlot> stepIntoRecordsScope(List<String> recordIdentifiers) {
 	    LexicalScope currentScope = this.currentLexicalScope;
         List<FrameSlot> recordsSlots = new ArrayList<>();
@@ -582,10 +733,21 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Creates a {@link WithNode} node.
+     * @param frameSlots slots of records into which the node will submerge at runtime.
+     * @param innerStatement statement which will be executed inside the with statement
+     * @return the newly created node
+     */
     public WithNode createWithStatement(List<FrameSlot> frameSlots, StatementNode innerStatement) {
 	    return new WithNode(frameSlots, innerStatement);
     }
 
+    /**
+     * Creates a {@link CaseNode} from the specified data.
+     * @param data data of the case statement
+     * @return the newly created node
+     */
     public CaseNode createCaseStatement(CaseStatementData data) {
         ExpressionNode[] indexes = data.indexNodes.toArray(new ExpressionNode[data.indexNodes.size()]);
         StatementNode[] statements = data.statementNodes.toArray(new StatementNode[data.statementNodes.size()]);
@@ -593,19 +755,33 @@ public class NodeFactory {
         return new CaseNode(data.caseExpression, indexes, statements, data.elseNode);
     }
 
+    /**
+     * Creates a {@link GotoNode} with jump to the specified label.
+     * @param labelToken token of the label to which the goto will jump
+     * @return the newly created node
+     */
     public StatementNode createGotoStatement(Token labelToken) {
 	    String labelIdentifier = this.getIdentifierFromToken(labelToken);
 	    return new GotoNode(labelIdentifier);
     }
 
+    /**
+     * Creates {@link NopNode}.
+     */
     public StatementNode createNopStatement() {
         return new NopNode();
     }
 
-    public ExpressionNode createBinaryExpression(Token operatorToken, ExpressionNode leftNode, ExpressionNode rightNode) {
-        String operator = operatorToken.val.toLowerCase();
+    /**
+     * Creates {@link BinaryExpressionNode} from the specified operator and operands.
+     * @param operator operator of the operation
+     * @param leftNode left operand's node
+     * @param rightNode right operand's node
+     * @return the newly created node
+     */
+    public ExpressionNode createBinaryExpression(String operator, ExpressionNode leftNode, ExpressionNode rightNode) {
         ExpressionNode resultExpression;
-	    switch (operator) {
+	    switch (operator.toLowerCase()) {
 
             // arithmetic
             case "+":
@@ -654,6 +830,12 @@ public class NodeFactory {
         return this.verifyOperandArguments(resultExpression, operator);
     }
 
+    /**
+     * Creates {@link UnaryNode} from the specified operator and operand.
+     * @param operator operator of the operation
+     * @param son operand's node
+     * @return the newly created node
+     */
     public ExpressionNode createUnaryExpression(Token operator, ExpressionNode son) {
         switch (operator.val) {
             case "+":
@@ -668,6 +850,12 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Creates an assignment node from the received data and the assigned value's node.
+     * @param assignmentData data of the assignment
+     * @param valueNode value's node
+     * @return the newly created node
+     */
     public StatementNode finishAssignmentNode(AssignmentData assignmentData, ExpressionNode valueNode) {
         switch (assignmentData.type) {
             case Simple:
@@ -683,6 +871,12 @@ public class NodeFactory {
         throw new UnexpectedRuntimeException();
     }
 
+    /**
+     * Creates assignment node for assignment to a variable ({@link AssignReferenceNode} or {@link SimpleAssignmentNode}).
+     * @param identifierToken identifier of the target variable
+     * @param valueNode assigning value's node
+     * @return the newly created node
+     */
     public StatementNode createSimpleAssignment(Token identifierToken, ExpressionNode valueNode) {
         String variableIdentifier = this.getIdentifierFromToken(identifierToken);
         FrameSlot frameSlot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot, true);
@@ -692,6 +886,13 @@ public class NodeFactory {
         return (targetType instanceof ReferenceDescriptor)? AssignReferenceNodeGen.create(valueNode, frameSlot) : SimpleAssignmentNodeGen.create(valueNode, frameSlot);
     }
 
+    /**
+     * Creates {@link AssignToArrayNode} for assignment to an array at specified index
+     * @param arrayExpression expression node which returns the target array
+     * @param indexExpressionNode expression node returning the index
+     * @param valueNode assigning value's node
+     * @return the newly created node
+     */
     private StatementNode createAssignmentToArray(ExpressionNode arrayExpression, ExpressionNode indexExpressionNode, ExpressionNode valueNode) {
 	    TypeDescriptor expressionType = getActualType(arrayExpression.getType());
 	    int arrayOffset = 0;
@@ -705,6 +906,12 @@ public class NodeFactory {
         return AssignToArrayNodeGen.create(arrayExpression, indexNode, valueNode);
     }
 
+    /**
+     * Creates {@link AssignToDereferenceNode} for assignment to dereferenced array
+     * @param pointerExpression expression node which returns the pointer
+     * @param valueNode assigning value's node
+     * @return the newly created node
+     */
     private StatementNode createAssignmentToDereference(ExpressionNode pointerExpression, ExpressionNode valueNode) {
         TypeDescriptor expressionType = getActualType(pointerExpression.getType());
 	    if (!(expressionType instanceof PointerDescriptor)) {
@@ -715,6 +922,13 @@ public class NodeFactory {
         return AssignToDereferenceNodeGen.create(pointerExpression, valueNode);
     }
 
+    /**
+     * Creates {@link AssignToRecordField} node for assignment to variable inside a record
+     * @param recordExpression expression node which returns the record
+     * @param identifierToken token of the target record's variable
+     * @param valueNode assigning value's node
+     * @return the newly created node
+     */
     private StatementNode createAssignmentToRecordField(ExpressionNode recordExpression, Token identifierToken, ExpressionNode valueNode) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         TypeDescriptor expressionType = getActualType(recordExpression.getType());
@@ -724,6 +938,11 @@ public class NodeFactory {
         return AssignToRecordFieldNodeGen.create(identifier, recordExpression, valueNode);
     }
 
+    /**
+     * Creates an {@link ExpressionNode} from an identifier (can be variable read or parameterless function call)
+     * @param identifierToken the identifier
+     * @return the newly created node
+     */
     public ExpressionNode createExpressionFromSingleIdentifier(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
@@ -738,7 +957,12 @@ public class NodeFactory {
         });
     }
 
-    ExpressionNode createReadVariableNode(Token identifierToken) {
+    /**
+     * Creates node that read value from specified variable.
+     * @param identifierToken identifier token of the variable
+     * @return the newly created node
+     */
+    public ExpressionNode createReadVariableNode(Token identifierToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    return this.doLookup(identifier, (LexicalScope foundInScope, String foundIdentifier) ->
 	        createReadVariableFromScope(foundIdentifier, foundInScope)
@@ -767,6 +991,12 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Creates {@link ReadFromArrayNode} that reads value from specified array at specified index.
+     * @param arrayExpression node that returns the array
+     * @param indexes nodes of the indexes at which the array will be read
+     * @return the newly created node
+     */
     public ExpressionNode createReadFromArrayNode(ExpressionNode arrayExpression, List<ExpressionNode> indexes) {
 	    ExpressionNode readArrayNode = arrayExpression;
 	    for (ExpressionNode index : indexes) {
@@ -782,6 +1012,11 @@ public class NodeFactory {
         return readArrayNode;
     }
 
+    /**
+     * Creates {@link ReadDereferenceNode} that reads value to which specified pointer points to.
+     * @param pointerExpression node that returns the pointer
+     * @return the newly created node
+     */
     public ReadDereferenceNode createReadDereferenceNode(ExpressionNode pointerExpression) {
         PointerDescriptor pointerDescriptor = null;
         TypeDescriptor actualType = this.getActualType(pointerExpression.getType());
@@ -796,6 +1031,12 @@ public class NodeFactory {
         return ReadDereferenceNodeGen.create(pointerExpression, returnType);
     }
 
+    /**
+     * Creates {@link ReadFromRecordNode} that reads value of specified variable from specified record.
+     * @param recordExpression node that returns the record
+     * @param identifierToken identifier of the variable to be read
+     * @return tje newly created node
+     */
     public ReadFromRecordNode createReadFromRecordNode(ExpressionNode recordExpression, Token identifierToken) {
         TypeDescriptor descriptor = this.getActualType(recordExpression.getType());
         String identifier = this.getIdentifierFromToken(identifierToken);
@@ -815,18 +1056,34 @@ public class NodeFactory {
         return ReadFromRecordNodeGen.create(recordExpression, returnType, identifier);
     }
 
+    /**
+     * Check whether formal parameter of specified subroutine at specified index is reference-passed.
+     * @param subroutineToken identifier of the subroutine
+     * @param parameterIndex index of the parameter
+     */
     public boolean shouldBeReference(Token subroutineToken, int parameterIndex) {
         String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
         return this.doLookup(subroutineIdentifier,
                 (LexicalScope foundInScope, String foundIdentifier) -> foundInScope.isReferenceParameter(foundIdentifier, parameterIndex));
     }
 
+    /**
+     * Check whether formal parameter of specified subroutine at specified index is subroutine-type.
+     * @param subroutineToken identifier of the subroutine
+     * @param parameterIndex index of the parameter
+     */
     public boolean shouldBeSubroutine(Token subroutineToken, int parameterIndex) {
         String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
         return this.doLookup(subroutineIdentifier,
                 (LexicalScope foundInScope, String foundIdentifier) -> foundInScope.isSubroutineParameter(foundIdentifier, parameterIndex));
     }
 
+    /**
+     * Creates {@link InvokeNode} for call statement with specified parameters.
+     * @param identifierToken identifier of the called subroutine
+     * @param params argument expression nodes
+     * @return the newly created node
+     */
     public ExpressionNode createSubroutineCall(Token identifierToken, List<ExpressionNode> params) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
@@ -854,24 +1111,39 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Creates {@link StoreReferenceArgumentNode} for the specified variable.
+     * @param variableToken identifier of the variable
+     * @return the newly created node
+     */
     public ExpressionNode createReferencePassNode(Token variableToken) {
         String variableIdentifier = this.getIdentifierFromToken(variableToken);
         FrameSlot slot = this.doLookup(variableIdentifier, LexicalScope::getLocalSlot);
         return new StoreReferenceArgumentNode(slot, currentLexicalScope.getIdentifierDescriptor(variableIdentifier));
     }
 
-    public ExpressionNode createSubroutineParameterPassNode(Token variableToken) {
-        String variableIdentifier = this.getIdentifierFromToken(variableToken);
-        PascalSubroutine function = this.doLookup(variableIdentifier, LexicalScope::getSubroutine);
-        TypeDescriptor descriptor = this.doLookup(variableIdentifier, LexicalScope::getIdentifierDescriptor);
+    /**
+     * Creates {@link SubroutineLiteralNode} for the specified subroutine.
+     * @param subroutineToken identifier of the subroutine
+     * @return the newly created node
+     */
+    public ExpressionNode createSubroutineParameterPassNode(Token subroutineToken) {
+        String subroutineIdentifier = this.getIdentifierFromToken(subroutineToken);
+        PascalSubroutine subroutine = this.doLookup(subroutineIdentifier, LexicalScope::getSubroutine);
+        TypeDescriptor descriptor = this.doLookup(subroutineIdentifier, LexicalScope::getIdentifierDescriptor);
 
-        return SubroutineLiteralNodeGen.create(function, (SubroutineDescriptor) descriptor);
+        return SubroutineLiteralNodeGen.create(subroutine, (SubroutineDescriptor) descriptor);
     }
 
     public ExpressionNode createLogicLiteralNode(boolean value) {
         return LogicLiteralNodeGen.create(value);
     }
 
+    /**
+     * Creates {@link SetConstructorNode} for the specified values.
+     * @param valueNodes nodes of the values
+     * @return the newly created node
+     */
     public ExpressionNode createSetConstructorNode(List<ExpressionNode> valueNodes) {
 	    if (valueNodes.size() > 0) {
 	        TypeDescriptor valuesType = valueNodes.get(0).getType();
@@ -901,6 +1173,9 @@ public class NodeFactory {
         return (literal.length() == 1) ? CharLiteralNodeGen.create(literal.charAt(0)) : StringLiteralNodeGen.create(literal);
     }
 
+    /**
+     * Creates {@link BlockNode} from the specified list of {@link StatementNode}s.
+     */
     public StatementNode createBlockNode(List<StatementNode> bodyNodes, boolean useExtendedVersion) {
         return (useExtendedVersion)?
                 new ExtendedBlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]))
@@ -908,6 +1183,11 @@ public class NodeFactory {
                 new BlockNode(bodyNodes.toArray(new StatementNode[bodyNodes.size()]));
     }
 
+    /**
+     * Changes the current state after finishing parsing of the source's main block.
+     * @param blockNode block node of the body
+     * @return the newly created root node
+     */
     public PascalRootNode finishMainFunction(StatementNode blockNode) {
         this.addUnitInitializationNodes();
 	    this.addProgramArgumentsAssignmentNodes();
@@ -921,6 +1201,9 @@ public class NodeFactory {
 	    return new ProcedurePascalRootNode(currentLexicalScope.getFrameDescriptor(), this.currentLexicalScope.createInitializationBlock());
     }
 
+    /**
+     * Creates assignment nodes for assigning program argument values to program argument variable.
+     */
     private void addProgramArgumentsAssignmentNodes() {
 	    int currentArgument = 0;
 	    for (String argumentIdentifier : this.mainProgramArgumentsIdentifiers) {
@@ -938,6 +1221,9 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Add initialization nodes of each registered unit to list of initialization nodes of the current scope.
+     */
     private void addUnitInitializationNodes() {
         for (LexicalScope unitScope : this.units) {
             this.currentLexicalScope.addScopeInitializationNode(unitScope.createInitializationBlock());
@@ -955,15 +1241,11 @@ public class NodeFactory {
         return typeNameToken.val.toLowerCase();
     }
 
-    private StatementNode createSubroutineNode(StatementNode bodyNode) {
-        List<StatementNode> subroutineNodes = new ArrayList<>();
-
-        subroutineNodes.add(currentLexicalScope.createInitializationBlock());
-        subroutineNodes.add(bodyNode);
-
-        return new BlockNode(subroutineNodes.toArray(new StatementNode[subroutineNodes.size()]));
-    }
-
+    /**
+     * Add nodes that assign passed value to current subroutine to their corresponding argument variables to the current
+     * scope's list of initialization nodes. The values are read from the frame's arguments at the runtime.
+     * @param parameters the formal parameters
+     */
     private void addParameterIdentifiersToLexicalScope(List<FormalParameter> parameters) {
         try {
             int count = 0;
@@ -991,6 +1273,12 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Creates {@link SimpleAssignmentNode} for the specified variable and value.
+     * @param targetIdentifier the variable's identifier
+     * @param valueNode assigning value's node
+     * @return the newly created node
+     */
     private SimpleAssignmentNode createAssignmentNode(String targetIdentifier, ExpressionNode valueNode) {
         TypeDescriptor targetType = this.doLookup(targetIdentifier, LexicalScope::getIdentifierDescriptor);
         this.checkTypesAreCompatible(valueNode.getType(), targetType);
@@ -999,6 +1287,9 @@ public class NodeFactory {
 	    return SimpleAssignmentNodeGen.create(valueNode, targetSlot);
     }
 
+    /**
+     * Checks whether the two types are compatible. The operation is not symmetric.
+     */
     private boolean checkTypesAreCompatible(TypeDescriptor leftType, TypeDescriptor rightType) {
         if ((leftType != rightType) && !leftType.convertibleTo(rightType)) {
             if ((rightType instanceof FunctionDescriptor) && !this.checkTypesAreCompatible(leftType, ((FunctionDescriptor) rightType).getReturnDescriptor())) {
@@ -1048,10 +1339,16 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Checks whether the specified (record's variant's) case selector constants are valid for the given ordinal. The
+     * must contain each value specified by the ordinal and no other.
+     * @param ordinal the ordinal
+     * @param constants the selector constants
+     */
     public void assertLegalsCaseValues(OrdinalDescriptor ordinal, List<ConstantDescriptor> constants) {
 	    if (!this.usingTPExtension) {
             if (ordinal.getSize() != constants.size()) {
-                parser.SemErr("Constants list of variant part of record type must contain all values of varant's selector type");
+                parser.SemErr("Constants list of variant part of record type must contain all values of variant's selector type");
                 return;
             }
         }
@@ -1092,10 +1389,16 @@ public class NodeFactory {
         return identifierToken.val.toLowerCase();
     }
 
+    /**
+     * Gets the current lexical scope.
+     */
     public LexicalScope getScope() {
 	    return this.currentLexicalScope;
     }
 
+    /**
+     * Sets new current lexical scope.
+     */
     public void setScope(LexicalScope scope) {
 	    this.currentLexicalScope = scope;
     }
@@ -1110,9 +1413,10 @@ public class NodeFactory {
     }
 
 
-    // ***************************************************
-    // UNIT PART
-    // ***************************************************
+    /**
+     * Changes the current state to represent start of parsing a unit with specified identifier.
+     * @param identifierToken the unit's identifier
+     */
     public void startUnit(Token identifierToken) {
         String identifier = this.getIdentifierFromToken(identifierToken);
 
@@ -1127,6 +1431,11 @@ public class NodeFactory {
         this.units.add(unitScope);
     }
 
+    /**
+     * Add new procedure to the currently parsed unit's lexical scope.
+     * @param identifierToken identifier ot the procedure
+     * @param formalParameters formal parameters of the procedure
+     */
     public void addUnitProcedureInterface(Token identifierToken, List<FormalParameter> formalParameters) {
         String identifier = this.getIdentifierFromToken(identifierToken);
         try {
@@ -1136,6 +1445,11 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Add new function to the currently parsed unit's lexical scope.
+     * @param identifierToken identifier ot the function
+     * @param formalParameters formal parameters of the function
+     */
     public void addUnitFunctionInterface(Token identifierToken, List<FormalParameter> formalParameters, Token returnTypeToken) {
 	    String identifier = this.getIdentifierFromToken(identifierToken);
 	    TypeDescriptor returnTypeDescriptor = this.getTypeDescriptor(returnTypeToken);
@@ -1147,10 +1461,18 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Changes the current state to represent that the parser finished parsing of current unit's interface part.
+     */
     public void finishUnitInterfaceSection() {
         ((UnitLexicalScope) this.currentLexicalScope).markAllIdentifiersPublic();
     }
 
+    /**
+     * Changes the current state to represent that tha parser started parsing implementation of a procedure of currently
+     * parsed unit.
+     * @param heading signature of the procedure
+     */
     public void startUnitProcedureImplementation(ProcedureHeading heading) {
 	    String identifier = this.getIdentifierFromToken(heading.identifierToken);
         try {
@@ -1166,6 +1488,11 @@ public class NodeFactory {
         }
     }
 
+    /**
+     * Changes the current state to represent that tha parser started parsing implementation of a function of currently
+     * parsed unit.
+     * @param heading signature of the function
+     */
     public void startUnitFunctionImplementation(FunctionHeading heading) {
 	    String identifier = this.getIdentifierFromToken(heading.identifierToken);
         TypeDescriptor returnTypeDescriptor = heading.returnTypeDescriptor;

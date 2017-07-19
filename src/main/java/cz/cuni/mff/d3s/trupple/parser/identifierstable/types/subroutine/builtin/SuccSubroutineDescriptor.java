@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin
 
 import cz.cuni.mff.d3s.trupple.language.nodes.builtin.ordinal.SuccBuiltinNodeGen;
 import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
-import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
+import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.GenericEnumTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;

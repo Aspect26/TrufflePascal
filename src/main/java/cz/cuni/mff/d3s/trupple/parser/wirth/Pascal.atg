@@ -700,7 +700,7 @@ Expression<out ExpressionNode expression>
 LogicTerm<out expression>
 {
     "or"                                        (. Token op = t; .)
-    LogicTerm<out ExpressionNode right>         (. expression = factory.createBinaryExpression(op, expression, right); .)
+    LogicTerm<out ExpressionNode right>         (. expression = factory.createBinaryExpression(op.val, expression, right); .)
 }
 .
 
@@ -710,7 +710,7 @@ LogicTerm<out ExpressionNode expression>
 SignedLogicFactor<out expression>
 {
     "and"                                       (. Token op = t; .)
-    SignedLogicFactor<out ExpressionNode right> (. expression = factory.createBinaryExpression(op, expression, right); .)
+    SignedLogicFactor<out ExpressionNode right> (. expression = factory.createBinaryExpression(op.val, expression, right); .)
 }
 .
 
@@ -733,7 +733,7 @@ Arithmetic<out expression>
 [
     (">" | ">=" | "<" | "<=" | "=" | "<>" | "in")
                                                 (. Token op = t; .)
-    Arithmetic<out ExpressionNode right>        (. expression = factory.createBinaryExpression(op, expression, right); .)
+    Arithmetic<out ExpressionNode right>        (. expression = factory.createBinaryExpression(op.val, expression, right); .)
 ]
 .
 
@@ -743,7 +743,7 @@ Arithmetic<out ExpressionNode expression>
 Term<out expression>
 {
     ( "+" | "-" )                               (. Token op = t; .)
-    Term<out ExpressionNode right>              (. expression = factory.createBinaryExpression(op, expression, right); .)
+    Term<out ExpressionNode right>              (. expression = factory.createBinaryExpression(op.val, expression, right); .)
 }
 .
 
@@ -753,7 +753,7 @@ Term<out ExpressionNode expression>
 SignedFactor<out expression>
 {
     ( "*" | "/" | "div" | "mod")                (. Token op = t; .)
-    SignedFactor<out ExpressionNode right>      (. expression = factory.createBinaryExpression(op, expression, right); .)
+    SignedFactor<out ExpressionNode right>      (. expression = factory.createBinaryExpression(op.val, expression, right); .)
 }
 .
 

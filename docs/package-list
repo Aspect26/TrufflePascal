@@ -48,4 +48,5 @@ cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive
 cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine
 cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin
 cz.cuni.mff.d3s.trupple.parser.tp
+cz.cuni.mff.d3s.trupple.parser.utils
 cz.cuni.mff.d3s.trupple.parser.wirth

@@ -1,6 +1,8 @@
-package cz.cuni.mff.d3s.trupple.parser;
+package cz.cuni.mff.d3s.trupple.parser.utils;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
+import cz.cuni.mff.d3s.trupple.parser.NodeFactory;
+import cz.cuni.mff.d3s.trupple.parser.Token;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,13 +16,13 @@ public class AssignmentData {
 
     public Type type;
 
-    ExpressionNode targetNode;
+    public ExpressionNode targetNode;
 
     private ExpressionNode nextTargetNode;
 
-    Token targetIdentifier;
+    public Token targetIdentifier;
 
-    ExpressionNode arrayIndexNode;
+    public ExpressionNode arrayIndexNode;
 
     public void setSimple(NodeFactory factory, Token identifierToken) {
         this.targetIdentifier = identifierToken;

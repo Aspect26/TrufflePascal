@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
-import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
+import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
 

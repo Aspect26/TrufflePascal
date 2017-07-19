@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.trupple.parser;
+package cz.cuni.mff.d3s.trupple.parser.utils;
 
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;

@@ -1,5 +1,6 @@
-package cz.cuni.mff.d3s.trupple.parser;
+package cz.cuni.mff.d3s.trupple.parser.utils;
 
+import cz.cuni.mff.d3s.trupple.parser.Token;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
 
 import java.util.List;

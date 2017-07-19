@@ -4,7 +4,7 @@ import com.oracle.truffle.api.frame.FrameDescriptor;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.statement.StatementNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.ProcedurePascalRootNode;
-import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
+import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.BuiltinNotSupportedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ProcedureDescriptor;
