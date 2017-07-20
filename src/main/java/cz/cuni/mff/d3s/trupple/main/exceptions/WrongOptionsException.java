@@ -5,11 +5,16 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import java.io.ByteArrayOutputStream;
 
-public class WrongOptionsException extends CompilerException {
+/**
+ * This exception is thrown when the interpreter is executed with wrong arguments or options. It provides the user an
+ * informative help message about arguments and options.
+ */
+public class WrongOptionsException extends Exception {
+
+    private String message;
 
     public WrongOptionsException(CmdLineException exception, CmdLineParser argsParser) {
-        super(ExitCodesEnum.EXIT_CODE_WRONG_OPTIONS);
-
+        super("");
         this.message = exception.getMessage() + String.format("%n");
         this.message += "java -jar Trupple.jar [options...] sourcefile%n";
 
@@ -18,4 +23,10 @@ public class WrongOptionsException extends CompilerException {
 
         this.message += baos.toString();
     }
+
+    @Override
+    public String getMessage() {
+        return this.message;
+    }
+
 }

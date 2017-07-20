@@ -1,7 +1,12 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.customvalues;
 
+import com.oracle.truffle.api.CompilerDirectives;
 import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.IndexOutOfBoundsException;
 
+/**
+ * Representation of variables of PChar type. It is a slight wrapper to Java's {@link String}.
+ */
+@CompilerDirectives.ValueType
 public class PCharValue implements PascalArray {
 
     private String data;
@@ -58,6 +63,12 @@ public class PCharValue implements PascalArray {
         }
     }
 
+    /**
+     * Creates and returns a new PChar string which is created by concatenation of two PChar strings.
+     * @param left the left argument of the concatenation operation
+     * @param right the right argument of the concatenation operation
+     * @return the PChar string
+     */
     public static PCharValue concat(PCharValue left, PCharValue right) {
         StringBuilder newData = new StringBuilder();
         newData.append(left.data);

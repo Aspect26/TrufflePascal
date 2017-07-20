@@ -11,6 +11,8 @@ import cz.cuni.mff.d3s.trupple.parser.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.utils.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -535,7 +537,7 @@ public class Parser implements IParser {
 		Expect(32);
 		Expect(1);
 		Token identifierToken = t; 
-		List<FormalParameter> formalParameters = new ArrayList<>(); 
+		List<FormalParameter> formalParameters = new ArrayList<>();
 		if (la.kind == 6) {
 			formalParameters = FormalParameterList();
 		}
@@ -830,7 +832,7 @@ public class Parser implements IParser {
 
 	StatementNode  Assignment(Token identifierToken) {
 		StatementNode  assignment;
-		AssignmentData assignmentData; assignment = null; 
+		AssignmentData assignmentData; assignment = null;
 		if (isReturnVariable(identifierToken)) {
 			Expect(35);
 			ExpressionNode value = Expression();
@@ -851,7 +853,7 @@ public class Parser implements IParser {
 			Get();
 			Token op = t; 
 			ExpressionNode right = LogicTerm();
-			expression = factory.createBinaryExpression(op, expression, right); 
+			expression = factory.createBinaryExpression(op.val, expression, right); 
 		}
 		return expression;
 	}
@@ -928,7 +930,7 @@ public class Parser implements IParser {
 			Get();
 			Token op = t; 
 			ExpressionNode right = SignedLogicFactor();
-			expression = factory.createBinaryExpression(op, expression, right); 
+			expression = factory.createBinaryExpression(op.val, expression, right); 
 		}
 		return expression;
 	}
@@ -983,7 +985,7 @@ public class Parser implements IParser {
 			}
 			Token op = t; 
 			ExpressionNode right = Arithmetic();
-			expression = factory.createBinaryExpression(op, expression, right); 
+			expression = factory.createBinaryExpression(op.val, expression, right); 
 		}
 		return expression;
 	}
@@ -999,7 +1001,7 @@ public class Parser implements IParser {
 			}
 			Token op = t; 
 			ExpressionNode right = Term();
-			expression = factory.createBinaryExpression(op, expression, right); 
+			expression = factory.createBinaryExpression(op.val, expression, right); 
 		}
 		return expression;
 	}
@@ -1019,7 +1021,7 @@ public class Parser implements IParser {
 			}
 			Token op = t; 
 			ExpressionNode right = SignedFactor();
-			expression = factory.createBinaryExpression(op, expression, right); 
+			expression = factory.createBinaryExpression(op.val, expression, right); 
 		}
 		return expression;
 	}

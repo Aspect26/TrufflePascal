@@ -1,12 +1,12 @@
 package cz.cuni.mff.d3s.trupple.parser;
 
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.IdentifiersTable;
-
-public class RecordLexicalScope extends LexicalScope {
+/**
+ * Specified lexical scope for records. Not really useful in its current state.
+ */
+class RecordLexicalScope extends LexicalScope {
 
     RecordLexicalScope(LexicalScope outer) {
         super(outer, "_record", false);
-        // this.localIdentifiers = new IdentifiersTable();
     }
 
 }

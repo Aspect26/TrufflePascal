@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.trupple.language.runtime.heap;
 
-import cz.cuni.mff.d3s.trupple.parser.exceptions.OutOfMemoryException;
-import cz.cuni.mff.d3s.trupple.parser.exceptions.SegmentationFaultException;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.OutOfMemoryException;
+import cz.cuni.mff.d3s.trupple.language.runtime.exceptions.SegmentationFaultException;
 
 import java.util.*;
 

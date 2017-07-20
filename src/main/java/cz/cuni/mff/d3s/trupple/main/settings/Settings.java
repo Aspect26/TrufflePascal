@@ -9,6 +9,9 @@ import org.kohsuke.args4j.spi.StringOptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class containing definitions of Trupple's arguments and options using args4j library.
+ */
 public class Settings {
 
     @Option(name="-I", handler=StringArrayOptionHandler.class, usage="specifies directories, where unit files are located")
@@ -27,6 +30,9 @@ public class Settings {
         this.includeDirectories.add("./builtinunits");
     }
 
+    /**
+     * Gets value of required source path arguments.
+     */
     public String getSourcePath() {
         if (this.arguments.size() == 0) {
             throw new IllegalArgumentException("No source file specified.");
@@ -36,15 +42,25 @@ public class Settings {
         return this.arguments.get(0);
     }
 
+    /**
+     * Checks whether the option for setting Turbo Pascal's extensions was set.
+     */
     public boolean usesTPExtension() {
         return StandardOptionHandler.isTurbo(this.standard);
     }
 
+    /**
+     * Checks whether the option for setting extended goto support was set.
+     */
     public boolean usesExtendedGoto() {
         return this.extendedGotoSupport;
     }
 
+    /**
+     * Gets the value of include directories option.
+     */
     public List<String> getIncludeDirectories() {
         return this.includeDirectories;
     }
+
 }

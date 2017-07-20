@@ -7,6 +7,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Representation of Turbo Pascal's graph mode. It contains a {@link PascalGraphFrame}, which is a GUI windows into which
+ * all the graphic content is drawn.
+ */
 public class PascalGraphMode {
 
     private static PascalGraphFrame frame;
@@ -42,10 +46,16 @@ public class PascalGraphMode {
         frame.putGeometry(pixel);
     }
 
+    /**
+     * Checks whether a key was pressed and not processed already.
+     */
     public static boolean keyPressed() {
         return frameOpened && frame.keyPressed();
     }
 
+    /**
+     * Reads key from the key buffer,
+     */
     public static char readKey() {
         if (!frameOpened) {
             return '\0';

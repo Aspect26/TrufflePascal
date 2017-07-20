@@ -26,9 +26,14 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConsta
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.OrdinalConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.ReturnTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.SubroutineDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 
 import java.util.*;
 
+/**
+ * This class represents currently parsed lexical scope. It is a slight wrapper of {@link IdentifiersTable} with some
+ * extended functionality. Lexical scope of pascal are scopes of subroutines.
+ */
 public class LexicalScope {
 
     private String name;
@@ -37,6 +42,12 @@ public class LexicalScope {
     IdentifiersTable localIdentifiers;
     final List<StatementNode> scopeInitializationNodes = new ArrayList<>();
 
+    /**
+     * Default constructor.
+     * @param outer instance of outer lexical scope
+     * @param name name of the current lexical scope
+     * @param usingTPExtension a flag whether support for Turbo Pascal extensions is turned on
+     */
     LexicalScope(LexicalScope outer, String name, boolean usingTPExtension) {
         this.name = name;
         this.outer = outer;
@@ -106,6 +117,14 @@ public class LexicalScope {
         this.localIdentifiers.addType(identifier, typeDescriptor);
     }
 
+    /**
+     * Checks whether subroutine with the specified identifier in current scope receives reference passed variable as
+     * argument at specified index.
+     * @param identifier identifier of the subroutine
+     * @param parameterIndex index of the subroutine's formal parameter
+     * @throws LexicalException if the received identifier does not represent a subroutine or the specified index is
+     * invalid for the subroutine
+     */
     boolean isReferenceParameter(String identifier, int parameterIndex) throws LexicalException {
         TypeDescriptor subroutineDescriptor = this.localIdentifiers.getIdentifierDescriptor(identifier);
         if (!(subroutineDescriptor instanceof SubroutineDescriptor)) {
@@ -116,6 +135,14 @@ public class LexicalScope {
         return descriptor.isReferenceParameter(parameterIndex);
     }
 
+    /**
+     * Checks whether subroutine with the specified identifier in current scope receives a subroutine as argument at
+     * specified index.
+     * @param identifier identifier of the subroutine
+     * @param parameterIndex index of the subroutine's formal parameter
+     * @throws LexicalException if the received identifier does not represent a subroutine or the specified index is
+     * invalid for the subroutine
+     */
     boolean isSubroutineParameter(String identifier, int parameterIndex) throws LexicalException {
         TypeDescriptor subroutineDescriptor = this.localIdentifiers.getIdentifierDescriptor(identifier);
         if (!(subroutineDescriptor instanceof SubroutineDescriptor)) {
@@ -146,6 +173,9 @@ public class LexicalScope {
         return this.containsLocalIdentifier(identifier);
     }
 
+    /**
+     * Checks whether current lexical scope contains return variable with the specified identifier.
+     */
     boolean containsReturnType(String identifier, boolean onlyPublic) {
         return this.localIdentifiers.containsIdentifier(identifier) &&
                 (this.localIdentifiers.getIdentifierDescriptor(identifier) instanceof ReturnTypeDescriptor) &&
@@ -160,6 +190,11 @@ public class LexicalScope {
         this.localIdentifiers.addVariable(identifier, typeDescriptor);
     }
 
+    /**
+     * Adds initialization scope for this lexical scope. These nodes are prepended to the main block's tree of the
+     * subroutine this scope represents. They are required to initialize values of each local variable of the scope.
+     * @param initializationNode the new initialization node
+     */
     void addScopeInitializationNode(StatementNode initializationNode) {
         this.scopeInitializationNodes.add(initializationNode);
     }
@@ -192,6 +227,13 @@ public class LexicalScope {
         return this.localIdentifiers.createSetType(baseType);
     }
 
+    /**
+     * Pascal allows to declare a pointer to a type that is declared after the pointer's declaration. In these cases, we
+     * create a pointer type with unspecified inner type but with the identifier of the type to be declared later. After
+     * the whole types declaration statement is parsed, this function is called and sets the correct inner type
+     * descriptors for each of these pointer types.
+     * @throws LexicalException if the inner type was not declared
+     */
     void initializeAllUninitializedPointerDescriptors() throws LexicalException {
         this.localIdentifiers.initializeAllUninitializedPointerDescriptors();
     }
@@ -248,6 +290,9 @@ public class LexicalScope {
         return new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(1));
     }
 
+    /**
+     * Creates a {@link BlockNode} containing each initialization node of the current scope and returns it.
+     */
     BlockNode createInitializationBlock() {
         List<StatementNode> initializationNodes = this.generateInitializationNodes(null);
         initializationNodes.addAll(this.scopeInitializationNodes);
@@ -255,6 +300,10 @@ public class LexicalScope {
         return new BlockNode(initializationNodes.toArray(new StatementNode[initializationNodes.size()]));
     }
 
+    /**
+     * Generates initialization node for each declared identifier in the current scope and returns list of these nodes.
+     * @param frame frame of the scope (used in scopes of units)
+     */
     List<StatementNode> generateInitializationNodes(VirtualFrame frame)  {
         List<StatementNode> initializationNodes = new ArrayList<>();
 
@@ -281,6 +330,13 @@ public class LexicalScope {
         return InitializationNodeFactory.create(frameSlot, typeDescriptor.getDefaultValue(), frame);
     }
 
+    /**
+     * Returns true if the parser is currently inside a loop in the currently parsed source.
+     */
+    boolean isInLoop() {
+        return loopDepth > 0;
+    }
+
     void increaseLoopDepth() {
         ++loopDepth;
     }
@@ -293,7 +349,4 @@ public class LexicalScope {
         }
     }
 
-    boolean isInLoop() {
-        return loopDepth > 0;
-    }
 }

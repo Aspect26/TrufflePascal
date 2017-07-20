@@ -7,6 +7,9 @@ import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
 
+/**
+ * Custom option handler for the <i>std</i> option.
+ */
 public class StandardOptionHandler extends OptionHandler<String> {
 
     private static final String STANDARD_WIRTH = "wirth";
@@ -35,4 +38,5 @@ public class StandardOptionHandler extends OptionHandler<String> {
     public static boolean isTurbo(String value) {
         return value != null && value.equals(STANDARD_TP);
     }
+
 }

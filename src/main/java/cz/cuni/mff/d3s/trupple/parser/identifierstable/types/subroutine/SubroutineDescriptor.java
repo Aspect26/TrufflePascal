@@ -7,9 +7,9 @@ import com.oracle.truffle.api.nodes.RootNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.ExpressionNode;
 import cz.cuni.mff.d3s.trupple.language.nodes.root.PascalRootNode;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PascalSubroutine;
-import cz.cuni.mff.d3s.trupple.parser.FormalParameter;
+import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.ArgumentTypeMismatchException;
-import cz.cuni.mff.d3s.trupple.parser.exceptions.IncorectNumberOfArgumentsProvidedException;
+import cz.cuni.mff.d3s.trupple.parser.exceptions.IncorrectNumberOfArgumentsProvidedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
@@ -70,7 +70,7 @@ public abstract class SubroutineDescriptor implements TypeDescriptor {
 
     public void verifyArguments(List<ExpressionNode> passedArguments) throws LexicalException {
         if (passedArguments.size() != this.formalParameters.size()) {
-            throw new IncorectNumberOfArgumentsProvidedException(this.formalParameters.size(), passedArguments.size());
+            throw new IncorrectNumberOfArgumentsProvidedException(this.formalParameters.size(), passedArguments.size());
         } else {
             for (int i = 0; i < this.formalParameters.size(); ++i) {
                 if (!this.formalParameters.get(i).type.equals(passedArguments.get(i).getType()) &&

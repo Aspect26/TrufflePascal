@@ -12,6 +12,9 @@ import java.io.PrintStream;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/**
+ * Representation of textfile-type variables.
+ */
 public class TextFileValue implements FileValue {
 
     private Scanner input;

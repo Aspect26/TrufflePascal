@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Specialized {@link LexicalScope} for units. It differentiates between public and private identifiers.
+ */
 public class UnitLexicalScope extends LexicalScope {
 
     private final Set<String> publicIdentifiers;
