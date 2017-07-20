@@ -20,13 +20,13 @@ public class TicTacToeMain {
      */
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
-            System.err.print("Expected one argument");
+            System.err.println("Expected one argument");
             return;
         }
 
         File sourceFile = new File(args[0]);
         if (!sourceFile.exists()) {
-            System.err.print("Could not find " + args[0]);
+            System.err.println("Could not find " + args[0]);
             return;
         }
 
