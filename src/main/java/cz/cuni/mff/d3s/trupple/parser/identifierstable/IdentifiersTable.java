@@ -15,7 +15,7 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeTypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.ConstantDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.label.LabelDescriptor;
+import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.LabelDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.*;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.*;
@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This is a storage for all identifiers encountered during the parsing phase.
+ */
 public class IdentifiersTable {
 
     /** Map of all identifiers: e.g.: variable names, function names, types names, ... */
@@ -177,6 +180,13 @@ public class IdentifiersTable {
         this.typeDescriptors.put(identifier, typeDescriptor);
     }
 
+    /**
+     * Pascal allows to declare a pointer to a type that is declared after the pointer's declaration. In these cases, we
+     * create a pointer type with unspecified inner type but with the identifier of the type to be declared later. After
+     * the whole types declaration statement is parsed, this function is called and sets the correct inner type
+     * descriptors for each of these pointer types.
+     * @throws LexicalException if the inner type was not declared
+     */
     public void initializeAllUninitializedPointerDescriptors() throws LexicalException {
         for (Map.Entry<String, TypeDescriptor> typeEntry : this.typeDescriptors.entrySet()) {
             TypeDescriptor type = typeEntry.getValue();

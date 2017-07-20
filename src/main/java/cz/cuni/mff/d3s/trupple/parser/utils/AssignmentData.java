@@ -7,7 +7,13 @@ import cz.cuni.mff.d3s.trupple.parser.Token;
 import java.util.Collections;
 import java.util.List;
 
-// TODO: rozdelit na viacero tried ...
+/**
+ * Structure holding information about currently parsed assignment statement. It holds its type (whether it is assignment
+ * to a variable, array, record, etc.), node that represents the target expression ({@link cz.cuni.mff.d3s.trupple.language.nodes.variables.read.ReadLocalVariableNode},
+ * {@link cz.cuni.mff.d3s.trupple.language.nodes.variables.read.ReadFromArrayNode}, {@link cz.cuni.mff.d3s.trupple.language.nodes.variables.read.ReadFromRecordNode},
+ * etc.) and the previous target node (we have to actually use this node to create the assignment node because of the
+ * definition of the assignment nodes).
+ */
 public class AssignmentData {
 
     public enum Type {

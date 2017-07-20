@@ -6,6 +6,10 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.Function
 
 import java.util.List;
 
+/**
+ * Structure defining a function signature. It contains function's identifier's token (from parser), list of its
+ * formal parameters, return type descriptor and the function's descriptor.
+ */
 public class FunctionHeading {
 
     public final Token identifierToken;

@@ -5,6 +5,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 
+/**
+ * Type descriptor for Pascal's <i>odd</i> built-in subroutine.
+ */
 public class OddSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public OddSubroutineDescriptor() {

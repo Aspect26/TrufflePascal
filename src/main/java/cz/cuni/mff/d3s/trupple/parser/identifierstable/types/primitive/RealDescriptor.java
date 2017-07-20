@@ -4,6 +4,9 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.RealConstantDescriptor;
 
+/**
+ * Type descriptor representing the real type.
+ */
 public class RealDescriptor implements PrimitiveDescriptor {
 
     private static RealDescriptor instance = new RealDescriptor();

@@ -9,11 +9,20 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDesc
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Type descriptor for the enum <i>types</i>. It contains additional information about the values it contains and the
+ * type's default value.
+ */
 public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
 
     private final List<String> identifiers;
+    // TODO: this is a bit useless overgeneralization since it is always the first declared value
     private final String defaultValue;
 
+    /**
+     * The default constructor.
+     * @param identifiers list of identifiers of the enum type's values as they appear in a Pascal source
+     */
     public EnumTypeDescriptor(List<String> identifiers) {
         this.identifiers = identifiers;
         this.defaultValue = identifiers.get(0);
@@ -53,6 +62,9 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
         return this.identifiers;
     }
 
+    /**
+     * Gets the next enum value of the specified value.
+     */
     public EnumValue getNext(String value) {
         int index = this.identifiers.indexOf(value);
         if (index == this.identifiers.size() - 1) {
@@ -62,6 +74,9 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
         return new EnumValue(this, this.identifiers.get(++index));
     }
 
+    /**
+     * Gets the previous enum value of the specified value.
+     */
     public EnumValue getPrevious(String value) {
         int index = this.identifiers.indexOf(value);
         if (index == 0) {
@@ -71,6 +86,9 @@ public class EnumTypeDescriptor implements OrdinalDescriptor, Serializable {
         return new EnumValue(this, this.identifiers.get(--index));
     }
 
+    /**
+     * Gets the ordinal value of the specified enum value (by its identifier as it appears in a Pascal source).
+     */
     public long getOrdinalValue(String value) {
         return this.identifiers.indexOf(value);
     }

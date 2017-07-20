@@ -3,6 +3,10 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex;
 import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
+/**
+ * Type descriptor for the reference passed variables. It contains additional information about the type of the variable
+ * inside the reference.
+ */
 public class ReferenceDescriptor implements TypeDescriptor {
 
     private final TypeDescriptor typeOfReferenceDescriptor;

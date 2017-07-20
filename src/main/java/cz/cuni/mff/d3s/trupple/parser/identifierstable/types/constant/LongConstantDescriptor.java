@@ -5,10 +5,16 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
+/**
+ * Type descriptor for a long-type constant. It also contains the constant's value.
+ */
 public class LongConstantDescriptor implements OrdinalConstantDescriptor {
 
     private final long value;
 
+    /**
+     * The default descriptor containing value of the constant.
+     */
     public LongConstantDescriptor(long value) {
         this.value = value;
     }

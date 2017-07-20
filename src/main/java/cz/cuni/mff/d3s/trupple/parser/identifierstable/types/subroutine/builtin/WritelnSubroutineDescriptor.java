@@ -9,6 +9,9 @@ import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Type descriptor for Pascal's <i>writeln</i> built-in subroutine.
+ */
 public class WritelnSubroutineDescriptor extends BuiltinProcedureDescriptor.NoReferenceParameterBuiltin {
 
     public WritelnSubroutineDescriptor() {

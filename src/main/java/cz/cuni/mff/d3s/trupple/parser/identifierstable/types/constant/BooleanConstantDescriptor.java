@@ -6,10 +6,16 @@ import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 
+/**
+ * Type descriptor for a boolean-type constant. It also contains the constant's value.
+ */
 public class BooleanConstantDescriptor implements OrdinalConstantDescriptor {
 
     private final boolean value;
 
+    /**
+     * The default descriptor containing value of the constant.
+     */
     public BooleanConstantDescriptor(boolean value) {
         this.value = value;
     }

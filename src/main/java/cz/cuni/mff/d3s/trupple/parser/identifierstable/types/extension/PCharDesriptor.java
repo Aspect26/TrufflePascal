@@ -7,6 +7,9 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 
+/**
+ * Type descriptor for Turbo Pascal's PChar type.
+ */
 public class PCharDesriptor extends ArrayDescriptor {
 
     private static PCharDesriptor instance = new PCharDesriptor();

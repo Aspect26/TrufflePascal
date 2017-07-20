@@ -7,6 +7,9 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescri
 
 import java.util.ArrayList;
 
+/**
+ * Type descriptor for Turbo Pascal's <i>halt</i> built-in subroutine.
+ */
 public class HaltSubroutineDescriptor extends BuiltinProcedureDescriptor {
 
     public HaltSubroutineDescriptor() {

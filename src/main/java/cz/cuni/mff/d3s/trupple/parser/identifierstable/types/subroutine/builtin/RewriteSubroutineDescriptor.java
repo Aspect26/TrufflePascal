@@ -5,7 +5,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.FileDescriptor;
 
-
+/**
+ * Type descriptor for Pascal's <i>rewrite</i> built-in subroutine.
+ */
 public class RewriteSubroutineDescriptor extends BuiltinProcedureDescriptor.OneArgumentBuiltin {
 
     public RewriteSubroutineDescriptor() {

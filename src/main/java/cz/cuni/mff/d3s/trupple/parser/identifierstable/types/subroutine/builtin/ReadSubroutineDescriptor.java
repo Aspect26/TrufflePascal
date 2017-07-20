@@ -8,6 +8,9 @@ import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Type descriptor for Pascal's <i>read</i> built-in subroutine.
+ */
 public class ReadSubroutineDescriptor extends BuiltinProcedureDescriptor.FullReferenceParameterBuiltin {
 
     public ReadSubroutineDescriptor() {

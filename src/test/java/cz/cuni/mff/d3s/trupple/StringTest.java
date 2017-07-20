@@ -21,7 +21,7 @@ public class StringTest extends JUnitTest {
 
     @Test
     public void stringDoubleQuotes3Test() {
-        test("program main; begin write('''So it begin.'''); end.", "'So it begin.'");
+        test("program main; begin write('''Who cares if one more light goes out'''); end.", "'Who cares if one more light goes out'");
     }
 
     @Test

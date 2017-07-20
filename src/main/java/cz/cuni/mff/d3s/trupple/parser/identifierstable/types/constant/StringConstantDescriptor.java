@@ -10,10 +10,16 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound.ArrayDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDescriptor;
 
+/**
+ * Type descriptor for a real-type constant. It also contains the constant's value.
+ */
 public class StringConstantDescriptor extends ArrayDescriptor implements ConstantDescriptor {
 
     private final PascalString value;
 
+    /**
+     * The default descriptor containing value of the constant.
+     */
     public StringConstantDescriptor(String value) {
         super(new OrdinalDescriptor.RangeDescriptor(new LongConstantDescriptor(0), new LongConstantDescriptor(Integer.MAX_VALUE)), CharDescriptor.getInstance());
         this.value = new PascalString(value);
