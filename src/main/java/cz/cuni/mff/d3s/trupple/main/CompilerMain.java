@@ -44,7 +44,7 @@ public class CompilerMain {
             }
             engine.eval(source).execute();
         } catch (RuntimeException e) {
-            System.err.print(e.getMessage().split(":")[1]);
+            System.err.println(e.getMessage().split(":")[1]);
         }
         engine.dispose();
     }
