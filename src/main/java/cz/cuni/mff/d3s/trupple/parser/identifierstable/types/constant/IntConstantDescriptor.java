@@ -1,16 +1,20 @@
 package cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
-import cz.cuni.mff.d3s.trupple.parser.exceptions.CantBeNegatedException;
 import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
-import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.BooleanDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
 
+/**
+ * Type descriptor for a integer-type constant. It also contains the constant's value.
+ */
 public class IntConstantDescriptor implements OrdinalConstantDescriptor {
 
     private final int value;
 
+    /**
+     * The default descriptor containing value of the constant.
+     */
     public IntConstantDescriptor(int value) {
         this.value = value;
     }

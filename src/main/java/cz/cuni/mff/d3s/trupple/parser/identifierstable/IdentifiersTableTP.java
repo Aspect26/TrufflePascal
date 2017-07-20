@@ -8,6 +8,10 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.RandomSubroutineDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin.RandomizeSubroutineDescriptor;
 
+/**
+ * Extension of the {@link IdentifiersTable} by identifiers that are exclusive for Turbo Pascal and are supported by
+ * Trupple.
+ */
 public class IdentifiersTableTP extends IdentifiersTable {
 
     @Override

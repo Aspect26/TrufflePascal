@@ -7,6 +7,9 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.IntConstan
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.RealConstantDescriptor;
 
+/**
+ * Type descriptor representing the integer type.
+ */
 public class IntDescriptor implements OrdinalDescriptor, PrimitiveDescriptor {
 
     private static IntDescriptor instance = new IntDescriptor();

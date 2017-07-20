@@ -5,6 +5,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 
+/**
+ * Type descriptor for Turbo Pascal's <i>random</i> built-in subroutine.
+ */
 public class RandomSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public RandomSubroutineDescriptor() {

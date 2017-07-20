@@ -6,6 +6,9 @@ import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
+/**
+ * Type descriptor for Pascal's <i>sqr</i> built-in subroutine.
+ */
 public class SqrSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public SqrSubroutineDescriptor() {

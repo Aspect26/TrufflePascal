@@ -6,10 +6,16 @@ import cz.cuni.mff.d3s.trupple.parser.exceptions.LexicalException;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 
+/**
+ * Type descriptor for a char-type constant. It also contains the constant's value.
+ */
 public class CharConstantDescriptor implements OrdinalConstantDescriptor {
 
     private final char value;
 
+    /**
+     * The default descriptor containing value of the constant.
+     */
     public CharConstantDescriptor(char value) {
         this.value = value;
     }

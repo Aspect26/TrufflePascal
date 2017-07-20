@@ -9,8 +9,14 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescr
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.IntDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.LongDescriptor;
 
+/**
+ * Type descriptor for Pascal's <i>pred</i> built-in subroutine.
+ */
 public class PredSubroutineDescriptor extends OverloadedFunctionDescriptor {
 
+    /**
+     * The default constructor which automatically registers the supported overloads of this subroutine.
+     */
     public PredSubroutineDescriptor() {
         this.addOverLoad(new BuiltinFunctionDescriptor.OrdinalArgumentBuiltin(
                 PredBuiltinNodeGen.create(new ReadArgumentNode(0, IntDescriptor.getInstance())),

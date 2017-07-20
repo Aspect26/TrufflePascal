@@ -6,6 +6,9 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.OrdinalDesc
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.CharConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.StringConstantDescriptor;
 
+/**
+ * Type descriptor representing the char type.
+ */
 public class CharDescriptor implements PrimitiveDescriptor, OrdinalDescriptor {
 
     private static CharDescriptor instance = new CharDescriptor();

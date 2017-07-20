@@ -43,7 +43,6 @@ cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex
 cz.cuni.mff.d3s.trupple.parser.identifierstable.types.compound
 cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant
 cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension
-cz.cuni.mff.d3s.trupple.parser.identifierstable.types.label
 cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive
 cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine
 cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.builtin

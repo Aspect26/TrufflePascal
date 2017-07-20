@@ -5,6 +5,10 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.Procedur
 
 import java.util.List;
 
+/**
+ * Structure defining a procedure signature. It contains procedure's identifier's token (from parser), list of its
+ * formal parameters and the procedure's descriptor.
+ */
 public class ProcedureHeading {
 
     public final Token identifierToken;

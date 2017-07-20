@@ -9,6 +9,9 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.FileDescrip
 
 import java.util.List;
 
+/**
+ * Type descriptor for Pascal's <i>eof</i> built-in subroutine.
+ */
 public class EofSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public EofSubroutineDescriptor() {

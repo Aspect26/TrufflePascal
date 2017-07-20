@@ -8,20 +8,36 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.subroutine.Subrouti
 import java.util.ArrayList;
 import java.util.List;
 
-// NOTE: Pascal does not allow defining overloaded subroutines, only some builtin functions are overloaded
+/**
+ * Type descriptor for Pascal's built-in functions that are overloaded.
+ */
 public class OverloadedFunctionDescriptor extends BuiltinFunctionDescriptor {
 
+    /**
+     * List of overloads represented by subroutine descriptors.
+     */
     private List<SubroutineDescriptor> overloads;
 
+    /**
+     * The default constructor. It creates an empty descriptor with no overloads.
+     */
     OverloadedFunctionDescriptor() {
         super();
         this.overloads = new ArrayList<>();
     }
 
+    /**
+     * Adds new overload to the list of overloads.
+     * @param subroutineDescriptor representation of the overload
+     */
     void addOverLoad(SubroutineDescriptor subroutineDescriptor) {
         this.overloads.add(subroutineDescriptor);
     }
 
+
+    /**
+     * Gets overload matching the specified list of parameter expressions from the registered overload in this descriptor.
+     */
     @Override
     public SubroutineDescriptor getOverload(List<ExpressionNode> actualParameters) throws LexicalException {
         for (SubroutineDescriptor descriptor : this.overloads) {
@@ -30,15 +46,22 @@ public class OverloadedFunctionDescriptor extends BuiltinFunctionDescriptor {
             }
         }
 
-        // TODO: create custom exception for this
         throw new LexicalException("Not existing overload for this subroutine");
     }
 
+    /**
+     * There are only a few built-in functions in Pascal that are overloaded and they typically do not take arguments
+     * passed as reference.
+     */
     @Override
     public boolean isReferenceParameter(int index) {
         return false;
     }
 
+    /**
+     * There are only a few built-in functions in Pascal that are overloaded and they typically do not take
+     * subroutine-type arguments.
+     */
     @Override
     public boolean isSubroutineParameter(int index) {
         return false;

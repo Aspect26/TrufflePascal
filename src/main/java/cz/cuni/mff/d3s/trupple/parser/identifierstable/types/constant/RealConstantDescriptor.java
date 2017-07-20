@@ -4,10 +4,16 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.RealDescriptor;
 
+/**
+ * Type descriptor for a real-type constant. It also contains the constant's value.
+ */
 public class RealConstantDescriptor implements ConstantDescriptor {
 
     private final double value;
 
+    /**
+     * The default descriptor containing value of the constant.
+     */
     public RealConstantDescriptor(double value) {
         this.value = value;
     }

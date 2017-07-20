@@ -20,8 +20,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Base type descriptor for type descriptors for Pascal's built-in functions. It additionally to {@link FunctionDescriptor}
+ * sets the function's root node in its constructor.
+ */
 public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
 
+    /**
+     * The default constructor.
+     * @param bodyNode body node of the function
+     * @param parameters list of formal parameters of the function
+     */
     BuiltinFunctionDescriptor(ExpressionNode bodyNode, List<FormalParameter> parameters) {
         super(parameters, bodyNode.getType());
         this.setRootNode(new FunctionPascalRootNode(new FrameDescriptor(), bodyNode));
@@ -36,8 +45,16 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
         return false;
     }
 
+    /**
+     * Specialized built-in function type descriptor for functions with single argument.
+     */
     public static class OneArgumentBuiltin extends BuiltinFunctionDescriptor {
 
+        /**
+         * The default constructor.
+         * @param bodyNode the body node of the function
+         * @param parameter the single function's formal parameter
+         */
         public OneArgumentBuiltin(ExpressionNode bodyNode, FormalParameter parameter) {
             super(bodyNode, Collections.singletonList(parameter));
         }
@@ -49,8 +66,16 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
 
     }
 
+    /**
+     * Specialized built-in function type descriptor for functions with single ordinal-type argument.
+     */
     public static class OrdinalArgumentBuiltin extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
+        /**
+         * The default constructor.
+         * @param bodyNode the body node of the function
+         * @param parameter the single ordinal-type formal parameter
+         */
         OrdinalArgumentBuiltin(ExpressionNode bodyNode, FormalParameter parameter) {
             super(bodyNode, parameter);
         }
@@ -70,8 +95,15 @@ public abstract class BuiltinFunctionDescriptor extends FunctionDescriptor {
         }
     }
 
+    /**
+     * Specialized built-in function type descriptor for functions with zero arguments.
+     */
     public static class NoArgumentBuiltin extends BuiltinFunctionDescriptor {
 
+        /**
+         * The default constructor.
+         * @param bodyNode the body node of the function
+         */
         public NoArgumentBuiltin(ExpressionNode bodyNode) {
             super(bodyNode, Collections.emptyList());
         }

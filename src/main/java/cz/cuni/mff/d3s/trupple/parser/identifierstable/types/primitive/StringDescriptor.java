@@ -9,6 +9,9 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.LongConsta
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.constant.StringConstantDescriptor;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.extension.PCharDesriptor;
 
+/**
+ * Type descriptor representing the string type.
+ */
 public class StringDescriptor extends ArrayDescriptor implements PrimitiveDescriptor {
 
     private static StringDescriptor instance = new StringDescriptor();

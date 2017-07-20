@@ -4,17 +4,29 @@ import com.oracle.truffle.api.frame.FrameSlotKind;
 import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.PointerValue;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
+/**
+ * Type descriptor for pointers. It contains additional information about the type it points to.
+ */
 public class PointerDescriptor implements TypeDescriptor {
 
     private TypeDescriptor innerType;
     private String innerTypeIdentifier;
     private boolean innerTypeInitialized;
 
+    /**
+     * Default constructor.
+     * @param innerType type of the values it can point to
+     */
     public PointerDescriptor(TypeDescriptor innerType) {
         this.innerType = innerType;
         this.innerTypeInitialized = true;
     }
 
+    /**
+     * Constructor used for the pointers to "forwarded types". These types has to be resolved when the parsing of the
+     * current type statement is finished.
+     * @param innerTypeIdentifier identifier of the forwarded type
+     */
     public PointerDescriptor(String innerTypeIdentifier) {
         this.innerTypeIdentifier = innerTypeIdentifier;
         this.innerTypeInitialized = false;

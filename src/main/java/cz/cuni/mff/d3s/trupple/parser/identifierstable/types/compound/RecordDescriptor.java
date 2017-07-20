@@ -5,11 +5,17 @@ import cz.cuni.mff.d3s.trupple.language.runtime.customvalues.RecordValue;
 import cz.cuni.mff.d3s.trupple.parser.LexicalScope;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.TypeDescriptor;
 
-
+/**
+ * Type descriptor for Pascal's records types. It contains additional information about the variables it contains.
+ */
 public class RecordDescriptor implements TypeDescriptor {
 
     private final LexicalScope innerScope;
 
+    /**
+     * The default descriptor.
+     * @param innerScope lexical scope containing the identifiers of the variables this record contains
+     */
     public RecordDescriptor(LexicalScope innerScope) {
         this.innerScope = innerScope;
     }

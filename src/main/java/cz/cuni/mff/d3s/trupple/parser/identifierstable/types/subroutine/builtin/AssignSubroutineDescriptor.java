@@ -8,6 +8,9 @@ import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.StringDes
 
 import java.util.ArrayList;
 
+/**
+ * Type descriptor for Turbo Pascal's <i>assign</i> built-in subroutine.
+ */
 public class AssignSubroutineDescriptor extends BuiltinProcedureDescriptor {
 
     public AssignSubroutineDescriptor() {

@@ -6,6 +6,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadAllArgumentsNode;
 import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.complex.TextFileDescriptor;
 
+/**
+ * Type descriptor for Pascal's <i>eoln</i> built-in subroutine.
+ */
 public class EolnSubroutineDescriptor extends BuiltinFunctionDescriptor.OneArgumentBuiltin {
 
     public EolnSubroutineDescriptor() {

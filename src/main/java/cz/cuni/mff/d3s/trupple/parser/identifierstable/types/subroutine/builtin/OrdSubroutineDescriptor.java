@@ -5,6 +5,9 @@ import cz.cuni.mff.d3s.trupple.language.nodes.call.ReadArgumentNode;
 import cz.cuni.mff.d3s.trupple.parser.utils.FormalParameter;
 import cz.cuni.mff.d3s.trupple.parser.identifierstable.types.primitive.CharDescriptor;
 
+/**
+ * Type descriptor for Pascal's <i>ord</i> built-in subroutine.
+ */
 public class OrdSubroutineDescriptor extends BuiltinFunctionDescriptor.OrdinalArgumentBuiltin {
 
     public OrdSubroutineDescriptor() {

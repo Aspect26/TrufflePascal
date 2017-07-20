@@ -2,6 +2,9 @@ package cz.cuni.mff.d3s.trupple.parser.identifierstable.types;
 
 import com.oracle.truffle.api.frame.FrameSlotKind;
 
+/**
+ * Type descriptor for identifiers of types. It contains descriptor of the type it specifies.
+ */
 // TODO: do we need this?
 public class TypeTypeDescriptor implements TypeDescriptor {
 
